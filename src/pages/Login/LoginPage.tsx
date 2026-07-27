@@ -6,7 +6,8 @@ import { Label } from "../../components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../../components/ui/card"
 import { ROUTES } from "../../shared/constants/routes"
 import { useLogin } from "../../features/auth/hooks/useAuth"
-import { Chrome } from "lucide-react"
+import { GoogleSignInButton } from "../../features/auth/components/GoogleSignInButton"
+import { showError, showSuccess } from "@/shared/hooks/useToast"
 
 export function LoginPage() {
     const [email, setEmail] = useState("")
@@ -19,14 +20,15 @@ export function LoginPage() {
         login.mutate(
             { email, password },
             {
-                onSuccess: () => navigate(ROUTES.DASHBOARD),
+                onSuccess: () => {
+                    showSuccess("Welcome back!", "You have been signed in successfully.")
+                    navigate(ROUTES.DASHBOARD)
+                },
+                onError: (err) => {
+                    showError("Sign in failed", err)
+                },
             },
         )
-    }
-
-    const handleGoogleLogin = () => {
-        // Redirect to backend Google OAuth endpoint
-        window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/v1/auth/google`
     }
 
     return (
@@ -73,15 +75,7 @@ export function LoginPage() {
                             <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
                         </div>
                     </div>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={handleGoogleLogin}
-                    >
-                        <Chrome className="mr-2 h-4 w-4" />
-                        Sign in with Google
-                    </Button>
+                    <GoogleSignInButton />
                     <p className="text-center text-sm text-muted-foreground">
                         Don't have an account?{" "}
                         <Link to={ROUTES.SIGNUP} className="font-medium text-primary hover:underline">

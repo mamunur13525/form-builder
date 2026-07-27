@@ -39,6 +39,23 @@ export interface FormSettings {
     collectIP: boolean
 }
 
+export type FieldType =
+    | "shortText"
+    | "longText"
+    | "email"
+    | "phone"
+    | "number"
+    | "date"
+    | "time"
+    | "radio"
+    | "checkbox"
+    | "select"
+    | "multiSelect"
+    | "file"
+    | "rating"
+    | "yesNo"
+    | "url"
+
 export interface FormField {
     _id?: string
     formId?: string
@@ -46,7 +63,7 @@ export interface FormField {
     label: string
     helperText: string
     placeholder: string
-    type: string
+    type: FieldType
     required: boolean
     order: number
     options: Option[]

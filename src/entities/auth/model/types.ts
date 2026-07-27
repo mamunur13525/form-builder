@@ -13,7 +13,7 @@ export interface AuthUser {
     avatarUrl: string
 }
 
-/** Response for register / login / refresh-token. */
+/** Response for register / login / refresh-token / google-auth. */
 export interface AuthResponse {
     user: AuthUser
     tokens: AuthTokens
@@ -28,6 +28,10 @@ export interface RegisterRequest {
 export interface LoginRequest {
     email: string
     password: string
+}
+
+export interface GoogleLoginRequest {
+    idToken: string
 }
 
 export interface ForgotPasswordRequest {

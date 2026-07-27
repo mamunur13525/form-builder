@@ -5,7 +5,7 @@ import { useState } from "react"
 
 export function MainLayout({ children }: { children: ReactNode }) {
     const location = useLocation()
-    const [sidebarOpen, setSidebarOpen] = useState(true)
+    const [sidebarOpen] = useState(true)
     const isDashboard = location.pathname === "/dashboard"
 
     return (

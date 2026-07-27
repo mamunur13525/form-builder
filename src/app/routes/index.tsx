@@ -4,6 +4,7 @@ import { MainLayout } from "../layouts/MainLayout"
 import { AuthLayout } from "../layouts/AuthLayout"
 import { HomePage } from "../../pages/Home"
 import { LoginPage } from "../../pages/Login"
+import { SignupPage } from "../../pages/Signup"
 import { DashboardPage } from "../../pages/Dashboard"
 import { FormBuilderPage } from "../../pages/FormBuilder"
 import { FormPreviewPage } from "../../pages/FormPreview"
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
                 element: <PublicLayout />,
                 children: [
                     { path: "/login", element: <LoginPage /> },
+                    { path: "/signup", element: <SignupPage /> },
                 ],
             },
             {

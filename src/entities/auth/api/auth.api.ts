@@ -8,6 +8,7 @@ import type {
     AuthResponse,
     ChangePasswordRequest,
     ForgotPasswordRequest,
+    GoogleLoginRequest,
     LoginRequest,
     RegisterRequest,
     ResetPasswordRequest,
@@ -75,6 +76,14 @@ export async function verifyEmail(token: string): Promise<void> {
 /** GET /auth/me — retrieve the current authenticated user's profile. */
 export async function getCurrentUser(): Promise<User> {
     return apiRequest<User>("/auth/me")
+}
+
+/** POST /auth/google — sign up or sign in with Google using a Google ID token. */
+export async function googleAuth(data: GoogleLoginRequest): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>("/auth/google", {
+        method: "POST",
+        body: JSON.stringify(data),
+    })
 }
 
 /** PATCH /auth/change-password — change the current user's password. */

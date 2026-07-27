@@ -6,4 +6,5 @@ export const ROUTES = {
     FORM_PREVIEW: "/form-preview/:id",
     FORM_RESPONSE: "/form-response/:id",
     FORM_FILL: "/form/:slug",
+    SIGNUP: "/signup",
 } as const

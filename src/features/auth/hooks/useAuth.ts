@@ -7,11 +7,12 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { tokenStorage } from "@/shared/utils/storage"
-import type { AuthResponse, LoginRequest, RegisterRequest } from "@/entities/auth/model/types"
+import type { AuthResponse, LoginRequest, RegisterRequest, GoogleLoginRequest } from "@/entities/auth/model/types"
 import {
     changePassword,
     forgotPassword,
     getCurrentUser,
+    googleAuth,
     loginUser,
     logoutUser,
     registerUser,
@@ -100,6 +101,19 @@ export function useResetPassword() {
 export function useVerifyEmail() {
     return useMutation({
         mutationFn: (token: string) => verifyEmail(token),
+    })
+}
+
+/** POST /auth/google — sign up or sign in with Google using a Google ID token. */
+export function useGoogleAuth() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (data: GoogleLoginRequest) => googleAuth(data),
+        onSuccess: (data: AuthResponse) => {
+            tokenStorage.setTokens(data.tokens.accessToken, data.tokens.refreshToken)
+            queryClient.setQueryData(AUTH_QUERY_KEY, data.user)
+        },
     })
 }
 

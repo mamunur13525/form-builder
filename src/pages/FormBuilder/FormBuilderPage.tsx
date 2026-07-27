@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import {
     Plus,
@@ -34,8 +34,6 @@ import {
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
-import { Textarea } from "../../components/ui/textarea"
-import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
 import {
     Select,
@@ -72,9 +70,12 @@ import {
     useSortable,
 } from "@dnd-kit/sortable"
 import { useFormStore } from "../../app/store/formStore"
-import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS } from "../../shared/constants/form-types"
-import type { Form, FormField } from "../../shared/types/common"
+import { FIELD_TYPE_LABELS } from "../../shared/constants/form-types"
+import type { FormField } from "../../shared/types/common"
 import type { LucideIcon } from "lucide-react"
+import { updateForm } from "../../entities/form/api/form.api"
+import { updateField, createField, deleteField } from "../../entities/form/api/field.api"
+import { useDebounce } from "../../shared/hooks/useDebounce"
 
 const PAGE_TYPE_ICONS: Record<string, LucideIcon> = {
     shortText: Type,
@@ -118,7 +119,6 @@ interface SortablePageItemProps {
     page: FormField
     index: number
     isSelected: boolean
-    selectedPageIndex: number
     onSelect: (index: number) => void
     onDuplicate: (index: number) => void
     onDelete: (index: number) => void
@@ -128,7 +128,6 @@ function SortablePageItem({
     page,
     index,
     isSelected,
-    selectedPageIndex,
     onSelect,
     onDuplicate,
     onDelete,
@@ -195,17 +194,19 @@ export function FormBuilderPage() {
     const { id } = useParams()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
-    const { forms, fetchForms, updateForm, publishForm, isLoading } = useFormStore()
+    const { forms, fetchForms, publishForm, isLoading } = useFormStore()
 
     const existingForm = id && id !== "new" ? forms.find((f) => f._id === id) : null
 
     const [title, setTitle] = useState(existingForm?.title || searchParams.get("title") || "")
-    const [description, setDescription] = useState(existingForm?.description || searchParams.get("desc") || "")
+    const description = existingForm?.description || searchParams.get("desc") || ""
     const [pages, setPages] = useState<FormField[]>(existingForm?.fields || [])
     const [selectedPageIndex, setSelectedPageIndex] = useState(0)
     const [addPageDialogOpen, setAddPageDialogOpen] = useState(false)
     const [publishDialogOpen, setPublishDialogOpen] = useState(false)
     const [isPublished, setIsPublished] = useState(existingForm?.status === "published")
+    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
+    const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     useEffect(() => {
         if (forms.length === 0) {
@@ -214,6 +215,7 @@ export function FormBuilderPage() {
     }, [forms.length, fetchForms])
 
     const selectedPage = pages[selectedPageIndex]
+    const selectedPageIndexValue = selectedPageIndex
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -222,51 +224,178 @@ export function FormBuilderPage() {
         })
     )
 
-    const addPage = (type: string) => {
+    // Show save status message
+    const showSaveStatus = useCallback((status: "saving" | "saved" | "error") => {
+        setSaveStatus(status)
+        if (saveStatusTimeoutRef.current) {
+            clearTimeout(saveStatusTimeoutRef.current)
+        }
+        saveStatusTimeoutRef.current = setTimeout(() => {
+            setSaveStatus("idle")
+        }, 2000)
+    }, [])
+
+    // Auto-save form metadata (title, description)
+    const autoSaveForm = useCallback(async () => {
+        if (!id || id === "new" || !existingForm) return
+
+        try {
+            setSaveStatus("saving")
+            await updateForm(id, { title, description })
+            showSaveStatus("saved")
+        } catch (error) {
+            console.error("Failed to auto-save form:", error)
+            showSaveStatus("error")
+        }
+    }, [id, title, description, existingForm, showSaveStatus])
+
+    const debouncedAutoSaveForm = useDebounce(autoSaveForm, 1000)
+
+    // Auto-save individual field
+    const autoSaveField = useCallback(async (field: FormField) => {
+        if (!id || id === "new" || !field._id) return
+
+        try {
+            setSaveStatus("saving")
+            await updateField(id, field._id, {
+                label: field.label,
+                helperText: field.helperText,
+                placeholder: field.placeholder,
+                required: field.required,
+                options: field.options,
+                validation: field.validation,
+                appearance: { width: field.appearance.width, icon: field.appearance.icon || "" },
+            })
+            showSaveStatus("saved")
+        } catch (error) {
+            console.error("Failed to auto-save field:", error)
+            showSaveStatus("error")
+        }
+    }, [id, showSaveStatus])
+
+    const debouncedAutoSaveField = useDebounce(autoSaveField, 1000)
+
+    // Create new field on server
+    const createFieldOnServer = useCallback(async (field: FormField): Promise<string | null> => {
+        if (!id || id === "new") return null
+
+        try {
+            setSaveStatus("saving")
+            const created = await createField(id, {
+                type: field.type,
+                label: field.label,
+                helperText: field.helperText,
+                placeholder: field.placeholder,
+                required: field.required,
+                options: field.options,
+                validation: field.validation,
+                appearance: { width: field.appearance.width, icon: field.appearance.icon || "" },
+            })
+            showSaveStatus("saved")
+            return created.id
+        } catch (error) {
+            console.error("Failed to create field:", error)
+            showSaveStatus("error")
+            return null
+        }
+    }, [id, showSaveStatus])
+
+    // Delete field from server
+    const deleteFieldFromServer = useCallback(async (fieldId: string) => {
+        if (!id || id === "new") return
+
+        try {
+            setSaveStatus("saving")
+            await deleteField(id, fieldId)
+            showSaveStatus("saved")
+        } catch (error) {
+            console.error("Failed to delete field:", error)
+            showSaveStatus("error")
+        }
+    }, [id, showSaveStatus])
+
+    const addPage = async (type: FormField["type"]) => {
+        const tempId = `temp_${Date.now()}`
         const newPage: FormField = {
+            _id: tempId,
+            formId: id || "",
             fieldKey: `page_${Date.now()}`,
             label: "New Question",
             helperText: "",
             placeholder: "",
-            type,
+            type: type,
             required: false,
             order: pages.length + 1,
             options: type === "radio" || type === "checkbox" || type === "select" || type === "multiSelect"
                 ? [{ label: "Option 1", value: "option_1" }]
                 : [],
             logic: [],
-            appearance: { width: "full" },
+            appearance: { width: "full", icon: "" },
             isActive: true,
         }
         setPages([...pages, newPage])
         setSelectedPageIndex(pages.length)
         setAddPageDialogOpen(false)
+
+        // Create field on server if editing existing form
+        if (id && id !== "new") {
+            const serverId = await createFieldOnServer(newPage)
+            if (serverId) {
+                setPages(prev => prev.map(p => p.fieldKey === newPage.fieldKey ? { ...p, _id: serverId } : p))
+            }
+        }
     }
 
     const updatePage = (index: number, updates: Partial<FormField>) => {
         const updated = [...pages]
         updated[index] = { ...updated[index], ...updates }
         setPages(updated)
+
+        // Auto-save the field if it has been persisted to server
+        const field = updated[index]
+        if (field._id && id && id !== "new") {
+            debouncedAutoSaveField(field)
+        }
     }
 
-    const duplicatePage = (index: number) => {
+    const duplicatePage = async (index: number) => {
         const page = pages[index]
         const newPage: FormField = {
             ...page,
+            _id: undefined,
+            formId: id || "",
             fieldKey: `page_${Date.now()}`,
             label: page.label + " (copy)",
             order: pages.length + 1,
+            appearance: { width: page.appearance.width, icon: page.appearance.icon || "" },
         }
         const updated = [...pages]
         updated.splice(index + 1, 0, newPage)
         setPages(updated)
+
+        // Create field on server if editing existing form
+        if (id && id !== "new") {
+            const serverId = await createFieldOnServer(newPage)
+            if (serverId) {
+                setPages(prev => prev.map(p => p.fieldKey === newPage.fieldKey ? { ...p, _id: serverId } : p))
+            }
+        }
     }
 
-    const removePage = (index: number) => {
+    const removePage = async (index: number) => {
         if (pages.length <= 1) return
-        setPages(pages.filter((_, i) => i !== index))
-        if (selectedPageIndex >= pages.length - 1) {
-            setSelectedPageIndex(Math.max(0, pages.length - 2))
+
+        const pageToRemove = pages[index]
+        const updatedPages = pages.filter((_, i) => i !== index)
+        setPages(updatedPages)
+
+        if (selectedPageIndex >= updatedPages.length) {
+            setSelectedPageIndex(Math.max(0, updatedPages.length - 1))
+        }
+
+        // Delete field from server if it was persisted
+        if (pageToRemove._id && id && id !== "new") {
+            await deleteFieldFromServer(pageToRemove._id)
         }
     }
 
@@ -279,7 +408,9 @@ export function FormBuilderPage() {
                 const updated = [...pages]
                 const [moved] = updated.splice(oldIndex, 1)
                 updated.splice(newIndex, 0, moved)
-                setPages(updated)
+                // Update order property
+                const reordered = updated.map((page, idx) => ({ ...page, order: idx + 1 }))
+                setPages(reordered)
             }
         }
     }
@@ -287,13 +418,16 @@ export function FormBuilderPage() {
     const handleSave = async () => {
         if (!id || id === "new") return
 
-        const form = forms.find((f) => f._id === id)
-        if (form) {
+        try {
+            setSaveStatus("saving")
             await updateForm(id, {
                 title,
                 description,
-                fields: pages,
             })
+            showSaveStatus("saved")
+        } catch (error) {
+            console.error("Failed to save form:", error)
+            showSaveStatus("error")
         }
     }
 
@@ -304,6 +438,13 @@ export function FormBuilderPage() {
     }
 
     const PageIcon = selectedPage ? (PAGE_TYPE_ICONS[selectedPage.type] || FileText) : FileText
+
+    // Auto-save form metadata when title or description changes
+    useEffect(() => {
+        if (id && id !== "new" && existingForm) {
+            debouncedAutoSaveForm()
+        }
+    }, [title, description, id, existingForm, debouncedAutoSaveForm])
 
     return (
         <div className="h-[calc(100vh-3.5rem)] flex flex-col">
@@ -342,6 +483,13 @@ export function FormBuilderPage() {
                         <Save className="mr-2 h-4 w-4" />
                         {isLoading ? "Saving..." : "Save"}
                     </Button>
+                    {saveStatus !== "idle" && (
+                        <span className={`text-xs ${saveStatus === "saving" ? "text-yellow-600" : saveStatus === "saved" ? "text-green-600" : "text-red-600"}`}>
+                            {saveStatus === "saving" && "Saving..."}
+                            {saveStatus === "saved" && "✓ Saved"}
+                            {saveStatus === "error" && "✗ Error"}
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -365,8 +513,7 @@ export function FormBuilderPage() {
                                             key={page.fieldKey}
                                             page={page}
                                             index={index}
-                                            isSelected={index === selectedPageIndex}
-                                            selectedPageIndex={selectedPageIndex}
+                                            isSelected={index === selectedPageIndexValue}
                                             onSelect={setSelectedPageIndex}
                                             onDuplicate={duplicatePage}
                                             onDelete={removePage}
@@ -564,8 +711,7 @@ export function FormBuilderPage() {
                                     <Label className="text-xs">Field Type</Label>
                                     <Select
                                         value={selectedPage.type}
-                                        onValueChange={(value) => updatePage(selectedPageIndex, { type: value })}
-
+                                        onValueChange={(value) => updatePage(selectedPageIndex, { type: value as FormField["type"] })}
                                     >
                                         <SelectTrigger className={'w-full'}>
                                             <SelectValue placeholder="Select field type" />
@@ -799,7 +945,7 @@ export function FormBuilderPage() {
                         return (
                             <button
                                 key={pt.type}
-                                onClick={() => addPage(pt.type)}
+                                onClick={() => addPage(pt.type as FormField["type"])}
                                 className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent hover:border-primary/50 transition-all text-left"
                             >
                                 <Icon className="h-5 w-5 text-muted-foreground shrink-0" />

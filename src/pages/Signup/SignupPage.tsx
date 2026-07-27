@@ -6,7 +6,8 @@ import { Label } from "../../components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../../components/ui/card"
 import { ROUTES } from "../../shared/constants/routes"
 import { useRegister } from "../../features/auth/hooks/useAuth"
-import { Chrome } from "lucide-react"
+import { GoogleSignInButton } from "../../features/auth/components/GoogleSignInButton"
+import { showError, showSuccess } from "@/shared/hooks/useToast"
 
 export function SignupPage() {
     const [name, setName] = useState("")
@@ -19,19 +20,21 @@ export function SignupPage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         if (password !== confirmPassword) {
+            showError("Validation", new Error("Passwords do not match. Please make sure both passwords are the same."))
             return
         }
         register.mutate(
             { name, email, password },
             {
-                onSuccess: () => navigate(ROUTES.DASHBOARD),
+                onSuccess: () => {
+                    showSuccess("Account created!", "Your account has been created successfully. Welcome aboard!")
+                    navigate(ROUTES.DASHBOARD)
+                },
+                onError: (err) => {
+                    showError("Sign up failed", err)
+                },
             },
         )
-    }
-
-    const handleGoogleLogin = () => {
-        // Redirect to backend Google OAuth endpoint
-        window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/v1/auth/google`
     }
 
     const passwordsMatch = password === confirmPassword || confirmPassword === ""
@@ -108,15 +111,7 @@ export function SignupPage() {
                             <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
                         </div>
                     </div>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={handleGoogleLogin}
-                    >
-                        <Chrome className="mr-2 h-4 w-4" />
-                        Sign up with Google
-                    </Button>
+                    <GoogleSignInButton />
                     <p className="text-center text-sm text-muted-foreground">
                         Already have an account?{" "}
                         <Link to={ROUTES.LOGIN} className="font-medium text-primary hover:underline">

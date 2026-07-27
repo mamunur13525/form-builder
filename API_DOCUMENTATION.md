@@ -2258,3 +2258,36 @@ interface Workspace {
 | 429 | Too Many Requests |
 | 500 | Internal Server Error |</arg_value>
 </write_to_file>
+
+
+``
+
+### POST /auth/google
+Sign up or sign in with Google using a Google ID token.
+
+**Request Body:**
+```json
+{
+  "idToken": "google-id-token-here"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Google signup successful",
+  "data": {
+    "user": {
+      "id": "65f1a2b3c4d5e6f7a8b9c0d1",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "viewer",
+      "avatarUrl": "https://lh3.googleusercontent.com/a-/photo.jpg"
+    },
+    "tokens": {
+      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
+  }
+}

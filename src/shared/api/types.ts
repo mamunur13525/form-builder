@@ -22,13 +22,18 @@ export interface ApiErrorResponse {
  * Carries HTTP status, backend message, and optional field-level errors.
  */
 export class ApiError extends Error {
+    public status: number
+    public errors?: string[]
+
     constructor(
         message: string,
-        public status: number,
-        public errors?: string[],
+        status: number,
+        errors?: string[],
     ) {
         super(message)
         this.name = "ApiError"
+        this.status = status
+        this.errors = errors
     }
 
     /** Convenience: is this a 401 Unauthorized error? */

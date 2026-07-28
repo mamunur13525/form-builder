@@ -12,19 +12,19 @@ import {
 } from "../../components/ui/table"
 import { motion } from "motion/react"
 import { useForm } from "../../features/forms/hooks/useForms"
-import { useFields } from "../../features/forms/hooks/useFormFields"
 import { useResponses } from "../../features/forms/hooks/useFormResponses"
 import { adaptApiForm, adaptApiResponse } from "../../features/forms/model/adapters"
+import type { Form as CommonForm } from "../../shared/types/common"
 
 export function FormResponsePage() {
     const { id } = useParams()
     const navigate = useNavigate()
 
     const { data: apiForm, isLoading: formLoading } = useForm(id || "")
-    const { data: apiFields = [] } = useFields(id || "")
+    console.log("form response page. ")
     const { data: apiResponses = [], isLoading: responsesLoading } = useResponses(id || "")
 
-    const form = apiForm ? adaptApiForm(apiForm, apiFields) : null
+    const form: CommonForm | null = apiForm ? adaptApiForm(apiForm) : null
     const formResponses = apiResponses.map(adaptApiResponse)
     const isLoading = formLoading || responsesLoading
 
@@ -76,7 +76,7 @@ export function FormResponsePage() {
                             <Button
                                 variant="outline"
                                 className="mt-4"
-                                onClick={() => navigate(`/form-preview/${form._id}`)}
+                                onClick={() => navigate(`/form-preview/${form.id}`)}
                             >
                                 Share Form
                             </Button>

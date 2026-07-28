@@ -64,7 +64,24 @@ async function request<T>(
         body,
     })
 
-    return response
+    // Parse JSON from response
+    const data: ApiResponse<T> = await response.json()
+
+    // HTTP-level error (non-2xx)
+    if (!response.ok) {
+        throw new ApiError(
+            data.message || response.statusText,
+            response.status,
+            data.errors,
+        )
+    }
+
+    // Application-level error (success === false)
+    if (!data.success) {
+        throw new ApiError(data.message || "Application error", response.status, data.errors)
+    }
+
+    return data.data as T
 }
 
 /**
@@ -75,10 +92,10 @@ async function request<T>(
 async function fetchWithRetry(
     url: string,
     options: RequestInit,
-): Promise<any> {
-    const attempt = await fetchOnce(url, options)
+): Promise<Response> {
+    const response = await fetchOnce(url, options)
 
-    if (attempt.status === 401) {
+    if (response.status === 401) {
         // Try to refresh the token
         const refreshed = await tryRefreshToken()
         if (refreshed) {
@@ -92,14 +109,14 @@ async function fetchWithRetry(
         }
     }
 
-    return attempt
+    return response
 }
 
 /**
  * Single fetch attempt — parses the response envelope and either
  * returns the typed data or throws an `ApiError`.
  */
-async function fetchOnce(url: string, options: RequestInit): Promise<any> {
+async function fetchOnce(url: string, options: RequestInit): Promise<Response> {
     let response: Response
     try {
         response = await fetch(url, options)
@@ -107,9 +124,11 @@ async function fetchOnce(url: string, options: RequestInit): Promise<any> {
         throw new ApiError("Network error — please check your connection", 0)
     }
 
+    // Clone the response before reading the body so the original stream
+    // is preserved for the caller (e.g. `request()` on line 68).
     let body: ApiResponse<unknown>
     try {
-        body = await response.json()
+        body = await response.clone().json()
     } catch {
         // Response wasn't JSON — treat as a raw HTTP error
         throw new ApiError(
@@ -132,7 +151,7 @@ async function fetchOnce(url: string, options: RequestInit): Promise<any> {
         throw new ApiError(body.message || "Application error", response.status, body.errors)
     }
 
-    return body.data
+    return response
 }
 
 /**

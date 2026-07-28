@@ -1,6 +1,16 @@
+/**
+ * Form Store - Zustand store that wraps the entity API layer.
+ * This store is being phased out in favor of TanStack Query hooks.
+ * New components should use the hooks in src/features/hooks/ directly.
+ */
+
 import { create } from "zustand"
-import { mockForms, mockResponses } from "../../shared/utils/mockData"
-import type { Form, FormResponse } from "../../shared/types/common"
+import { getForms, createForm as apiCreateForm, updateForm as apiUpdateForm, deleteForm as apiDeleteForm, publishForm as apiPublishForm } from "@/entities/form/api/form.api"
+import { getResponses } from "@/entities/response/api/response.api"
+import { submitPublicForm } from "@/entities/response/api/public-form.api"
+import type { Form as ApiForm } from "@/entities/form/model/types"
+import type { Form, FormResponse } from "@/shared/types/common"
+import { adaptApiForm, adaptApiResponse } from "@/features/forms/model/adapters"
 
 interface FormState {
     forms: Form[]
@@ -31,9 +41,14 @@ export const useFormStore = create<FormState>((set, get) => ({
 
     fetchForms: async () => {
         set({ isLoading: true, error: null })
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        set({ forms: mockForms, isLoading: false })
+        try {
+            const apiForms: ApiForm[] = await getForms()
+            // Fields are now embedded in the form response
+            const adaptedForms: Form[] = apiForms.map(adaptApiForm)
+            set({ forms: adaptedForms, isLoading: false })
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to fetch forms", isLoading: false })
+        }
     },
 
     getFormById: (id: string) => {
@@ -46,68 +61,86 @@ export const useFormStore = create<FormState>((set, get) => ({
 
     createForm: async (formData) => {
         set({ isLoading: true, error: null })
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 800))
+        try {
+            const created = await apiCreateForm({
+                title: formData.title,
+                description: formData.description,
+            })
 
-        const newForm: Form = {
-            ...formData,
-            _id: `form_${Date.now()}`,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            const newForm: Form = adaptApiForm(created)
+
+            set((state) => ({
+                forms: [...state.forms, newForm],
+                isLoading: false,
+            }))
+
+            return newForm
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to create form", isLoading: false })
+            throw err
         }
-
-        set((state) => ({
-            forms: [...state.forms, newForm],
-            isLoading: false,
-        }))
-
-        return newForm
     },
 
     updateForm: async (id: string, updates: Partial<Form>) => {
         set({ isLoading: true, error: null })
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 600))
+        try {
+            await apiUpdateForm(id, {
+                title: updates.title,
+                description: updates.description,
+            })
 
-        set((state) => ({
-            forms: state.forms.map((f) =>
-                f._id === id ? { ...f, ...updates, updatedAt: new Date().toISOString() } : f
-            ),
-            isLoading: false,
-        }))
+            set((state) => ({
+                forms: state.forms.map((f) =>
+                    f._id === id ? { ...f, ...updates, updatedAt: new Date().toISOString() } : f
+                ),
+                isLoading: false,
+            }))
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to update form", isLoading: false })
+        }
     },
 
     deleteForm: async (id: string) => {
         set({ isLoading: true, error: null })
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        try {
+            await apiDeleteForm(id)
 
-        set((state) => ({
-            forms: state.forms.filter((f) => f._id !== id),
-            isLoading: false,
-        }))
+            set((state) => ({
+                forms: state.forms.filter((f) => f._id !== id),
+                isLoading: false,
+            }))
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to delete form", isLoading: false })
+        }
     },
 
     publishForm: async (id: string) => {
         set({ isLoading: true, error: null })
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 700))
+        try {
+            const updated = await apiPublishForm(id)
 
-        set((state) => ({
-            forms: state.forms.map((f) =>
-                f._id === id ? { ...f, status: "published", updatedAt: new Date().toISOString() } : f
-            ),
-            isLoading: false,
-        }))
+            set((state) => ({
+                forms: state.forms.map((f) =>
+                    f._id === id
+                        ? { ...f, status: updated.status, updatedAt: new Date().toISOString() }
+                        : f
+                ),
+                isLoading: false,
+            }))
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to publish form", isLoading: false })
+        }
     },
 
     fetchResponses: async (formId: string) => {
         set({ isLoading: true, error: null })
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 400))
-
-        const formResponses = mockResponses.filter((r) => r.formId === formId)
-        set({ responses: formResponses, isLoading: false })
+        try {
+            const apiResponses = await getResponses(formId)
+            const adapted = apiResponses.map(adaptApiResponse)
+            set({ responses: adapted, isLoading: false })
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to fetch responses", isLoading: false })
+        }
     },
 
     getResponsesByFormId: (formId: string) => {
@@ -116,41 +149,50 @@ export const useFormStore = create<FormState>((set, get) => ({
 
     submitResponse: async (formId: string, answers: Record<string, unknown>) => {
         set({ isLoading: true, error: null })
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        try {
+            const form = get().forms.find((f) => f._id === formId)
+            if (!form) throw new Error("Form not found")
 
-        const form = get().forms.find((f) => f._id === formId)
-
-        const newResponse: FormResponse = {
-            _id: `response_${Date.now()}`,
-            formId,
-            respondentId: `user_${Date.now()}`,
-            sessionId: `session_${Date.now()}`,
-            answers: Object.entries(answers).map(([fieldKey, value]) => {
+            const answerList = Object.entries(answers).map(([fieldKey, value]) => {
                 const field = form?.fields.find((f) => f.fieldKey === fieldKey)
                 return {
                     fieldKey,
-                    value,
                     label: field?.label || "",
                     type: field?.type || "text",
+                    value,
                 }
-            }),
-            metadata: {
-                ipAddress: "127.0.0.1",
-                userAgent: navigator.userAgent,
-                referrer: document.referrer,
-                country: "Unknown",
-                city: "Unknown",
-            },
-            submittedAt: new Date().toISOString(),
+            })
+
+            const result = await submitPublicForm(form.slug, {
+                answers: answerList,
+                sessionId: `session_${Date.now()}`,
+            })
+
+            const newResponse: FormResponse = {
+                _id: result.submissionId,
+                formId,
+                sessionId: `session_${Date.now()}`,
+                answers: answerList,
+                metadata: {
+                    ipAddress: "",
+                    userAgent: navigator.userAgent,
+                    referrer: document.referrer,
+                    country: "",
+                    city: "",
+                },
+                submittedAt: new Date().toISOString(),
+            }
+
+            set((state) => ({
+                responses: [...state.responses, newResponse],
+                isLoading: false,
+            }))
+
+            return newResponse
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to submit response", isLoading: false })
+            throw err
         }
-
-        set((state) => ({
-            responses: [...state.responses, newResponse],
-            isLoading: false,
-        }))
-
-        return newResponse
     },
 }))
 

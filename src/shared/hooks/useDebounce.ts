@@ -5,6 +5,12 @@ export function useDebounce<T extends (...args: never[]) => void>(
     delay: number
 ): T {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const callbackRef = useRef(callback)
+
+    // Update the ref when callback changes
+    useEffect(() => {
+        callbackRef.current = callback
+    }, [callback])
 
     useEffect(() => {
         return () => {
@@ -20,10 +26,10 @@ export function useDebounce<T extends (...args: never[]) => void>(
                 clearTimeout(timeoutRef.current)
             }
             timeoutRef.current = setTimeout(() => {
-                callback(...args)
+                callbackRef.current(...args)
             }, delay)
         },
-        [callback, delay]
+        [delay]
     ) as T
 
     return debouncedCallback

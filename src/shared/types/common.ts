@@ -74,7 +74,7 @@ export interface FormField {
 }
 
 export interface Form {
-    _id?: string
+    id?: string
     title: string
     description: string
     slug: string

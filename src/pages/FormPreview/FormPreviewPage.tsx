@@ -3,14 +3,23 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Badge } from "../../components/ui/badge"
 import { FormView } from "../../shared/components/FormView"
-import { mockForms } from "../../shared/utils/mockData"
+import { useForm } from "../../features/forms/hooks/useForms"
+import { adaptApiForm } from "../../features/forms/model/adapters"
 
 export function FormPreviewPage() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const form = mockForms.find((f) => f._id === id)
+    const { data: apiForm, isLoading } = useForm(id || "")
+    console.log('form preveiw page.')
+    if (isLoading) {
+        return (
+            <div className="text-center py-20">
+                <p className="text-muted-foreground">Loading form...</p>
+            </div>
+        )
+    }
 
-    if (!form) {
+    if (!apiForm) {
         return (
             <div className="text-center py-20">
                 <h2 className="text-2xl font-bold">Form not found</h2>
@@ -21,10 +30,12 @@ export function FormPreviewPage() {
         )
     }
 
+    const form = adaptApiForm(apiForm)
+
     return (
         <div className="min-h-screen flex flex-col bg-muted/30">
             <div className="flex items-center justify-between p-4 border-b bg-background">
-                <Button variant="ghost" size="icon" onClick={() => navigate(`/form-builder/${form._id}`)}>
+                <Button variant="ghost" size="icon" onClick={() => navigate(`/form-builder/${form.id}`)}>
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <Badge variant="outline">Preview Mode</Badge>

@@ -15,6 +15,7 @@ export function DashboardPage() {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [newTitle, setNewTitle] = useState("")
     const [newDesc, setNewDesc] = useState("")
+    console.log('dashboard')
 
     const { data: forms = [], isLoading } = useForms()
     const createForm = useCreateForm()

@@ -25,6 +25,8 @@ export interface Form {
     theme: FormTheme
     settings: FormSettings
     createdBy: string
+    updatedBy?: string
+    fields: FormField[]
     createdAt: string
     updatedAt: string
 }
@@ -111,9 +113,9 @@ export interface FieldValidation {
 
 export interface FieldLogic {
     whenFieldKey?: string
-    operator?: string
-    value?: unknown
-    action?: string
+    operator?: "equals" | "notEquals" | "contains" | "greaterThan" | "lessThan"
+    value?: any
+    action?: "show" | "hide" | "goToField" | "goToEnd"
     targetFieldKey?: string
 }
 
@@ -123,7 +125,7 @@ export interface FieldAppearance {
 }
 
 export interface FormField {
-    id: string
+    _id: string
     formId: string
     fieldKey: string
     label: string

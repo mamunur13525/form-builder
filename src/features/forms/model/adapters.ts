@@ -10,10 +10,10 @@ import type { Form as ApiForm, FormField as ApiField } from "@/entities/form/mod
 import type { FormResponse as ApiResponse } from "@/entities/response/model/types"
 import type { Form, FormField, FormResponse as CommonFormResponse } from "@/shared/types/common"
 
-/** Convert an API Form + fields into the legacy Form type. */
-export function adaptApiForm(apiForm: ApiForm, fields: ApiField[] = []): Form {
+/** Convert an API Form into the legacy Form type. Fields are now embedded in the form. */
+export function adaptApiForm(apiForm: ApiForm): Form {
     return {
-        _id: apiForm.id,
+        id: apiForm.id,
         title: apiForm.title,
         description: apiForm.description,
         slug: apiForm.slug,
@@ -22,17 +22,17 @@ export function adaptApiForm(apiForm: ApiForm, fields: ApiField[] = []): Form {
         settings: apiForm.settings,
         createdBy: apiForm.createdBy,
         updatedBy: undefined,
-        fields: fields.map(adaptApiField),
+        fields: (apiForm.fields ?? []).map((a: any) => adaptApiField(a, apiForm.id)),
         createdAt: apiForm.createdAt,
         updatedAt: apiForm.updatedAt,
     }
 }
 
 /** Convert an API FormField into the legacy FormField type. */
-export function adaptApiField(apiField: ApiField): FormField {
+export function adaptApiField(apiField: ApiField, formId: string): FormField {
     return {
-        _id: apiField.id,
-        formId: apiField.formId,
+        _id: apiField._id,
+        formId: formId,
         fieldKey: apiField.fieldKey,
         label: apiField.label,
         helperText: apiField.helperText,

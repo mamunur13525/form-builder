@@ -1,10 +1,10 @@
-import { FileText, Paintbrush, GitBranch, Play, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { FileText } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS } from "@/shared/constants/form-types"
 import type { FormField } from "@/shared/types/common"
 import type { LucideIcon } from "lucide-react"
+
 import {
     ShortTextEditor,
     LongTextEditor,
@@ -45,6 +45,7 @@ const editorMap: Record<string, React.ComponentType<{ page: FormField; pageIndex
     checkbox: CheckboxEditor,
     select: SelectEditor,
     multiSelect: MultiSelectEditor,
+
 }
 
 export function PageContentEditor({
@@ -59,7 +60,10 @@ export function PageContentEditor({
         <div className="w-full h-3/4 flex flex-col">
             {/* Editor Content */}
             <div className="flex-1 overflow-y-auto p-6">
-                <div className="max-w-2xl mx-auto space-y-6">
+                <div
+                    className={`mx-auto space-y-6 transition-all duration-500 ease-in-out 
+                        }`}
+                >
                     <div className="flex items-center gap-2 mb-2">
                         <PageIcon className="h-5 w-5 text-muted-foreground" />
                         <Badge variant="secondary">
@@ -105,6 +109,5 @@ export function PageContentEditor({
                 </div>
             </div>
         </div>
-
     )
 }

@@ -43,6 +43,8 @@ export function FormBuilderPage() {
     const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const hasInitializedRef = useRef(false)
     const pendingFieldUpdateRef = useRef<{ fieldId: string; data: any } | null>(null)
+    const [isMobileView, setIsMobileView] = useState(false)
+
 
     const showSaveStatus = useCallback((status: "idle" | "saving" | "saved" | "error") => {
         setSaveStatus(status)
@@ -367,13 +369,15 @@ export function FormBuilderPage() {
                 <ResizableHandle className="w-3 bg-transparent after:hidden" />
 
                 <ResizablePanel defaultSize={700} minSize={300}>
-                    <div className="flex flex-col h-full gap-2">
-
+                    <div className="h-full w-full flex flex-col gap-3">
                         <PageContentTopbar
-                            onAddPage={() => setShowAddPageDialog(true)}
-                            onPreview={() => navigate(`/form-preview/${id || "new"}`)}
+                            onAddPage={() => { setShowAddPageDialog(true) }}
+                            onPreview={() => { }}
+                            isMobileView={isMobileView}
+                            onToggleView={() => setIsMobileView(prev => !prev)}
                         />
-                        <div className="w-full flex-1 h-full flex items-center overflow-y-auto p-6 bg-background border rounded-md shadow-sm">
+
+                        <div className={`w-full flex items-center justify-center flex-1 bg-background border rounded-md shadow-sm transition-all duration-500 ease-in-out ${isMobileView ? "max-w-sm mx-auto" : "max-w-full"}`}>
                             {selectedPage ? (
                                 <PageContentEditor
                                     page={selectedPage}
@@ -387,6 +391,7 @@ export function FormBuilderPage() {
                             )}
                         </div>
                     </div>
+
                 </ResizablePanel>
 
                 <ResizableHandle className="w-3 bg-transparent after:hidden" />
@@ -435,6 +440,6 @@ export function FormBuilderPage() {
                 onAddPage={addPage}
                 onShowSaveStatus={showSaveStatus}
             />
-        </div>
+        </div >
     )
 }

@@ -114,7 +114,7 @@ export function SortablePageItem({
       <div className="shrink-0 flex flex-col items-end gap-0.5">
         <div
           className={`
-            w-fit min-w-10 h-7 rounded-lg flex items-center justify-center
+            w-fit min-w-10 h-5 rounded-lg flex items-center justify-center
             bg-linear-to-br transition-all duration-200 gap-1 relative
             ${colorClass}
             ${isSelected ? "ring-1 ring-primary/20" : ""}
@@ -141,7 +141,7 @@ export function SortablePageItem({
       </div>
 
       {/* Label */}
-      <span className="flex-1 truncate min-w-0 text-[13px] font-medium leading-tight">
+      <span className="flex-1 truncate min-w-0 text-xs font-normal leading-tight">
         {page.label || (
           <span className="italic opacity-50">Untitled {page.type}</span>
         )}

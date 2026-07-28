@@ -45,7 +45,11 @@ export function FormBuilderSidebar({
     onShowSaveStatus: _onShowSaveStatus,
 }: FormBuilderSidebarProps) {
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            // Require a small movement before a drag starts,
+            // so plain clicks still select the page
+            activationConstraint: { distance: 6 },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -66,6 +70,27 @@ export function FormBuilderSidebar({
         [onDeletePage, pages.length]
     )
 
+    const movePage = useCallback((from: number, to: number) => {
+        if (to < 0 || to >= pages.length) return
+        const updated = [...pages]
+        const [moved] = updated.splice(from, 1)
+        updated.splice(to, 0, moved)
+        const reordered = updated.map((page, idx) => ({ ...page, order: idx + 1 }))
+        onSetPages(reordered)
+
+        // Select the moved page
+        onSelectPage(to)
+    }, [pages, onSetPages, onSelectPage])
+
+    const movePageUp = useCallback((index: number) => {
+        movePage(index, index - 1)
+    }, [movePage])
+
+    const movePageDown = useCallback((index: number) => {
+        movePage(index, index + 1)
+    }, [movePage])
+
+
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
             const { active, over } = event
@@ -73,25 +98,29 @@ export function FormBuilderSidebar({
                 const oldIndex = pages.findIndex((p) => p.fieldKey === active.id)
                 const newIndex = pages.findIndex((p) => p.fieldKey === over.id)
                 if (oldIndex !== -1 && newIndex !== -1) {
-                    const updated = [...pages]
-                    const [moved] = updated.splice(oldIndex, 1)
-                    updated.splice(newIndex, 0, moved)
-                    const reordered = updated.map((page, idx) => ({ ...page, order: idx + 1 }))
-                    onSetPages(reordered)
+                    movePage(oldIndex, newIndex)
                 }
             }
         },
-        [pages, onSetPages]
+        [pages, movePage]
     )
 
     return (
-        <div className="w-full h-full flex flex-col bg-background border rounded-xl shadow-sm overflow-hidden">
-            <div className="p-3 border-b">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+        <div className="w-full h-full flex flex-col bg-background border rounded-md shadow-sm overflow-hidden">
+            <div className="px-3 py-1 border-b flex items-center justify-between">
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                     Pages
                 </h3>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 bg-gray-200/80 rounded-md cursor-pointer"
+                    onClick={onAddPage}
+                >
+                    <Plus className="h-4 w-4" />
+                </Button>
             </div>
-            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-1">
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
@@ -110,6 +139,9 @@ export function FormBuilderSidebar({
                                 onSelect={onSelectPage}
                                 onDuplicate={duplicatePage}
                                 onDelete={removePage}
+                                onMoveUp={movePageUp}
+                                pagesCount={pages.length}
+                                onMoveDown={movePageDown}
                             />
                         ))}
                     </SortableContext>

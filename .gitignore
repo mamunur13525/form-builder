@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.claude/autoharness/session-af5900bd-5e3a-4b96-ad8c-13597cc9c14a
+.claude/autoharness/session-088b27d5-e609-4aff-85df-f1f84d90b204
+.claude/autoharness/session-af5900bd-5e3a-4b96-ad8c-13597cc9c14a
+.claude/autoharness/requests

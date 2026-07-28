@@ -61,7 +61,7 @@ export function FormBuilderTopBar({
     }, [id, title, description, onShowSaveStatus])
 
     return (
-        <div className="flex items-center justify-between px-6 py-3 shrink-0 bg-background border rounded-xl shadow-sm">
+        <div className="flex items-center justify-between px-6 py-1 shrink-0 bg-background shadow-sm">
             <div className="flex items-center gap-3 flex-1">
                 <Button variant="ghost" size="icon" onClick={onBack}>
                     <ArrowLeft className="h-5 w-5" />

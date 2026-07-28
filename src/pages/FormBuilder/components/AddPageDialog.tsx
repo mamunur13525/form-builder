@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { FileText } from "lucide-react"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../../components/ui/dialog"
-import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS } from "../../../shared/constants/form-types"
+import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, type FieldType } from "../../../shared/constants/form-types"
 import type { FormField } from "../../../shared/types/common"
 import type { LucideIcon } from "lucide-react"
 
@@ -41,7 +41,7 @@ export function AddPageDialog({
                 _id: undefined,
                 formId: id || "",
                 fieldKey: `field_${Date.now()}`,
-                label: "New Question",
+                label: FIELD_TYPE_LABELS[type as FieldType] || "New Question",
                 helperText: "",
                 placeholder: "",
                 type,

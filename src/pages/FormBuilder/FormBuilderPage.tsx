@@ -22,6 +22,7 @@ import { PageContentEditor } from "./components/PageContentEditor/PageContentEdi
 import { SettingsPanel } from "./components/SettingsPanel"
 import { PublishDialog } from "./components/PublishDialog"
 import { AddPageDialog } from "./components/AddPageDialog"
+import PageContentTopbar from "./components/PageContentEditor/PageContentTopbar"
 
 export function FormBuilderPage() {
     const { id } = useParams()
@@ -304,7 +305,7 @@ export function FormBuilderPage() {
     // Show loading state while fetching form
     if (isLoadingForm) {
         return (
-            <div className="h-[calc(100vh-3.5rem)] flex items-center justify-center">
+            <div className="h-screen flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                     <p className="text-muted-foreground">Loading form...</p>
@@ -316,7 +317,7 @@ export function FormBuilderPage() {
     // Show error state if form failed to load
     if (formError) {
         return (
-            <div className="h-[calc(100vh-3.5rem)] flex items-center justify-center">
+            <div className="h-screen flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-destructive mb-4">{formError}</p>
                     <button
@@ -331,7 +332,7 @@ export function FormBuilderPage() {
     }
     console.log({ pages })
     return (
-        <div className="h-[calc(100vh-3.5rem)] flex flex-col gap-3 p-3 bg-muted/50">
+        <div className="h-screen flex flex-col bg-muted/50">
             <FormBuilderTopBar
                 title={title}
                 onTitleChange={handleTitleChange}
@@ -348,7 +349,7 @@ export function FormBuilderPage() {
                 onBack={() => navigate("/dashboard")}
             />
 
-            <ResizablePanelGroup orientation="horizontal" className="flex-1 min-h-0">
+            <ResizablePanelGroup orientation="horizontal" className="flex-1 min-h-0 p-3">
                 <ResizablePanel defaultSize={200} minSize={200} maxSize={300}>
                     <FormBuilderSidebar
                         pages={pages}
@@ -366,18 +367,25 @@ export function FormBuilderPage() {
                 <ResizableHandle className="w-3 bg-transparent after:hidden" />
 
                 <ResizablePanel defaultSize={700} minSize={300}>
-                    <div className="w-full h-full flex items-center overflow-y-auto p-6 bg-background border rounded-xl shadow-sm">
-                        {selectedPage ? (
-                            <PageContentEditor
-                                page={selectedPage}
-                                pageIndex={selectedPageIndex}
-                                onUpdate={updatePage}
-                            />
-                        ) : (
-                            <div className="flex items-center justify-center h-full text-muted-foreground">
-                                <p>Select a page to edit</p>
-                            </div>
-                        )}
+                    <div className="flex flex-col h-full gap-2">
+
+                        <PageContentTopbar
+                            onAddPage={() => setShowAddPageDialog(true)}
+                            onPreview={() => navigate(`/form-preview/${id || "new"}`)}
+                        />
+                        <div className="w-full flex-1 h-full flex items-center overflow-y-auto p-6 bg-background border rounded-md shadow-sm">
+                            {selectedPage ? (
+                                <PageContentEditor
+                                    page={selectedPage}
+                                    pageIndex={selectedPageIndex}
+                                    onUpdate={updatePage}
+                                />
+                            ) : (
+                                <div className="flex items-center justify-center h-full text-muted-foreground">
+                                    <p>Select a page to edit</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </ResizablePanel>
 
@@ -391,7 +399,7 @@ export function FormBuilderPage() {
                             onUpdate={updatePage}
                         />
                     ) : (
-                        <div className="w-full h-full flex flex-col bg-background border rounded-xl shadow-sm overflow-hidden">
+                        <div className="w-full h-full flex flex-col bg-background border rounded-md shadow-sm overflow-hidden">
                             <div className="p-3 border-b">
                                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                                     <span>Settings</span>

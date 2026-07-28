@@ -1,4 +1,5 @@
-import { FileText } from "lucide-react"
+import { FileText, Paintbrush, GitBranch, Play, Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS } from "@/shared/constants/form-types"
@@ -55,49 +56,55 @@ export function PageContentEditor({
     const FieldEditor = editorMap[page.type]
 
     return (
-        <div className="w-full h-3/5 max-w-2xl mx-auto space-y-6">
-            <div className="flex items-center gap-2 mb-2">
-                <PageIcon className="h-5 w-5 text-muted-foreground" />
-                <Badge variant="secondary">
-                    {FIELD_TYPE_LABELS[page.type as keyof typeof FIELD_TYPE_LABELS] || page.type}
-                </Badge>
-                {page.required && (
-                    <Badge variant="destructive" className="text-[10px]">Required</Badge>
-                )}
-            </div>
+        <div className="w-full h-3/4 flex flex-col">
+            {/* Editor Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+                <div className="max-w-2xl mx-auto space-y-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <PageIcon className="h-5 w-5 text-muted-foreground" />
+                        <Badge variant="secondary">
+                            {FIELD_TYPE_LABELS[page.type as keyof typeof FIELD_TYPE_LABELS] || page.type}
+                        </Badge>
+                        {page.required && (
+                            <Badge variant="destructive" className="text-[10px] text-white">Required</Badge>
+                        )}
+                    </div>
 
-            {/* Editable Label */}
-            <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Question</Label>
-                <div
-                    contentEditable
-                    suppressContentEditableWarning
-                    className="text-2xl font-bold outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
-                    onBlur={(e) => onUpdate(pageIndex, { label: e.currentTarget.textContent || "" })}
-                    dangerouslySetInnerHTML={{ __html: page.label }}
-                />
-            </div>
+                    {/* Editable Label */}
+                    <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Question</Label>
+                        <div
+                            contentEditable
+                            suppressContentEditableWarning
+                            className="text-2xl font-bold outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
+                            onBlur={(e) => onUpdate(pageIndex, { label: e.currentTarget.textContent || "" })}
+                            dangerouslySetInnerHTML={{ __html: page.label }}
+                        />
+                    </div>
 
-            {/* Editable Helper Text */}
-            <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Description / Helper Text</Label>
-                <div
-                    contentEditable
-                    suppressContentEditableWarning
-                    className="text-sm text-muted-foreground outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
-                    onBlur={(e) => onUpdate(pageIndex, { helperText: e.currentTarget.textContent || "" })}
-                    dangerouslySetInnerHTML={{ __html: page.helperText || "Click to add description..." }}
-                />
-            </div>
+                    {/* Editable Helper Text */}
+                    <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Description / Helper Text</Label>
+                        <div
+                            contentEditable
+                            suppressContentEditableWarning
+                            className="text-sm text-muted-foreground outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
+                            onBlur={(e) => onUpdate(pageIndex, { helperText: e.currentTarget.textContent || "" })}
+                            dangerouslySetInnerHTML={{ __html: page.helperText || "Click to add description..." }}
+                        />
+                    </div>
 
-            {/* Field-specific editor */}
-            {FieldEditor && (
-                <FieldEditor
-                    page={page}
-                    pageIndex={pageIndex}
-                    onUpdate={onUpdate}
-                />
-            )}
+                    {/* Field-specific editor */}
+                    {FieldEditor && (
+                        <FieldEditor
+                            page={page}
+                            pageIndex={pageIndex}
+                            onUpdate={onUpdate}
+                        />
+                    )}
+                </div>
+            </div>
         </div>
+
     )
 }

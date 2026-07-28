@@ -1,4 +1,4 @@
-import { Settings2, Plus } from "lucide-react"
+import { Settings2, Plus, Asterisk } from "lucide-react"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
@@ -9,6 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../../../components/ui/select"
+import { Switch } from "../../../components/ui/switch"
 import { FIELD_TYPE_LABELS } from "../../../shared/constants/form-types"
 import type { FormField } from "../../../shared/types/common"
 
@@ -25,9 +26,9 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps) {
     return (
-        <div className="w-full h-full flex flex-col bg-background border rounded-xl shadow-sm overflow-hidden">
+        <div className="w-full h-full flex flex-col bg-background border rounded-md shadow-sm overflow-hidden">
             <div className="p-3 border-b">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <h3 className="flex items-center gap-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                     <Settings2 className="h-4 w-4" />
                     Settings
                 </h3>
@@ -54,19 +55,27 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                 </div>
 
                 {/* Required Toggle */}
-                <div className="flex items-center justify-between">
-                    <Label className="text-xs cursor-pointer">Required</Label>
-                    <input
-                        type="checkbox"
-                        checked={page.required}
-                        onChange={(e) => onUpdate(pageIndex, { required: e.target.checked })}
-                        className="h-4 w-4"
-                    />
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                            <Asterisk className="h-3.5 w-3.5 text-red-500" />
+                            <Label className="text-xs cursor-pointer">Required</Label>
+                        </div>
+                        <Switch
+                            checked={page.required}
+                            onCheckedChange={(checked) => onUpdate(pageIndex, { required: checked })}
+                            size="sm"
+                        />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">Respondents must answer this field to submit the form.</p>
                 </div>
 
                 {/* Validation */}
                 <div className="space-y-3">
-                    <Label className="text-xs font-semibold">Validation</Label>
+                    <div className="flex items-center gap-1.5">
+                        <Label className="text-xs font-semibold">Validation</Label>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground -mt-1">Control what respondents can enter, like character limits or number ranges.</p>
                     {(page.type === "shortText" || page.type === "longText") && (
                         <>
                             <div className="space-y-1">
@@ -149,6 +158,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                 {/* Logic */}
                 <div className="space-y-3">
                     <Label className="text-xs font-semibold">Logic</Label>
+                    <p className="text-[11px] text-muted-foreground -mt-1">Dynamically show or hide this field depending on how respondents answer other questions.</p>
                     {page.logic.length === 0 ? (
                         <p className="text-xs text-muted-foreground">No logic rules configured</p>
                     ) : (

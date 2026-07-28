@@ -22,11 +22,13 @@ import {
     SelectEditor,
     MultiSelectEditor,
 } from "./editors"
+import { cn } from "@/lib/utils"
 
 interface PageContentEditorProps {
     page: FormField
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormField>) => void
+    isMobileView: boolean
 }
 
 const editorMap: Record<string, React.ComponentType<{ page: FormField; pageIndex: number; onUpdate: (index: number, updates: Partial<FormField>) => void }>> = {
@@ -52,6 +54,7 @@ export function PageContentEditor({
     page,
     pageIndex,
     onUpdate,
+    isMobileView,
 }: PageContentEditorProps) {
     const PageIcon: LucideIcon = FIELD_TYPE_ICONS[page.type as keyof typeof FIELD_TYPE_ICONS] || FileText
     const FieldEditor = editorMap[page.type]
@@ -59,10 +62,9 @@ export function PageContentEditor({
     return (
         <div className="w-full h-3/4 flex flex-col">
             {/* Editor Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className={cn("flex-1 overflow-y-auto")}>
                 <div
-                    className={`mx-auto space-y-6 transition-all duration-500 ease-in-out 
-                        }`}
+                    className={cn("mx-auto space-y-6 transition-all duration-500 ease-in-out px-6", isMobileView ? "w-full " : "w-11/12")}
                 >
                     <div className="flex items-center gap-2 mb-2">
                         <PageIcon className="h-5 w-5 text-muted-foreground" />

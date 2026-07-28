@@ -23,6 +23,7 @@ import { SettingsPanel } from "./components/SettingsPanel"
 import { PublishDialog } from "./components/PublishDialog"
 import { AddPageDialog } from "./components/AddPageDialog"
 import PageContentTopbar from "./components/PageContentEditor/PageContentTopbar"
+import { cn } from "@/lib/utils"
 
 export function FormBuilderPage() {
     const { id } = useParams()
@@ -377,18 +378,24 @@ export function FormBuilderPage() {
                             onToggleView={() => setIsMobileView(prev => !prev)}
                         />
 
-                        <div className={`w-full flex items-center justify-center flex-1 bg-background border rounded-md shadow-sm transition-all duration-500 ease-in-out ${isMobileView ? "max-w-sm mx-auto" : "max-w-full"}`}>
-                            {selectedPage ? (
-                                <PageContentEditor
-                                    page={selectedPage}
-                                    pageIndex={selectedPageIndex}
-                                    onUpdate={updatePage}
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center h-full text-muted-foreground">
-                                    <p>Select a page to edit</p>
-                                </div>
-                            )}
+                        <div className="w-full h-full flex-1 flex items-center justify-center">
+                            <div
+                                className={cn("w-full h-full bg-background border rounded-md shadow-sm transition-all duration-500 ease-in-out overflow-hidden flex flex-col justify-center")}
+                                style={{ width: isMobileView ? '384px' : '100%' }}
+                            >
+                                {selectedPage ? (
+                                    <PageContentEditor
+                                        page={selectedPage}
+                                        pageIndex={selectedPageIndex}
+                                        onUpdate={updatePage}
+                                        isMobileView={isMobileView}
+                                    />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                                        <p>Select a page to edit</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 

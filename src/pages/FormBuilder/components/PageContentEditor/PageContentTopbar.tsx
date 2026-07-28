@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { GitBranch, Paintbrush, Play, Plus, Smartphone, Monitor } from "lucide-react";
 
 interface PageContentTopbarProps {
@@ -42,29 +43,44 @@ const PageContentTopbar = ({
                     Logic
                 </Button>
             </div>
-            <div className="flex items-center gap-1">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                    onClick={onToggleView}
-                    title={isMobileView ? "Switch to desktop view" : "Switch to mobile view"}
-                >
-                    {isMobileView ? (
-                        <Monitor className="h-4 w-4" />
-                    ) : (
-                        <Smartphone className="h-4 w-4" />
-                    )}
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                    onClick={onPreview}
-                >
-                    <Play className="h-4 w-4" />
-                </Button>
-            </div>
+            <TooltipProvider delay={200}>
+                <div className="flex items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger render={<span />}>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                onClick={onToggleView}
+                            >
+                                {isMobileView ? (
+                                    <Monitor className="h-4 w-4" />
+                                ) : (
+                                    <Smartphone className="h-4 w-4" />
+                                )}
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {isMobileView ? "Desktop view" : "Mobile view"}
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger render={<span />}>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                onClick={onPreview}
+                            >
+                                <Play className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            Preview
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+            </TooltipProvider>
         </div>
     )
 }

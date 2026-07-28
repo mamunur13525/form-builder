@@ -99,7 +99,7 @@ export function SortablePageItem({
       {...listeners}
       onClick={() => onSelect(index)}
       className={`
-        group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm
+        group relative flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm
         transition-all duration-200 ease-out cursor-pointer select-none
         ${isSelected
           ? "bg-linear-to-br from-primary/10 to-primary/5 text-primary shadow-sm shadow-primary/5 ring-1 ring-primary/20"

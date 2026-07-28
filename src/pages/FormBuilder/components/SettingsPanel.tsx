@@ -25,7 +25,7 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps) {
     return (
-        <div className="w-full h-full border-l flex flex-col">
+        <div className="w-full h-full flex flex-col bg-background border rounded-xl shadow-sm overflow-hidden">
             <div className="p-3 border-b">
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                     <Settings2 className="h-4 w-4" />

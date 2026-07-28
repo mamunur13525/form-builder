@@ -85,7 +85,7 @@ export function FormBuilderSidebar({
     )
 
     return (
-        <div className="w-full h-full border-r flex flex-col">
+        <div className="w-full h-full flex flex-col bg-background border rounded-xl shadow-sm overflow-hidden">
             <div className="p-3 border-b">
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Pages

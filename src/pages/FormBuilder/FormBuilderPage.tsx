@@ -18,7 +18,7 @@ import { adaptApiForm } from "../../features/forms/model/adapters"
 import { useDebounce } from "../../shared/hooks/useDebounce"
 import { FormBuilderTopBar } from "./components/FormBuilderTopBar"
 import { FormBuilderSidebar } from "./components/FormBuilderSidebar"
-import { PageContentEditor } from "./components/PageContentEditor"
+import { PageContentEditor } from "./components/PageContentEditor/PageContentEditor"
 import { SettingsPanel } from "./components/SettingsPanel"
 import { PublishDialog } from "./components/PublishDialog"
 import { AddPageDialog } from "./components/AddPageDialog"
@@ -331,7 +331,7 @@ export function FormBuilderPage() {
     }
     console.log({ pages })
     return (
-        <div className="h-[calc(100vh-3.5rem)] flex flex-col">
+        <div className="h-[calc(100vh-3.5rem)] flex flex-col gap-3 p-3 bg-muted/50">
             <FormBuilderTopBar
                 title={title}
                 onTitleChange={handleTitleChange}
@@ -348,7 +348,7 @@ export function FormBuilderPage() {
                 onBack={() => navigate("/dashboard")}
             />
 
-            <ResizablePanelGroup orientation="horizontal" className="flex-1">
+            <ResizablePanelGroup orientation="horizontal" className="flex-1 min-h-0">
                 <ResizablePanel defaultSize={200} minSize={200} maxSize={300}>
                     <FormBuilderSidebar
                         pages={pages}
@@ -363,10 +363,10 @@ export function FormBuilderPage() {
                     />
                 </ResizablePanel>
 
-                <ResizableHandle />
+                <ResizableHandle className="w-3 bg-transparent after:hidden" />
 
                 <ResizablePanel defaultSize={700} minSize={300}>
-                    <div className="w-full h-full overflow-y-auto p-6">
+                    <div className="w-full h-full flex items-center overflow-y-auto p-6 bg-background border rounded-xl shadow-sm">
                         {selectedPage ? (
                             <PageContentEditor
                                 page={selectedPage}
@@ -381,7 +381,7 @@ export function FormBuilderPage() {
                     </div>
                 </ResizablePanel>
 
-                <ResizableHandle />
+                <ResizableHandle className="w-3 bg-transparent after:hidden" />
 
                 <ResizablePanel defaultSize={100} minSize={200} maxSize={300}>
                     {selectedPage ? (
@@ -391,7 +391,7 @@ export function FormBuilderPage() {
                             onUpdate={updatePage}
                         />
                     ) : (
-                        <div className="w-full h-full border-l flex flex-col">
+                        <div className="w-full h-full flex flex-col bg-background border rounded-xl shadow-sm overflow-hidden">
                             <div className="p-3 border-b">
                                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                                     <span>Settings</span>

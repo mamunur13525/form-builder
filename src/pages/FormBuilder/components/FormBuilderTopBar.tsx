@@ -15,6 +15,7 @@ import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { updateForm } from "@/entities/form/api/form.api";
+import { useFormContext } from "@/features/forms/hooks/useFormContext";
 
 const navLinks = [
   { to: ROUTES.FORM_BUILDER, icon: Wrench, label: "Build" },
@@ -41,6 +42,7 @@ export function FormBuilderTopBar({
 }: FormBuilderTopBarProps) {
   const { formId } = useParams<{ formId: string }>();
   const navigate = useNavigate();
+  const { updateFormData } = useFormContext();
 
   const baseNavLinkClass =
     "flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-md";
@@ -57,10 +59,10 @@ export function FormBuilderTopBar({
 
   // Update local state when initial values change from external source
   useEffect(() => {
-    const hasInitialChanged = 
-      initialTitle !== prevInitialTitleRef.current || 
+    const hasInitialChanged =
+      initialTitle !== prevInitialTitleRef.current ||
       initialDescription !== prevInitialDescriptionRef.current;
-    
+
     if (hasInitialChanged) {
       setFormTitleDesc({
         title: initialTitle,
@@ -87,7 +89,7 @@ export function FormBuilderTopBar({
       setIsSaving(true);
       try {
         const updateData: { title?: string; description?: string } = {};
-        
+
         // Only send the field that changed
         if (field === "title") {
           updateData.title = value;
@@ -98,6 +100,8 @@ export function FormBuilderTopBar({
         }
 
         await updateForm(formId, updateData);
+        // Update context so other components see the change
+        updateFormData(updateData);
       } catch (error) {
         console.error("Failed to update form:", error);
         setSaveError("Failed to save changes");
@@ -143,17 +147,7 @@ export function FormBuilderTopBar({
             disabled={isSaving}
           />
         </div>
-        {isSaving && (
-          <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-            <span className="animate-spin">⏳</span>
-            Saving...
-          </span>
-        )}
-        {saveError && (
-          <span className="text-[11px] text-destructive">
-            {saveError}
-          </span>
-        )}
+ 
       </div>
 
       <nav className="flex items-center gap-1">

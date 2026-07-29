@@ -27,38 +27,17 @@ export function FormBuilderPage() {
   const { formId } = useParams();
   const navigate = useNavigate();
   const { forms, fetchForms } = useFormStore();
-  const { form, isLoading: isLoadingForm, error: formError, isPublished, setIsPublished } = useFormContext();
+  const { form, isLoading: isLoadingForm, error: formError, isPublished, setIsPublished, showSaveStatus } = useFormContext();
 
   const [pages, setPages] = useState<FormField[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
-  const [, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">(
-    "idle",
-  );
-  const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
   const pendingFieldUpdateRef = useRef<
     { fieldId: string; data: Record<string, unknown> } | null
   >(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const prevFormIdRef = useRef<string | undefined>(undefined);
-
-  const showSaveStatus = useCallback(
-    (status: "idle" | "saving" | "saved" | "error") => {
-      setSaveStatus(status);
-      if (saveStatusTimeoutRef.current) {
-        clearTimeout(saveStatusTimeoutRef.current);
-      }
-      if (status !== "idle") {
-        saveStatusTimeoutRef.current = setTimeout(() => {
-          setSaveStatus("idle");
-        }, 2000);
-      }
-    },
-    [],
-  );
 
   // Fetch all forms only when creating a new form (not when editing)
   useEffect(() => {

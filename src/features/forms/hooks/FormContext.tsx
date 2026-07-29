@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import { getFormById } from "@/entities/form/api/form.api";
 import { adaptApiForm } from "@/features/forms/model/adapters";
 import type { Form as ApiForm } from "@/entities/form/model/types";
 import type { Form } from "@/shared/types/common";
-import { FormContext, type FormContextValue } from "./form-context";
+import { FormContext, type FormContextValue, type SaveStatus } from "./form-context";
 
 export function FormProvider({ children }: { children: ReactNode }) {
   const { formId } = useParams<{ formId: string }>();
@@ -12,6 +12,10 @@ export function FormProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const refreshForm = useCallback(async () => {
     if (!formId || formId === "new") {
@@ -42,6 +46,18 @@ export function FormProvider({ children }: { children: ReactNode }) {
     loadForm();
   }, [refreshForm]);
 
+  const showSaveStatus = useCallback((status: SaveStatus) => {
+    setSaveStatus(status);
+    if (saveStatusTimeoutRef.current) {
+      clearTimeout(saveStatusTimeoutRef.current);
+    }
+    if (status !== "idle") {
+      saveStatusTimeoutRef.current = setTimeout(() => {
+        setSaveStatus("idle");
+      }, 2000);
+    }
+  }, []);
+
   const updateFormData = useCallback((updates: Partial<Form>) => {
     setForm((prev) => (prev ? { ...prev, ...updates } : prev));
   }, []);
@@ -51,9 +67,11 @@ export function FormProvider({ children }: { children: ReactNode }) {
     isLoading,
     error,
     isPublished,
+    saveStatus,
     refreshForm,
     setIsPublished,
     updateFormData,
+    showSaveStatus,
   };
 
   return <FormContext.Provider value={value}>{children}</FormContext.Provider>;

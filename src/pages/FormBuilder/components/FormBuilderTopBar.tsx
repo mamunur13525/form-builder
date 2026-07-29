@@ -8,6 +8,8 @@ import {
   Puzzle,
   Share2,
   BarChart3,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -42,8 +44,7 @@ export function FormBuilderTopBar({
 }: FormBuilderTopBarProps) {
   const { formId } = useParams<{ formId: string }>();
   const navigate = useNavigate();
-  const { updateFormData } = useFormContext();
-
+  const { updateFormData, saveStatus, showSaveStatus } = useFormContext();
   const baseNavLinkClass =
     "flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-md";
   const activeNavLinkClass = "text-primary bg-primary/10";
@@ -87,6 +88,7 @@ export function FormBuilderTopBar({
     // Auto-save if form has been persisted to server
     if (formId && formId !== "new") {
       setIsSaving(true);
+      showSaveStatus("saving");
       try {
         const updateData: { title?: string; description?: string } = {};
 
@@ -102,9 +104,11 @@ export function FormBuilderTopBar({
         await updateForm(formId, updateData);
         // Update context so other components see the change
         updateFormData(updateData);
+        showSaveStatus("saved");
       } catch (error) {
         console.error("Failed to update form:", error);
         setSaveError("Failed to save changes");
+        showSaveStatus("error");
         // Revert the change on error
         setFormTitleDesc((prev) => ({
           ...prev,
@@ -115,7 +119,6 @@ export function FormBuilderTopBar({
       }
     }
   };
-
   const onBack = useCallback(() => {
     navigate("/dashboard");
   }, [navigate]);
@@ -134,20 +137,26 @@ export function FormBuilderTopBar({
         <div className="flex flex-col gap-1">
           <Input
             value={formTitleDesc.title}
-            onChange={(e) => handleTitleDescriptionChange("title", e.target.value)}
+            onChange={(e) =>
+              handleTitleDescriptionChange("title", e.target.value)
+            }
             placeholder="Form title"
             className="h-7 text-sm font-semibold border-0 shadow-none focus-visible:ring-1 px-0 py-0 w-64"
             disabled={isSaving}
           />
           <Input
             value={formTitleDesc.description}
-            onChange={(e) => handleTitleDescriptionChange("description", e.target.value)}
+            onChange={(e) =>
+              handleTitleDescriptionChange("description", e.target.value)
+            }
             placeholder="Form description"
             className="h-6 text-xs text-muted-foreground border-0 shadow-none focus-visible:ring-1 px-0 py-0 w-64"
             disabled={isSaving}
           />
         </div>
- 
+        {saveError && (
+          <span className="text-[11px] text-destructive">{saveError}</span>
+        )}
       </div>
 
       <nav className="flex items-center gap-1">
@@ -169,6 +178,28 @@ export function FormBuilderTopBar({
       </nav>
 
       <div className="flex items-center gap-2">
+        <span
+          className={cn(
+            "text-[11px] flex items-center gap-1.5 text-muted-foreground w-14",
+            saveStatus !== "idle" ? "opacity-100" : "opacity-0",
+          )}
+        >
+          {saveStatus === "saving" && (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          )}
+          {saveStatus === "saved" && (
+            <CheckCircle className="h-3 w-3 text-green-600" />
+          )}
+          {saveStatus === "error" && (
+            <AlertCircle className="h-3 w-3 text-red-600" />
+          )}
+          {saveStatus === "saving"
+            ? "Saving..."
+            : saveStatus === "saved"
+              ? "Saved"
+              : "Error"}
+        </span>
+
         <Link to={`/form-preview/${formId || "new"}`}>
           <Button
             variant="outline"

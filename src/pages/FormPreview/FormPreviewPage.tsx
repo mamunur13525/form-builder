@@ -1,3 +1,4 @@
+import { ROUTES } from "@/shared/constants/routes";
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "../../components/ui/button"
@@ -7,9 +8,9 @@ import { useForm } from "../../features/forms/hooks/useForms"
 import { adaptApiForm } from "../../features/forms/model/adapters"
 
 export function FormPreviewPage() {
-    const { id } = useParams()
+    const { formId } = useParams()
     const navigate = useNavigate()
-    const { data: apiForm, isLoading } = useForm(id || "")
+    const { data: apiForm, isLoading } = useForm(formId || "")
     console.log('form preveiw page.')
     if (isLoading) {
         return (
@@ -23,7 +24,7 @@ export function FormPreviewPage() {
         return (
             <div className="text-center py-20">
                 <h2 className="text-2xl font-bold">Form not found</h2>
-                <Button className="mt-4" onClick={() => navigate("/dashboard")}>
+                <Button className="mt-4" onClick={() => navigate(ROUTES.DASHBOARD)}>
                     Back to Dashboard
                 </Button>
             </div>
@@ -34,8 +35,8 @@ export function FormPreviewPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted/30">
-            <div className="flex items-center justify-between p-4 border-b bg-background">
-                <Button variant="ghost" size="icon" onClick={() => navigate(`/form-builder/${form.id}`)}>
+            <div className="absolute left-0 top-0 w-full flex items-center justify-between p-4 border-b bg-background">
+                <Button variant="ghost" size="icon" onClick={() => navigate(ROUTES.FORM_BUILDER.replace(":formId", form.id))}>
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <Badge variant="outline">Preview Mode</Badge>
@@ -46,3 +47,4 @@ export function FormPreviewPage() {
         </div>
     )
 }
+

@@ -16,7 +16,6 @@ import {
 } from "../../entities/form/api/field.api"
 import { adaptApiForm } from "../../features/forms/model/adapters"
 import { useDebounce } from "../../shared/hooks/useDebounce"
-import { FormBuilderTopBar } from "./components/FormBuilderTopBar"
 import { FormBuilderSidebar } from "./components/FormBuilderSidebar"
 import { PageContentEditor } from "./components/PageContentEditor/PageContentEditor"
 import { SettingsPanel } from "./components/SettingsPanel"
@@ -26,13 +25,12 @@ import PageContentTopbar from "./components/PageContentEditor/PageContentTopbar"
 import { cn } from "@/lib/utils"
 
 export function FormBuilderPage() {
-    const { id } = useParams()
+    const { formId } = useParams()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
-    const { forms, fetchForms, isLoading } = useFormStore()
+    const { forms, fetchForms } = useFormStore()
 
-    const [title, setTitle] = useState(searchParams.get("title") || "")
-    const [description, setDescription] = useState("")
+ 
     const [pages, setPages] = useState<FormField[]>([])
     const [selectedPageIndex, setSelectedPageIndex] = useState(0)
     const [showAddPageDialog, setShowAddPageDialog] = useState(false)
@@ -61,32 +59,22 @@ export function FormBuilderPage() {
 
     // Fetch all forms only when creating a new form (not when editing)
     useEffect(() => {
-        if (!id || id === "new") {
+        if (!formId || formId === "new") {
             // Only fetch all forms when creating a new form
             if (forms.length === 0) {
                 fetchForms()
             }
         }
-    }, [id, forms.length, fetchForms])
+    }, [formId, forms.length, fetchForms])
 
     // Fetch specific form by ID when editing an existing form
     useEffect(() => {
         const loadForm = async () => {
-            // Skip if creating new form or already initialized
-            if (!id || id === "new" || hasInitializedRef.current) {
-                if (!id || id === "new") {
-                    setTitle(searchParams.get("title") || "")
-                }
-                return
-            }
-
-            // Check if form is already in the store
-            const cachedForm = forms.find((f) => f.id === id)
+          // Check if form is already in the store
+            const cachedForm = forms.find((f) => f.id === formId)
             console.log({ cachedForm })
             if (cachedForm) {
                 hasInitializedRef.current = true
-                setTitle(cachedForm.title || "")
-                setDescription(cachedForm.description || "")
                 setPages(cachedForm.fields || [])
                 setSelectedPageIndex(0)
                 setIsPublished(cachedForm.status === "published")
@@ -97,14 +85,12 @@ export function FormBuilderPage() {
             setIsLoadingForm(true)
             setFormError(null)
             try {
-                const apiForm = await getFormById(id)
+                const apiForm = await getFormById(formId||"")
                 console.log({ apiForm })
 
                 const adaptedForm = adaptApiForm(apiForm)
                 console.log({ adaptedForm })
                 hasInitializedRef.current = true
-                setTitle(adaptedForm.title || "")
-                setDescription(adaptedForm.description || "")
                 setPages(adaptedForm.fields || [])
                 setSelectedPageIndex(0)
                 setIsPublished(adaptedForm.status === "published")
@@ -117,51 +103,26 @@ export function FormBuilderPage() {
         }
 
         loadForm()
-    }, [id, forms, searchParams])
+    }, [formId, forms, searchParams])
 
     const selectedPage = pages[selectedPageIndex]
 
-    const autoSaveTitle = useCallback(async () => {
-        if (!id || id === "new") return
-
-        try {
-            showSaveStatus("saving")
-            await updateForm(id, {
-                title,
-                description,
-            })
-            showSaveStatus("saved")
-        } catch (error) {
-            console.error("Failed to auto-save title:", error)
-            showSaveStatus("error")
-        }
-    }, [id, title, description, showSaveStatus])
-
-    const debouncedAutoSaveTitle = useDebounce(autoSaveTitle, 1000)
-
     const executeFieldUpdate = useCallback(async () => {
         const pending = pendingFieldUpdateRef.current
-        if (!pending || !id || id === "new") return
+        if (!pending || !formId || formId === "new") return
 
         try {
             showSaveStatus("saving")
-            await updateField(id, pending.fieldId, pending.data)
+            await updateField(formId, pending.fieldId, pending.data)
             showSaveStatus("saved")
         } catch (error) {
             console.error("Failed to update field:", error)
             showSaveStatus("error")
         }
-    }, [id, showSaveStatus])
+    }, [formId, showSaveStatus])
 
     const debouncedFieldUpdate = useDebounce(executeFieldUpdate, 1000)
 
-    const handleDescriptionChange = (newDescription: string) => {
-        setDescription(newDescription)
-        // Auto-save description if form has been persisted to server
-        if (id && id !== "new") {
-            debouncedAutoSaveTitle()
-        }
-    }
 
     const updatePage = useCallback(async (index: number, updates: Partial<FormField>) => {
         const field = pages[index]
@@ -176,7 +137,7 @@ export function FormBuilderPage() {
         setPages(updated)
 
         // If form is persisted, debounce the API update
-        if (id && id !== "new") {
+        if (formId && formId !== "new") {
             // Prepare the update data, ensuring appearance.icon is always provided
             const updateData: any = { ...updates }
             if (updateData.appearance && !updateData.appearance.icon) {
@@ -185,18 +146,12 @@ export function FormBuilderPage() {
             pendingFieldUpdateRef.current = { fieldId, data: updateData }
             debouncedFieldUpdate()
         }
-    }, [id, pages, showSaveStatus, debouncedFieldUpdate])
+    }, [formId, pages, showSaveStatus, debouncedFieldUpdate])
 
-    const handleTitleChange = (newTitle: string) => {
-        setTitle(newTitle)
-        // Auto-save title if form has been persisted to server
-        if (id && id !== "new") {
-            debouncedAutoSaveTitle()
-        }
-    }
+  
 
     const addPage = useCallback(async (page: FormField) => {
-        if (!id || id === "new") {
+        if (!formId || formId === "new") {
             // For new forms, just add to local state
             setPages(prev => [...prev, page])
             setSelectedPageIndex(pages.length)
@@ -206,7 +161,7 @@ export function FormBuilderPage() {
         try {
             showSaveStatus("saving")
             // Create field via API
-            const createdField = await createField(id, {
+            const createdField = await createField(formId, {
                 type: page.type,
                 label: page.label,
                 helperText: page.helperText,
@@ -228,7 +183,7 @@ export function FormBuilderPage() {
             console.error("Failed to create field:", error)
             showSaveStatus("error")
         }
-    }, [id, pages.length, showSaveStatus])
+    }, [formId, pages.length, showSaveStatus])
 
     const deletePage = useCallback(async (index: number) => {
         console.log({ index })
@@ -246,10 +201,10 @@ export function FormBuilderPage() {
         }
 
         // If form is persisted, delete via API
-        if (id && id !== "new" && fieldId !== undefined) {
+        if (formId && formId !== "new" && fieldId !== undefined) {
             try {
                 showSaveStatus("saving")
-                await deleteField(id, fieldId)
+                await deleteField(formId, fieldId)
                 showSaveStatus("saved")
             } catch (error) {
                 console.error("Failed to delete field:", error)
@@ -258,7 +213,7 @@ export function FormBuilderPage() {
                 setPages(pages)
             }
         }
-    }, [id, pages, selectedPageIndex, showSaveStatus])
+    }, [formId, pages, selectedPageIndex, showSaveStatus])
 
     const duplicatePage = useCallback(async (index: number) => {
         const page = pages[index]
@@ -280,10 +235,10 @@ export function FormBuilderPage() {
         setSelectedPageIndex(index + 1)
 
         // If form is persisted, duplicate via API
-        if (id && id !== "new") {
+        if (formId && formId !== "new") {
             try {
                 showSaveStatus("saving")
-                const duplicatedField = await duplicateField(id, fieldId)
+                const duplicatedField = await duplicateField(formId, fieldId)
 
                 // Update the temporary field with the real one from server
                 setPages(prev => {
@@ -303,7 +258,7 @@ export function FormBuilderPage() {
                 setPages(pages)
             }
         }
-    }, [id, pages, showSaveStatus])
+    }, [formId, pages, showSaveStatus])
 
     // Show loading state while fetching form
     if (isLoadingForm) {
@@ -333,31 +288,15 @@ export function FormBuilderPage() {
             </div>
         )
     }
-    console.log({ pages })
+
     return (
         <div className="h-screen flex flex-col bg-muted/50">
-            <FormBuilderTopBar
-                title={title}
-                onTitleChange={handleTitleChange}
-                description={description}
-                onDescriptionChange={handleDescriptionChange}
-                id={id}
-                isPublished={isPublished}
-                isLoading={isLoading || isLoadingForm}
-                saveStatus={saveStatus}
-                onShowSaveStatus={showSaveStatus}
-                onPreview={() => navigate(`/form-preview/${id || "new"}`)}
-                onPublish={() => setShowPublishDialog(true)}
-                onPublishedClick={() => setShowPublishDialog(true)}
-                onBack={() => navigate("/dashboard")}
-            />
-
             <ResizablePanelGroup orientation="horizontal" className="flex-1 min-h-0 p-3">
                 <ResizablePanel defaultSize={200} minSize={200} maxSize={300}>
                     <FormBuilderSidebar
                         pages={pages}
                         selectedPageIndex={selectedPageIndex}
-                        id={id}
+                        id={formId}
                         onSelectPage={setSelectedPageIndex}
                         onSetPages={setPages}
                         onAddPage={() => setShowAddPageDialog(true)}
@@ -373,7 +312,7 @@ export function FormBuilderPage() {
                     <div className="h-full w-full flex flex-col gap-3">
                         <PageContentTopbar
                             onAddPage={() => { setShowAddPageDialog(true) }}
-                            onPreview={() => { }}
+                            onPreview={() => { navigate(`/form-preview/${formId || "new"}`) }}
                             isMobileView={isMobileView}
                             onToggleView={() => setIsMobileView(prev => !prev)}
                         />
@@ -428,13 +367,13 @@ export function FormBuilderPage() {
             <PublishDialog
                 open={showPublishDialog}
                 onOpenChange={setShowPublishDialog}
-                id={id}
+                id={formId}
                 isPublished={isPublished}
-                slug={id && id !== "new" ? forms.find((f) => f.id === id)?.slug : undefined}
+                slug={formId && formId !== "new" ? forms.find((f) => f.id === formId)?.slug : undefined}
                 onIsPublishedChange={setIsPublished}
                 onOpenForm={() => {
                     setShowPublishDialog(false)
-                    const slug = id && id !== "new" ? forms.find((f) => f.id === id)?.slug : "form-slug"
+                    const slug = formId && formId !== "new" ? forms.find((f) => f.id === formId)?.slug : "form-slug"
                     navigate(`/form/${slug}`)
                 }}
             />
@@ -442,7 +381,7 @@ export function FormBuilderPage() {
             <AddPageDialog
                 open={showAddPageDialog}
                 onOpenChange={setShowAddPageDialog}
-                id={id}
+                id={formId}
                 pagesLength={pages.length}
                 onAddPage={addPage}
                 onShowSaveStatus={showSaveStatus}

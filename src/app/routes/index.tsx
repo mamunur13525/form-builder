@@ -8,8 +8,15 @@ import { SignupPage } from "../../pages/Signup"
 import { DashboardPage } from "../../pages/Dashboard"
 import { FormBuilderPage } from "../../pages/FormBuilder"
 import { FormPreviewPage } from "../../pages/FormPreview"
-import { FormResponsePage } from "../../pages/FormResponse"
+import { SubmissionsPage } from "../../pages/FormResponse"
+import { SummaryPage } from "../../pages/FormResponse"
+import { AnalyticsPage } from "../../pages/FormResponse"
+import { FormSettingsPage } from "../../pages/FormSettings/FormSettingsPage"
+import { FormIntegrationsPage } from "../../pages/FormIntegrations/FormIntegrationsPage"
+import { FormSharePage } from "../../pages/FormShare/FormSharePage"
 import { FormFillPage } from "../../pages/FormFill"
+import { FormLayout } from "../layouts/FormLayout"
+import { ROUTES } from "@/shared/constants/routes"
 
 function AppShell() {
     return (
@@ -39,25 +46,35 @@ export const router = createBrowserRouter([
     {
         element: <AppShell />,
         children: [
-            { path: "/", element: <HomePage /> },
+            { path: ROUTES.HOME, element: <HomePage /> },
             {
                 element: <PublicLayout />,
                 children: [
-                    { path: "/login", element: <LoginPage /> },
-                    { path: "/signup", element: <SignupPage /> },
+                    { path: ROUTES.LOGIN, element: <LoginPage /> },
+                    { path: ROUTES.SIGNUP, element: <SignupPage /> },
                 ],
             },
             {
                 element: <ProtectedLayout />,
                 children: [
-                    { path: "/dashboard", element: <DashboardPage /> },
-                    { path: "/form-builder/:id", element: <FormBuilderPage /> },
-                    { path: "/form-preview/:id", element: <FormPreviewPage /> },
-                    { path: "/form-response/:id", element: <FormResponsePage /> },
+                    { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
+                    {
+                        element: <FormLayout />,
+                        children: [
+                            { path: ROUTES.FORM_BUILDER, element: <FormBuilderPage /> },
+                            { path: ROUTES.FORM_SETTINGS, element: <FormSettingsPage /> },
+                            { path: ROUTES.FORM_INTEGRATIONS, element: <FormIntegrationsPage /> },
+                            { path: ROUTES.FORM_SHARE, element: <FormSharePage /> },
+                            { path: ROUTES.FORM_RESPONSE_SUBMISSIONS, element: <SubmissionsPage /> },
+                            { path: ROUTES.FORM_RESPONSE_SUMMARY, element: <SummaryPage /> },
+                            { path: ROUTES.FORM_RESPONSE_ANALYTICS, element: <AnalyticsPage /> },
+                        ]
+                    },
+                    { path: ROUTES.FORM_PREVIEW, element: <FormPreviewPage /> },
                 ],
             },
-            { path: "/form/:slug", element: <FormFillPage /> },
-            { path: "*", element: <Navigate to="/" replace /> },
+            { path: ROUTES.FORM_FILL, element: <FormFillPage /> },
+            { path: "*", element: <Navigate to={ROUTES.HOME} replace /> },
         ],
     },
 ])

@@ -59,12 +59,14 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                             <Asterisk className="h-3.5 w-3.5 text-red-500" />
-                            <Label className="text-xs cursor-pointer">Required</Label>
+                            <Label htmlFor="required" className="text-xs cursor-pointer">Required</Label>
                         </div>
+                        
                         <Switch
                             checked={page.required}
                             onCheckedChange={(checked) => onUpdate(pageIndex, { required: checked })}
                             size="sm"
+                            id="required"
                         />
                     </div>
                     <p className="text-[11px] text-muted-foreground">Respondents must answer this field to submit the form.</p>

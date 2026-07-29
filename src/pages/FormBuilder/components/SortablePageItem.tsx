@@ -162,19 +162,20 @@ export function SortablePageItem({
           `}
           aria-label="Page actions"
         >
-          <MoreVertical className="h-3.5 w-3.5" />
+          <MoreVertical className="h-3 w-3" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="bottom" sideOffset={4}>
-          <DropdownMenuItem onClick={() => onDuplicate(index)}>
-            <Copy className="h-4 w-4" />
+        <DropdownMenuContent align="start" side="right" sideOffset={4}>
+          <DropdownMenuItem onClick={() => onDuplicate(index)} className="px-2 py-1 gap-1.5 text-xs">
+            <Copy size={12} />
             Duplicate
           </DropdownMenuItem>
           {index !== 0 && (
             <DropdownMenuItem
               onClick={() => onMoveUp(index)}
               disabled={index === 0}
+              className="px-2 py-1 gap-1.5 text-xs"
             >
-              <ChevronUp className="h-4 w-4" />
+              <ChevronUp size={12} />
               Move up
             </DropdownMenuItem>
           )}
@@ -182,8 +183,9 @@ export function SortablePageItem({
             <DropdownMenuItem
               onClick={() => onMoveDown(index)}
               disabled={index === pagesCount - 1}
+              className="px-2 py-1 gap-1.5 text-xs"
             >
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown size={12} />
               Move down
             </DropdownMenuItem>
           )}
@@ -191,8 +193,9 @@ export function SortablePageItem({
           <DropdownMenuItem
             onClick={() => onDelete(index)}
             variant="destructive"
+            className="px-2 py-1 gap-1.5 text-xs"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 size={12} />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

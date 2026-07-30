@@ -1,4 +1,5 @@
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "../../shared/utils/cn"
 
 interface DialogProps {
@@ -8,14 +9,30 @@ interface DialogProps {
 }
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
-    if (!open) return null
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="fixed inset-0 bg-black/50" onClick={() => onOpenChange(false)} />
-            <div className="relative z-50 w-full max-w-lg rounded-lg border bg-background p-6 shadow-lg mx-4">
-                {children}
-            </div>
-        </div>
+        <AnimatePresence>
+            {open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <motion.div
+                        className="fixed inset-0 bg-black/50"
+                        onClick={() => onOpenChange(false)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    />
+                    <motion.div
+                        className="relative z-50 w-full max-w-lg rounded-lg border bg-background p-6 shadow-lg mx-4"
+                        initial={{ opacity: 0, scale: 0.96, y: -12 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                    >
+                        {children}
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
     )
 }
 

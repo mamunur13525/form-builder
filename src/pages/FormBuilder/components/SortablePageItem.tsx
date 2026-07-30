@@ -89,7 +89,7 @@ export function SortablePageItem({
       <div className="shrink-0 flex flex-col items-end gap-0.5">
         <div
           className={`
-            w-fit min-w-10 h-5 rounded flex items-center justify-center
+            w-fit min-w-9 h-5 rounded flex items-center justify-center
             bg-linear-to-br transition-all duration-200 gap-1 relative
             ${colorClass}
             ${isSelected ? "ring-1 ring-primary/20" : ""}

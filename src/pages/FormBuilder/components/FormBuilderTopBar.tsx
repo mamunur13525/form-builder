@@ -10,13 +10,14 @@ import {
   Loader2,
   AlertCircle,
   Home,
+  Pencil,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { updateForm } from "@/entities/form/api/form.api";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
 import {
@@ -26,6 +27,7 @@ import {
   DialogFooter,
   DialogContent,
 } from "../../../components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 const navLinks = [
   { to: ROUTES.FORM_BUILDER, icon: Wrench, label: "Build" },
@@ -111,21 +113,22 @@ export function FormBuilderTopBar({
 
   return (
     <div className="flex items-center justify-between px-4 py-2 shrink-0 bg-background border-b">
-      <div className="flex items-center gap-2">      
+      <div className="flex items-center gap-2">
         <nav className="flex items-center gap-1.5 text-sm">
           <button
             onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors font-medium"
+            className="flex items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors font-medium cursor-pointer"
           >
-            <Home className="w-3 h-3 mb-0.5"/>
+            <Home className="w-3 h-3 mb-0.5" />
             forms
           </button>
           <span className="text-muted-foreground">/</span>
           <button
             onClick={openTitleDialog}
-            className="text-foreground hover:text-primary transition-colors font-semibold flex items-center gap-1 hover:cursor-text"
+            className="text-foreground hover:text-primary transition-colors font-semibold flex items-center gap-1 cursor-pointer group"
           >
             {title}
+            <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-100 duration-300" />
           </button>
         </nav>
         {saveError && (
@@ -143,8 +146,8 @@ export function FormBuilderTopBar({
             }
             end={to === ROUTES.FORM_BUILDER}
           >
-            <Icon className="h-4 w-4" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider">
+            <Icon className="h-3 w-3" />
+            <span className="text-[8px] font-semibold uppercase tracking-wider">
               {label}
             </span>
           </NavLink>
@@ -235,6 +238,7 @@ export function FormBuilderTopBar({
             </Button>
             <Button onClick={handleTitleSave} disabled={isSaving}>
               {isSaving ? "Saving..." : "Save"}
+              {isSaving && <Spinner data-icon="inline-start" />}
             </Button>
           </DialogFooter>
         </DialogContent>

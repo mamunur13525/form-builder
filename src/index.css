@@ -130,3 +130,16 @@
         @apply font-sans;
     }
 }
+
+/* Editable placeholder styling for contentEditable elements */
+[contenteditable][data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: var(--muted-foreground);
+    font-style: italic;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+[contenteditable][data-placeholder]:empty:focus:before {
+    opacity: 0.35;
+}

@@ -204,7 +204,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                         </Select>
                     </div>
                     <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground">Submit Button Text</Label>
+                        <Label className="text-[11px] text-muted-foreground">Button Text</Label>
                         <Input
                             value={page.appearance.submitButtonText ?? ""}
                             onChange={(e) =>
@@ -217,7 +217,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                         />
                     </div>
                     <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground">Submit Button Color</Label>
+                        <Label className="text-[11px] text-muted-foreground">Button Color</Label>
                         <div className="flex items-center gap-2">
                             <input
                                 type="color"

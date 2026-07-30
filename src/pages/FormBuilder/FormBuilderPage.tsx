@@ -18,7 +18,6 @@ import { useFormContext } from "@/features/forms/hooks/useFormContext";
 import { FormBuilderSidebar } from "./components/FormBuilderSidebar";
 import { PageContentEditor } from "./components/PageContentEditor/PageContentEditor";
 import { SettingsPanel } from "./components/SettingsPanel";
-import { PublishDialog } from "./components/PublishDialog";
 import { AddPageDialog } from "./components/AddPageDialog";
 import PageContentTopbar from "./components/PageContentEditor/PageContentTopbar";
 import { cn } from "@/lib/utils";
@@ -27,12 +26,11 @@ export function FormBuilderPage() {
   const { formId } = useParams();
   const navigate = useNavigate();
   const { forms, fetchForms } = useFormStore();
-  const { form, isLoading: isLoadingForm, error: formError, isPublished, setIsPublished, showSaveStatus } = useFormContext();
+  const { form, isLoading: isLoadingForm, error: formError, showSaveStatus } = useFormContext();
 
   const [pages, setPages] = useState<FormField[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
-  const [showPublishDialog, setShowPublishDialog] = useState(false);
   const pendingFieldUpdateRef = useRef<
     { fieldId: string; data: Record<string, unknown> } | null
   >(null);
@@ -341,27 +339,6 @@ export function FormBuilderPage() {
           )}
         </ResizablePanel>
       </ResizablePanelGroup>
-
-      <PublishDialog
-        open={showPublishDialog}
-        onOpenChange={setShowPublishDialog}
-        id={formId}
-        isPublished={isPublished}
-        slug={
-          formId && formId !== "new"
-            ? forms.find((f) => f.id === formId)?.slug
-            : undefined
-        }
-        onIsPublishedChange={setIsPublished}
-        onOpenForm={() => {
-          setShowPublishDialog(false);
-          const slug =
-            formId && formId !== "new"
-              ? forms.find((f) => f.id === formId)?.slug
-              : "form-slug";
-          navigate(`/form/${slug}`);
-        }}
-      />
 
       <AddPageDialog
         open={showAddPageDialog}

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { FileText } from "lucide-react"
 import { Button } from "../../../components/ui/button"
-import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../../components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "../../../components/ui/input"
 import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, FIELD_TYPE_COLORS, type FieldType } from "../../../shared/constants/form-types"
 import type { FormField } from "../../../shared/types/common"
@@ -79,64 +79,66 @@ export function AddPageDialog({
     )
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange} className="max-w-xl">
-            <DialogHeader>
-                <DialogTitle>Add a Page</DialogTitle>
-                <DialogDescription>
-                    Choose the type of page you want to add to your form.
-                </DialogDescription>
-            </DialogHeader>
-            
-            {/* Search Input */}
-            <div className="py-2" key="search-input">
-                <Input
-                    ref={searchInputRef}
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-8 text-sm"
-                />
-            </div>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Add a Page</DialogTitle>
+                    <DialogDescription>
+                        Choose the type of page you want to add to your form.
+                    </DialogDescription>
+                </DialogHeader>
+                
+                {/* Search Input */}
+                <div className="py-2" key="search-input">
+                    <Input
+                        ref={searchInputRef}
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="h-8 text-sm"
+                    />
+                </div>
 
-            <div 
-                key="page-types-grid"
-                className="grid grid-cols-3 gap-1.5 min-h-32 overflow-y-auto py-1"
-            >
-                {filteredPageTypes.length > 0 ? (
-                    filteredPageTypes.map((pt) => {
-                        const Icon: LucideIcon = pt.icon || FileText
-                        const colorClass = FIELD_TYPE_COLORS[pt.type] || "from-gray-500/20 to-gray-600/10 text-gray-600 dark:text-gray-400"
-                        
-                        return (
-                            <button
-                                key={pt.type}
-                                onClick={() => addPage(pt.type)}
-                                className="flex items-center gap-2 p-2 rounded-md border hover:bg-accent hover:border-primary/50 transition-all text-left group"
-                            >
-                                <div className={`
-                                    w-7 h-7 rounded flex items-center justify-center
-                                    bg-linear-to-br shrink-0 transition-all duration-200
-                                    ${colorClass}
-                                `}>
-                                    <Icon className="h-3.5 w-3.5" />
-                                </div>
-                                <span className="text-xs font-medium leading-tight">{pt.label}</span>
-                            </button>
-                        )
-                    })
-                ) : (
-                    <div className="col-span-3 flex flex-col items-center justify-center py-8 text-center">
-                        <FileText className="h-8 w-8 text-muted-foreground/50 mb-2" />
-                        <p className="text-sm text-muted-foreground">No page types found</p>
-                        <p className="text-xs text-muted-foreground/70 mt-1">Try a different search term</p>
-                    </div>
-                )}
-            </div>
-            <DialogFooter>
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
-                    Cancel
-                </Button>
-            </DialogFooter>
+                <div 
+                    key="page-types-grid"
+                    className="grid grid-cols-3 gap-1.5 min-h-32 overflow-y-auto py-1"
+                >
+                    {filteredPageTypes.length > 0 ? (
+                        filteredPageTypes.map((pt) => {
+                            const Icon: LucideIcon = pt.icon || FileText
+                            const colorClass = FIELD_TYPE_COLORS[pt.type] || "from-gray-500/20 to-gray-600/10 text-gray-600 dark:text-gray-400"
+                            
+                            return (
+                                <button
+                                    key={pt.type}
+                                    onClick={() => addPage(pt.type)}
+                                    className="flex items-center gap-2 p-2 rounded-md border hover:bg-accent hover:border-primary/50 transition-all text-left group"
+                                >
+                                    <div className={`
+                                        w-7 h-7 rounded flex items-center justify-center
+                                        bg-linear-to-br shrink-0 transition-all duration-200
+                                        ${colorClass}
+                                    `}>
+                                        <Icon className="h-3.5 w-3.5" />
+                                    </div>
+                                    <span className="text-xs font-medium leading-tight">{pt.label}</span>
+                                </button>
+                            )
+                        })
+                    ) : (
+                        <div className="col-span-3 flex flex-col items-center justify-center py-8 text-center">
+                            <FileText className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                            <p className="text-sm text-muted-foreground">No page types found</p>
+                            <p className="text-xs text-muted-foreground/70 mt-1">Try a different search term</p>
+                        </div>
+                    )}
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Cancel
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
         </Dialog>
     )
 }

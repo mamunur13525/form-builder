@@ -3,7 +3,7 @@ import { CheckCircle } from "lucide-react"
 import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
 import { Label } from "../../../components/ui/label"
-import { Dialog, DialogHeader, DialogTitle, DialogDescription } from "../../../components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useFormStore } from "../../../app/store/formStore"
 
 interface PublishDialogProps {
@@ -35,15 +35,16 @@ export function PublishDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogHeader>
-                <DialogTitle>{isPublished ? "Form Published" : "Publish Form"}</DialogTitle>
-                <DialogDescription>
-                    {isPublished
-                        ? "Your form is live and ready to collect responses."
-                        : "Publish your form to make it available for users to fill out."}
-                </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{isPublished ? "Form Published" : "Publish Form"}</DialogTitle>
+                    <DialogDescription>
+                        {isPublished
+                            ? "Your form is live and ready to collect responses."
+                            : "Publish your form to make it available for users to fill out."}
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
                 {isPublished ? (
                     <div className="space-y-3">
                         <div className="flex items-center gap-2 text-green-600">
@@ -98,6 +99,7 @@ export function PublishDialog({
                     </div>
                 )}
             </div>
+            </DialogContent>
         </Dialog>
     )
 }

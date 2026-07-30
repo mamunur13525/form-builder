@@ -3,30 +3,11 @@ import { FileText } from "lucide-react"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../../components/ui/dialog"
 import { Input } from "../../../components/ui/input"
-import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, type FieldType } from "../../../shared/constants/form-types"
+import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, FIELD_TYPE_COLORS, type FieldType } from "../../../shared/constants/form-types"
 import type { FormField } from "../../../shared/types/common"
 import type { LucideIcon } from "lucide-react"
 
 type PageType = keyof typeof FIELD_TYPE_LABELS
-
-// Map field types to subtle accent colors for the icon badge (matching SortablePageItem)
-const FIELD_TYPE_COLORS: Record<string, string> = {
-    shortText: "from-blue-500/20 to-blue-600/10 text-blue-600 dark:text-blue-400",
-    longText: "from-sky-500/20 to-sky-600/10 text-sky-600 dark:text-sky-400",
-    email: "from-violet-500/20 to-violet-600/10 text-violet-600 dark:text-violet-400",
-    phone: "from-emerald-500/20 to-emerald-600/10 text-emerald-600 dark:text-emerald-400",
-    number: "from-amber-500/20 to-amber-600/10 text-amber-600 dark:text-amber-400",
-    date: "from-rose-500/20 to-rose-600/10 text-rose-600 dark:text-rose-400",
-    time: "from-cyan-500/20 to-cyan-600/10 text-cyan-600 dark:text-cyan-400",
-    radio: "from-orange-500/20 to-orange-600/10 text-orange-600 dark:text-orange-400",
-    checkbox: "from-indigo-500/20 to-indigo-600/10 text-indigo-600 dark:text-indigo-400",
-    select: "from-teal-500/20 to-teal-600/10 text-teal-600 dark:text-teal-400",
-    multiSelect: "from-purple-500/20 to-purple-600/10 text-purple-600 dark:text-purple-400",
-    file: "from-pink-500/20 to-pink-600/10 text-pink-600 dark:text-pink-400",
-    rating: "from-yellow-500/20 to-yellow-600/10 text-yellow-600 dark:text-yellow-400",
-    yesNo: "from-green-500/20 to-green-600/10 text-green-600 dark:text-green-400",
-    url: "from-slate-500/20 to-slate-600/10 text-slate-600 dark:text-slate-400",
-}
 
 interface AddPageDialogProps {
     open: boolean
@@ -107,17 +88,20 @@ export function AddPageDialog({
             </DialogHeader>
             
             {/* Search Input */}
-            <div className="py-2" key={open ? "open" : "closed"}>
+            <div className="py-2" key="search-input">
                 <Input
                     ref={searchInputRef}
-                    placeholder="Search page types..."
+                    placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="h-8 text-sm"
                 />
             </div>
 
-            <div className="grid grid-cols-3 gap-1.5 min-h-32 overflow-y-auto py-1">
+            <div 
+                key="page-types-grid"
+                className="grid grid-cols-3 gap-1.5 min-h-32 overflow-y-auto py-1"
+            >
                 {filteredPageTypes.length > 0 ? (
                     filteredPageTypes.map((pt) => {
                         const Icon: LucideIcon = pt.icon || FileText
@@ -127,7 +111,7 @@ export function AddPageDialog({
                             <button
                                 key={pt.type}
                                 onClick={() => addPage(pt.type)}
-                                className="flex items-center gap-2 p-2 rounded-md border hover:bg-accent hover:border-primary/50 transition-all text-left group h-11"
+                                className="flex items-center gap-2 p-2 rounded-md border hover:bg-accent hover:border-primary/50 transition-all text-left group"
                             >
                                 <div className={`
                                     w-7 h-7 rounded flex items-center justify-center

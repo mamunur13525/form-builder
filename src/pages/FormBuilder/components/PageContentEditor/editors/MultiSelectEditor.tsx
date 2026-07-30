@@ -13,7 +13,7 @@ interface EditorProps {
 export function MultiSelectEditor({ page, pageIndex, onUpdate }: EditorProps) {
     return (
         <div className="space-y-3">
-            <Label className="text-xs text-muted-foreground">Options</Label>
+            <Label className="text-base text-muted-foreground">Options</Label>
             {page.options.map((opt, optIndex) => (
                 <div key={optIndex} className="flex items-center gap-2">
                     <ListChecks className="h-4 w-4 text-muted-foreground shrink-0" />

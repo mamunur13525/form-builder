@@ -31,7 +31,7 @@ export function FormPreviewPage() {
   if (isLoading || isFetching) {
     return (
       <div className="text-center py-20">
-        <p className="text-muted-foreground">Loading form...</p>
+        <p className="text-base text-muted-foreground">Loading form...</p>
       </div>
     );
   }
@@ -39,7 +39,7 @@ export function FormPreviewPage() {
   if (!apiForm) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold">Form not found</h2>
+        <h2 className="text-3xl font-bold">Form not found</h2>
         <Button className="mt-4" onClick={() => navigate(ROUTES.DASHBOARD)}>
           Back to Dashboard
         </Button>
@@ -118,12 +118,12 @@ export function FormPreviewPage() {
           <div className="w-px h-5 bg-border mx-0.5" />
 
           <div className="flex items-center gap-2 pl-1 pr-1">
-            <Badge variant="outline" className="text-[10px] font-normal">
+            <Badge variant="outline" className="text-sm font-normal">
               Preview
             </Badge>
             <label
               htmlFor="skip-validation"
-              className="text-[11px] text-muted-foreground cursor-pointer select-none whitespace-nowrap"
+              className="text-sm text-muted-foreground cursor-pointer select-none whitespace-nowrap"
             >
               Skip validation
             </label>

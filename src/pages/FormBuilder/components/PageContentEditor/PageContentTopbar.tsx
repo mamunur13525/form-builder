@@ -93,7 +93,7 @@ const PageContentTopbar = ({
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 shrink-0 bg-background border rounded-md">
+    <div className="flex items-center px-4 py-2 shrink-0 bg-background border rounded-md">
       <div className="flex items-center gap-1">
         {leftButtons.map((button) => (
           <Button
@@ -102,12 +102,12 @@ const PageContentTopbar = ({
             variant={button.variant ?? "ghost"}
             className={
               button.variant === "default"
-                ? "h-8 gap-1.5 text-xs font-medium"
-                : "h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                ? "h-9 gap-1.5 text-sm font-medium"
+                : "h-9 gap-1.5 text-sm text-muted-foreground hover:text-foreground"
             }
             onClick={() => handleBtnClick(button.type)}
           >
-            <button.icon className="h-3.5 w-3.5" />
+            <button.icon className="h-4 w-4" />
             {button.label}
           </Button>
         ))}
@@ -120,7 +120,7 @@ const PageContentTopbar = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  className="h-9 w-9 text-muted-foreground hover:text-foreground"
                   onClick={() => handleBtnClick(button.type)}
                 >
                   <button.icon className="h-4 w-4" />

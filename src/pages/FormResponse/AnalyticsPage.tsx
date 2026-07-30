@@ -23,7 +23,7 @@ export function AnalyticsPage() {
     if (!form) {
         return (
             <div className="text-center py-20">
-                <h2 className="text-2xl font-bold">Form not found</h2>
+                <h2 className="text-3xl font-bold">Form not found</h2>
             </div>
         )
     }
@@ -51,8 +51,8 @@ export function AnalyticsPage() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div className="flex-1">
-                        <h1 className="text-sm font-bold">Analytics</h1>
-                        <p className="text-[11px] text-muted-foreground">Detailed insights and statistics</p>
+                        <h1 className="text-lg font-bold">Analytics</h1>
+                        <p className="text-base text-muted-foreground">Detailed insights and statistics</p>
                     </div>
                 </div>
             </div>
@@ -63,26 +63,26 @@ export function AnalyticsPage() {
                     <TabsList className="bg-transparent h-9">
                         <TabsTrigger
                             value="submissions"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/submissions`)}
                         >
-                            <FileText className="h-3.5 w-3.5" />
+                            <FileText className="h-4 w-4" />
                             Submissions
                         </TabsTrigger>
                         <TabsTrigger
                             value="summary"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/summary`)}
                         >
-                            <BarChart3 className="h-3.5 w-3.5" />
+                            <BarChart3 className="h-4 w-4" />
                             Summary
                         </TabsTrigger>
                         <TabsTrigger
                             value="analytics"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/analytics`)}
                         >
-                            <Activity className="h-3.5 w-3.5" />
+                            <Activity className="h-4 w-4" />
                             Analytics
                         </TabsTrigger>
                     </TabsList>
@@ -95,13 +95,13 @@ export function AnalyticsPage() {
                 {isLoading ? (
                     <Card>
                         <CardContent className="text-center py-12">
-                            <p className="text-muted-foreground">Loading analytics...</p>
+                            <p className="text-base text-muted-foreground">Loading analytics...</p>
                         </CardContent>
                     </Card>
                 ) : totalResponses === 0 ? (
                     <Card>
                         <CardContent className="text-center py-12">
-                            <p className="text-muted-foreground">No data available yet. Share your form to start collecting responses.</p>
+                            <p className="text-base text-muted-foreground">No data available yet. Share your form to start collecting responses.</p>
                         </CardContent>
                     </Card>
                 ) : (
@@ -115,7 +115,7 @@ export function AnalyticsPage() {
                             <Card>
                                 <CardContent className="pt-6">
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium text-muted-foreground">Total Responses</p>
+                                        <p className="text-base font-medium text-muted-foreground">Total Responses</p>
                                         <p className="text-3xl font-bold">{totalResponses}</p>
                                     </div>
                                 </CardContent>
@@ -123,7 +123,7 @@ export function AnalyticsPage() {
                             <Card>
                                 <CardContent className="pt-6">
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium text-muted-foreground">Unique Respondents</p>
+                                        <p className="text-base font-medium text-muted-foreground">Unique Respondents</p>
                                         <p className="text-3xl font-bold">{uniqueRespondents}</p>
                                     </div>
                                 </CardContent>
@@ -131,7 +131,7 @@ export function AnalyticsPage() {
                             <Card>
                                 <CardContent className="pt-6">
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium text-muted-foreground">Today's Responses</p>
+                                        <p className="text-base font-medium text-muted-foreground">Today's Responses</p>
                                         <p className="text-3xl font-bold">{todayResponses}</p>
                                     </div>
                                 </CardContent>
@@ -139,7 +139,7 @@ export function AnalyticsPage() {
                             <Card>
                                 <CardContent className="pt-6">
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium text-muted-foreground">Completion Rate</p>
+                                        <p className="text-base font-medium text-muted-foreground">Completion Rate</p>
                                         <p className="text-3xl font-bold">{completionRate}%</p>
                                     </div>
                                 </CardContent>
@@ -151,7 +151,7 @@ export function AnalyticsPage() {
                             <Card>
                                 <CardContent className="pt-6">
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium text-muted-foreground">Avg. Completion Time</p>
+                                        <p className="text-base font-medium text-muted-foreground">Avg. Completion Time</p>
                                         <p className="text-2xl font-bold">{avgCompletionTime}s</p>
                                     </div>
                                 </CardContent>
@@ -159,7 +159,7 @@ export function AnalyticsPage() {
                             <Card>
                                 <CardContent className="pt-6">
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium text-muted-foreground">Total Fields</p>
+                                        <p className="text-base font-medium text-muted-foreground">Total Fields</p>
                                         <p className="text-2xl font-bold">{form.fields.length}</p>
                                     </div>
                                 </CardContent>

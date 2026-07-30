@@ -74,7 +74,7 @@ export function SortablePageItem({
       {...listeners}
       onClick={() => onSelect(index)}
       className={`
-        group relative flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm
+        group relative flex items-center gap-2.5 px-3 py-3.5 rounded-md text-sm
         transition-all duration-200 ease-out cursor-pointer select-none
         ${isSelected
           ? "bg-linear-to-br from-primary/10 to-primary/5 text-primary shadow-sm shadow-primary/5 ring-1 ring-primary/20"
@@ -89,7 +89,7 @@ export function SortablePageItem({
       <div className="shrink-0 flex flex-col items-end gap-0.5">
         <div
           className={`
-            w-fit min-w-9 h-5 rounded flex items-center justify-center
+            w-fit min-w-12 h-7 rounded-md flex items-center justify-center
             bg-linear-to-br transition-all duration-200 gap-1 relative
             ${colorClass}
             ${isSelected ? "ring-1 ring-primary/20" : ""}
@@ -100,10 +100,10 @@ export function SortablePageItem({
               *
             </span>
           )}
-          <Icon className="h-3 w-3" />
+          <Icon className="h-4 w-4" />
           <span
             className={`
-            text-[10px] font-semibold leading-none transition-colors duration-200
+            text-xs font-semibold leading-none transition-colors duration-200
             ${isSelected
                 ? "text-primary"
                 : "text-muted-foreground/70 group-hover:text-muted-foreground"
@@ -116,9 +116,9 @@ export function SortablePageItem({
       </div>
 
       {/* Label */}
-      <span className="flex-1 truncate min-w-0 text-xs font-normal leading-tight">
+      <span className="flex-1 truncate min-w-0 text-sm font-normal leading-tight">
         {page.label || (
-          <span className="italic opacity-50">Untitled {page.type}</span>
+          <span className="italic opacity-50">...</span>
         )}
       </span>
 

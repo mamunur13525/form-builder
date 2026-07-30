@@ -23,7 +23,7 @@ export function SummaryPage() {
     if (!form) {
         return (
             <div className="text-center py-20">
-                <h2 className="text-2xl font-bold">Form not found</h2>
+                <h2 className="text-3xl font-bold">Form not found</h2>
             </div>
         )
     }
@@ -48,8 +48,8 @@ export function SummaryPage() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div className="flex-1">
-                        <h1 className="text-sm font-bold">Summary</h1>
-                        <p className="text-[11px] text-muted-foreground">Overview of your form responses</p>
+                        <h1 className="text-lg font-bold">Summary</h1>
+                        <p className="text-base text-muted-foreground">Overview of your form responses</p>
                     </div>
                 </div>
             </div>
@@ -60,26 +60,26 @@ export function SummaryPage() {
                     <TabsList className="bg-transparent h-9">
                         <TabsTrigger
                             value="submissions"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/submissions`)}
                         >
-                            <FileText className="h-3.5 w-3.5" />
+                            <FileText className="h-4 w-4" />
                             Submissions
                         </TabsTrigger>
                         <TabsTrigger
                             value="summary"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/summary`)}
                         >
-                            <BarChart3 className="h-3.5 w-3.5" />
+                            <BarChart3 className="h-4 w-4" />
                             Summary
                         </TabsTrigger>
                         <TabsTrigger
                             value="analytics"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/analytics`)}
                         >
-                            <Activity className="h-3.5 w-3.5" />
+                            <Activity className="h-4 w-4" />
                             Analytics
                         </TabsTrigger>
                     </TabsList>
@@ -91,13 +91,13 @@ export function SummaryPage() {
                 {isLoading ? (
                     <Card>
                         <CardContent className="text-center py-12">
-                            <p className="text-muted-foreground">Loading summary...</p>
+                            <p className="text-base text-muted-foreground">Loading summary...</p>
                         </CardContent>
                     </Card>
                 ) : totalResponses === 0 ? (
                     <Card>
                         <CardContent className="text-center py-12">
-                            <p className="text-muted-foreground">No responses yet</p>
+                            <p className="text-base text-muted-foreground">No responses yet</p>
                         </CardContent>
                     </Card>
                 ) : (

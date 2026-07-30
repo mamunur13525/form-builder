@@ -32,21 +32,13 @@ export function SubmissionsPage() {
     if (!form) {
         return (
             <div className="text-center py-20">
-                <h2 className="text-2xl font-bold">Form not found</h2>
+                <h2 className="text-3xl font-bold">Form not found</h2>
                 <Button className="mt-4" onClick={() => navigate("/dashboard")}>
                     Back to Dashboard
                 </Button>
             </div>
         )
     }
-
-    const getCurrentTab = () => {
-        if (location.pathname.includes("/summary")) return "summary"
-        if (location.pathname.includes("/analytics")) return "analytics"
-        return "submissions"
-    }
-
-    const currentTab = getCurrentTab()
 
     return (
         <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">
@@ -57,11 +49,11 @@ export function SubmissionsPage() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div className="flex-1">
-                        <h1 className="text-sm font-bold">Submissions</h1>
-                        <p className="text-[11px] text-muted-foreground">{formResponses.length} total responses</p>
+                        <h1 className="text-lg font-bold">Submissions</h1>
+                        <p className="text-base text-muted-foreground">{formResponses.length} total responses</p>
                     </div>
-                    <Button variant="outline" size="sm" className="h-8 text-xs">
-                        <Download className="mr-1.5 h-3.5 w-3.5" />
+                    <Button variant="outline" size="sm" className="h-9 text-base">
+                        <Download className="mr-1.5 h-4 w-4" />
                         Export
                     </Button>
                 </div>
@@ -73,26 +65,26 @@ export function SubmissionsPage() {
                     <TabsList className="bg-transparent h-9">
                         <TabsTrigger
                             value="submissions"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/submissions`)}
                         >
-                            <FileText className="h-3.5 w-3.5" />
+                            <FileText className="h-4 w-4" />
                             Submissions
                         </TabsTrigger>
                         <TabsTrigger
                             value="summary"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/summary`)}
                         >
-                            <BarChart3 className="h-3.5 w-3.5" />
+                            <BarChart3 className="h-4 w-4" />
                             Summary
                         </TabsTrigger>
                         <TabsTrigger
                             value="analytics"
-                            className="text-xs gap-1.5 h-7"
+                            className="text-sm gap-1.5 h-7"
                             onClick={() => navigate(`/form-response/${id}/analytics`)}
                         >
-                            <Activity className="h-3.5 w-3.5" />
+                            <Activity className="h-4 w-4" />
                             Analytics
                         </TabsTrigger>
                     </TabsList>
@@ -108,7 +100,7 @@ export function SubmissionsPage() {
                     >
                         <Card>
                             <CardContent className="text-center py-12">
-                                <p className="text-muted-foreground">No responses yet</p>
+                                <p className="text-base text-muted-foreground">No responses yet</p>
                                 <Button
                                     variant="outline"
                                     className="mt-4"

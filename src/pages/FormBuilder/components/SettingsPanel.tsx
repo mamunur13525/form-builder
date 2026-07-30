@@ -28,7 +28,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
     return (
         <div className="w-full h-full flex flex-col bg-background border rounded-md  overflow-hidden">
             <div className="p-3 border-b">
-                <h3 className="flex items-center gap-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <h3 className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     <Settings2 className="h-4 w-4" />
                     Settings
                 </h3>
@@ -36,7 +36,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
             <div className="flex-1 overflow-y-auto p-4 space-y-5">
                 {/* Field Type */}
                 <div className="space-y-2">
-                    <Label className="text-xs">Field Type</Label>
+                    <Label className="text-base">Field Type</Label>
                     <Select
                         value={page.type}
                         onValueChange={(value) => onUpdate(pageIndex, { type: value as FormField["type"] })}
@@ -59,7 +59,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                             <Asterisk className="h-3.5 w-3.5 text-red-500" />
-                            <Label htmlFor="required" className="text-xs cursor-pointer">Required</Label>
+                            <Label htmlFor="required" className="text-base cursor-pointer">Required</Label>
                         </div>
                         
                         <Switch
@@ -69,19 +69,19 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                             id="required"
                         />
                     </div>
-                    <p className="text-[11px] text-muted-foreground">Respondents must answer this field to submit the form.</p>
+                    <p className="text-xs text-muted-foreground">Respondents must answer this field to submit the form.</p>
                 </div>
 
                 {/* Validation */}
                 <div className="space-y-3">
                     <div className="flex items-center gap-1.5">
-                        <Label className="text-xs font-semibold">Validation</Label>
+                        <Label className="text-base font-semibold">Validation</Label>
                     </div>
-                    <p className="text-[11px] text-muted-foreground -mt-1">Control what respondents can enter, like character limits or number ranges.</p>
+                    <p className="text-xs text-muted-foreground -mt-1">Control what respondents can enter, like character limits or number ranges.</p>
                     {(page.type === "shortText" || page.type === "longText") && (
                         <>
                             <div className="space-y-1">
-                                <Label className="text-[11px] text-muted-foreground">Min Length</Label>
+                                <Label className="text-base text-muted-foreground">Min Length</Label>
                                 <Input
                                     type="number"
                                     value={page.validation?.minLength ?? ""}
@@ -91,11 +91,11 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                         })
                                     }
                                     placeholder="0"
-                                    className="h-8 text-sm"
+                                    className="h-8 text-base"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <Label className="text-[11px] text-muted-foreground">Max Length</Label>
+                                <Label className="text-base text-muted-foreground">Max Length</Label>
                                 <Input
                                     type="number"
                                     value={page.validation?.maxLength ?? ""}
@@ -105,7 +105,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                         })
                                     }
                                     placeholder="1000"
-                                    className="h-8 text-sm"
+                                    className="h-8 text-base"
                                 />
                             </div>
                         </>
@@ -113,7 +113,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                     {page.type === "number" && (
                         <>
                             <div className="space-y-1">
-                                <Label className="text-[11px] text-muted-foreground">Min Value</Label>
+                                <Label className="text-base text-muted-foreground">Min Value</Label>
                                 <Input
                                     type="number"
                                     value={page.validation?.min ?? ""}
@@ -123,11 +123,11 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                         })
                                     }
                                     placeholder="0"
-                                    className="h-8 text-sm"
+                                    className="h-8 text-base"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <Label className="text-[11px] text-muted-foreground">Max Value</Label>
+                                <Label className="text-base text-muted-foreground">Max Value</Label>
                                 <Input
                                     type="number"
                                     value={page.validation?.max ?? ""}
@@ -137,13 +137,13 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                         })
                                     }
                                     placeholder="100"
-                                    className="h-8 text-sm"
+                                    className="h-8 text-base"
                                 />
                             </div>
                         </>
                     )}
                     <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground">Custom Error Message</Label>
+                        <Label className="text-base text-muted-foreground">Custom Error Message</Label>
                         <Input
                             value={page.validation?.message ?? ""}
                             onChange={(e) =>
@@ -152,21 +152,21 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                 })
                             }
                             placeholder="This field is required"
-                            className="h-8 text-sm"
+                            className="h-8 text-base"
                         />
                     </div>
                 </div>
 
                 {/* Logic */}
                 <div className="space-y-3">
-                    <Label className="text-xs font-semibold">Logic</Label>
-                    <p className="text-[11px] text-muted-foreground -mt-1">Dynamically show or hide this field depending on how respondents answer other questions.</p>
+                    <Label className="text-base font-semibold">Logic</Label>
+                    <p className="text-xs text-muted-foreground mt-1">Dynamically show or hide this field depending on how respondents answer other questions.</p>
                     {page.logic.length === 0 ? (
                         <p className="text-xs text-muted-foreground">No logic rules configured</p>
                     ) : (
                         page.logic.map((rule, ruleIndex) => (
                             <div key={ruleIndex} className="p-2 rounded border bg-muted/30 space-y-1">
-                                <p className="text-xs">
+                                <p className="text-base">
                                     When <strong>{rule.whenFieldKey}</strong> {rule.operator} "{String(rule.value)}"
                                 </p>
                                 <p className="text-xs text-muted-foreground">
@@ -175,7 +175,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                             </div>
                         ))
                     )}
-                    <Button variant="outline" size="sm" className="w-full text-xs">
+                    <Button variant="outline" size="sm" className="w-full text-base">
                         <Plus className="mr-1 h-3 w-3" />
                         Add Logic
                     </Button>
@@ -183,9 +183,9 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
 
                 {/* Appearance */}
                 <div className="space-y-2">
-                    <Label className="text-xs font-semibold">Appearance</Label>
+                    <Label className="text-base font-semibold">Appearance</Label>
                     <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground">Width</Label>
+                        <Label className="text-base text-muted-foreground">Width</Label>
                         <Select
                             value={page.appearance.width}
                             onValueChange={(value) =>
@@ -194,7 +194,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                 })
                             }
                         >
-                            <SelectTrigger className="w-full h-8 text-xs">
+                            <SelectTrigger className="w-full h-10 text-base">
                                 <SelectValue placeholder="Select width" />
                             </SelectTrigger>
                             <SelectContent>
@@ -204,7 +204,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                         </Select>
                     </div>
                     <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground">Button Text</Label>
+                        <Label className="text-base text-muted-foreground">Button Text</Label>
                         <Input
                             value={page.appearance.submitButtonText ?? ""}
                             onChange={(e) =>
@@ -213,11 +213,11 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                 })
                             }
                             placeholder="Submit"
-                            className="h-8 text-sm"
+                            className="h-10 text-base"
                         />
                     </div>
                     <div className="space-y-1">
-                        <Label className="text-[11px] text-muted-foreground">Button Color</Label>
+                        <Label className="text-base text-muted-foreground">Button Color</Label>
                         <div className="flex items-center gap-2">
                             <input
                                 type="color"
@@ -227,7 +227,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                         appearance: { ...page.appearance, submitButtonColor: e.target.value },
                                     })
                                 }
-                                className="h-8 w-8 rounded border cursor-pointer p-0"
+                                className="h-10 w-10 rounded border cursor-pointer p-0"
                             />
                             <Input
                                 type="text"
@@ -238,7 +238,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                     })
                                 }
                                 placeholder="#000000"
-                                className="h-8 text-sm"
+                                className="h-10 text-base"
                             />
                         </div>
                     </div>

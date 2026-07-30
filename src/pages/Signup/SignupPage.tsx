@@ -42,15 +42,15 @@ export function SignupPage() {
     return (
         <Card>
             <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl text-center">Create your account</CardTitle>
-                <CardDescription className="text-center">
+                <CardTitle className="text-3xl text-center">Create your account</CardTitle>
+                <CardDescription className="text-base text-center">
                     Sign up to start building beautiful forms
                 </CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Full Name</Label>
+                        <Label htmlFor="name" className="text-base">Full Name</Label>
                         <Input
                             id="name"
                             type="text"
@@ -61,7 +61,7 @@ export function SignupPage() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email" className="text-base">Email</Label>
                         <Input
                             id="email"
                             type="email"
@@ -72,7 +72,7 @@ export function SignupPage() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password" className="text-base">Password</Label>
                         <Input
                             id="password"
                             type="password"
@@ -82,7 +82,7 @@ export function SignupPage() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="confirm-password">Confirm Password</Label>
+                        <Label htmlFor="confirm-password" className="text-base">Confirm Password</Label>
                         <Input
                             id="confirm-password"
                             type="password"
@@ -91,7 +91,7 @@ export function SignupPage() {
                             required
                         />
                         {!passwordsMatch && (
-                            <p className="text-xs text-destructive">Passwords do not match</p>
+                            <p className="text-base text-destructive">Passwords do not match</p>
                         )}
                     </div>
                 </CardContent>
@@ -107,12 +107,12 @@ export function SignupPage() {
                         <div className="absolute inset-0 flex items-center">
                             <span className="w-full border-t" />
                         </div>
-                        <div className="relative flex justify-center text-xs uppercase">
+                        <div className="relative flex justify-center text-sm uppercase">
                             <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
                         </div>
                     </div>
                     <GoogleSignInButton />
-                    <p className="text-center text-sm text-muted-foreground">
+                    <p className="text-center text-base text-muted-foreground">
                         Already have an account?{" "}
                         <Link to={ROUTES.LOGIN} className="font-medium text-primary hover:underline">
                             Sign in

@@ -12,7 +12,7 @@ interface EditorProps {
 export function FileEditor({ page, pageIndex, onUpdate }: EditorProps) {
     return (
         <div className="space-y-3">
-            <Label className="text-xs text-muted-foreground">File Upload Preview</Label>
+            <Label className="text-base text-muted-foreground">File Upload Preview</Label>
             <div className="border-2 border-dashed rounded-lg p-8 text-center">
                 <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">Click or drag files to upload</p>

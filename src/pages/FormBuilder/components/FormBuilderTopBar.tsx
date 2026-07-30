@@ -132,7 +132,7 @@ export function FormBuilderTopBar({
           </button>
         </nav>
         {saveError && (
-          <span className="text-[11px] text-destructive">{saveError}</span>
+          <span className="text-sm text-destructive">{saveError}</span>
         )}
       </div>
 
@@ -146,8 +146,8 @@ export function FormBuilderTopBar({
             }
             end={to === ROUTES.FORM_BUILDER}
           >
-            <Icon className="h-3 w-3" />
-            <span className="text-[8px] font-semibold uppercase tracking-wider">
+            <Icon className="h-4 w-4" />
+            <span className="text-xs tracking-wider">
               {label}
             </span>
           </NavLink>
@@ -157,18 +157,18 @@ export function FormBuilderTopBar({
       <div className="flex items-center gap-2">
         <span
           className={cn(
-            "text-[11px] flex items-center gap-1.5 text-muted-foreground w-14",
+            "text-sm flex items-center gap-1.5 text-muted-foreground w-18",
             saveStatus !== "idle" ? "opacity-100" : "opacity-0",
           )}
         >
           {saveStatus === "saving" && (
-            <Loader2 className="h-3 w-3 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
           )}
           {saveStatus === "saved" && (
-            <CheckCircle className="h-3 w-3 text-green-600" />
+            <CheckCircle className="h-4 w-4 text-green-600" />
           )}
           {saveStatus === "error" && (
-            <AlertCircle className="h-3 w-3 text-red-600" />
+            <AlertCircle className="h-4 w-4 text-red-600" />
           )}
           {saveStatus === "saving"
             ? "Saving..."
@@ -181,29 +181,29 @@ export function FormBuilderTopBar({
           <Button
             variant="outline"
             size="sm"
-            className="h-7 gap-1 text-[11px] px-2"
+            className="h-9 gap-1.5 text-sm px-3"
           >
-            <Play className="h-3 w-3" />
+            <Play className="h-4 w-4" />
             Preview
           </Button>
         </Link>
         {!isPublished ? (
           <Button
             size="sm"
-            className="h-7 gap-1 text-[11px] font-medium px-2"
+            className="h-9 gap-1.5 text-sm font-medium px-3"
             onClick={onPublish}
           >
-            <Share2 className="h-3 w-3" />
+            <Share2 className="h-4 w-4" />
             Publish
           </Button>
         ) : (
           <Button
             size="sm"
             variant="default"
-            className="h-7 gap-1 text-[11px] font-medium px-2 bg-green-600 hover:bg-green-700"
+            className="h-9 gap-1.5 text-sm font-medium px-3 bg-green-600 hover:bg-green-700"
             onClick={onPublishedClick}
           >
-            <CheckCircle className="h-3 w-3" />
+            <CheckCircle className="h-4 w-4" />
             Published
           </Button>
         )}
@@ -217,7 +217,7 @@ export function FormBuilderTopBar({
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="edit-title">Form Title</Label>
+              <Label htmlFor="edit-title" className="text-base">Form Title</Label>
               <Input
                 id="edit-title"
                 value={editTitle}

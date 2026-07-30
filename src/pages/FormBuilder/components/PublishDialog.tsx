@@ -52,7 +52,7 @@ export function PublishDialog({
                             <span className="font-medium">Form is published</span>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-xs text-muted-foreground">Form Link</Label>
+                            <Label className="text-base text-muted-foreground">Form Link</Label>
                             <div className="flex items-center gap-2">
                                 <Input
                                     readOnly

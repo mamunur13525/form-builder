@@ -246,7 +246,7 @@ export function FormBuilderPage() {
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading form...</p>
+          <p className="text-base text-muted-foreground">Loading form...</p>
         </div>
       </div>
     );
@@ -257,7 +257,7 @@ export function FormBuilderPage() {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-destructive mb-4">{formError}</p>
+          <p className="text-base text-destructive mb-4">{formError}</p>
           <button
             onClick={() => navigate("/dashboard")}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
@@ -275,7 +275,7 @@ export function FormBuilderPage() {
         orientation="horizontal"
         className="flex-1 min-h-0 p-3"
       >
-        <ResizablePanel defaultSize={200} minSize={200} maxSize={300}>
+        <ResizablePanel defaultSize={300} minSize={300} maxSize={400}>
           <FormBuilderSidebar
             pages={pages}
             selectedPageIndex={selectedPageIndex}
@@ -291,7 +291,7 @@ export function FormBuilderPage() {
 
         <ResizableHandle className="w-3 bg-transparent after:hidden" />
 
-        <ResizablePanel defaultSize={700} minSize={300}>
+        <ResizablePanel defaultSize={600} minSize={300}>
           <div className="h-full w-full flex flex-col gap-3">
             <PageContentTopbar
               onAddPage={() => {
@@ -309,7 +309,7 @@ export function FormBuilderPage() {
             <div className="w-full h-full flex-1 flex items-center justify-center">
               <div
                 className={cn(
-                  "w-full h-full bg-background border rounded-md shadow-sm transition-all duration-500 ease-in-out overflow-hidden flex flex-col justify-center",
+                  "w-full h-full bg-background border rounded-md shadow-sm transition-all duration-500 ease-in-out overflow-hidden",
                 )}
                 style={{ width: isMobileView ? "384px" : "100%" }}
               >
@@ -322,7 +322,7 @@ export function FormBuilderPage() {
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-muted-foreground">
-                    <p>Select a page to edit</p>
+                    <p className="text-base">Select a page to edit</p>
                   </div>
                 )}
               </div>
@@ -332,7 +332,7 @@ export function FormBuilderPage() {
 
         <ResizableHandle className="w-3 bg-transparent after:hidden" />
 
-        <ResizablePanel defaultSize={100} minSize={200} maxSize={300}>
+        <ResizablePanel defaultSize={300} minSize={300} maxSize={400}>
           {selectedPage ? (
             <SettingsPanel
               page={selectedPage}
@@ -342,12 +342,12 @@ export function FormBuilderPage() {
           ) : (
             <div className="w-full h-full flex flex-col bg-background border rounded-md shadow-sm overflow-hidden">
               <div className="p-3 border-b">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                   <span>Settings</span>
                 </h3>
               </div>
-              <div className="flex items-center justify-center h-full text-muted-foreground p-4 text-center text-sm">
-                Select a page to view settings
+              <div className="flex items-center justify-center h-full text-muted-foreground p-4 text-center">
+                <p className="text-base">Select a page to view settings</p>
               </div>
             </div>
           )}

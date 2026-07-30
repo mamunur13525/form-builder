@@ -60,8 +60,8 @@ export function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-base text-muted-foreground">
             Manage your forms and view responses
           </p>
         </div>
@@ -105,36 +105,36 @@ export function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Forms</CardTitle>
+            <CardTitle className="text-base font-medium">Total Forms</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">{forms.length}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold">{forms.length}</div>
+            <p className="text-sm text-muted-foreground">
               {publishedForms} published, {draftForms} drafts
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-base font-medium">
               Total Responses
             </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">{totalResponses}</div>
-            <p className="text-xs text-muted-foreground">Across all forms</p>
+            <div className="text-2xl font-bold">{totalResponses}</div>
+            <p className="text-sm text-muted-foreground">Across all forms</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Published</CardTitle>
+            <CardTitle className="text-base font-medium">Published</CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">{publishedForms}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold">{publishedForms}</div>
+            <p className="text-sm text-muted-foreground">
               Forms live and accepting responses
             </p>
           </CardContent>
@@ -142,7 +142,7 @@ export function DashboardPage() {
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold mb-4">Your Forms</h2>
+        <h2 className="text-2xl font-semibold mb-4">Your Forms</h2>
         {forms.length === 0 ? (
           <Card>
             <CardContent className="text-center py-8">
@@ -162,7 +162,7 @@ export function DashboardPage() {
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-4">
-                    <CardTitle className="text-base font-semibold">
+                    <CardTitle className="text-lg font-semibold">
                       {form.title}
                     </CardTitle>
                     <Badge
@@ -180,7 +180,7 @@ export function DashboardPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex items-center justify-between pt-2">
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {form.responses_count || 0} responses
                   </p>
                   <div className="flex gap-0.5">

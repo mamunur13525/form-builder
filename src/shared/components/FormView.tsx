@@ -86,17 +86,17 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
       </div>
 
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">Question</Label>
-        <h2 className="text-2xl font-bold pb-1">{field.label}</h2>
+        <Label className="text-sm text-muted-foreground">Question</Label>
+        <h2 className="text-3xl font-bold pb-1">{field.label}</h2>
         {field.helperText && (
-          <p className="text-sm text-muted-foreground pb-1">
+          <p className="text-base text-muted-foreground pb-1">
             {field.helperText}
           </p>
         )}
       </div>
 
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">Your Answer</Label>
+        <Label className="text-sm text-muted-foreground">Your Answer</Label>
         <FormFieldRenderer
           field={field}
           value={answers[field.fieldKey]}
@@ -107,7 +107,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
           <motion.div
             initial={{ y: -4, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="flex items-center gap-1.5 text-xs text-destructive font-medium pt-1"
+            className="flex items-center gap-1.5 text-sm text-destructive font-medium pt-1"
           >
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
             {error}
@@ -170,7 +170,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
                 {activeFields.length === 0 ? (
                   <div className="text-center py-20 text-muted-foreground">
                     <p className="text-lg">No fields in this form yet.</p>
-                    <p className="text-sm mt-2">
+                    <p className="text-base mt-2">
                       Add fields in the form builder to see them here.
                     </p>
                   </div>

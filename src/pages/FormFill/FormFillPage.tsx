@@ -9,7 +9,7 @@ export function FormFillPage() {
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-muted/30">
-                <p className="text-muted-foreground">Loading form...</p>
+                <p className="text-base text-muted-foreground">Loading form...</p>
             </div>
         )
     }
@@ -18,8 +18,8 @@ export function FormFillPage() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-muted/30">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold">Form not found</h2>
-                    <p className="text-muted-foreground mt-2">The form you're looking for doesn't exist.</p>
+                    <h2 className="text-3xl font-bold">Form not found</h2>
+                    <p className="text-base text-muted-foreground mt-2">The form you're looking for doesn't exist.</p>
                 </div>
             </div>
         )

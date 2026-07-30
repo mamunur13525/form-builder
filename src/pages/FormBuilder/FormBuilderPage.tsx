@@ -74,6 +74,18 @@ export function FormBuilderPage() {
 
   const debouncedFieldUpdate = useDebounce(executeFieldUpdate, 1000);
 
+  // Flush any pending debounced field update immediately (used before navigation)
+  const flushPendingUpdate = useCallback(async () => {
+    const pending = pendingFieldUpdateRef.current;
+    if (!pending || !formId || formId === "new") return;
+    pendingFieldUpdateRef.current = null;
+    try {
+      await updateField(formId, pending.fieldId, pending.data);
+    } catch (error) {
+      console.error("Failed to flush field update:", error);
+    }
+  }, [formId]);
+
   const updatePage = useCallback(
     async (index: number, updates: Partial<FormField>) => {
       const field = pages[index];
@@ -285,7 +297,9 @@ export function FormBuilderPage() {
               onAddPage={() => {
                 setShowAddPageDialog(true);
               }}
-              onPreview={() => {
+              onPreview={async () => {
+                // Flush any pending debounced updates before navigating
+                await flushPendingUpdate();
                 navigate(`/form-preview/${formId || "new"}`);
               }}
               isMobileView={isMobileView}

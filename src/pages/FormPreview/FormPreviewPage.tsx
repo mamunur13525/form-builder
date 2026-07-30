@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { ROUTES } from "@/shared/constants/routes";
 import { useParams, useNavigate } from "react-router-dom";
 import { X, Monitor, Smartphone, RotateCcw } from "lucide-react";
@@ -18,7 +19,7 @@ import { cn } from "@/lib/utils";
 export function FormPreviewPage() {
   const { formId } = useParams();
   const navigate = useNavigate();
-  const { data: apiForm, isLoading } = useForm(formId || "");
+  const { data: apiForm, isLoading, isFetching } = useForm(formId || "");
   const [isMobileView, setIsMobileView] = useState(false);
   const [skipValidation, setSkipValidation] = useState(false);
   const [key, setKey] = useState(0);
@@ -28,7 +29,7 @@ export function FormPreviewPage() {
     setKey((prev) => prev + 1);
   };
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className="text-center py-20">
         <p className="text-muted-foreground">Loading form...</p>
@@ -52,10 +53,15 @@ export function FormPreviewPage() {
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
       {/* Centered Dock */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring",  delay: 0 }}
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 duration-100"
+      >
         <div className="flex items-center gap-1 px-3 py-1.5 rounded-full border bg-background/80 backdrop-blur-lg shadow-lg">
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger render={<span/>}>
               <Button
                 variant="ghost"
                 size="icon"
@@ -75,7 +81,7 @@ export function FormPreviewPage() {
           <div className="w-px h-5 bg-border mx-0.5" />
 
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger render={<span/>}>
               <Button
                 variant="ghost"
                 size="icon"
@@ -97,7 +103,7 @@ export function FormPreviewPage() {
           <div className="w-px h-5 bg-border mx-0.5" />
 
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger render={<span/>}>
               <Button
                 variant="ghost"
                 size="icon"
@@ -130,7 +136,7 @@ export function FormPreviewPage() {
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Preview Content */}
       <div className="w-full flex-1 flex items-stretch justify-center px-10 py-20 ">

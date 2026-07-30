@@ -60,8 +60,9 @@ export function useForm(formId: string) {
         queryKey: [...FORMS_QUERY_KEY, formId],
         queryFn: () => getFormById(formId),
         enabled: !!formId,
-        staleTime: 5 * 60 * 1000,
+        staleTime: 0,
         gcTime: 10 * 60 * 1000,
+        refetchOnMount: "always",
     })
 }
 

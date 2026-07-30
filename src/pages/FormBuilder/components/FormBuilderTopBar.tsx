@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
@@ -213,11 +212,10 @@ export function FormBuilderTopBar({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Form Title</DialogTitle>
+            <DialogTitle>Rename Form</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="edit-title" className="text-base">Form Title</Label>
               <Input
                 id="edit-title"
                 value={editTitle}

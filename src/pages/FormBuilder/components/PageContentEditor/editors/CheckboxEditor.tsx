@@ -1,7 +1,6 @@
 import { CheckSquare, Plus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import type { FormField } from "@/shared/types/common"
 
 interface EditorProps {
@@ -13,36 +12,37 @@ interface EditorProps {
 export function CheckboxEditor({ page, pageIndex, onUpdate }: EditorProps) {
     return (
         <div className="space-y-3">
-            <Label className="text-base text-muted-foreground">Options</Label>
-            {page.options.map((opt, optIndex) => (
-                <div key={optIndex} className="flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <Input
-                        value={opt.label}
-                        onChange={(e) => {
-                            const newOpts = [...page.options]
-                            newOpts[optIndex] = {
-                                label: e.target.value,
-                                value: e.target.value.toLowerCase().replace(/\s+/g, "_"),
-                            }
-                            onUpdate(pageIndex, { options: newOpts })
-                        }}
-                        placeholder="Option label"
-                        className="flex-1"
-                    />
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0"
-                        onClick={() => {
-                            const newOpts = page.options.filter((_, i) => i !== optIndex)
-                            onUpdate(pageIndex, { options: newOpts })
-                        }}
-                    >
-                        <X className="h-4 w-4" />
-                    </Button>
-                </div>
-            ))}
+            <div className="space-y-2">
+                {page.options.map((opt, optIndex) => (
+                    <div key={optIndex} className="flex items-center gap-2">
+                        <CheckSquare className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <Input
+                            value={opt.label}
+                            onChange={(e) => {
+                                const newOpts = [...page.options]
+                                newOpts[optIndex] = {
+                                    label: e.target.value,
+                                    value: e.target.value.toLowerCase().replace(/\s+/g, "_"),
+                                }
+                                onUpdate(pageIndex, { options: newOpts })
+                            }}
+                            placeholder="Option label"
+                            className="flex-1"
+                        />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            onClick={() => {
+                                const newOpts = page.options.filter((_, i) => i !== optIndex)
+                                onUpdate(pageIndex, { options: newOpts })
+                            }}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                ))}
+            </div>
             <Button
                 variant="outline"
                 size="sm"

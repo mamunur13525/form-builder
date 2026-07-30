@@ -1,6 +1,5 @@
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import type { FormField } from "@/shared/types/common"
+import type { FormField } from "@/shared/types/common";
+import { TextField } from "@/shared/components/fields";
 
 interface EditorProps {
     page: FormField
@@ -11,10 +10,9 @@ interface EditorProps {
 export function NumberEditor({ page, pageIndex, onUpdate }: EditorProps) {
     return (
         <div className="space-y-1">
-            <Label className="text-base text-muted-foreground">Placeholder</Label>
-            <Input
+            <TextField
                 value={page.placeholder}
-                onChange={(e) => onUpdate(pageIndex, { placeholder: e.target.value })}
+                onChange={(v) => onUpdate(pageIndex, { placeholder: v })}
                 placeholder="0"
             />
         </div>

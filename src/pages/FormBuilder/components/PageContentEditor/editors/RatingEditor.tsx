@@ -1,6 +1,5 @@
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import type { FormField } from "@/shared/types/common"
+import type { FormField } from "@/shared/types/common";
+import { RatingField } from "@/shared/components/fields";
 
 interface EditorProps {
     page: FormField
@@ -8,17 +7,11 @@ interface EditorProps {
     onUpdate: (index: number, updates: Partial<FormField>) => void
 }
 
-export function RatingEditor({ page, pageIndex, onUpdate }: EditorProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function RatingEditor(_props: EditorProps) {
     return (
         <div className="space-y-2">
-            <Label className="text-base text-muted-foreground">Rating Preview</Label>
-            <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <Button key={star} variant="outline" size="icon" className="h-12 w-12 text-lg">
-                        {star}
-                    </Button>
-                ))}
-            </div>
+            <RatingField />
         </div>
     )
 }

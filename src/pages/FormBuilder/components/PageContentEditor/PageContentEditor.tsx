@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import type { FormField } from "@/shared/types/common";
+import { FieldLabel, FieldHelperText, FieldSubmitButton } from "@/shared/components/fields";
 
 import {
   ShortTextEditor,
@@ -70,40 +70,19 @@ export function PageContentEditor({
             isMobileView ? "w-full" : "w-11/12",
           )}
         >
-          {/* Editable Label */}
-          <div className="relative space-y-1">
-            <span className="absolute right-[102%]  top-2 text-xs font-bold text-muted select-none bg-gray-900 px-1 rounded">
-              {pageIndex + 1}
-            </span>
-            <div
-              contentEditable
-              suppressContentEditableWarning
-              data-placeholder="Type your question... Use @ to recall information."
-              className="text-[26px] outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
-              onBlur={(e) =>
-                onUpdate(pageIndex, {
-                  label: e.currentTarget.textContent || "",
-                })
-              }
-              dangerouslySetInnerHTML={{ __html: page.label }}
-            />
-          </div>
+          <FieldLabel
+            label={page.label}
+            pageNumber={pageIndex + 1}
+            editable
+            onUpdate={(label) => onUpdate(pageIndex, { label })}
+          />
 
-          {/* Editable Helper Text */}
-          <div className="space-y-1">
-            <div
-              contentEditable
-              suppressContentEditableWarning
-              data-placeholder="Description (optional)"
-              className="text-[18px] text-muted-foreground outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
-              onBlur={(e) =>
-                onUpdate(pageIndex, {
-                  helperText: e.currentTarget.textContent || "",
-                })
-              }
-              dangerouslySetInnerHTML={{ __html: page.helperText || "" }}
-            />
-          </div>
+          <FieldHelperText
+            helperText={page.helperText}
+            editable
+            onUpdate={(helperText) => onUpdate(pageIndex, { helperText })}
+          />
+
           <div className="mt-5">
             {/* Field-specific editor */}
             {FieldEditor && (
@@ -115,20 +94,10 @@ export function PageContentEditor({
             )}
           </div>
 
-          {/* Submit button preview */}
-          <div className="mt-8">
-            <Button
-              size="lg"
-              className="w-full sm:w-auto px-8!"
-              style={
-                page.appearance.submitButtonColor
-                  ? { backgroundColor: page.appearance.submitButtonColor }
-                  : undefined
-              }
-            >
-              {page.appearance.submitButtonText || "Submit"}
-            </Button>
-          </div>
+          <FieldSubmitButton
+            text={page.appearance.submitButtonText || "Submit"}
+            color={page.appearance.submitButtonColor}
+          />
         </div>
       </div>
     </div>

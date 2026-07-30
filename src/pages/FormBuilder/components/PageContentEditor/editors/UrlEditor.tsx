@@ -1,22 +1,20 @@
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import type { FormField } from "@/shared/types/common"
+import type { FormField } from "@/shared/types/common";
+import { TextField } from "@/shared/components/fields";
 
 interface EditorProps {
-    page: FormField
-    pageIndex: number
-    onUpdate: (index: number, updates: Partial<FormField>) => void
+  page: FormField;
+  pageIndex: number;
+  onUpdate: (index: number, updates: Partial<FormField>) => void;
 }
 
 export function UrlEditor({ page, pageIndex, onUpdate }: EditorProps) {
-    return (
-        <div className="space-y-1">
-            <Label className="text-base text-muted-foreground">Placeholder</Label>
-            <Input
-                value={page.placeholder}
-                onChange={(e) => onUpdate(pageIndex, { placeholder: e.target.value })}
-                placeholder="https://example.com"
-            />
-        </div>
-    )
+  return (
+    <div className="space-y-1">
+      <TextField
+        value={page.placeholder}
+        onChange={(v) => onUpdate(pageIndex, { placeholder: v })}
+        placeholder="https://example.com"
+      />
+    </div>
+  );
 }

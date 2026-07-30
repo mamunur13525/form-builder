@@ -1,7 +1,5 @@
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Upload } from "lucide-react"
-import type { FormField } from "@/shared/types/common"
+import type { FormField } from "@/shared/types/common";
+import { FileField } from "@/shared/components/fields";
 
 interface EditorProps {
     page: FormField
@@ -9,14 +7,11 @@ interface EditorProps {
     onUpdate: (index: number, updates: Partial<FormField>) => void
 }
 
-export function FileEditor({ page, pageIndex, onUpdate }: EditorProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function FileEditor(_props: EditorProps) {
     return (
         <div className="space-y-3">
-            <Label className="text-base text-muted-foreground">File Upload Preview</Label>
-            <div className="border-2 border-dashed rounded-lg p-8 text-center">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Click or drag files to upload</p>
-            </div>
+            <FileField />
         </div>
     )
 }

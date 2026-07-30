@@ -1,20 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Label } from "../../components/ui/label";
-import { Button } from "../../components/ui/button";
-import { Badge } from "../../components/ui/badge";
-import { AlertTriangle, FileText } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import type { Form, FormField } from "../../shared/types/common";
-import {
-  FIELD_TYPE_ICONS,
-  FIELD_TYPE_LABELS,
-} from "@/shared/constants/form-types";
 import { cn } from "@/lib/utils";
 import { useFormNavigation } from "../hooks/useFormNavigation";
 import { FormFieldRenderer } from "./FormFieldRenderer";
 import { FormProgressBar } from "./FormProgressBar";
 import { FormSubmittedView } from "./FormSubmittedView";
 import { FormNavigationFooter } from "./FormNavigationFooter";
+import { FieldLabel, FieldHelperText, FieldSubmitButton } from "./fields";
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -65,38 +58,19 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
     currentField?.fieldKey,
   );
 
-  const PageIcon: LucideIcon = currentField
-    ? FIELD_TYPE_ICONS[currentField.type as keyof typeof FIELD_TYPE_ICONS] ||
-      FileText
-    : FileText;
-
   const renderFieldQuestion = (field: FormField) => (
-    <>
-      <div className="flex items-center gap-2 mb-2">
-        <PageIcon className="h-5 w-5 text-muted-foreground" />
-        <Badge variant="secondary">
-          {FIELD_TYPE_LABELS[field.type as keyof typeof FIELD_TYPE_LABELS] ||
-            field.type}
-        </Badge>
-        {field.required && (
-          <Badge variant="destructive" className="text-[10px] text-white">
-            Required
-          </Badge>
-        )}
-      </div>
+    <div className="w-full">
+      <FieldLabel
+        label={field.label}
+        pageNumber={currentStep + 1}
+      />
 
-      <div className="space-y-1">
-        <Label className="text-sm text-muted-foreground">Question</Label>
-        <h2 className="text-3xl font-bold pb-1">{field.label}</h2>
-        {field.helperText && (
-          <p className="text-base text-muted-foreground pb-1">
-            {field.helperText}
-          </p>
-        )}
-      </div>
+      <FieldHelperText
+        helperText={field.helperText}
+      />
 
-      <div className="space-y-1">
-        <Label className="text-sm text-muted-foreground">Your Answer</Label>
+      {/* Field-specific input */}
+      <div className="mt-5">
         <FormFieldRenderer
           field={field}
           value={answers[field.fieldKey]}
@@ -115,24 +89,13 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
         )}
       </div>
 
-      <div className="pt-2">
-        <Button
-          size="lg"
-          className="w-full sm:w-auto"
-          onClick={handleNext}
-          disabled={isSubmitting}
-          style={
-            field.appearance.submitButtonColor
-              ? { backgroundColor: field.appearance.submitButtonColor }
-              : undefined
-          }
-        >
-          {isSubmitting
-            ? "Submitting..."
-            : field.appearance.submitButtonText || "Submit"}
-        </Button>
-      </div>
-    </>
+      <FieldSubmitButton
+        text={isSubmitting ? "Submitting..." : field.appearance.submitButtonText || "Submit"}
+        color={field.appearance.submitButtonColor}
+        onClick={handleNext}
+        disabled={isSubmitting}
+      />
+    </div>
   );
 
   if (submitted) {

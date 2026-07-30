@@ -80,7 +80,7 @@ export function AddPageDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="max-w-4xl">
                 <DialogHeader>
                     <DialogTitle>Add a Page</DialogTitle>
                     <DialogDescription>
@@ -95,7 +95,7 @@ export function AddPageDialog({
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-base"
                     />
                 </div>
 
@@ -115,13 +115,13 @@ export function AddPageDialog({
                                     className="flex items-center gap-2 p-2 rounded-md border hover:bg-accent hover:border-primary/50 transition-all text-left group"
                                 >
                                     <div className={`
-                                        w-7 h-7 rounded flex items-center justify-center
+                                        w-9 h-9 rounded flex items-center justify-center
                                         bg-linear-to-br shrink-0 transition-all duration-200
                                         ${colorClass}
                                     `}>
                                         <Icon className="h-3.5 w-3.5" />
                                     </div>
-                                    <span className="text-xs font-medium leading-tight">{pt.label}</span>
+                                    <span className="text-base font-medium leading-tight">{pt.label}</span>
                                 </button>
                             )
                         })

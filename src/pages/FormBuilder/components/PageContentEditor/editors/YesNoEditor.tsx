@@ -1,6 +1,5 @@
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import type { FormField } from "@/shared/types/common"
+import type { FormField } from "@/shared/types/common";
+import { YesNoField } from "@/shared/components/fields";
 
 interface EditorProps {
     page: FormField
@@ -8,14 +7,11 @@ interface EditorProps {
     onUpdate: (index: number, updates: Partial<FormField>) => void
 }
 
-export function YesNoEditor({ page, pageIndex, onUpdate }: EditorProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function YesNoEditor(_props: EditorProps) {
     return (
         <div className="space-y-2">
-            <Label className="text-base text-muted-foreground">Yes/No Preview</Label>
-            <div className="flex gap-3">
-                <Button variant="outline" className="px-8">Yes</Button>
-                <Button variant="outline" className="px-8">No</Button>
-            </div>
+            <YesNoField />
         </div>
     )
 }

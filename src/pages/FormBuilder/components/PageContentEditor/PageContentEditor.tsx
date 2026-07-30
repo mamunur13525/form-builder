@@ -1,5 +1,6 @@
 import { FileText } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS } from "@/shared/constants/form-types"
 import type { FormField } from "@/shared/types/common"
@@ -108,6 +109,21 @@ export function PageContentEditor({
                             onUpdate={onUpdate}
                         />
                     )}
+
+                    {/* Submit button preview */}
+                    <div className="pt-2">
+                        <Button
+                            size="lg"
+                            className="w-full sm:w-auto"
+                            style={
+                                page.appearance.submitButtonColor
+                                    ? { backgroundColor: page.appearance.submitButtonColor }
+                                    : undefined
+                            }
+                        >
+                            {page.appearance.submitButtonText || "Submit"}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

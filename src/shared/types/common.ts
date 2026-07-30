@@ -23,6 +23,8 @@ export interface LogicRule {
 export interface Appearance {
     width: "full" | "half"
     icon?: string
+    submitButtonText?: string
+    submitButtonColor?: string
 }
 
 export interface Theme {

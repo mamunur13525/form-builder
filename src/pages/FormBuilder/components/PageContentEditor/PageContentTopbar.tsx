@@ -70,7 +70,6 @@ const PageContentTopbar = ({
   };
 
   const handleBtnClick = (type: string) => {
-    console.log(type);
     switch (type) {
       case "add_page":
         onAddPage();

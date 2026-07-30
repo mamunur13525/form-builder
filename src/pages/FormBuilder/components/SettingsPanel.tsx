@@ -203,6 +203,45 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                             </SelectContent>
                         </Select>
                     </div>
+                    <div className="space-y-1">
+                        <Label className="text-[11px] text-muted-foreground">Submit Button Text</Label>
+                        <Input
+                            value={page.appearance.submitButtonText ?? ""}
+                            onChange={(e) =>
+                                onUpdate(pageIndex, {
+                                    appearance: { ...page.appearance, submitButtonText: e.target.value },
+                                })
+                            }
+                            placeholder="Submit"
+                            className="h-8 text-sm"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <Label className="text-[11px] text-muted-foreground">Submit Button Color</Label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="color"
+                                value={page.appearance.submitButtonColor ?? "#000000"}
+                                onChange={(e) =>
+                                    onUpdate(pageIndex, {
+                                        appearance: { ...page.appearance, submitButtonColor: e.target.value },
+                                    })
+                                }
+                                className="h-8 w-8 rounded border cursor-pointer p-0"
+                            />
+                            <Input
+                                type="text"
+                                value={page.appearance.submitButtonColor ?? ""}
+                                onChange={(e) =>
+                                    onUpdate(pageIndex, {
+                                        appearance: { ...page.appearance, submitButtonColor: e.target.value },
+                                    })
+                                }
+                                placeholder="#000000"
+                                className="h-8 text-sm"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

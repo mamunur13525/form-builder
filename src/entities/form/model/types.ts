@@ -119,6 +119,8 @@ export interface FieldLogic {
 export interface FieldAppearance {
     width: "full" | "half"
     icon: string
+    submitButtonText?: string
+    submitButtonColor?: string
 }
 
 export interface FormField {

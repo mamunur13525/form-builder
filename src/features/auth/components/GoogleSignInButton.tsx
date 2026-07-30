@@ -36,14 +36,12 @@ export function GoogleSignInButton({
         { idToken },
         {
           onSuccess: () => {
-            console.log("onSuccess...");
             navigate(redirectTo);
           },
-          onError: () => {
-            console.log("onError...");
+          onError: (err) => {
+            console.log({ err });
           },
           onSettled: () => {
-            console.log("final...");
             setIsPending(false);
           },
         },
@@ -53,7 +51,7 @@ export function GoogleSignInButton({
   );
   if (isPending) {
     return (
-      <Button variant={'outline'} className={'w-7/12 rounded-lg'}>
+      <Button variant={"outline"} className={"w-7/12 rounded-lg"}>
         <Spinner />
       </Button>
     );

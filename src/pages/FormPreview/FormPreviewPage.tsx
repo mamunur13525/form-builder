@@ -23,7 +23,6 @@ export function FormPreviewPage() {
   const [isMobileView, setIsMobileView] = useState(false);
   const [skipValidation, setSkipValidation] = useState(false);
   const [key, setKey] = useState(0);
-  console.log("form preveiw page.");
 
   const handleRestart = () => {
     setKey((prev) => prev + 1);

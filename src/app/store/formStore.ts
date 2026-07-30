@@ -52,7 +52,7 @@ export const useFormStore = create<FormState>((set, get) => ({
     },
 
     getFormById: (id: string) => {
-        return get().forms.find((f) => f._id === id)
+        return get().forms.find((f) => f.id === id)
     },
 
     getFormBySlug: (slug: string) => {
@@ -89,7 +89,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
             set((state) => ({
                 forms: state.forms.map((f) =>
-                    f._id === id ? { ...f, ...updates, updatedAt: new Date().toISOString() } : f
+                    f.id === id ? { ...f, ...updates, updatedAt: new Date().toISOString() } : f
                 ),
                 isLoading: false,
             }))
@@ -104,7 +104,7 @@ export const useFormStore = create<FormState>((set, get) => ({
             await apiDeleteForm(id)
 
             set((state) => ({
-                forms: state.forms.filter((f) => f._id !== id),
+                forms: state.forms.filter((f) => f.id !== id),
                 isLoading: false,
             }))
         } catch (err) {
@@ -119,7 +119,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
             set((state) => ({
                 forms: state.forms.map((f) =>
-                    f._id === id
+                    f.id === id
                         ? { ...f, status: updated.status, updatedAt: new Date().toISOString() }
                         : f
                 ),
@@ -148,7 +148,7 @@ export const useFormStore = create<FormState>((set, get) => ({
     submitResponse: async (formId: string, answers: Record<string, unknown>) => {
         set({ isLoading: true, error: null })
         try {
-            const form = get().forms.find((f) => f._id === formId)
+            const form = get().forms.find((f) => f.id === formId)
             if (!form) throw new Error("Form not found")
 
             const answerList = Object.entries(answers).map(([fieldKey, value]) => {
@@ -163,7 +163,6 @@ export const useFormStore = create<FormState>((set, get) => ({
 
             const result = await submitPublicForm(form.slug, {
                 answers: answerList,
-                sessionId: `session_${Date.now()}`,
             })
 
             const newResponse: FormResponse = {

@@ -28,6 +28,23 @@ export interface Form {
     fields: FormField[]
     createdAt: string
     updatedAt: string
+    draftVersionId?: string
+    publishedVersionId?: string | null
+    hasUnpublishedChanges?: boolean
+    version?: number
+    responses_count?: number
+}
+
+export interface PublishedForm {
+    id: string
+    title: string
+    slug: string
+    status: FormStatus
+    formVersionId: string
+    version: number
+    fields: FormField[]
+    theme: FormTheme
+    settings: FormSettings
 }
 
 export interface CreateFormRequest {
@@ -111,7 +128,7 @@ export interface FieldValidation {
 export interface FieldLogic {
     whenFieldKey?: string
     operator?: "equals" | "notEquals" | "contains" | "greaterThan" | "lessThan"
-    value?: any
+    value?: unknown
     action?: "show" | "hide" | "goToField" | "goToEnd"
     targetFieldKey?: string
 }

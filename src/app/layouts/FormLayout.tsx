@@ -4,12 +4,10 @@ import { FormBuilderTopBar } from "../../pages/FormBuilder/components/FormBuilde
 import { FormProvider } from "@/features/forms/hooks/FormContext";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
 import { PublishDialog } from "../../pages/FormBuilder/components/PublishDialog";
-import { useFormStore } from "../../app/store/formStore";
 
 function FormLayoutContent() {
   const { form, isPublished, setIsPublished } = useFormContext();
   const { formId } = useParams();
-  const { forms } = useFormStore();
   const [showPublishDialog, setShowPublishDialog] = useState(false);
 
   const onPublish = () => {
@@ -22,11 +20,8 @@ function FormLayoutContent() {
 
   const handleOpenForm = () => {
     setShowPublishDialog(false);
-    const slug =
-      formId && formId !== "new"
-        ? forms.find((f) => f.id === formId)?.slug
-        : "form-slug";
-    window.open(`/form/${slug}`, "_blank");
+    
+    window.open(`/form/${formId}`, "_blank");
   };
 
   return (
@@ -44,13 +39,8 @@ function FormLayoutContent() {
       <PublishDialog
         open={showPublishDialog}
         onOpenChange={setShowPublishDialog}
-        id={formId}
+        formId={formId}
         isPublished={isPublished}
-        slug={
-          formId && formId !== "new"
-            ? forms.find((f) => f.id === formId)?.slug
-            : undefined
-        }
         onIsPublishedChange={setIsPublished}
         onOpenForm={handleOpenForm}
       />

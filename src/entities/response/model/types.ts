@@ -89,11 +89,11 @@ export interface ExportResult {
 
 export interface SubmitFormRequest {
     answers: ResponseAnswer[]
-    sessionId: string
 }
 
 export interface SubmissionResult {
     submissionId: string
+    formVersionId: string
     message: string
 }
 

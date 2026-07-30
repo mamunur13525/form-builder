@@ -7,15 +7,15 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { getPublicForm } from "@/entities/response/api/public-form.api"
-import { adaptApiForm } from "@/features/forms/model/adapters"
+import { adaptPublishedForm } from "@/features/forms/model/adapters"
 import type { Form } from "@/shared/types/common"
 
 export function usePublicForm(slug: string) {
     return useQuery({
         queryKey: ["public-form", slug],
         queryFn: async (): Promise<Form> => {
-            const apiForm = await getPublicForm(slug)
-            return adaptApiForm(apiForm)
+            const publishedForm = await getPublicForm(slug)
+            return adaptPublishedForm(publishedForm)
         },
         enabled: !!slug,
         staleTime: 5 * 60 * 1000,

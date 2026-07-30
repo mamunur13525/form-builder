@@ -56,7 +56,6 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         setIsSubmitting(true)
         setError(null)
         try {
-            const sessionId = `session_${Date.now()}`
             const answerList = Object.entries(answers).map(([fieldKey, value]) => {
                 const field = form.fields.find((f) => f.fieldKey === fieldKey)
                 return {
@@ -66,7 +65,7 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
                     value,
                 }
             })
-            await submitPublicForm(form.slug, { answers: answerList, sessionId })
+            await submitPublicForm(form.slug, { answers: answerList })
             setSubmitted(true)
             onSubmit?.(answers)
         } catch (error) {

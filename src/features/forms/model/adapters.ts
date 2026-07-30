@@ -6,7 +6,7 @@
  * `shared/types/common.ts` types used throughout the pages.
  */
 
-import type { Form as ApiForm, FormField as ApiField } from "@/entities/form/model/types"
+import type { Form as ApiForm, FormField as ApiField, PublishedForm } from "@/entities/form/model/types"
 import type { FormResponse as ApiResponse } from "@/entities/response/model/types"
 import type { Form, FormField, FormResponse as CommonFormResponse } from "@/shared/types/common"
 
@@ -21,9 +21,26 @@ export function adaptApiForm(apiForm: ApiForm): Form {
         settings: apiForm.settings,
         createdBy: apiForm.createdBy,
         updatedBy: undefined,
-        fields: (apiForm.fields ?? []).map((a: any) => adaptApiField(a, apiForm.id)),
+        fields: (apiForm.fields ?? []).map((a) => adaptApiField(a, apiForm.id)),
         createdAt: apiForm.createdAt,
         updatedAt: apiForm.updatedAt,
+    }
+}
+
+/** Convert a PublishedForm (from public API) into the legacy Form type. */
+export function adaptPublishedForm(publishedForm: PublishedForm): Form {
+    return {
+        id: publishedForm.id,
+        title: publishedForm.title,
+        slug: publishedForm.slug,
+        status: publishedForm.status,
+        theme: publishedForm.theme,
+        settings: publishedForm.settings,
+        createdBy: "",
+        updatedBy: undefined,
+        fields: (publishedForm.fields ?? []).map((a) => adaptApiField(a, publishedForm.id)),
+        createdAt: "",
+        updatedAt: "",
     }
 }
 

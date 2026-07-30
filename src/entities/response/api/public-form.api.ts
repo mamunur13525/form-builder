@@ -4,7 +4,7 @@
  */
 
 import { apiRequest } from "@/shared/api/client"
-import type { Form } from "@/entities/form/model/types"
+import type { PublishedForm } from "@/entities/form/model/types"
 import type {
     DraftResult,
     PublicFormPreview,
@@ -16,8 +16,8 @@ import type {
 } from "@/entities/response/model/types"
 
 /** GET /public/forms/:slug — get a published form by slug (public, no auth). */
-export async function getPublicForm(slug: string): Promise<Form> {
-    return apiRequest<Form>(`/public/forms/${slug}`)
+export async function getPublicForm(slug: string): Promise<PublishedForm> {
+    return apiRequest<PublishedForm>(`/public/forms/${slug}`)
 }
 
 /** GET /public/forms/:slug/schema — get form schema with fields (public, no auth). */

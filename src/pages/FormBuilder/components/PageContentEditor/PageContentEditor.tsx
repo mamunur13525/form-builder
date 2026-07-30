@@ -79,7 +79,7 @@ export function PageContentEditor({
               contentEditable
               suppressContentEditableWarning
               data-placeholder="Type your question... Use @ to recall information."
-              className="text-2xl outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
+              className="text-[26px] outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
               onBlur={(e) =>
                 onUpdate(pageIndex, {
                   label: e.currentTarget.textContent || "",
@@ -95,7 +95,7 @@ export function PageContentEditor({
               contentEditable
               suppressContentEditableWarning
               data-placeholder="Description (optional)"
-              className="text-xl text-muted-foreground outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
+              className="text-[18px] text-muted-foreground outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
               onBlur={(e) =>
                 onUpdate(pageIndex, {
                   helperText: e.currentTarget.textContent || "",

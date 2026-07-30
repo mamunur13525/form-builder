@@ -309,9 +309,9 @@ export function FormBuilderPage() {
             <div className="w-full h-full flex-1 flex items-center justify-center">
               <div
                 className={cn(
-                  "w-full h-full bg-background border rounded-md shadow-sm transition-all duration-500 ease-in-out overflow-hidden",
+                  "w-full h-full bg-background border rounded-md shadow-sm transition-all duration-500 ease-in-out overflow-hidden px-5",
                 )}
-                style={{ width: isMobileView ? "384px" : "100%" }}
+                style={{ width: isMobileView ? "420px" : "100%" }}
               >
                 {selectedPage ? (
                   <PageContentEditor

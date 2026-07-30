@@ -6,7 +6,6 @@ import mongoose, { Schema, model, models } from "mongoose";
 const formSchema = new Schema(
   {
     title: { type: String, required: true },
-    description: { type: String, default: "" },
     slug: { type: String, required: true, unique: true, index: true },
 
     status: {

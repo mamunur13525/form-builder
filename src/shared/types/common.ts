@@ -76,7 +76,6 @@ export interface FormField {
 export interface Form {
     id?: string
     title: string
-    description: string
     slug: string
     status: "draft" | "published" | "archived"
     theme: Theme

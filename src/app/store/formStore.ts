@@ -64,7 +64,6 @@ export const useFormStore = create<FormState>((set, get) => ({
         try {
             const created = await apiCreateForm({
                 title: formData.title,
-                description: formData.description,
             })
 
             const newForm: Form = adaptApiForm(created)
@@ -86,7 +85,6 @@ export const useFormStore = create<FormState>((set, get) => ({
         try {
             await apiUpdateForm(id, {
                 title: updates.title,
-                description: updates.description,
             })
 
             set((state) => ({

@@ -120,7 +120,7 @@ export function FormBuilderSidebar({
                     <Plus className="h-4 w-4" />
                 </Button>
             </div>
-            <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-1">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-2">
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}

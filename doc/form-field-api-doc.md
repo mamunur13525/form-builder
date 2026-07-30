@@ -338,7 +338,6 @@ Form fields are now **embedded subdocuments** inside the Form document. They are
 interface Form {
   _id: string;
   title: string;
-  description: string;
   slug: string;
   status: "draft" | "published" | "archived";
   theme: {

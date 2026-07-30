@@ -1,6 +1,5 @@
 import { ROUTES } from "@/shared/constants/routes";
 import {
-  ArrowLeft,
   CheckCircle,
   Play,
   Wrench,
@@ -10,14 +9,23 @@ import {
   BarChart3,
   Loader2,
   AlertCircle,
+  Home,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { updateForm } from "@/entities/form/api/form.api";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogContent,
+} from "../../../components/ui/dialog";
 
 const navLinks = [
   { to: ROUTES.FORM_BUILDER, icon: Wrench, label: "Build" },
@@ -32,7 +40,6 @@ interface FormBuilderTopBarProps {
   onPublish: () => void;
   onPublishedClick: () => void;
   initialTitle?: string;
-  initialDescription?: string;
 }
 
 export function FormBuilderTopBar({
@@ -40,7 +47,6 @@ export function FormBuilderTopBar({
   onPublish,
   onPublishedClick,
   initialTitle = "",
-  initialDescription = "",
 }: FormBuilderTopBarProps) {
   const { formId } = useParams<{ formId: string }>();
   const navigate = useNavigate();
@@ -49,111 +55,79 @@ export function FormBuilderTopBar({
     "flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-md";
   const activeNavLinkClass = "text-primary bg-primary/10";
 
-  const [formTitleDesc, setFormTitleDesc] = useState({
-    title: initialTitle,
-    description: initialDescription,
-  });
+  const [title, setTitle] = useState(initialTitle);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const prevInitialTitleRef = useRef(initialTitle);
-  const prevInitialDescriptionRef = useRef(initialDescription);
+
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
 
   // Update local state when initial values change from external source
   useEffect(() => {
-    const hasInitialChanged =
-      initialTitle !== prevInitialTitleRef.current ||
-      initialDescription !== prevInitialDescriptionRef.current;
-
-    if (hasInitialChanged) {
-      setFormTitleDesc({
-        title: initialTitle,
-        description: initialDescription,
-      });
+    if (initialTitle !== prevInitialTitleRef.current) {
+      setTitle(initialTitle);
       prevInitialTitleRef.current = initialTitle;
-      prevInitialDescriptionRef.current = initialDescription;
     }
-  }, [initialTitle, initialDescription]);
+  }, [initialTitle]);
 
-  const handleTitleDescriptionChange = async (
-    field: "title" | "description",
-    value: string,
-  ) => {
-    // Optimistically update local state
-    setFormTitleDesc((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleTitleSave = async () => {
+    const trimmed = editTitle.trim();
+    if (!trimmed || trimmed === title) {
+      setDialogOpen(false);
+      return;
+    }
+
     setSaveError(null);
 
-    // Auto-save if form has been persisted to server
     if (formId && formId !== "new") {
       setIsSaving(true);
       showSaveStatus("saving");
       try {
-        const updateData: { title?: string; description?: string } = {};
-
-        // Only send the field that changed
-        if (field === "title") {
-          updateData.title = value;
-          updateData.description = formTitleDesc.description;
-        } else {
-          updateData.description = value;
-          updateData.title = formTitleDesc.title;
-        }
-
-        await updateForm(formId, updateData);
-        // Update context so other components see the change
-        updateFormData(updateData);
+        await updateForm(formId, { title: trimmed });
+        setTitle(trimmed);
+        updateFormData({ title: trimmed });
         showSaveStatus("saved");
       } catch (error) {
-        console.error("Failed to update form:", error);
+        console.error("Failed to update form title:", error);
         setSaveError("Failed to save changes");
         showSaveStatus("error");
-        // Revert the change on error
-        setFormTitleDesc((prev) => ({
-          ...prev,
-          [field]: field === "title" ? initialTitle : initialDescription,
-        }));
       } finally {
         setIsSaving(false);
       }
+    } else {
+      setTitle(trimmed);
+      updateFormData({ title: trimmed });
     }
+
+    setDialogOpen(false);
   };
-  const onBack = useCallback(() => {
-    navigate("/dashboard");
-  }, [navigate]);
+
+  const openTitleDialog = () => {
+    setEditTitle(title);
+    setDialogOpen(true);
+  };
 
   return (
     <div className="flex items-center justify-between px-4 py-2 shrink-0 bg-background border-b">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={onBack}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="flex flex-col gap-1">
-          <Input
-            value={formTitleDesc.title}
-            onChange={(e) =>
-              handleTitleDescriptionChange("title", e.target.value)
-            }
-            placeholder="Form title"
-            className="h-7 text-sm font-semibold border-0 shadow-none focus-visible:ring-1 px-0 py-0 w-64"
-            disabled={isSaving}
-          />
-          <Input
-            value={formTitleDesc.description}
-            onChange={(e) =>
-              handleTitleDescriptionChange("description", e.target.value)
-            }
-            placeholder="Form description"
-            className="h-6 text-xs text-muted-foreground border-0 shadow-none focus-visible:ring-1 px-0 py-0 w-64"
-            disabled={isSaving}
-          />
-        </div>
+      <div className="flex items-center gap-2">      
+        <nav className="flex items-center gap-1.5 text-sm">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors font-medium"
+          >
+            <Home className="w-3 h-3 mb-0.5"/>
+            forms
+          </button>
+          <span className="text-muted-foreground">/</span>
+          <button
+            onClick={openTitleDialog}
+            className="text-foreground hover:text-primary transition-colors font-semibold flex items-center gap-1 hover:cursor-text"
+          >
+            {title}
+          </button>
+        </nav>
         {saveError && (
           <span className="text-[11px] text-destructive">{saveError}</span>
         )}
@@ -231,6 +205,40 @@ export function FormBuilderTopBar({
           </Button>
         )}
       </div>
+
+      {/* Title Edit Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Form Title</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-title">Form Title</Label>
+              <Input
+                id="edit-title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Enter form title"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleTitleSave();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleTitleSave} disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

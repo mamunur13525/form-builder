@@ -19,7 +19,6 @@ export interface FormSettings {
 export interface Form {
     id: string
     title: string
-    description: string
     slug: string
     status: FormStatus
     theme: FormTheme
@@ -33,12 +32,10 @@ export interface Form {
 
 export interface CreateFormRequest {
     title: string
-    description: string
 }
 
 export interface UpdateFormRequest {
     title?: string
-    description?: string
 }
 
 export interface FormSlug {

@@ -99,7 +99,7 @@ export function SortablePageItem({
       {...listeners}
       onClick={() => onSelect(index)}
       className={`
-        group relative flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm
+        group relative flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm
         transition-all duration-200 ease-out cursor-pointer select-none
         ${isSelected
           ? "bg-linear-to-br from-primary/10 to-primary/5 text-primary shadow-sm shadow-primary/5 ring-1 ring-primary/20"
@@ -114,7 +114,7 @@ export function SortablePageItem({
       <div className="shrink-0 flex flex-col items-end gap-0.5">
         <div
           className={`
-            w-fit min-w-10 h-5 rounded-lg flex items-center justify-center
+            w-fit min-w-10 h-5 rounded flex items-center justify-center
             bg-linear-to-br transition-all duration-200 gap-1 relative
             ${colorClass}
             ${isSelected ? "ring-1 ring-primary/20" : ""}
@@ -153,7 +153,7 @@ export function SortablePageItem({
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           className={`
-            shrink-0 flex items-center justify-center w-6 h-6 rounded-lg
+            shrink-0 flex items-center justify-center w-6 h-6 rounded
             transition-all duration-150
             ${isSelected
               ? "opacity-70 hover:opacity-100 hover:bg-primary/15"

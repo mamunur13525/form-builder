@@ -36,7 +36,7 @@ export async function getFormById(formId: string): Promise<Form> {
     return apiRequest<Form>(`/forms/${formId}`)
 }
 
-/** PATCH /forms/:formId — update a form's title/description. */
+/** PATCH /forms/:formId — update a form's title */
 export async function updateForm(formId: string, data: UpdateFormRequest): Promise<Form> {
     return apiRequest<Form>(`/forms/${formId}`, {
         method: "PATCH",

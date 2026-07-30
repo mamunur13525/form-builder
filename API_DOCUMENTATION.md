@@ -478,7 +478,6 @@ Create a new form.
 ```json
 {
   "title": "Customer Feedback Form",
-  "description": "Please provide your feedback"
 }
 ```
 
@@ -490,7 +489,6 @@ Create a new form.
   "data": {
     "id": "65f1a2b3c4d5e6f7a8b9c0d2",
     "title": "Customer Feedback Form",
-    "description": "Please provide your feedback",
     "slug": "customer-feedback-form",
     "status": "draft",
     "theme": {
@@ -531,7 +529,6 @@ Get all forms for the authenticated user.
     {
       "id": "65f1a2b3c4d5e6f7a8b9c0d2",
       "title": "Customer Feedback Form",
-      "description": "Please provide your feedback",
       "slug": "customer-feedback-form",
       "status": "draft",
       "theme": { "primaryColor": "#000000", "backgroundColor": "#ffffff", "textColor": "#111111" },
@@ -557,7 +554,6 @@ Get a form by ID.
   "data": {
     "id": "65f1a2b3c4d5e6f7a8b9c0d2",
     "title": "Customer Feedback Form",
-    "description": "Please provide your feedback",
     "slug": "customer-feedback-form",
     "status": "draft",
     "theme": { "primaryColor": "#000000", "backgroundColor": "#ffffff", "textColor": "#111111" },
@@ -578,7 +574,6 @@ Update a form.
 ```json
 {
   "title": "Updated Form Title",
-  "description": "Updated description"
 }
 ```
 
@@ -1431,7 +1426,6 @@ Get a published form by slug (public, no auth).
   "data": {
     "id": "65f1a2b3c4d5e6f7a8b9c0d2",
     "title": "Customer Feedback Form",
-    "description": "Please provide your feedback",
     "slug": "customer-feedback-form",
     "status": "published",
     "theme": { "primaryColor": "#000000", "backgroundColor": "#ffffff", "textColor": "#111111" },
@@ -1455,7 +1449,6 @@ Get form schema with fields (public, no auth).
     "form": {
       "id": "65f1a2b3c4d5e6f7a8b9c0d2",
       "title": "Customer Feedback Form",
-      "description": "Please provide your feedback",
       "settings": { "oneQuestionAtATime": true, "showProgressBar": true, "allowMultipleSubmissions": true, "requireLogin": false, "collectIP": false }
     },
     "fields": [ { ...field object... } ]
@@ -2149,7 +2142,6 @@ interface User {
 interface Form {
   id: string;
   title: string;
-  description: string;
   slug: string;
   status: "draft" | "published" | "archived";
   theme: {

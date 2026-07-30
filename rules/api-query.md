@@ -13,27 +13,6 @@ calls outside of `src/shared/api/client.ts`.
 - **State Management:** TanStack Query (`@tanstack/react-query`) for all server state
 - **Auth:** Bearer token stored in `localStorage` under key `accessToken`
 
-## Response Format
-
-Every API response follows this envelope:
-
-```json
-{
-  "success": true,
-  "message": "Description of what happened",
-  "data": {}
-}
-```
-
-On error:
-
-```json
-{
-  "success": false,
-  "message": "Error description",
-  "errors": []
-}
-```
 
 ### Response Handling
 

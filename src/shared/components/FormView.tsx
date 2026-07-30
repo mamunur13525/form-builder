@@ -356,9 +356,6 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
             <div className="flex items-center justify-between px-6 py-3 border-b shrink-0">
                 <div>
                     <h1 className="text-sm font-semibold">{form.title}</h1>
-                    {form.description && (
-                        <p className="text-xs text-muted-foreground">{form.description}</p>
-                    )}
                 </div>
                 {form.settings.showStepCounter && (
                     <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">

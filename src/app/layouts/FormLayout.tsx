@@ -16,7 +16,6 @@ function FormLayoutContent() {
         onPublishedClick={onPublishedClick}
         isPublished={isPublished}
         initialTitle={form?.title ?? ""}
-        initialDescription={form?.description ?? ""}
       />
       <div className="flex-1 overflow-auto">
         <Outlet />

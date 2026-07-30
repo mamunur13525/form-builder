@@ -6,13 +6,11 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
 } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Textarea } from "../../components/ui/textarea";
 import {
   Dialog,
   DialogHeader,
@@ -27,7 +25,6 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newDesc, setNewDesc] = useState("");
 
   const { data: forms = [], isLoading } = useForms();
   const createForm = useCreateForm();
@@ -42,7 +39,7 @@ export function DashboardPage() {
   const handleCreateForm = () => {
     const title = newTitle.trim() || "Untitled Form";
     createForm.mutate(
-      { title, description: newDesc },
+      { title },
       {
         onSuccess: (created) => {
           navigate(`/form-builder/${created.id}`);
@@ -79,7 +76,7 @@ export function DashboardPage() {
           <DialogHeader>
             <DialogTitle>Create New Form</DialogTitle>
             <DialogDescription>
-              Give your form a name and description to get started.
+              Give your form a name to get started.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -91,16 +88,6 @@ export function DashboardPage() {
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="e.g. Customer Feedback Survey"
                 autoFocus
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="form-desc">Description (optional)</Label>
-              <Textarea
-                id="form-desc"
-                value={newDesc}
-                onChange={(e) => setNewDesc(e.target.value)}
-                placeholder="Brief description of your form"
-                rows={3}
               />
             </div>
           </div>
@@ -191,9 +178,6 @@ export function DashboardPage() {
                       {form.status}
                     </Badge>
                   </div>
-                  <CardDescription className="line-clamp-2 text-xs pt-1">
-                    {form.description || "No description"}
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="flex items-center justify-between pt-2">
                   <p className="text-xs text-muted-foreground">

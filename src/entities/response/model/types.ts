@@ -117,7 +117,6 @@ export interface PublicFormSchema {
     form: {
         id: string
         title: string
-        description: string
         settings: {
             oneQuestionAtATime: boolean
             showProgressBar: boolean

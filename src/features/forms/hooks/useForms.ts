@@ -92,7 +92,7 @@ export function useCreateForm() {
     })
 }
 
-/** PATCH /forms/:formId — update a form's title/description. */
+/** PATCH /forms/:formId — update a form's title */
 export function useUpdateForm() {
     const queryClient = useQueryClient()
 

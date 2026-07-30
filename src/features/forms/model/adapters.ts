@@ -15,7 +15,6 @@ export function adaptApiForm(apiForm: ApiForm): Form {
     return {
         id: apiForm.id,
         title: apiForm.title,
-        description: apiForm.description,
         slug: apiForm.slug,
         status: apiForm.status,
         theme: apiForm.theme,

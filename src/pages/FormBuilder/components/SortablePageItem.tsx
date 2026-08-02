@@ -58,7 +58,6 @@ export function SortablePageItem({
       : undefined,
     // Never animate the item being dragged — it must follow the pointer 1:1
     transition: isDragging ? "none" : transition,
-    opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 50 : undefined,
   };
 

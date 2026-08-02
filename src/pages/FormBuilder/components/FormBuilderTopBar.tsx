@@ -13,20 +13,11 @@ import {
   Pencil,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { updateForm } from "@/entities/form/api/form.api";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogContent,
-} from "../../../components/ui/dialog";
-import { Spinner } from "@/components/ui/spinner";
+import { FormDialog } from "@/pages/Dashboard/components/FormDialog";
 
 const navLinks = [
   { to: ROUTES.FORM_BUILDER, icon: Wrench, label: "Build" },
@@ -51,19 +42,17 @@ export function FormBuilderTopBar({
 }: FormBuilderTopBarProps) {
   const { formId } = useParams<{ formId: string }>();
   const navigate = useNavigate();
-  const { updateFormData, saveStatus, showSaveStatus } = useFormContext();
+  const { saveStatus, showSaveStatus, openPreview } = useFormContext();
   const baseNavLinkClass =
     "flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-md";
   const activeNavLinkClass = "text-primary bg-primary/10";
 
   const [title, setTitle] = useState(initialTitle);
-  const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const prevInitialTitleRef = useRef(initialTitle);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editTitle, setEditTitle] = useState("");
 
   // Update local state when initial values change from external source
   useEffect(() => {
@@ -73,42 +62,6 @@ export function FormBuilderTopBar({
     }
   }, [initialTitle]);
 
-  const handleTitleSave = async () => {
-    const trimmed = editTitle.trim();
-    if (!trimmed || trimmed === title) {
-      setDialogOpen(false);
-      return;
-    }
-
-    setSaveError(null);
-
-    if (formId && formId !== "new") {
-      setIsSaving(true);
-      showSaveStatus("saving");
-      try {
-        await updateForm(formId, { title: trimmed });
-        setTitle(trimmed);
-        updateFormData({ title: trimmed });
-        showSaveStatus("saved");
-      } catch (error) {
-        console.error("Failed to update form title:", error);
-        setSaveError("Failed to save changes");
-        showSaveStatus("error");
-      } finally {
-        setIsSaving(false);
-      }
-    } else {
-      setTitle(trimmed);
-      updateFormData({ title: trimmed });
-    }
-
-    setDialogOpen(false);
-  };
-
-  const openTitleDialog = () => {
-    setEditTitle(title);
-    setDialogOpen(true);
-  };
 
   return (
     <div className="flex items-center justify-between px-4 py-2 shrink-0 bg-background border-b">
@@ -123,7 +76,7 @@ export function FormBuilderTopBar({
           </button>
           <span className="text-muted-foreground">/</span>
           <button
-            onClick={openTitleDialog}
+            onClick={() => setDialogOpen(true)}
             className="text-foreground hover:text-primary transition-colors font-semibold flex items-center gap-1 cursor-pointer group"
           >
             {title}
@@ -176,16 +129,15 @@ export function FormBuilderTopBar({
               : "Error"}
         </span>
 
-        <Link to={`/form-preview/${formId || "new"}`}>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 gap-1.5 text-sm px-3"
-          >
-            <Play className="h-4 w-4" />
-            Preview
-          </Button>
-        </Link>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-1.5 text-sm px-3"
+          onClick={() => openPreview()}
+        >
+          <Play className="h-4 w-4" />
+          Preview
+        </Button>
         {!isPublished ? (
           <Button
             size="sm"
@@ -209,38 +161,19 @@ export function FormBuilderTopBar({
       </div>
 
       {/* Title Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Rename Form</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Input
-                id="edit-title"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                placeholder="Enter form title"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleTitleSave();
-                  }
-                }}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleTitleSave} disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save"}
-              {isSaving && <Spinner data-icon="inline-start" />}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <FormDialog
+        type="rename"
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        initialTitle={title}
+        formId={formId || ""}
+        onSuccess={(newTitle) => {
+          if (newTitle) {
+            setTitle(newTitle);
+          }
+          showSaveStatus("saved");
+        }}
+      />
     </div>
   );
 }

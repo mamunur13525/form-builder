@@ -4,9 +4,17 @@ import { FormBuilderTopBar } from "../../pages/FormBuilder/components/FormBuilde
 import { FormProvider } from "@/features/forms/hooks/FormContext";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
 import { PublishDialog } from "../../pages/FormBuilder/components/PublishDialog";
+import { FormPreviewDialog } from "../../pages/FormBuilder/components/FormPreviewDialog";
 
 function FormLayoutContent() {
-  const { form, isPublished, setIsPublished } = useFormContext();
+  const {
+    form,
+    isPublished,
+    setIsPublished,
+    previewForm,
+    showPreview,
+    setShowPreview,
+  } = useFormContext();
   const { formId } = useParams();
   const [showPublishDialog, setShowPublishDialog] = useState(false);
 
@@ -44,6 +52,14 @@ function FormLayoutContent() {
         onIsPublishedChange={setIsPublished}
         onOpenForm={handleOpenForm}
       />
+
+      {showPreview && (
+        <FormPreviewDialog
+          open={showPreview}
+          onOpenChange={setShowPreview}
+          form={previewForm ?? form}
+        />
+      )}
     </div>
   );
 }

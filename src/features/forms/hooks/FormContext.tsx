@@ -13,6 +13,8 @@ export function FormProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [previewForm, setPreviewForm] = useState<Form | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
   const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -62,16 +64,36 @@ export function FormProvider({ children }: { children: ReactNode }) {
     setForm((prev) => (prev ? { ...prev, ...updates } : prev));
   }, []);
 
+  // Opens the preview dialog. Pass a form to preview the latest (unsaved)
+  // builder data, otherwise fall back to the previously staged preview form
+  // or the loaded form.
+  const openPreview = useCallback(
+    (formToPreview?: Form | null) => {
+      if (formToPreview !== undefined) {
+        setPreviewForm(formToPreview);
+      } else {
+        setPreviewForm((prev) => prev ?? form);
+      }
+      setShowPreview(true);
+    },
+    [form],
+  );
+
   const value: FormContextValue = {
     form,
     isLoading,
     error,
     isPublished,
     saveStatus,
+    previewForm,
+    showPreview,
     refreshForm,
     setIsPublished,
     updateFormData,
     showSaveStatus,
+    setPreviewForm,
+    setShowPreview,
+    openPreview,
   };
 
   return <FormContext.Provider value={value}>{children}</FormContext.Provider>;

@@ -6,9 +6,10 @@ interface DialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     children: React.ReactNode
+    className?: string
 }
 
-export function Dialog({ open, onOpenChange, children }: DialogProps) {
+export function Dialog({ open, onOpenChange, children, className }: DialogProps) {
     return (
         <AnimatePresence>
             {open && (
@@ -22,7 +23,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
                         transition={{ duration: 0.2 }}
                     />
                     <motion.div
-                        className="relative z-50 w-full max-w-lg rounded-lg border bg-background p-6 shadow-lg mx-4"
+                        className={cn("relative z-50 w-full max-w-lg rounded-lg border bg-background p-6 shadow-lg mx-4", className)}
                         initial={{ opacity: 0, scale: 0.96, y: -12 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.96, y: 12 }}

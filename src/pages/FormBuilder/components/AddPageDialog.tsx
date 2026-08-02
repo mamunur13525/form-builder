@@ -79,15 +79,15 @@ export function AddPageDialog({
     )
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl">
+        <Dialog open={open} onOpenChange={onOpenChange} className="max-w-3xl w-full">
+            <DialogContent >
                 <DialogHeader>
                     <DialogTitle>Add a Page</DialogTitle>
                     <DialogDescription>
                         Choose the type of page you want to add to your form.
                     </DialogDescription>
                 </DialogHeader>
-                
+
                 {/* Search Input */}
                 <div className="py-2" key="search-input">
                     <Input
@@ -95,11 +95,12 @@ export function AddPageDialog({
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-8 text-base"
+                        className="h-12 text-base"
+                        autoFocus={true}
                     />
                 </div>
 
-                <div 
+                <div
                     key="page-types-grid"
                     className="grid grid-cols-3 gap-1.5 min-h-32 overflow-y-auto py-1"
                 >
@@ -107,7 +108,7 @@ export function AddPageDialog({
                         filteredPageTypes.map((pt) => {
                             const Icon: LucideIcon = pt.icon || FileText
                             const colorClass = FIELD_TYPE_COLORS[pt.type] || "from-gray-500/20 to-gray-600/10 text-gray-600 dark:text-gray-400"
-                            
+
                             return (
                                 <button
                                     key={pt.type}

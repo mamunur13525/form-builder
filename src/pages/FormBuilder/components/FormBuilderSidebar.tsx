@@ -17,6 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import { SortablePageItem } from "./SortablePageItem";
 import type { FormField } from "../../../shared/types/common";
+import { showWarning } from "@/shared/hooks/useToast";
 
 interface FormBuilderSidebarProps {
   pages: FormField[];
@@ -66,7 +67,10 @@ export function FormBuilderSidebar({
 
   const removePage = useCallback(
     async (index: number) => {
-      if (pages.length <= 1) return;
+      if (pages.length <= 1) {
+        showWarning("You can't delete the last page!");
+        return;
+      }
       await onDeletePage(index);
     },
     [onDeletePage, pages.length],

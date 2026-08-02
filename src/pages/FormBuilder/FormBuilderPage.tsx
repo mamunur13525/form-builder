@@ -26,7 +26,14 @@ export function FormBuilderPage() {
   const { formId } = useParams();
   const navigate = useNavigate();
   const { forms, fetchForms } = useFormStore();
-  const { form, isLoading: isLoadingForm, error: formError, showSaveStatus } = useFormContext();
+  const {
+    form,
+    isLoading: isLoadingForm,
+    error: formError,
+    showSaveStatus,
+    setPreviewForm,
+    openPreview,
+  } = useFormContext();
 
   const [pages, setPages] = useState<FormField[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
@@ -57,6 +64,13 @@ export function FormBuilderPage() {
   }, [form]);
 
   const selectedPage = pages[selectedPageIndex];
+
+  // Keep the preview form in sync with the latest builder edits, so the
+  // preview dialog shows unsaved changes.
+  useEffect(() => {
+    if (!form) return;
+    setPreviewForm({ ...form, fields: pages });
+  }, [form, pages, setPreviewForm]);
 
   const executeFieldUpdate = useCallback(async () => {
     const pending = pendingFieldUpdateRef.current;
@@ -298,9 +312,9 @@ export function FormBuilderPage() {
                 setShowAddPageDialog(true);
               }}
               onPreview={async () => {
-                // Flush any pending debounced updates before navigating
+                // Flush any pending debounced updates before showing preview
                 await flushPendingUpdate();
-                navigate(`/form-preview/${formId || "new"}`);
+                openPreview(form ? { ...form, fields: pages } : null);
               }}
               isMobileView={isMobileView}
               onToggleView={() => setIsMobileView((prev) => !prev)}
@@ -362,6 +376,7 @@ export function FormBuilderPage() {
         onAddPage={addPage}
         onShowSaveStatus={showSaveStatus}
       />
+
     </div>
   );
 }

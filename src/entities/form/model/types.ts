@@ -106,14 +106,99 @@ export type FieldType =
     | "checkbox"
     | "select"
     | "multiSelect"
+    | "dropdown"
     | "file"
     | "rating"
     | "yesNo"
     | "url"
+    | "statement"
+    | "address"
+    | "opinionScale"
+    | "signature"
+    | "matrix"
 
 export interface FieldOption {
     label?: string
     value?: string
+}
+
+export interface FieldCoverImage {
+    url: string
+    fileId?: string
+    alt?: string
+}
+
+export interface FieldEmailSettings {
+    businessEmailsOnly: boolean
+    emailVerification: boolean
+}
+
+export interface FieldPhoneSettings {
+    phoneVerification: boolean
+    countryCodeMode: "auto" | "specific"
+    defaultCountry?: { iso2: string; name: string; dialCode: string } | null
+}
+
+export interface FieldStatementSettings {
+    embedUrl: string
+    embedProvider: "youtube" | "loom" | "vimeo" | "pdf" | "image" | "other"
+    embedTitle: string
+}
+
+export interface FieldChoiceSettings {
+    allowOther: boolean
+    otherLabel: string
+    horizontalAlign: boolean
+    optionsPerRow: { desktop: number; mobile: number }
+    hideLabels: boolean
+    selectionLimit?: { mode: "none" | "exact" | "range"; exact?: number; min?: number; max?: number }
+}
+
+export interface FieldAddressSettings {
+    fields: Array<{
+        key: "address1" | "address2" | "city" | "state" | "zip" | "country"
+        label: string
+        placeholder: string
+        required: boolean
+        hidden: boolean
+        order: number
+    }>
+}
+
+export interface FieldRatingSettings {
+    style: "star" | "number"
+    max: number
+}
+
+export interface FieldOpinionScaleSettings {
+    min: number
+    max: number
+    leftLabel: string
+    rightLabel: string
+}
+
+export interface FieldUploadSettings {
+    allowMultiple: boolean
+    allowedFileTypes: string[]
+    maxFileSizeMb: number
+}
+
+export interface FieldMatrixSettings {
+    rows: Array<{ key: string; label: string; order: number }>
+    columns: Array<{ key: string; label: string; order: number }>
+    allowMultiplePerRow: boolean
+}
+
+export interface FieldSettings {
+    email?: FieldEmailSettings
+    phone?: FieldPhoneSettings
+    statement?: FieldStatementSettings
+    choice?: FieldChoiceSettings
+    address?: FieldAddressSettings
+    rating?: FieldRatingSettings
+    opinionScale?: FieldOpinionScaleSettings
+    upload?: FieldUploadSettings
+    matrix?: FieldMatrixSettings
 }
 
 export interface FieldValidation {
@@ -155,6 +240,8 @@ export interface FormField {
     logic: FieldLogic[]
     appearance: FieldAppearance
     isActive: boolean
+    coverImage?: FieldCoverImage | null
+    settings?: FieldSettings
     createdAt: string
     updatedAt: string
 }
@@ -168,6 +255,8 @@ export interface CreateFieldRequest {
     options?: FieldOption[]
     validation?: FieldValidation
     appearance?: FieldAppearance
+    coverImage?: FieldCoverImage | null
+    settings?: FieldSettings
 }
 
 export interface UpdateFieldRequest {
@@ -178,6 +267,8 @@ export interface UpdateFieldRequest {
     options?: FieldOption[]
     validation?: FieldValidation
     appearance?: FieldAppearance
+    coverImage?: FieldCoverImage | null
+    settings?: FieldSettings
 }
 
 export interface ReorderFieldsRequest {

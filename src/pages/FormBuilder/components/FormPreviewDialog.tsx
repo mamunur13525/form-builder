@@ -32,7 +32,7 @@ export function FormPreviewDialog({
   }, [form]);
 
   const [restartCount, setRestartCount] = useState(0);
-  console.log({ form })
+
   const handleRestart = () => {
     setRestartCount((prev) => prev + 1);
   };

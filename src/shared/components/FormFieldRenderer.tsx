@@ -5,12 +5,18 @@ import {
     DateField,
     TimeField,
     SelectField,
-    RadioField,
-    CheckboxField,
     YesNoField,
-    RatingField,
-    FileField,
+    ChoiceField,
+    SignatureField,
+    StatementField,
+    AddressField,
+    OpinionScaleField,
+    MatrixField,
+    StarRatingField,
+    UploadField,
+    PhoneAnswerField,
 } from "./fields"
+import type { UploadedFile } from "./fields/UploadField"
 
 interface FormFieldRendererProps {
     field: FormField
@@ -19,7 +25,18 @@ interface FormFieldRendererProps {
     onAnswer: (fieldKey: string, value: unknown) => void
 }
 
+/** Fall back to sane defaults so a field missing its settings group still renders. */
+const CHOICE_FALLBACK = {
+    allowOther: false,
+    otherLabel: "Other",
+    horizontalAlign: false,
+    optionsPerRow: { desktop: 3, mobile: 1 },
+    hideLabels: false,
+}
+
 export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRendererProps) {
+    const settings = field.settings ?? {}
+
     switch (field.type) {
         case "shortText":
             return (
@@ -45,13 +62,18 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
             )
         case "phone":
             return (
-                <TextField
-                    type="tel"
-                    placeholder={field.placeholder || "Type your answer here..."}
+                <PhoneAnswerField
                     value={(value as string) || ""}
                     onChange={(v) => onAnswer(field.fieldKey, v)}
+                    settings={
+                        settings.phone ?? {
+                            phoneVerification: false,
+                            countryCodeMode: "auto",
+                            defaultCountry: null,
+                        }
+                    }
+                    placeholder={field.placeholder}
                     error={error}
-                    autoFocus
                 />
             )
         case "url":
@@ -103,7 +125,7 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     error={error}
                 />
             )
-        case "select":
+        case "dropdown":
             return (
                 <SelectField
                     value={(value as string) || ""}
@@ -112,22 +134,33 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     error={error}
                 />
             )
+        case "select":
         case "radio":
             return (
-                <RadioField
+                <ChoiceField
                     value={(value as string) || ""}
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     options={field.options}
+                    settings={settings.choice ?? CHOICE_FALLBACK}
+                    multiple={false}
                     name={field.fieldKey}
                 />
             )
         case "checkbox":
         case "multiSelect":
             return (
-                <CheckboxField
+                <ChoiceField
                     value={(value as string[]) || []}
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     options={field.options}
+                    settings={
+                        settings.choice ?? {
+                            ...CHOICE_FALLBACK,
+                            selectionLimit: { mode: "none" as const },
+                        }
+                    }
+                    multiple
+                    name={field.fieldKey}
                 />
             )
         case "yesNo":
@@ -139,13 +172,82 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
             )
         case "rating":
             return (
-                <RatingField
+                <StarRatingField
                     value={(value as number) || 0}
+                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    settings={settings.rating ?? { style: "star", max: 5 }}
+                />
+            )
+        case "opinionScale":
+            return (
+                <OpinionScaleField
+                    value={value as number | undefined}
+                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    settings={
+                        settings.opinionScale ?? {
+                            min: 0,
+                            max: 10,
+                            leftLabel: "",
+                            rightLabel: "",
+                        }
+                    }
+                />
+            )
+        case "address":
+            return (
+                <AddressField
+                    value={value as Record<string, string> | undefined}
+                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    fields={settings.address?.fields ?? []}
+                />
+            )
+        case "matrix":
+            return (
+                <MatrixField
+                    value={value as Record<string, string | string[]> | undefined}
+                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    settings={
+                        settings.matrix ?? {
+                            rows: [],
+                            columns: [],
+                            allowMultiplePerRow: false,
+                        }
+                    }
+                />
+            )
+        case "signature":
+            return (
+                <SignatureField
+                    value={(value as string) || ""}
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                 />
             )
+        case "statement":
+            return (
+                <StatementField
+                    settings={
+                        settings.statement ?? {
+                            embedUrl: "",
+                            embedProvider: "youtube",
+                            embedTitle: "",
+                        }
+                    }
+                />
+            )
         case "file":
-            return <FileField />
+            return (
+                <UploadField
+                    value={value as UploadedFile[] | undefined}
+                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    settings={
+                        settings.upload ?? {
+                            allowMultiple: false,
+                            allowedFileTypes: [],
+                            maxFileSizeMb: 10,
+                        }
+                    }
+                />
+            )
         default:
             return (
                 <TextField

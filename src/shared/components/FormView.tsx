@@ -48,18 +48,16 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
     handleNavNext,
   } = useFormNavigation({ form, mode, onSubmit });
 
-  // Debug: log form data to check what's being received
-  console.log(
-    "[FormView] form fields:",
-    form.fields?.length,
-    "activeFields:",
-    activeFields.length,
-    "currentField:",
-    currentField?.fieldKey,
-  );
-
   const renderFieldQuestion = (field: FormField) => (
     <div className="w-full">
+      {field.coverImage?.url && (
+        <img
+          src={field.coverImage.url}
+          alt={field.coverImage.alt || ""}
+          className="mb-5 max-h-56 w-full rounded-md border object-cover"
+        />
+      )}
+
       <FieldLabel
         label={field.label}
         pageNumber={currentStep + 1}
@@ -89,8 +87,14 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
         )}
       </div>
 
+      {/* Statement pages collect no answer, so the button just advances. */}
       <FieldSubmitButton
-        text={isSubmitting ? "Submitting..." : field.appearance.submitButtonText || "Submit"}
+        text={
+          isSubmitting
+            ? "Submitting..."
+            : field.appearance.submitButtonText ||
+              (field.type === "statement" ? "Continue" : "Submit")
+        }
         color={field.appearance.submitButtonColor}
         onClick={handleNext}
         disabled={isSubmitting}

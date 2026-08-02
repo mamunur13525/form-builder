@@ -154,6 +154,8 @@ export function FormBuilderPage() {
             width: page.appearance.width,
             icon: page.appearance.icon || "",
           },
+          coverImage: page.coverImage ?? null,
+          settings: page.settings,
         });
 
         // Update local state with the created field (which has id from server)

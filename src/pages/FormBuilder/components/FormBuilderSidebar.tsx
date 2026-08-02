@@ -112,8 +112,8 @@ export function FormBuilderSidebar({
     (event: DragEndEvent) => {
       const { active, over } = event;
       if (over && active.id !== over.id) {
-        const oldIndex = pages.findIndex((p) => p.fieldKey === active.id);
-        const newIndex = pages.findIndex((p) => p.fieldKey === over.id);
+        const oldIndex = pages.findIndex((p) => (p._id || p.fieldKey) === active.id);
+        const newIndex = pages.findIndex((p) => (p._id || p.fieldKey) === over.id);
         if (oldIndex !== -1 && newIndex !== -1) {
           movePage(oldIndex, newIndex);
         }
@@ -121,7 +121,7 @@ export function FormBuilderSidebar({
     },
     [pages, movePage],
   );
-
+  console.log({ pages })
   return (
     <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">
       <div className="p-3 py-2 border-b flex items-center justify-between">
@@ -144,12 +144,12 @@ export function FormBuilderSidebar({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={pages.map((p) => p.fieldKey)}
+            items={pages.map((p) => p._id || p.fieldKey)}
             strategy={verticalListSortingStrategy}
           >
             {pages.map((page, index) => (
               <SortablePageItem
-                key={page.fieldKey}
+                key={page._id || page.fieldKey || index}
                 page={page}
                 index={index}
                 isSelected={index === selectedPageIndex}

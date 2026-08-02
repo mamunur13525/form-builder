@@ -10,10 +10,16 @@ import {
     CheckSquare,
     List,
     ListChecks,
+    ChevronDownSquare,
     Upload,
     Star,
     ThumbsUp,
     Link,
+    MessageSquareText,
+    MapPin,
+    Gauge,
+    PenLine,
+    Grid3x3,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -29,10 +35,16 @@ export const FIELD_TYPES = [
     "checkbox",
     "select",
     "multiSelect",
+    "dropdown",
     "file",
     "rating",
     "yesNo",
     "url",
+    "statement",
+    "address",
+    "opinionScale",
+    "signature",
+    "matrix",
 ] as const
 
 export type FieldType = (typeof FIELD_TYPES)[number]
@@ -49,10 +61,16 @@ export const FIELD_TYPE_LABELS: Record<FieldType, string> = {
     checkbox: "Checkbox",
     select: "Select",
     multiSelect: "Multi Select",
+    dropdown: "Dropdown",
     file: "File Upload",
     rating: "Rating",
     yesNo: "Yes/No",
     url: "URL",
+    statement: "Statement",
+    address: "Address",
+    opinionScale: "Opinion Scale",
+    signature: "Signature",
+    matrix: "Matrix",
 }
 
 export const FIELD_TYPE_ICONS: Record<FieldType, LucideIcon> = {
@@ -67,10 +85,16 @@ export const FIELD_TYPE_ICONS: Record<FieldType, LucideIcon> = {
     checkbox: CheckSquare,
     select: List,
     multiSelect: ListChecks,
+    dropdown: ChevronDownSquare,
     file: Upload,
     rating: Star,
     yesNo: ThumbsUp,
     url: Link,
+    statement: MessageSquareText,
+    address: MapPin,
+    opinionScale: Gauge,
+    signature: PenLine,
+    matrix: Grid3x3,
 }
 
 export const FIELD_TYPE_COLORS: Record<FieldType, string> = {
@@ -85,10 +109,16 @@ export const FIELD_TYPE_COLORS: Record<FieldType, string> = {
     checkbox: "from-indigo-500/20 to-indigo-600/10 text-indigo-600 dark:text-indigo-400",
     select: "from-teal-500/20 to-teal-600/10 text-teal-600 dark:text-teal-400",
     multiSelect: "from-purple-500/20 to-purple-600/10 text-purple-600 dark:text-purple-400",
+    dropdown: "from-teal-500/20 to-teal-600/10 text-teal-600 dark:text-teal-400",
     file: "from-pink-500/20 to-pink-600/10 text-pink-600 dark:text-pink-400",
     rating: "from-yellow-500/20 to-yellow-600/10 text-yellow-600 dark:text-yellow-400",
     yesNo: "from-green-500/20 to-green-600/10 text-green-600 dark:text-green-400",
     url: "from-slate-500/20 to-slate-600/10 text-slate-600 dark:text-slate-400",
+    statement: "from-fuchsia-500/20 to-fuchsia-600/10 text-fuchsia-600 dark:text-fuchsia-400",
+    address: "from-lime-500/20 to-lime-600/10 text-lime-600 dark:text-lime-400",
+    opinionScale: "from-red-500/20 to-red-600/10 text-red-600 dark:text-red-400",
+    signature: "from-stone-500/20 to-stone-600/10 text-stone-600 dark:text-stone-400",
+    matrix: "from-blue-500/20 to-blue-600/10 text-blue-600 dark:text-blue-400",
 }
 
 export const FORM_STATUS = ["draft", "published", "archived"] as const

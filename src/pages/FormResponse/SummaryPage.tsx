@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft, FileText, BarChart3, Activity } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { motion } from "motion/react"
@@ -12,7 +12,6 @@ import type { Form as CommonForm } from "../../shared/types/common"
 export function SummaryPage() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const location = useLocation()
 
     const { data: apiForm, isLoading: formLoading } = useForm(id || "")
     const { data: summaryData, isLoading: summaryLoading } = useResponseSummary(id || "")
@@ -30,14 +29,6 @@ export function SummaryPage() {
 
     const totalResponses = summaryData?.totalResponses || 0
     const fields = summaryData?.fields || []
-
-    const getCurrentTab = () => {
-        if (location.pathname.includes("/summary")) return "summary"
-        if (location.pathname.includes("/analytics")) return "analytics"
-        return "submissions"
-    }
-
-    const currentTab = getCurrentTab()
 
     return (
         <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">

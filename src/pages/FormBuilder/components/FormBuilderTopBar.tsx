@@ -48,7 +48,6 @@ export function FormBuilderTopBar({
   const activeNavLinkClass = "text-primary bg-primary/10";
 
   const [title, setTitle] = useState(initialTitle);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const prevInitialTitleRef = useRef(initialTitle);
 
   // Dialog state
@@ -83,9 +82,6 @@ export function FormBuilderTopBar({
             <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-100 duration-300" />
           </button>
         </nav>
-        {saveError && (
-          <span className="text-sm text-destructive">{saveError}</span>
-        )}
       </div>
 
       <nav className="flex items-center gap-1">

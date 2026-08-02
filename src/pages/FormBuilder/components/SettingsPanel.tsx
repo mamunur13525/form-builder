@@ -1,4 +1,4 @@
-import { Settings2, Plus, Asterisk } from "lucide-react"
+import { Settings2, Plus } from "lucide-react"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
@@ -9,9 +9,41 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../../../components/ui/select"
-import { Switch } from "../../../components/ui/switch"
 import { FIELD_TYPE_LABELS } from "../../../shared/constants/form-types"
-import type { FormField } from "../../../shared/types/common"
+import type {
+    ChoiceSettings,
+    FieldSettings,
+    FormField,
+    Validation,
+} from "../../../shared/types/common"
+import {
+    defaultOptionsForType,
+    defaultSettingsForType,
+    CHOICE_TYPES,
+    MULTI_ANSWER_TYPES,
+} from "@/features/forms/model/field-defaults"
+import {
+    CoverImageField,
+    NumberSetting,
+    RequiredToggle,
+    SettingsSection,
+    ToggleRow,
+} from "./settings/primitives"
+import {
+    HideLabelsSetting,
+    HorizontalAlignSetting,
+    OtherOptionSetting,
+    SelectionLimitSetting,
+} from "./settings/choice-settings"
+import { PhoneSettingsWidget } from "./settings/phone-settings"
+import { RatingSettingsWidget } from "./settings/rating-settings"
+import {
+    AddressSettingsWidget,
+    MatrixSettingsWidget,
+    OpinionScaleSettingsWidget,
+    StatementSettingsWidget,
+    UploadSettingsWidget,
+} from "./settings/type-settings"
 
 const PAGE_TYPES = Object.entries(FIELD_TYPE_LABELS).map(([type, label]) => ({
     type,
@@ -25,22 +57,62 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps) {
+    const settings = page.settings ?? {}
+
+    /** Merge a single settings group, preserving the rest. */
+    const patchSettings = (group: Partial<FieldSettings>) => {
+        onUpdate(pageIndex, { settings: { ...settings, ...group } })
+    }
+
+    const patchValidation = (patch: Partial<Validation>) => {
+        onUpdate(pageIndex, { validation: { ...page.validation, ...patch } })
+    }
+
+    /**
+     * Changing the type wipes settings server-side, so reset locally to the
+     * new type's defaults (and reseed options for option-based types).
+     */
+    const handleTypeChange = (value: FormField["type"] | null) => {
+        if (!value) return
+        const nextType = value
+        const isOptionType = defaultOptionsForType(nextType).length > 0
+        onUpdate(pageIndex, {
+            type: nextType,
+            settings: defaultSettingsForType(nextType),
+            ...(isOptionType && page.options.length === 0
+                ? { options: defaultOptionsForType(nextType) }
+                : {}),
+        })
+    }
+
+    const isChoiceType = CHOICE_TYPES.includes(page.type)
+    const isMultiAnswer = MULTI_ANSWER_TYPES.includes(page.type)
+    const isStatement = page.type === "statement"
+
+    // The choice group with guaranteed defaults, so the widgets never see undefined.
+    const choice: ChoiceSettings = settings.choice ?? {
+        allowOther: false,
+        otherLabel: "Other",
+        horizontalAlign: false,
+        optionsPerRow: { desktop: 3, mobile: 1 },
+        hideLabels: false,
+        ...(isMultiAnswer ? { selectionLimit: { mode: "none" as const } } : {}),
+    }
+
     return (
-        <div className="w-full h-full flex flex-col bg-background border rounded-md  overflow-hidden">
+        <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">
             <div className="p-3 border-b">
                 <h3 className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     <Settings2 className="h-4 w-4" />
                     Settings
                 </h3>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-5">
-                {/* Field Type */}
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Field type — always available */}
                 <div className="space-y-2">
                     <Label className="text-base">Field Type</Label>
-                    <Select
-                        value={page.type}
-                        onValueChange={(value) => onUpdate(pageIndex, { type: value as FormField["type"] })}
-                    >
+                    <Select value={page.type} onValueChange={handleTypeChange}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select field type" />
                         </SelectTrigger>
@@ -54,120 +126,251 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                     </Select>
                 </div>
 
-                {/* Required Toggle */}
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                            <Asterisk className="h-3.5 w-3.5 text-red-500" />
-                            <Label htmlFor="required" className="text-base cursor-pointer">Required</Label>
-                        </div>
-                        
-                        <Switch
-                            checked={page.required}
-                            onCheckedChange={(checked) => onUpdate(pageIndex, { required: checked })}
-                            size="sm"
-                            id="required"
-                        />
-                    </div>
-                    <p className="text-xs text-muted-foreground">Respondents must answer this field to submit the form.</p>
-                </div>
+                {/* Required — every type except statement (forced false server-side) */}
+                {!isStatement && (
+                    <RequiredToggle
+                        checked={page.required}
+                        onCheckedChange={(required) => onUpdate(pageIndex, { required })}
+                    />
+                )}
 
-                {/* Validation */}
-                <div className="space-y-3">
-                    <div className="flex items-center gap-1.5">
-                        <Label className="text-base font-semibold">Validation</Label>
-                    </div>
-                    <p className="text-xs text-muted-foreground -mt-1">Control what respondents can enter, like character limits or number ranges.</p>
-                    {(page.type === "shortText" || page.type === "longText") && (
-                        <>
-                            <div className="space-y-1">
-                                <Label className="text-base text-muted-foreground">Min Length</Label>
-                                <Input
-                                    type="number"
-                                    value={page.validation?.minLength ?? ""}
-                                    onChange={(e) =>
-                                        onUpdate(pageIndex, {
-                                            validation: { ...page.validation, minLength: Number(e.target.value) || undefined },
-                                        })
-                                    }
-                                    placeholder="0"
-                                    className="h-8 text-base"
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-base text-muted-foreground">Max Length</Label>
-                                <Input
-                                    type="number"
-                                    value={page.validation?.maxLength ?? ""}
-                                    onChange={(e) =>
-                                        onUpdate(pageIndex, {
-                                            validation: { ...page.validation, maxLength: Number(e.target.value) || undefined },
-                                        })
-                                    }
-                                    placeholder="1000"
-                                    className="h-8 text-base"
-                                />
-                            </div>
-                        </>
-                    )}
-                    {page.type === "number" && (
-                        <>
-                            <div className="space-y-1">
-                                <Label className="text-base text-muted-foreground">Min Value</Label>
-                                <Input
-                                    type="number"
-                                    value={page.validation?.min ?? ""}
-                                    onChange={(e) =>
-                                        onUpdate(pageIndex, {
-                                            validation: { ...page.validation, min: Number(e.target.value) || undefined },
-                                        })
-                                    }
-                                    placeholder="0"
-                                    className="h-8 text-base"
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-base text-muted-foreground">Max Value</Label>
-                                <Input
-                                    type="number"
-                                    value={page.validation?.max ?? ""}
-                                    onChange={(e) =>
-                                        onUpdate(pageIndex, {
-                                            validation: { ...page.validation, max: Number(e.target.value) || undefined },
-                                        })
-                                    }
-                                    placeholder="100"
-                                    className="h-8 text-base"
-                                />
-                            </div>
-                        </>
-                    )}
-                    <div className="space-y-1">
-                        <Label className="text-base text-muted-foreground">Custom Error Message</Label>
-                        <Input
-                            value={page.validation?.message ?? ""}
-                            onChange={(e) =>
-                                onUpdate(pageIndex, {
-                                    validation: { ...page.validation, message: e.target.value },
+                {/* ---------------- Email ---------------- */}
+                {page.type === "email" && (
+                    <SettingsSection title="Email">
+                        <ToggleRow
+                            id="business-emails"
+                            label="Accept only business emails?"
+                            checked={settings.email?.businessEmailsOnly ?? false}
+                            onCheckedChange={(businessEmailsOnly) =>
+                                patchSettings({
+                                    email: {
+                                        businessEmailsOnly,
+                                        emailVerification:
+                                            settings.email?.emailVerification ?? false,
+                                    },
                                 })
                             }
-                            placeholder="This field is required"
-                            className="h-8 text-base"
                         />
-                    </div>
-                </div>
+                        <ToggleRow
+                            id="email-verification"
+                            label="Email verification"
+                            checked={settings.email?.emailVerification ?? false}
+                            onCheckedChange={(emailVerification) =>
+                                patchSettings({
+                                    email: {
+                                        businessEmailsOnly:
+                                            settings.email?.businessEmailsOnly ?? false,
+                                        emailVerification,
+                                    },
+                                })
+                            }
+                        />
+                    </SettingsSection>
+                )}
 
-                {/* Logic */}
-                <div className="space-y-3">
-                    <Label className="text-base font-semibold">Logic</Label>
-                    <p className="text-xs text-muted-foreground mt-1">Dynamically show or hide this field depending on how respondents answer other questions.</p>
+                {/* ---------------- Long text: character limits ---------------- */}
+                {page.type === "longText" && (
+                    <SettingsSection title="Character limits">
+                        <NumberSetting
+                            label="Minimum characters"
+                            description="Leave blank for no minimum limit."
+                            value={page.validation?.minLength}
+                            onChange={(minLength) => patchValidation({ minLength })}
+                            placeholder="No minimum"
+                            min={0}
+                        />
+                        <NumberSetting
+                            label="Maximum characters"
+                            description="Leave blank for no maximum limit."
+                            value={page.validation?.maxLength}
+                            onChange={(maxLength) => patchValidation({ maxLength })}
+                            placeholder="No maximum"
+                            min={0}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Number: min / max ---------------- */}
+                {page.type === "number" && (
+                    <SettingsSection title="Number range">
+                        <NumberSetting
+                            label="Minimum number"
+                            description="Leave blank for no minimum limit."
+                            value={page.validation?.min}
+                            onChange={(min) => patchValidation({ min })}
+                            placeholder="No minimum"
+                        />
+                        <NumberSetting
+                            label="Maximum number"
+                            description="Leave blank for no maximum limit."
+                            value={page.validation?.max}
+                            onChange={(max) => patchValidation({ max })}
+                            placeholder="No maximum"
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Phone ---------------- */}
+                {page.type === "phone" && (
+                    <SettingsSection title="Phone">
+                        <PhoneSettingsWidget
+                            settings={
+                                settings.phone ?? {
+                                    phoneVerification: false,
+                                    countryCodeMode: "auto",
+                                    defaultCountry: null,
+                                }
+                            }
+                            onChange={(phone) => patchSettings({ phone })}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Statement ---------------- */}
+                {isStatement && (
+                    <SettingsSection title="Embed">
+                        <StatementSettingsWidget
+                            settings={
+                                settings.statement ?? {
+                                    embedUrl: "",
+                                    embedProvider: "youtube",
+                                    embedTitle: "",
+                                }
+                            }
+                            onChange={(statement) => patchSettings({ statement })}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Choice types ---------------- */}
+                {isChoiceType && (
+                    <SettingsSection title="Options">
+                        <OtherOptionSetting
+                            settings={choice}
+                            onChange={(next) => patchSettings({ choice: next })}
+                        />
+                        <HorizontalAlignSetting
+                            settings={choice}
+                            onChange={(next) => patchSettings({ choice: next })}
+                        />
+                        <HideLabelsSetting
+                            settings={choice}
+                            onChange={(next) => patchSettings({ choice: next })}
+                        />
+                        <SelectionLimitSetting
+                            settings={choice}
+                            onChange={(next) => patchSettings({ choice: next })}
+                            isMultiAnswer={isMultiAnswer}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Address ---------------- */}
+                {page.type === "address" && (
+                    <SettingsSection title="Address fields">
+                        <AddressSettingsWidget
+                            settings={settings.address ?? { fields: [] }}
+                            onChange={(address) => patchSettings({ address })}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Rating ---------------- */}
+                {page.type === "rating" && (
+                    <SettingsSection title="Rating">
+                        <RatingSettingsWidget
+                            settings={settings.rating ?? { style: "star", max: 5 }}
+                            onChange={(rating) => patchSettings({ rating })}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Opinion scale ---------------- */}
+                {page.type === "opinionScale" && (
+                    <SettingsSection title="Scale">
+                        <OpinionScaleSettingsWidget
+                            settings={
+                                settings.opinionScale ?? {
+                                    min: 0,
+                                    max: 10,
+                                    leftLabel: "",
+                                    rightLabel: "",
+                                }
+                            }
+                            onChange={(opinionScale) => patchSettings({ opinionScale })}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Upload ---------------- */}
+                {page.type === "file" && (
+                    <SettingsSection title="Upload">
+                        <UploadSettingsWidget
+                            settings={
+                                settings.upload ?? {
+                                    allowMultiple: false,
+                                    allowedFileTypes: [],
+                                    maxFileSizeMb: 10,
+                                }
+                            }
+                            onChange={(upload) => patchSettings({ upload })}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* ---------------- Matrix ---------------- */}
+                {page.type === "matrix" && (
+                    <SettingsSection title="Matrix">
+                        <MatrixSettingsWidget
+                            settings={
+                                settings.matrix ?? {
+                                    rows: [],
+                                    columns: [],
+                                    allowMultiplePerRow: false,
+                                }
+                            }
+                            onChange={(matrix) => patchSettings({ matrix })}
+                        />
+                    </SettingsSection>
+                )}
+
+                {/* Cover image — available on every field type */}
+                <CoverImageField
+                    value={page.coverImage}
+                    onChange={(coverImage) => onUpdate(pageIndex, { coverImage })}
+                />
+
+                {/* Custom validation error message — available on every type */}
+                <SettingsSection title="Validation message">
+                    <Input
+                        value={page.validation?.message ?? ""}
+                        onChange={(e) => patchValidation({ message: e.target.value })}
+                        placeholder="This field is required"
+                        className="h-9 text-base"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                        Shown to respondents when this field fails validation.
+                    </p>
+                </SettingsSection>
+
+                {/* Logic — unchanged from the previous panel */}
+                <SettingsSection
+                    title="Logic"
+                    description="Dynamically show or hide this field depending on how respondents answer other questions."
+                >
                     {page.logic.length === 0 ? (
-                        <p className="text-xs text-muted-foreground">No logic rules configured</p>
+                        <p className="text-xs text-muted-foreground">
+                            No logic rules configured
+                        </p>
                     ) : (
                         page.logic.map((rule, ruleIndex) => (
-                            <div key={ruleIndex} className="p-2 rounded border bg-muted/30 space-y-1">
+                            <div
+                                key={ruleIndex}
+                                className="space-y-1 rounded border bg-muted/30 p-2"
+                            >
                                 <p className="text-base">
-                                    When <strong>{rule.whenFieldKey}</strong> {rule.operator} "{String(rule.value)}"
+                                    When <strong>{rule.whenFieldKey}</strong> {rule.operator} "
+                                    {String(rule.value)}"
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                     → {rule.action} {rule.targetFieldKey}
@@ -179,22 +382,22 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                         <Plus className="mr-1 h-3 w-3" />
                         Add Logic
                     </Button>
-                </div>
+                </SettingsSection>
 
-                {/* Appearance */}
-                <div className="space-y-2">
-                    <Label className="text-base font-semibold">Appearance</Label>
+                {/* Appearance — button text/color (shared with all types) */}
+                <SettingsSection title="Appearance">
                     <div className="space-y-1">
                         <Label className="text-base text-muted-foreground">Width</Label>
                         <Select
                             value={page.appearance.width}
-                            onValueChange={(value) =>
+                            onValueChange={(v: "full" | "half" | null) => {
+                                if (!v) return
                                 onUpdate(pageIndex, {
-                                    appearance: { ...page.appearance, width: value as "full" | "half" },
+                                    appearance: { ...page.appearance, width: v },
                                 })
-                            }
+                            }}
                         >
-                            <SelectTrigger className="w-full h-10 text-base">
+                            <SelectTrigger className="w-full h-9 text-base">
                                 <SelectValue placeholder="Select width" />
                             </SelectTrigger>
                             <SelectContent>
@@ -209,11 +412,14 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                             value={page.appearance.submitButtonText ?? ""}
                             onChange={(e) =>
                                 onUpdate(pageIndex, {
-                                    appearance: { ...page.appearance, submitButtonText: e.target.value },
+                                    appearance: {
+                                        ...page.appearance,
+                                        submitButtonText: e.target.value,
+                                    },
                                 })
                             }
                             placeholder="Submit"
-                            className="h-10 text-base"
+                            className="h-9 text-base"
                         />
                     </div>
                     <div className="space-y-1">
@@ -224,25 +430,31 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                 value={page.appearance.submitButtonColor ?? "#000000"}
                                 onChange={(e) =>
                                     onUpdate(pageIndex, {
-                                        appearance: { ...page.appearance, submitButtonColor: e.target.value },
+                                        appearance: {
+                                            ...page.appearance,
+                                            submitButtonColor: e.target.value,
+                                        },
                                     })
                                 }
-                                className="h-10 w-10 rounded border cursor-pointer p-0"
+                                className="h-9 w-9 rounded border cursor-pointer p-0"
                             />
                             <Input
                                 type="text"
                                 value={page.appearance.submitButtonColor ?? ""}
                                 onChange={(e) =>
                                     onUpdate(pageIndex, {
-                                        appearance: { ...page.appearance, submitButtonColor: e.target.value },
+                                        appearance: {
+                                            ...page.appearance,
+                                            submitButtonColor: e.target.value,
+                                        },
                                     })
                                 }
                                 placeholder="#000000"
-                                className="h-10 text-base"
+                                className="h-9 text-base"
                             />
                         </div>
                     </div>
-                </div>
+                </SettingsSection>
             </div>
         </div>
     )

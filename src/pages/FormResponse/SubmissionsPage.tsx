@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft, Download, FileText, BarChart3, Activity } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
@@ -20,14 +20,13 @@ import type { Form as CommonForm } from "../../shared/types/common"
 export function SubmissionsPage() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const location = useLocation()
 
-    const { data: apiForm, isLoading: formLoading } = useForm(id || "")
-    const { data: apiResponses = [], isLoading: responsesLoading } = useResponses(id || "")
+
+    const { data: apiForm } = useForm(id || "")
+    const { data: apiResponses = [] } = useResponses(id || "")
 
     const form: CommonForm | null = apiForm ? adaptApiForm(apiForm) : null
     const formResponses = apiResponses.map(adaptApiResponse)
-    const isLoading = formLoading || responsesLoading
 
     if (!form) {
         return (

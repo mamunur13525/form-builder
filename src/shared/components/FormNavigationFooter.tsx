@@ -18,8 +18,8 @@ export function FormNavigationFooter({
     onNavNext,
 }: FormNavigationFooterProps) {
     return (
-        <div className="flex items-center justify-between px-6 py-3 border-t shrink-0 bg-background">
-            <Badge variant="outline" className="text-[10px] text-muted-foreground font-normal">
+        <div className="flex items-center justify-between px-6 py-4 border-t shrink-0 bg-background">
+            <Badge variant="outline" className="text-sm text-muted-foreground font-normal">
                 powered by typeform alternative
             </Badge>
             <div className="flex items-center gap-2">
@@ -28,18 +28,18 @@ export function FormNavigationFooter({
                     size="icon"
                     onClick={onPrev}
                     disabled={currentStep === 0}
-                    className="h-8 w-8"
+                    className="h-12 w-12"
                 >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowLeft className="h-8 w-8" />
                 </Button>
                 <Button
                     variant="outline"
                     size="icon"
                     onClick={onNavNext}
                     disabled={!hasSubmittedCurrent || isLastStep}
-                    className="h-8 w-8"
+                    className="h-12 w-12"
                 >
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-8 w-8" />
                 </Button>
             </div>
         </div>

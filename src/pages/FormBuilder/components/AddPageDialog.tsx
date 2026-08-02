@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "../../../components/ui/input"
 import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, FIELD_TYPE_COLORS, type FieldType } from "../../../shared/constants/form-types"
 import type { FormField } from "../../../shared/types/common"
+import { defaultOptionsForType, defaultSettingsForType } from "@/features/forms/model/field-defaults"
 import type { LucideIcon } from "lucide-react"
 
 type PageType = keyof typeof FIELD_TYPE_LABELS
@@ -60,13 +61,12 @@ export function AddPageDialog({
                 type,
                 required: false,
                 order: pagesLength + 1,
-                options:
-                    type === "radio" || type === "checkbox" || type === "select" || type === "multiSelect"
-                        ? [{ label: "Option 1", value: "option_1" }]
-                        : [],
+                options: defaultOptionsForType(type as FieldType),
                 logic: [],
                 appearance: { width: "full", icon: "" },
                 isActive: true,
+                coverImage: null,
+                settings: defaultSettingsForType(type as FieldType),
             }
             onAddPage(newPage)
         },

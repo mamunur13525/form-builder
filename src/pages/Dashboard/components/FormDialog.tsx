@@ -51,7 +51,7 @@ export function FormDialog({
         register,
         handleSubmit: handleFormSubmit,
         reset,
-        formState: { errors, isSubmitting },
+        formState: { errors },
     } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {

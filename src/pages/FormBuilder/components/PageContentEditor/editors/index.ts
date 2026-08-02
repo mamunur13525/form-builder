@@ -13,3 +13,13 @@ export { RadioEditor } from "./RadioEditor"
 export { CheckboxEditor } from "./CheckboxEditor"
 export { SelectEditor } from "./SelectEditor"
 export { MultiSelectEditor } from "./MultiSelectEditor"
+export {
+    StatementEditor,
+    DropdownEditor,
+    AddressEditor,
+    OpinionScaleEditor,
+    SignatureEditor,
+    MatrixEditor,
+    UploadEditor,
+    RatingSettingsAwareEditor,
+} from "./NewTypeEditors"

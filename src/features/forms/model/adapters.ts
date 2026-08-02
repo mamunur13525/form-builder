@@ -70,6 +70,8 @@ export function adaptApiField(apiField: ApiField, formId: string): FormField {
         })) as FormField["logic"],
         appearance: apiField.appearance,
         isActive: apiField.isActive,
+        coverImage: apiField.coverImage ?? null,
+        settings: apiField.settings,
     }
 }
 

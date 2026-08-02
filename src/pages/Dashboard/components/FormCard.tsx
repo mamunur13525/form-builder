@@ -56,7 +56,7 @@ export function FormCard({ form, onDeleteClick }: FormCardProps) {
                     <span>{form.responses_count || 0} responses</span>
                 </div>
                 <DropdownMenu>
-                    <DropdownMenuTrigger>
+                    <DropdownMenuTrigger render={<span />}>
                         <Button
                             variant="ghost"
                             size="icon"

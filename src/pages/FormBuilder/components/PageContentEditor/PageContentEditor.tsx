@@ -10,13 +10,19 @@ import {
   DateEditor,
   TimeEditor,
   UrlEditor,
-  FileEditor,
-  RatingEditor,
   YesNoEditor,
   RadioEditor,
   CheckboxEditor,
   SelectEditor,
   MultiSelectEditor,
+  StatementEditor,
+  DropdownEditor,
+  AddressEditor,
+  OpinionScaleEditor,
+  SignatureEditor,
+  MatrixEditor,
+  UploadEditor,
+  RatingSettingsAwareEditor,
 } from "./editors";
 import { cn } from "@/lib/utils";
 
@@ -43,13 +49,19 @@ const editorMap: Record<
   date: DateEditor,
   time: TimeEditor,
   url: UrlEditor,
-  file: FileEditor,
-  rating: RatingEditor,
+  file: UploadEditor,
+  rating: RatingSettingsAwareEditor,
   yesNo: YesNoEditor,
   radio: RadioEditor,
   checkbox: CheckboxEditor,
   select: SelectEditor,
   multiSelect: MultiSelectEditor,
+  statement: StatementEditor,
+  dropdown: DropdownEditor,
+  address: AddressEditor,
+  opinionScale: OpinionScaleEditor,
+  signature: SignatureEditor,
+  matrix: MatrixEditor,
 };
 
 export function PageContentEditor({
@@ -59,6 +71,8 @@ export function PageContentEditor({
   isMobileView,
 }: PageContentEditorProps) {
   const FieldEditor = editorMap[page.type];
+  // Statement pages are display-only, so they get no submit button.
+  const isStatement = page.type === "statement";
 
   return (
     <div className="w-full max-w-[800px] mx-auto h-full flex flex-col items-center justify-center">
@@ -70,6 +84,14 @@ export function PageContentEditor({
             isMobileView ? "w-full" : "w-11/12",
           )}
         >
+          {page.coverImage?.url && (
+            <img
+              src={page.coverImage.url}
+              alt={page.coverImage.alt || ""}
+              className="mb-5 max-h-56 w-full rounded-md border object-cover"
+            />
+          )}
+
           <FieldLabel
             label={page.label}
             pageNumber={pageIndex + 1}
@@ -95,7 +117,10 @@ export function PageContentEditor({
           </div>
 
           <FieldSubmitButton
-            text={page.appearance.submitButtonText || "Submit"}
+            text={
+              page.appearance.submitButtonText ||
+              (isStatement ? "Continue" : "Submit")
+            }
             color={page.appearance.submitButtonColor}
           />
         </div>

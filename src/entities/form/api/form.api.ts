@@ -78,6 +78,15 @@ export async function unpublishForm(formId: string): Promise<Form> {
     return apiRequest<Form>(`/forms/${formId}/unpublish`, { method: "PATCH" })
 }
 
+/**
+ * POST /forms/:formId/discard — discard the unpublished draft and revert to the
+ * active published version. Note this endpoint is POST, unlike the other
+ * status actions.
+ */
+export async function discardDraft(formId: string): Promise<Form> {
+    return apiRequest<Form>(`/forms/${formId}/discard`, { method: "POST" })
+}
+
 // ---------------------------------------------------------------------------
 // Settings / theme / share
 // ---------------------------------------------------------------------------

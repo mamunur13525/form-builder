@@ -30,6 +30,8 @@ export function FormBuilderPage() {
     isLoading: isLoadingForm,
     error: formError,
     showSaveStatus,
+    setHasUnpublishedChanges,
+    formRevision,
     setPreviewForm,
     openPreview,
   } = useFormContext();
@@ -41,18 +43,23 @@ export function FormBuilderPage() {
     { fieldId: string; data: Record<string, unknown> } | null
   >(null);
   const [isMobileView, setIsMobileView] = useState(false);
-  const prevFormIdRef = useRef<string | undefined>(undefined);
+  const syncedKeyRef = useRef<string | undefined>(undefined);
 
 
-  // Sync pages from context form data when form changes
+  // Sync pages from context form data when a different form loads, or when the
+  // form is re-fetched (formRevision changes) because the server rewrote the
+  // fields underneath us — e.g. after discarding a draft.
   useEffect(() => {
     const currentFormId = form?.id;
-    if (form?.fields && currentFormId !== prevFormIdRef.current) {
-      prevFormIdRef.current = currentFormId;
+    const syncKey = `${currentFormId}:${formRevision}`;
+    if (form?.fields && syncKey !== syncedKeyRef.current) {
+      syncedKeyRef.current = syncKey;
       setPages(form.fields);
-      setSelectedPageIndex(0);
+      setSelectedPageIndex((prev) =>
+        prev < form.fields.length ? prev : 0,
+      );
     }
-  }, [form]);
+  }, [form, formRevision]);
 
   const selectedPage = pages[selectedPageIndex];
 
@@ -69,13 +76,17 @@ export function FormBuilderPage() {
 
     try {
       showSaveStatus("saving");
-      await updateField(formId, pending.fieldId, pending.data);
+      const updated = await updateField(formId, pending.fieldId, pending.data);
       showSaveStatus("saved");
+      // The backend reports whether the published form is now out of date.
+      if (updated.hasUnpublishedChanges !== undefined) {
+        setHasUnpublishedChanges(updated.hasUnpublishedChanges);
+      }
     } catch (error) {
       console.error("Failed to update field:", error);
       showSaveStatus("error");
     }
-  }, [formId, showSaveStatus]);
+  }, [formId, showSaveStatus, setHasUnpublishedChanges]);
 
   const debouncedFieldUpdate = useDebounce(executeFieldUpdate, 1000);
 
@@ -85,11 +96,14 @@ export function FormBuilderPage() {
     if (!pending || !formId || formId === "new") return;
     pendingFieldUpdateRef.current = null;
     try {
-      await updateField(formId, pending.fieldId, pending.data);
+      const updated = await updateField(formId, pending.fieldId, pending.data);
+      if (updated.hasUnpublishedChanges !== undefined) {
+        setHasUnpublishedChanges(updated.hasUnpublishedChanges);
+      }
     } catch (error) {
       console.error("Failed to flush field update:", error);
     }
-  }, [formId]);
+  }, [formId, setHasUnpublishedChanges]);
 
   const updatePage = useCallback(
     async (index: number, updates: Partial<FormField>) => {
@@ -156,12 +170,14 @@ export function FormBuilderPage() {
         ]);
         setSelectedPageIndex(pages.length);
         showSaveStatus("saved");
+        // Adding a field to a published form makes it out of date.
+        setHasUnpublishedChanges(true);
       } catch (error) {
         console.error("Failed to create field:", error);
         showSaveStatus("error");
       }
     },
-    [formId, pages.length, showSaveStatus],
+    [formId, pages.length, showSaveStatus, setHasUnpublishedChanges],
   );
 
   const deletePage = useCallback(
@@ -185,6 +201,8 @@ export function FormBuilderPage() {
           showSaveStatus("saving");
           await deleteField(formId, fieldId);
           showSaveStatus("saved");
+          // Removing a field from a published form makes it out of date.
+          setHasUnpublishedChanges(true);
         } catch (error) {
           console.error("Failed to delete field:", error);
           showSaveStatus("error");
@@ -193,7 +211,7 @@ export function FormBuilderPage() {
         }
       }
     },
-    [formId, pages, selectedPageIndex, showSaveStatus],
+    [formId, pages, selectedPageIndex, showSaveStatus, setHasUnpublishedChanges],
   );
 
   const duplicatePage = useCallback(
@@ -236,6 +254,8 @@ export function FormBuilderPage() {
             return updated;
           });
           showSaveStatus("saved");
+          // Duplicating a field on a published form makes it out of date.
+          setHasUnpublishedChanges(true);
         } catch (error) {
           console.error("Failed to duplicate field:", error);
           showSaveStatus("error");
@@ -244,7 +264,7 @@ export function FormBuilderPage() {
         }
       }
     },
-    [formId, pages, showSaveStatus],
+    [formId, pages, showSaveStatus, setHasUnpublishedChanges],
   );
 
   // Show loading state while fetching form

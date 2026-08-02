@@ -29,13 +29,19 @@ export async function getFieldById(formId: string, fieldId: string): Promise<For
     return apiRequest<FormField>(`/forms/${formId}/fields/${fieldId}`)
 }
 
+/** The field, plus form-level metadata returned by the update response. */
+export interface UpdateFieldResponse extends FormField {
+    /** True when the published form is out of date relative to the latest draft. */
+    hasUnpublishedChanges?: boolean
+}
+
 /** PATCH /forms/:formId/fields/:fieldId — update a field. */
 export async function updateField(
     formId: string,
     fieldId: string,
     data: UpdateFieldRequest,
-): Promise<FormField> {
-    return apiRequest<FormField>(`/forms/${formId}/fields/${fieldId}`, {
+): Promise<UpdateFieldResponse> {
+    return apiRequest<UpdateFieldResponse>(`/forms/${formId}/fields/${fieldId}`, {
         method: "PATCH",
         body: JSON.stringify(data),
     })

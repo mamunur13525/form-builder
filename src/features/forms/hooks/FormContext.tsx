@@ -12,6 +12,8 @@ export function FormProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
+  const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(false);
+  const [formRevision, setFormRevision] = useState(0);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [previewForm, setPreviewForm] = useState<Form | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -23,6 +25,8 @@ export function FormProvider({ children }: { children: ReactNode }) {
     if (!formId || formId === "new") {
       setForm(null);
       setIsPublished(false);
+      setHasUnpublishedChanges(false);
+      setFormRevision((revision) => revision + 1);
       return;
     }
 
@@ -33,6 +37,8 @@ export function FormProvider({ children }: { children: ReactNode }) {
       const adaptedForm = adaptApiForm(apiForm);
       setForm(adaptedForm);
       setIsPublished(adaptedForm.status === "published");
+      setHasUnpublishedChanges(apiForm.hasUnpublishedChanges ?? false);
+      setFormRevision((revision) => revision + 1);
     } catch (err) {
       console.error("Failed to fetch form:", err);
       setError(err instanceof Error ? err.message : "Failed to load form");
@@ -84,11 +90,14 @@ export function FormProvider({ children }: { children: ReactNode }) {
     isLoading,
     error,
     isPublished,
+    hasUnpublishedChanges,
+    formRevision,
     saveStatus,
     previewForm,
     showPreview,
     refreshForm,
     setIsPublished,
+    setHasUnpublishedChanges,
     updateFormData,
     showSaveStatus,
     setPreviewForm,

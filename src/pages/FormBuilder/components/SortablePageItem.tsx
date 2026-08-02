@@ -139,7 +139,7 @@ export function SortablePageItem({
           <MoreVertical className="h-3 w-3" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" side="right" sideOffset={4}>
-          <DropdownMenuItem onClick={() => onDuplicate(index)} className="px-2 py-1 gap-1.5 text-xs">
+          <DropdownMenuItem onClick={() => onDuplicate(index)} className="px-2 py-1 gap-1.5">
             <Copy size={12} />
             Duplicate
           </DropdownMenuItem>
@@ -147,7 +147,7 @@ export function SortablePageItem({
             <DropdownMenuItem
               onClick={() => onMoveUp(index)}
               disabled={index === 0}
-              className="px-2 py-1 gap-1.5 text-xs"
+              className="px-2 py-1 gap-1.5"
             >
               <ChevronUp size={12} />
               Move up
@@ -157,7 +157,7 @@ export function SortablePageItem({
             <DropdownMenuItem
               onClick={() => onMoveDown(index)}
               disabled={index === pagesCount - 1}
-              className="px-2 py-1 gap-1.5 text-xs"
+              className="px-2 py-1 gap-1.5"
             >
               <ChevronDown size={12} />
               Move down
@@ -167,7 +167,7 @@ export function SortablePageItem({
           <DropdownMenuItem
             onClick={() => onDelete(index)}
             variant="destructive"
-            className="px-2 py-1 gap-1.5 text-xs"
+            className="px-2 py-1 gap-1.5"
           >
             <Trash2 size={12} />
             Delete

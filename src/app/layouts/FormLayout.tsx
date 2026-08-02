@@ -11,6 +11,9 @@ function FormLayoutContent() {
     form,
     isPublished,
     setIsPublished,
+    hasUnpublishedChanges,
+    setHasUnpublishedChanges,
+    refreshForm,
     previewForm,
     showPreview,
     setShowPreview,
@@ -49,8 +52,11 @@ function FormLayoutContent() {
         onOpenChange={setShowPublishDialog}
         formId={formId}
         isPublished={isPublished}
+        hasUnpublishedChanges={hasUnpublishedChanges}
         onIsPublishedChange={setIsPublished}
+        onHasUnpublishedChangesChange={setHasUnpublishedChanges}
         onOpenForm={handleOpenForm}
+        onAfterDiscard={refreshForm}
       />
 
       {showPreview && (

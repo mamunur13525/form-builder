@@ -8,11 +8,19 @@ export interface FormContextValue {
   isLoading: boolean;
   error: string | null;
   isPublished: boolean;
+  hasUnpublishedChanges: boolean;
+  /**
+   * Incremented every time the form is re-fetched from the server. Builder
+   * views watch this to re-sync local state after the server changes fields
+   * underneath them (e.g. discarding a draft).
+   */
+  formRevision: number;
   saveStatus: SaveStatus;
   previewForm: Form | null;
   showPreview: boolean;
   refreshForm: () => Promise<void>;
   setIsPublished: (published: boolean) => void;
+  setHasUnpublishedChanges: (hasChanges: boolean) => void;
   updateFormData: (updates: Partial<Form>) => void;
   showSaveStatus: (status: SaveStatus) => void;
   setPreviewForm: (form: Form | null) => void;

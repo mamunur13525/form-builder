@@ -5,7 +5,7 @@
  */
 
 import { create } from "zustand"
-import { getForms, createForm as apiCreateForm, updateForm as apiUpdateForm, deleteForm as apiDeleteForm, publishForm as apiPublishForm } from "@/entities/form/api/form.api"
+import { getForms, createForm as apiCreateForm, updateForm as apiUpdateForm, deleteForm as apiDeleteForm, publishForm as apiPublishForm, unpublishForm as apiUnpublishForm, discardDraft as apiDiscardDraft } from "@/entities/form/api/form.api"
 import { getResponses } from "@/entities/response/api/response.api"
 import { submitPublicForm } from "@/entities/response/api/public-form.api"
 import type { Form as ApiForm } from "@/entities/form/model/types"
@@ -25,7 +25,9 @@ interface FormState {
     createForm: (form: Omit<Form, "_id" | "createdAt" | "updatedAt">) => Promise<Form>
     updateForm: (id: string, updates: Partial<Form>) => Promise<void>
     deleteForm: (id: string) => Promise<void>
-    publishForm: (id: string) => Promise<void>
+    publishForm: (id: string) => Promise<ApiForm>
+    unpublishForm: (id: string) => Promise<ApiForm>
+    discardDraft: (id: string) => Promise<ApiForm>
 
     // Response actions
     fetchResponses: (formId: string) => Promise<void>
@@ -125,8 +127,53 @@ export const useFormStore = create<FormState>((set, get) => ({
                 ),
                 isLoading: false,
             }))
+
+            return updated
         } catch (err) {
             set({ error: err instanceof Error ? err.message : "Failed to publish form", isLoading: false })
+            throw err
+        }
+    },
+
+    unpublishForm: async (id: string) => {
+        set({ isLoading: true, error: null })
+        try {
+            const updated = await apiUnpublishForm(id)
+
+            set((state) => ({
+                forms: state.forms.map((f) =>
+                    f.id === id
+                        ? { ...f, status: updated.status, updatedAt: new Date().toISOString() }
+                        : f
+                ),
+                isLoading: false,
+            }))
+
+            return updated
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to unpublish form", isLoading: false })
+            throw err
+        }
+    },
+
+    discardDraft: async (id: string) => {
+        set({ isLoading: true, error: null })
+        try {
+            const updated = await apiDiscardDraft(id)
+
+            set((state) => ({
+                forms: state.forms.map((f) =>
+                    f.id === id
+                        ? { ...f, status: updated.status, updatedAt: new Date().toISOString() }
+                        : f
+                ),
+                isLoading: false,
+            }))
+
+            return updated
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Failed to discard changes", isLoading: false })
+            throw err
         }
     },
 

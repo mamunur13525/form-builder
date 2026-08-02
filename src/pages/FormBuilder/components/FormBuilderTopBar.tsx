@@ -42,7 +42,8 @@ export function FormBuilderTopBar({
 }: FormBuilderTopBarProps) {
   const { formId } = useParams<{ formId: string }>();
   const navigate = useNavigate();
-  const { saveStatus, showSaveStatus, openPreview } = useFormContext();
+  const { saveStatus, showSaveStatus, openPreview, hasUnpublishedChanges } =
+    useFormContext();
   const baseNavLinkClass =
     "flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-md";
   const activeNavLinkClass = "text-primary bg-primary/10";
@@ -142,6 +143,16 @@ export function FormBuilderTopBar({
           >
             <Share2 className="h-4 w-4" />
             Publish
+          </Button>
+        ) : hasUnpublishedChanges ? (
+          <Button
+            size="sm"
+            variant="default"
+            className="h-9 gap-1.5 text-sm font-medium px-3 bg-amber-500 hover:bg-amber-600 text-white"
+            onClick={onPublishedClick}
+          >
+            <AlertCircle className="h-4 w-4" />
+            Publish changes
           </Button>
         ) : (
           <Button

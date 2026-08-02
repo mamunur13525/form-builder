@@ -121,7 +121,7 @@ export function FormBuilderSidebar({
     },
     [pages, movePage],
   );
-  console.log({ pages })
+
   return (
     <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">
       <div className="p-3 py-2 border-b flex items-center justify-between">

@@ -5,7 +5,6 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "../../components/ui/resizable";
-import { useFormStore } from "../../app/store/formStore";
 import type { FormField } from "../../shared/types/common";
 import {
   createField,
@@ -25,7 +24,7 @@ import { cn } from "@/lib/utils";
 export function FormBuilderPage() {
   const { formId } = useParams();
   const navigate = useNavigate();
-  const { forms, fetchForms } = useFormStore();
+
   const {
     form,
     isLoading: isLoadingForm,
@@ -44,14 +43,6 @@ export function FormBuilderPage() {
   const [isMobileView, setIsMobileView] = useState(false);
   const prevFormIdRef = useRef<string | undefined>(undefined);
 
-  // Fetch all forms only when creating a new form (not when editing)
-  useEffect(() => {
-    if (!formId || formId === "new") {
-      if (forms.length === 0) {
-        fetchForms();
-      }
-    }
-  }, [formId, forms.length, fetchForms]);
 
   // Sync pages from context form data when form changes
   useEffect(() => {

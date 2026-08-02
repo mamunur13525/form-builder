@@ -56,15 +56,17 @@ export function FormCard({ form, onDeleteClick }: FormCardProps) {
                     <span>{form.responses_count || 0} responses</span>
                 </div>
                 <DropdownMenu>
-                    <DropdownMenuTrigger render={<span />}>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-8 w-8"
-                        >
-                            <Pencil className="h-4 w-4" />
-                        </Button>
+                    <DropdownMenuTrigger
+                        render={
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                            />
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <Pencil className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate(`/form-response/${form.id}/submissions`)}>

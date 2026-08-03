@@ -112,8 +112,8 @@ export function FormBuilderSidebar({
     (event: DragEndEvent) => {
       const { active, over } = event;
       if (over && active.id !== over.id) {
-        const oldIndex = pages.findIndex((p) => (p._id || p.fieldKey) === active.id);
-        const newIndex = pages.findIndex((p) => (p._id || p.fieldKey) === over.id);
+        const oldIndex = pages.findIndex((p) => (p.fieldKey) === active.id);
+        const newIndex = pages.findIndex((p) => (p.fieldKey) === over.id);
         if (oldIndex !== -1 && newIndex !== -1) {
           movePage(oldIndex, newIndex);
         }
@@ -144,12 +144,12 @@ export function FormBuilderSidebar({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={pages.map((p) => p._id || p.fieldKey)}
+            items={pages.map((p) => p.fieldKey)}
             strategy={verticalListSortingStrategy}
           >
             {pages.map((page, index) => (
               <SortablePageItem
-                key={page._id || page.fieldKey || index}
+                key={page.fieldKey}
                 page={page}
                 index={index}
                 isSelected={index === selectedPageIndex}

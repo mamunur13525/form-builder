@@ -79,7 +79,7 @@ export function AddPageDialog({
     )
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange} className="max-w-3xl w-full">
+        <Dialog open={open} onOpenChange={onOpenChange} className="max-w-3xl w-full -translate-y-30">
             <DialogContent >
                 <DialogHeader>
                     <DialogTitle>Add a Page</DialogTitle>

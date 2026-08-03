@@ -261,7 +261,7 @@ export function PublishDialog({
             )}
 
             {state === "draft" ? (
-              <ul className="divide-y rounded-xl border bg-muted/30 text-sm">
+              <ul className="rounded-xl bg-muted/30 text-sm">
                 <li className="flex items-center gap-3 px-3.5 py-3">
                   <Globe className="size-4 shrink-0 text-muted-foreground" />
                   <span className="text-muted-foreground">

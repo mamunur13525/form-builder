@@ -13,6 +13,7 @@ export { RadioEditor } from "./RadioEditor"
 export { CheckboxEditor } from "./CheckboxEditor"
 export { SelectEditor } from "./SelectEditor"
 export { MultiSelectEditor } from "./MultiSelectEditor"
+export { OptionListEditor } from "./OptionListEditor"
 export {
     StatementEditor,
     DropdownEditor,

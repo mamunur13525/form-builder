@@ -39,6 +39,7 @@ const editorMap: Record<
     page: FormField;
     pageIndex: number;
     onUpdate: (index: number, updates: Partial<FormField>) => void;
+    isMobileView?: boolean;
   }>
 > = {
   shortText: ShortTextEditor,
@@ -112,6 +113,7 @@ export function PageContentEditor({
                 page={page}
                 pageIndex={pageIndex}
                 onUpdate={onUpdate}
+                isMobileView={isMobileView}
               />
             )}
           </div>

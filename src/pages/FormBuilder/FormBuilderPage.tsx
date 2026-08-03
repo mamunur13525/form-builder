@@ -11,6 +11,7 @@ import {
   updateField,
   deleteField,
   duplicateField,
+  reorderFields,
 } from "../../entities/form/api/field.api";
 import { useDebounce } from "../../shared/hooks/useDebounce";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
@@ -42,6 +43,7 @@ export function FormBuilderPage() {
   const pendingFieldUpdateRef = useRef<
     { fieldId: string; data: Record<string, unknown> } | null
   >(null);
+  const pendingReorderRef = useRef<string[] | null>(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const syncedKeyRef = useRef<string | undefined>(undefined);
 
@@ -77,6 +79,11 @@ export function FormBuilderPage() {
     try {
       showSaveStatus("saving");
       const updated = await updateField(formId, pending.fieldId, pending.data);
+      // Drop the payload once it lands so a later flush cannot re-send it.
+      // Only if a newer edit has not replaced it in the meantime.
+      if (pendingFieldUpdateRef.current === pending) {
+        pendingFieldUpdateRef.current = null;
+      }
       showSaveStatus("saved");
       // The backend reports whether the published form is now out of date.
       if (updated.hasUnpublishedChanges !== undefined) {
@@ -90,18 +97,73 @@ export function FormBuilderPage() {
 
   const debouncedFieldUpdate = useDebounce(executeFieldUpdate, 1000);
 
-  // Flush any pending debounced field update immediately (used before navigation)
-  const flushPendingUpdate = useCallback(async () => {
-    const pending = pendingFieldUpdateRef.current;
-    if (!pending || !formId || formId === "new") return;
-    pendingFieldUpdateRef.current = null;
+  const executeReorder = useCallback(async () => {
+    const fieldIds = pendingReorderRef.current;
+    pendingReorderRef.current = null;
+    if (!fieldIds || !formId || formId === "new") return;
+
     try {
-      const updated = await updateField(formId, pending.fieldId, pending.data);
-      if (updated.hasUnpublishedChanges !== undefined) {
-        setHasUnpublishedChanges(updated.hasUnpublishedChanges);
+      showSaveStatus("saving");
+      await reorderFields(formId, { fieldIds });
+      showSaveStatus("saved");
+      // Reordering a published form makes it out of date.
+      setHasUnpublishedChanges(true);
+    } catch (error) {
+      console.error("Failed to reorder fields:", error);
+      showSaveStatus("error");
+    }
+  }, [formId, showSaveStatus, setHasUnpublishedChanges]);
+
+  // Rapid "move up"/"move down" clicks would otherwise fire one PATCH per
+  // click. The payload is the whole ordering, so only the last one matters.
+  const debouncedReorder = useDebounce(executeReorder, 500);
+
+  /**
+   * Apply a reordered page list and persist the new order.
+   *
+   * The reorder endpoint identifies fields by `_id`, so a page that has not
+   * been created server-side yet (the window between adding/duplicating and
+   * the POST resolving) cannot be described in the payload. Sending a partial
+   * list would drop that field's ordering, so the persist is skipped and the
+   * next re-fetch reconciles.
+   */
+  const reorderPages = useCallback(
+    (reordered: FormField[]) => {
+      setPages(reordered);
+
+      if (!formId || formId === "new") return;
+
+      const fieldIds = reordered.map((page) => page._id).filter(Boolean) as string[];
+      if (fieldIds.length !== reordered.length) return;
+
+      pendingReorderRef.current = fieldIds;
+      debouncedReorder();
+    },
+    [formId, debouncedReorder],
+  );
+
+  // Flush any pending debounced writes immediately (used before navigation)
+  const flushPendingUpdate = useCallback(async () => {
+    const pendingOrder = pendingReorderRef.current;
+    pendingReorderRef.current = null;
+    const pending = pendingFieldUpdateRef.current;
+    pendingFieldUpdateRef.current = null;
+
+    if (!formId || formId === "new") return;
+
+    try {
+      if (pending) {
+        const updated = await updateField(formId, pending.fieldId, pending.data);
+        if (updated.hasUnpublishedChanges !== undefined) {
+          setHasUnpublishedChanges(updated.hasUnpublishedChanges);
+        }
+      }
+      if (pendingOrder) {
+        await reorderFields(formId, { fieldIds: pendingOrder });
+        setHasUnpublishedChanges(true);
       }
     } catch (error) {
-      console.error("Failed to flush field update:", error);
+      console.error("Failed to flush pending update:", error);
     }
   }, [formId, setHasUnpublishedChanges]);
 
@@ -306,13 +368,11 @@ export function FormBuilderPage() {
           <FormBuilderSidebar
             pages={pages}
             selectedPageIndex={selectedPageIndex}
-            id={formId}
             onSelectPage={setSelectedPageIndex}
-            onSetPages={setPages}
+            onReorderPages={reorderPages}
             onAddPage={() => setShowAddPageDialog(true)}
             onDeletePage={deletePage}
             onDuplicatePage={duplicatePage}
-            onShowSaveStatus={showSaveStatus}
           />
         </ResizablePanel>
 

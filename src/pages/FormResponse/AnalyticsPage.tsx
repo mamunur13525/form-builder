@@ -1,25 +1,55 @@
-import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, FileText, BarChart3, Activity } from "lucide-react"
-import { Button } from "../../components/ui/button"
+import { useParams } from "react-router-dom"
 import { motion } from "motion/react"
-import { Card, CardContent } from "../../components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs"
-import { useForm } from "../../features/forms/hooks/useForms"
-import { useResponseStats } from "../../features/forms/hooks/useFormResponses"
-import { adaptApiForm } from "../../features/forms/model/adapters"
-import type { Form as CommonForm } from "../../shared/types/common"
+import { Card, CardContent } from "@/components/ui/card"
+import { useForm } from "@/features/forms/hooks/useForms"
+import { useResponseStats } from "@/features/forms/hooks/useFormResponses"
+import { adaptApiForm } from "@/features/forms/model/adapters"
+import type { Form as CommonForm } from "@/shared/types/common"
+import { ResponsePageShell } from "./components/ResponsePageShell"
+import { ResponseStateCard } from "./components/ResponseStateCard"
+
+/** Format a duration in seconds as `45s` or `2m 5s`. */
+function formatDuration(seconds: number): string {
+    if (!Number.isFinite(seconds) || seconds <= 0) return "0s"
+    const rounded = Math.round(seconds)
+    if (rounded < 60) return `${rounded}s`
+    const minutes = Math.floor(rounded / 60)
+    const remainder = rounded % 60
+    return remainder ? `${minutes}m ${remainder}s` : `${minutes}m`
+}
+
+/** Trim trailing zeros from a percentage (85.5 -> "85.5", 85 -> "85"). */
+function formatPercent(value: number): string {
+    if (!Number.isFinite(value)) return "0"
+    return `${Number(value.toFixed(1))}`
+}
 
 export function AnalyticsPage() {
-    const { id } = useParams()
-    const navigate = useNavigate()
+    // The route is /form-response/:formId/analytics — the param is `formId`, not `id`.
+    const { formId } = useParams<{ formId: string }>()
 
-    const { data: apiForm, isLoading: formLoading } = useForm(id || "")
-    const { data: stats, isLoading: statsLoading } = useResponseStats(id || "")
+    const {
+        data: apiForm,
+        isLoading: formLoading,
+        isError: formError,
+    } = useForm(formId || "")
+    const {
+        data: stats,
+        isLoading: statsLoading,
+        isError: statsError,
+    } = useResponseStats(formId || "")
 
     const form: CommonForm | null = apiForm ? adaptApiForm(apiForm) : null
     const isLoading = formLoading || statsLoading
 
-    if (!form) {
+    const totalResponses = stats?.totalResponses ?? 0
+    const uniqueRespondents = stats?.uniqueRespondents ?? 0
+    const todayResponses = stats?.todayResponses ?? 0
+    const avgCompletionTime = stats?.averageCompletionTime ?? 0
+    const completionRate = stats?.completionRate ?? 0
+
+    // Only claim the form is missing once loading has finished.
+    if (!formId || (!isLoading && !form)) {
         return (
             <div className="text-center py-20">
                 <h2 className="text-3xl font-bold">Form not found</h2>
@@ -27,138 +57,97 @@ export function AnalyticsPage() {
         )
     }
 
-    const totalResponses = stats?.totalResponses || 0
-    const uniqueRespondents = stats?.uniqueRespondents || 0
-    const todayResponses = stats?.todayResponses || 0
-    const avgCompletionTime = stats?.averageCompletionTime || 0
-    const completionRate = stats?.completionRate || 0
-
     return (
-        <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">
-            {/* Header */}
-            <div className="p-3 border-b">
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} className="h-8 w-8">
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="flex-1">
-                        <h1 className="text-lg font-bold">Analytics</h1>
-                        <p className="text-base text-muted-foreground">Detailed insights and statistics</p>
+        <ResponsePageShell
+            activeTab="analytics"
+            title="Analytics"
+            description="Detailed insights and statistics"
+        >
+            {isLoading ? (
+                <ResponseStateCard loading message="Loading analytics..." />
+            ) : formError || statsError ? (
+                <ResponseStateCard message="Could not load analytics. Please try again." />
+            ) : totalResponses === 0 ? (
+                <ResponseStateCard message="No data available yet. Share your form to start collecting responses." />
+            ) : (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-6"
+                >
+                    {/* Overview Stats */}
+                    <div className="grid gap-4 md:grid-cols-4">
+                        <Card>
+                            <CardContent className="pt-6">
+                                <div className="space-y-2">
+                                    <p className="text-base font-medium text-muted-foreground">
+                                        Total Responses
+                                    </p>
+                                    <p className="text-3xl font-bold">{totalResponses}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardContent className="pt-6">
+                                <div className="space-y-2">
+                                    <p className="text-base font-medium text-muted-foreground">
+                                        Unique Respondents
+                                    </p>
+                                    <p className="text-3xl font-bold">{uniqueRespondents}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardContent className="pt-6">
+                                <div className="space-y-2">
+                                    <p className="text-base font-medium text-muted-foreground">
+                                        Today's Responses
+                                    </p>
+                                    <p className="text-3xl font-bold">{todayResponses}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardContent className="pt-6">
+                                <div className="space-y-2">
+                                    <p className="text-base font-medium text-muted-foreground">
+                                        Completion Rate
+                                    </p>
+                                    <p className="text-3xl font-bold">
+                                        {formatPercent(completionRate)}%
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
-                </div>
-            </div>
 
-            {/* Navigation Tabs */}
-            <div className="border-b px-2">
-                <Tabs defaultValue="overview" className="w-[400px]">
-                    <TabsList className="bg-transparent h-9">
-                        <TabsTrigger
-                            value="submissions"
-                            className="text-sm gap-1.5 h-7"
-                            onClick={() => navigate(`/form-response/${id}/submissions`)}
-                        >
-                            <FileText className="h-4 w-4" />
-                            Submissions
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="summary"
-                            className="text-sm gap-1.5 h-7"
-                            onClick={() => navigate(`/form-response/${id}/summary`)}
-                        >
-                            <BarChart3 className="h-4 w-4" />
-                            Summary
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="analytics"
-                            className="text-sm gap-1.5 h-7"
-                            onClick={() => navigate(`/form-response/${id}/analytics`)}
-                        >
-                            <Activity className="h-4 w-4" />
-                            Analytics
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-3">
-
-                {isLoading ? (
-                    <Card>
-                        <CardContent className="text-center py-12">
-                            <p className="text-base text-muted-foreground">Loading analytics...</p>
-                        </CardContent>
-                    </Card>
-                ) : totalResponses === 0 ? (
-                    <Card>
-                        <CardContent className="text-center py-12">
-                            <p className="text-base text-muted-foreground">No data available yet. Share your form to start collecting responses.</p>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-6"
-                    >
-                        {/* Overview Stats */}
-                        <div className="grid gap-4 md:grid-cols-4">
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <div className="space-y-2">
-                                        <p className="text-base font-medium text-muted-foreground">Total Responses</p>
-                                        <p className="text-3xl font-bold">{totalResponses}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <div className="space-y-2">
-                                        <p className="text-base font-medium text-muted-foreground">Unique Respondents</p>
-                                        <p className="text-3xl font-bold">{uniqueRespondents}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <div className="space-y-2">
-                                        <p className="text-base font-medium text-muted-foreground">Today's Responses</p>
-                                        <p className="text-3xl font-bold">{todayResponses}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <div className="space-y-2">
-                                        <p className="text-base font-medium text-muted-foreground">Completion Rate</p>
-                                        <p className="text-3xl font-bold">{completionRate}%</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* Additional Stats */}
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <div className="space-y-2">
-                                        <p className="text-base font-medium text-muted-foreground">Avg. Completion Time</p>
-                                        <p className="text-2xl font-bold">{avgCompletionTime}s</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <div className="space-y-2">
-                                        <p className="text-base font-medium text-muted-foreground">Total Fields</p>
-                                        <p className="text-2xl font-bold">{form.fields.length}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </motion.div>
-                )}
-            </div>
-        </div>
+                    {/* Additional Stats */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <Card>
+                            <CardContent className="pt-6">
+                                <div className="space-y-2">
+                                    <p className="text-base font-medium text-muted-foreground">
+                                        Avg. Completion Time
+                                    </p>
+                                    <p className="text-2xl font-bold">
+                                        {formatDuration(avgCompletionTime)}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardContent className="pt-6">
+                                <div className="space-y-2">
+                                    <p className="text-base font-medium text-muted-foreground">
+                                        Total Fields
+                                    </p>
+                                    <p className="text-2xl font-bold">{form?.fields.length ?? 0}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </motion.div>
+            )}
+        </ResponsePageShell>
     )
 }

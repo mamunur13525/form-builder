@@ -1,14 +1,17 @@
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox"
-import { Check } from "lucide-react"
+import { Check, Minus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
+function Checkbox({ className, indeterminate, ...props }: CheckboxPrimitive.Root.Props) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
+      indeterminate={indeterminate}
       className={cn(
         "peer size-4 shrink-0 rounded-[4px] border border-input shadow-sm outline-none transition-shadow focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
+        // `indeterminate` is a mixed state, so the data-checked styles above don't apply.
+        indeterminate && "border-primary bg-primary text-primary-foreground",
         className
       )}
       {...props}
@@ -17,7 +20,11 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
         data-slot="checkbox-indicator"
         className="flex items-center justify-center text-current"
       >
-        <Check className="size-3.5" strokeWidth={3} />
+        {indeterminate ? (
+          <Minus className="size-3.5" strokeWidth={3} />
+        ) : (
+          <Check className="size-3.5" strokeWidth={3} />
+        )}
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )

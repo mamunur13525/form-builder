@@ -1,20 +1,7 @@
 import { useCallback } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "../../../components/ui/button";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import type { DragEndEvent } from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { List } from "react-movable";
 import { SortablePageItem } from "./SortablePageItem";
 import type { FormField } from "../../../shared/types/common";
 import { showWarning } from "@/shared/hooks/useToast";
@@ -22,42 +9,23 @@ import { showWarning } from "@/shared/hooks/useToast";
 interface FormBuilderSidebarProps {
   pages: FormField[];
   selectedPageIndex: number;
-  id: string | undefined;
   onSelectPage: (index: number) => void;
-  onSetPages: (
-    pages: FormField[] | ((prev: FormField[]) => FormField[]),
-  ) => void;
+  /** Applies a reordered page list and persists the new order. */
+  onReorderPages: (pages: FormField[]) => void;
   onAddPage: () => void;
   onDeletePage: (index: number) => void;
   onDuplicatePage: (index: number) => void;
-  onShowSaveStatus: (status: "saving" | "saved" | "error") => void;
 }
-
-// Note: Field deletions and duplications are now handled locally.
-// The form will be saved with updated fields array via updateForm.
 
 export function FormBuilderSidebar({
   pages,
   selectedPageIndex,
-  id: _id,
   onSelectPage,
-  onSetPages,
+  onReorderPages,
   onAddPage,
   onDeletePage,
   onDuplicatePage,
-  onShowSaveStatus: _onShowSaveStatus,
 }: FormBuilderSidebarProps) {
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      // Require a small movement before a drag starts,
-      // so plain clicks still select the page
-      activationConstraint: { distance: 6 },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
   const duplicatePage = useCallback(
     async (index: number) => {
       await onDuplicatePage(index);
@@ -78,7 +46,7 @@ export function FormBuilderSidebar({
 
   const movePage = useCallback(
     (from: number, to: number) => {
-      if (to < 0 || to >= pages.length) return;
+      if (to < 0 || to >= pages.length || from === to) return;
       const updated = [...pages];
       const [moved] = updated.splice(from, 1);
       updated.splice(to, 0, moved);
@@ -86,12 +54,12 @@ export function FormBuilderSidebar({
         ...page,
         order: idx + 1,
       }));
-      onSetPages(reordered);
+      onReorderPages(reordered);
 
       // Select the moved page
       onSelectPage(to);
     },
-    [pages, onSetPages, onSelectPage],
+    [pages, onReorderPages, onSelectPage],
   );
 
   const movePageUp = useCallback(
@@ -106,20 +74,6 @@ export function FormBuilderSidebar({
       movePage(index, index + 1);
     },
     [movePage],
-  );
-
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (over && active.id !== over.id) {
-        const oldIndex = pages.findIndex((p) => (p.fieldKey) === active.id);
-        const newIndex = pages.findIndex((p) => (p.fieldKey) === over.id);
-        if (oldIndex !== -1 && newIndex !== -1) {
-          movePage(oldIndex, newIndex);
-        }
-      }
-    },
-    [pages, movePage],
   );
 
   return (
@@ -137,33 +91,39 @@ export function FormBuilderSidebar({
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-2">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={pages.map((p) => p.fieldKey)}
-            strategy={verticalListSortingStrategy}
+      <List
+        values={pages}
+        onChange={({ oldIndex, newIndex }) => movePage(oldIndex, newIndex)}
+        lockVertically
+        renderList={({ children, props }) => (
+          <div
+            {...props}
+            className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-2"
           >
-            {pages.map((page, index) => (
-              <SortablePageItem
-                key={page.fieldKey}
-                page={page}
-                index={index}
-                isSelected={index === selectedPageIndex}
-                onSelect={onSelectPage}
-                onDuplicate={duplicatePage}
-                onDelete={removePage}
-                onMoveUp={movePageUp}
-                pagesCount={pages.length}
-                onMoveDown={movePageDown}
-              />
-            ))}
-          </SortableContext>
-        </DndContext>
-      </div>
+            {children}
+          </div>
+        )}
+        renderItem={({ value, index = 0, props, isDragged, isSelected }) => {
+          const { key, ...itemProps } = props;
+          return (
+            <SortablePageItem
+              key={key}
+              itemProps={itemProps}
+              page={value}
+              index={index}
+              isSelected={index === selectedPageIndex}
+              isDragged={isDragged}
+              isLifted={isSelected}
+              onSelect={onSelectPage}
+              onDuplicate={duplicatePage}
+              onDelete={removePage}
+              onMoveUp={movePageUp}
+              pagesCount={pages.length}
+              onMoveDown={movePageDown}
+            />
+          );
+        }}
+      />
       <div className="p-3 border-t">
         <Button
           variant="outline"

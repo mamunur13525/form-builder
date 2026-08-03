@@ -1,4 +1,3 @@
-import { useSortable } from "@dnd-kit/sortable";
 import {
   MoreVertical,
   Copy,
@@ -6,6 +5,7 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
+  GripVertical,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -16,12 +16,19 @@ import {
 import { FIELD_TYPE_ICONS, FIELD_TYPE_COLORS } from "../../../shared/constants/form-types";
 import type { FormField } from "../../../shared/types/common";
 import type { LucideIcon } from "lucide-react";
+import type { IItemProps } from "react-movable";
 
 interface SortablePageItemProps {
+  /** Props provided by react-movable, spread over the root element. */
+  itemProps: Omit<IItemProps, "key">;
   page: FormField;
   index: number;
   pagesCount: number;
   isSelected: boolean;
+  /** True while this item follows the pointer (the portaled ghost). */
+  isDragged: boolean;
+  /** True while this item is lifted via keyboard (space bar). */
+  isLifted: boolean;
   onSelect: (index: number) => void;
   onDuplicate: (index: number) => void;
   onDelete: (index: number) => void;
@@ -31,10 +38,13 @@ interface SortablePageItemProps {
 
 
 export function SortablePageItem({
+  itemProps,
   page,
   index,
   pagesCount,
   isSelected,
+  isDragged,
+  isLifted,
   onSelect,
   onDuplicate,
   onDelete,
@@ -43,53 +53,49 @@ export function SortablePageItem({
 }: SortablePageItemProps) {
   const Icon: LucideIcon =
     FIELD_TYPE_ICONS[page.type as keyof typeof FIELD_TYPE_ICONS] || FileText;
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: page.fieldKey });
-
-  const style = {
-    transform: transform
-      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : undefined,
-    // Never animate the item being dragged — it must follow the pointer 1:1
-    transition: isDragging ? "none" : transition,
-    zIndex: isDragging ? 50 : undefined,
-  };
 
   const colorClass =
     FIELD_TYPE_COLORS[page.type] ||
     "from-gray-500/20 to-gray-600/10 text-gray-600 dark:text-gray-400";
 
+  const isActive = isDragged || isLifted;
+
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
+      {...itemProps}
       onClick={() => onSelect(index)}
       className={`
-        group relative flex items-center gap-2.5 px-3 py-3.5 rounded-md text-sm
-        transition-all duration-200 ease-out cursor-pointer select-none
+        group relative flex items-center gap-2 px-3 py-3.5 rounded-md text-sm
+        transition-colors duration-200 ease-out cursor-pointer
         ${isSelected
           ? "bg-linear-to-br from-primary/10 to-primary/5 text-primary shadow-sm shadow-primary/5 ring-1 ring-primary/20"
           : "text-muted-foreground hover:bg-accent/50 hover:text-foreground hover:shadow-sm"
         }
-        ${isDragging ? "shadow-lg shadow-black/10 scale-[1.02] cursor-grabbing" : ""}
+        ${isActive ? "bg-background shadow-lg shadow-black/10 ring-1 ring-primary/20" : ""}
       `}
     >
-      {/* Required star indicator */}
+      {/* Drag handle — dragging only starts from here, so clicks still select */}
+      <span
+        data-movable-handle
+        aria-hidden="true"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        className={`
+          shrink-0 flex items-center justify-center -ml-1.5 w-4 rounded
+          transition-opacity duration-150 text-muted-foreground/60
+          ${isDragged ? "cursor-grabbing" : "cursor-grab"}
+          ${isSelected || isActive ? "opacity-70" : "opacity-0 group-hover:opacity-60"}
+        `}
+      >
+        <GripVertical className="h-4 w-4" />
+      </span>
 
-      {/* Field type icon with page number below */}
+      {/* Field type icon with page number */}
       <div className="shrink-0 flex flex-col items-end gap-0.5">
         <div
           className={`
             w-fit min-w-12 h-7 rounded-md flex items-center justify-center
-            bg-linear-to-br transition-all duration-200 gap-1 relative
+            bg-linear-to-br transition-colors duration-200 gap-1 relative
             ${colorClass}
             ${isSelected ? "ring-1 ring-primary/20" : ""}
           `}
@@ -125,7 +131,6 @@ export function SortablePageItem({
       <DropdownMenu>
         <DropdownMenuTrigger
           onClick={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
           className={`
             shrink-0 flex items-center justify-center w-6 h-6 rounded
             transition-all duration-150

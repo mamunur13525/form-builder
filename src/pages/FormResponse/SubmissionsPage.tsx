@@ -1,181 +1,181 @@
+import { useMemo, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, Download, FileText, BarChart3, Activity } from "lucide-react"
-import { Button } from "../../components/ui/button"
-import { Card, CardContent } from "../../components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "../../components/ui/table"
 import { motion } from "motion/react"
-import { useForm } from "../../features/forms/hooks/useForms"
-import { useResponses } from "../../features/forms/hooks/useFormResponses"
-import { adaptApiForm, adaptApiResponse } from "../../features/forms/model/adapters"
-import type { Form as CommonForm } from "../../shared/types/common"
+import { Button } from "@/components/ui/button"
+import { useForm } from "@/features/forms/hooks/useForms"
+import { useResponses } from "@/features/forms/hooks/useFormResponses"
+import { adaptApiForm, adaptApiResponse } from "@/features/forms/model/adapters"
+import { ROUTES } from "@/shared/constants/routes"
+import type { Form as CommonForm } from "@/shared/types/common"
+import { ResponsePageShell } from "./components/ResponsePageShell"
+import { ResponseStateCard } from "./components/ResponseStateCard"
+import { SubmissionsTable } from "./components/SubmissionsTable"
+import { SubmissionsToolbar } from "./components/SubmissionsToolbar"
+import { buildSubmissionColumns, type SubmissionLayer } from "./lib/columns"
+import {
+    buildResponsesCsv,
+    buildResponsesJson,
+    downloadTextFile,
+    toSafeFileName,
+} from "./lib/export"
 
 export function SubmissionsPage() {
-    const { id } = useParams()
+    // The route is /form-response/:formId/submissions — the param is `formId`, not `id`.
+    const { formId } = useParams<{ formId: string }>()
     const navigate = useNavigate()
 
+    const [layer, setLayer] = useState<SubmissionLayer>("visible")
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
-    const { data: apiForm } = useForm(id || "")
-    const { data: apiResponses = [] } = useResponses(id || "")
+    const {
+        data: apiForm,
+        isLoading: formLoading,
+        isError: formError,
+    } = useForm(formId || "")
+    const {
+        data: apiResponses,
+        isLoading: responsesLoading,
+        isError: responsesError,
+    } = useResponses(formId || "")
 
     const form: CommonForm | null = apiForm ? adaptApiForm(apiForm) : null
-    const formResponses = apiResponses.map(adaptApiResponse)
+    const formResponses = useMemo(
+        () => (apiResponses ?? []).map(adaptApiResponse),
+        [apiResponses],
+    )
+    const isLoading = formLoading || responsesLoading
 
-    if (!form) {
+    const columns = useMemo(() => buildSubmissionColumns(form, layer), [form, layer])
+    const columnCounts = useMemo(
+        () => ({
+            visible: buildSubmissionColumns(form, "visible").length,
+            all: buildSubmissionColumns(form, "all").length,
+        }),
+        [form],
+    )
+
+    const toggleRow = (id: string) => {
+        if (!id) return
+        setSelectedIds((current) => {
+            const next = new Set(current)
+            if (next.has(id)) next.delete(id)
+            else next.add(id)
+            return next
+        })
+    }
+
+    const toggleAll = () => {
+        setSelectedIds((current) =>
+            current.size === formResponses.length
+                ? new Set()
+                : new Set(formResponses.map((response) => response._id ?? "").filter(Boolean)),
+        )
+    }
+
+    const clearSelection = () => setSelectedIds(new Set())
+
+    /** Exports the selected rows, or every row when nothing is selected. */
+    const handleExport = (format: "csv" | "json") => {
+        if (!form || formResponses.length === 0) return
+
+        const rows =
+            selectedIds.size > 0
+                ? formResponses.filter((response) => selectedIds.has(response._id ?? ""))
+                : formResponses
+        if (rows.length === 0) return
+
+        const baseName = `${toSafeFileName(form.title, "form")}-responses`
+        if (format === "csv") {
+            downloadTextFile(
+                `${baseName}.csv`,
+                buildResponsesCsv(columns, rows),
+                "text/csv;charset=utf-8;",
+            )
+        } else {
+            downloadTextFile(
+                `${baseName}.json`,
+                buildResponsesJson(columns, rows),
+                "application/json;charset=utf-8;",
+            )
+        }
+    }
+
+    // Only claim the form is missing once loading has finished, otherwise the page
+    // flashes "Form not found" on every visit.
+    if (!formId || (!isLoading && !form)) {
         return (
             <div className="text-center py-20">
                 <h2 className="text-3xl font-bold">Form not found</h2>
-                <Button className="mt-4" onClick={() => navigate("/dashboard")}>
+                <Button className="mt-4" onClick={() => navigate(ROUTES.DASHBOARD)}>
                     Back to Dashboard
                 </Button>
             </div>
         )
     }
 
+    const hasResponses = formResponses.length > 0
+    const showTable = !isLoading && !formError && !responsesError && hasResponses
+
     return (
-        <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">
-            {/* Header */}
-            <div className="p-3 border-b">
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} className="h-8 w-8">
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="flex-1">
-                        <h1 className="text-lg font-bold">Submissions</h1>
-                        <p className="text-base text-muted-foreground">{formResponses.length} total responses</p>
-                    </div>
-                    <Button variant="outline" size="sm" className="h-9 text-base">
-                        <Download className="mr-1.5 h-4 w-4" />
-                        Export
-                    </Button>
+        <ResponsePageShell activeTab="submissions" fill>
+            {isLoading ? (
+                <div className="p-3">
+                    <ResponseStateCard loading message="Loading submissions..." />
                 </div>
-            </div>
+            ) : formError || responsesError ? (
+                <div className="p-3">
+                    <ResponseStateCard message="Could not load submissions. Please try again." />
+                </div>
+            ) : !hasResponses ? (
+                <motion.div
+                    className="p-3"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                >
+                    <ResponseStateCard
+                        message="No responses yet"
+                        action={
+                            <Button
+                                variant="outline"
+                                onClick={() =>
+                                    navigate(ROUTES.FORM_SHARE.replace(":formId", formId))
+                                }
+                            >
+                                Share Form
+                            </Button>
+                        }
+                    />
+                </motion.div>
+            ) : null}
 
-            {/* Navigation Tabs */}
-            <div className="border-b px-2">
-                <Tabs defaultValue="overview" className="w-[400px]">
-                    <TabsList className="bg-transparent h-9">
-                        <TabsTrigger
-                            value="submissions"
-                            className="text-sm gap-1.5 h-7"
-                            onClick={() => navigate(`/form-response/${id}/submissions`)}
-                        >
-                            <FileText className="h-4 w-4" />
-                            Submissions
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="summary"
-                            className="text-sm gap-1.5 h-7"
-                            onClick={() => navigate(`/form-response/${id}/summary`)}
-                        >
-                            <BarChart3 className="h-4 w-4" />
-                            Summary
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="analytics"
-                            className="text-sm gap-1.5 h-7"
-                            onClick={() => navigate(`/form-response/${id}/analytics`)}
-                        >
-                            <Activity className="h-4 w-4" />
-                            Analytics
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-3">
-                {formResponses.length === 0 ? (
+            {showTable && (
+                <>
+                    <div className="border-b">
+                        <SubmissionsToolbar
+                            layer={layer}
+                            onLayerChange={setLayer}
+                            columnCounts={columnCounts}
+                            selectedCount={selectedIds.size}
+                            totalCount={formResponses.length}
+                            onClearSelection={clearSelection}
+                            onExport={handleExport}
+                        />
+                    </div>
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                    >
-                        <Card>
-                            <CardContent className="text-center py-12">
-                                <p className="text-base text-muted-foreground">No responses yet</p>
-                                <Button
-                                    variant="outline"
-                                    className="mt-4"
-                                    onClick={() => navigate(`/form-preview/${form.id}`)}
-                                >
-                                    Share Form
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        className="min-h-0 flex-1"
+                        initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="rounded-md border"
                     >
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[100px]">Response ID</TableHead>
-                                    <TableHead>Submitted At</TableHead>
-                                    {form.fields.slice(0, 4).map((field) => (
-                                        <TableHead key={field.fieldKey}>{field.label}</TableHead>
-                                    ))}
-                                    {form.fields.length > 4 && (
-                                        <TableHead className="text-right">More</TableHead>
-                                    )}
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {formResponses.map((response, index) => (
-                                    <motion.tr
-                                        key={response._id}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.05 }}
-                                        className="hover:bg-muted/50 cursor-pointer"
-                                    >
-                                        <TableCell className="font-medium">
-                                            #{response._id?.slice(-4)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {new Date(response.submittedAt).toLocaleDateString("en-US", {
-                                                month: "short",
-                                                day: "numeric",
-                                                year: "numeric",
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </TableCell>
-                                        {form.fields.slice(0, 4).map((field) => {
-                                            const answer = response.answers.find((a) => a.fieldKey === field.fieldKey)
-                                            return (
-                                                <TableCell key={field.fieldKey}>
-                                                    {answer ? (
-                                                        Array.isArray(answer.value)
-                                                            ? answer.value.join(", ")
-                                                            : String(answer.value)
-                                                    ) : (
-                                                        <span className="text-muted-foreground">-</span>
-                                                    )}
-                                                </TableCell>
-                                            )
-                                        })}
-                                        {form.fields.length > 4 && (
-                                            <TableCell className="text-right text-muted-foreground">
-                                                +{form.fields.length - 4} more
-                                            </TableCell>
-                                        )}
-                                    </motion.tr>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <SubmissionsTable
+                            columns={columns}
+                            responses={formResponses}
+                            selectedIds={selectedIds}
+                            onToggleRow={toggleRow}
+                            onToggleAll={toggleAll}
+                        />
                     </motion.div>
-                )}
-            </div>
-        </div>
+                </>
+            )}
+        </ResponsePageShell>
     )
 }

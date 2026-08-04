@@ -20,6 +20,8 @@ import { PageContentEditor } from "./components/PageContentEditor/PageContentEdi
 import { SettingsPanel } from "./components/SettingsPanel";
 import { AddPageDialog } from "./components/AddPageDialog";
 import PageContentTopbar from "./components/PageContentEditor/PageContentTopbar";
+import { Drawer } from "@/components/ui/drawer";
+import { useIsDesktop } from "@/shared/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 
 export function FormBuilderPage() {
@@ -45,8 +47,22 @@ export function FormBuilderPage() {
   >(null);
   const pendingReorderRef = useRef<string[] | null>(null);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [showPagesDrawer, setShowPagesDrawer] = useState(false);
+  const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   const syncedKeyRef = useRef<string | undefined>(undefined);
+  const isDesktop = useIsDesktop();
 
+  // The drawers only exist on the compact layout. Reset them while the
+  // breakpoint changes so a drawer left open on mobile does not reappear when
+  // the viewport shrinks back down. (Adjusting state during render, rather than
+  // in an effect, avoids a second render pass — see the React docs on deriving
+  // state from props.)
+  const [wasDesktop, setWasDesktop] = useState(isDesktop);
+  if (wasDesktop !== isDesktop) {
+    setWasDesktop(isDesktop);
+    setShowPagesDrawer(false);
+    setShowSettingsDrawer(false);
+  }
 
   // Sync pages from context form data when a different form loads, or when the
   // form is re-fetched (formRevision changes) because the server rewrote the
@@ -332,10 +348,15 @@ export function FormBuilderPage() {
   // Show loading state while fetching form
   if (isLoadingForm) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-base text-muted-foreground">Loading form...</p>
+      <div className="editorial h-screen flex items-center justify-center bg-[var(--editorial-canvas)]">
+        <div className="flex flex-col items-center text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-[var(--border)] border-t-[var(--primary)] mb-6"></div>
+          <p className="font-display text-2xl text-[var(--foreground)]">
+            Loading form
+          </p>
+          <p className="mt-2 text-base text-[var(--editorial-subtle)]">
+            One moment while we gather your pages.
+          </p>
         </div>
       </div>
     );
@@ -344,12 +365,17 @@ export function FormBuilderPage() {
   // Show error state if form failed to load
   if (formError) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-base text-destructive mb-4">{formError}</p>
+      <div className="editorial h-screen flex items-center justify-center bg-[var(--editorial-canvas)] px-8">
+        <div className="editorial-shadow-md flex max-w-md flex-col items-center rounded-[24px] border border-[var(--border)] bg-[var(--card)] px-10 py-12 text-center">
+          <h2 className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+            Something went wrong
+          </h2>
+          <p className="mt-4 text-base leading-6 text-[var(--editorial-body)]">
+            {formError}
+          </p>
           <button
             onClick={() => navigate("/dashboard")}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-8 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           >
             Back to Dashboard
           </button>
@@ -358,88 +384,143 @@ export function FormBuilderPage() {
     );
   }
 
-  return (
-    <div className="h-full flex flex-col bg-muted/50">
-      <ResizablePanelGroup
-        orientation="horizontal"
-        className="flex-1 min-h-0 p-3"
-      >
-        <ResizablePanel defaultSize={300} minSize={300} maxSize={400}>
-          <FormBuilderSidebar
-            pages={pages}
-            selectedPageIndex={selectedPageIndex}
-            onSelectPage={setSelectedPageIndex}
-            onReorderPages={reorderPages}
-            onAddPage={() => setShowAddPageDialog(true)}
-            onDeletePage={deletePage}
-            onDuplicatePage={duplicatePage}
-          />
-        </ResizablePanel>
+  const sidebarPanel = (
+    <FormBuilderSidebar
+      pages={pages}
+      selectedPageIndex={selectedPageIndex}
+      onSelectPage={setSelectedPageIndex}
+      onPageOpened={() => setShowPagesDrawer(false)}
+      onReorderPages={reorderPages}
+      onAddPage={() => {
+        setShowPagesDrawer(false);
+        setShowAddPageDialog(true);
+      }}
+      onDeletePage={deletePage}
+      onDuplicatePage={duplicatePage}
+    />
+  );
 
-        <ResizableHandle className="w-3 bg-transparent after:hidden" />
+  const settingsPanel = selectedPage ? (
+    <SettingsPanel
+      page={selectedPage}
+      pageIndex={selectedPageIndex}
+      onUpdate={updatePage}
+    />
+  ) : (
+    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+      <div className="border-b border-[var(--editorial-border-light)] px-6 py-5">
+        <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
+          Settings
+        </h3>
+      </div>
+      <div className="flex h-full items-center justify-center p-8 text-center">
+        <p className="text-base leading-6 text-[var(--editorial-subtle)]">
+          Select a page to view its settings.
+        </p>
+      </div>
+    </div>
+  );
 
-        <ResizablePanel defaultSize={600} minSize={300}>
-          <div className="h-full w-full flex flex-col gap-3">
-            <PageContentTopbar
-              onAddPage={() => {
-                setShowAddPageDialog(true);
-              }}
-              onPreview={async () => {
-                // Flush any pending debounced updates before showing preview
-                await flushPendingUpdate();
-                openPreview(form ? { ...form, fields: pages } : null);
-              }}
-              isMobileView={isMobileView}
-              onToggleView={() => setIsMobileView((prev) => !prev)}
-            />
+  const editorColumn = (
+    <div className="flex h-full min-h-0 w-full flex-col gap-3 sm:gap-4">
+      <PageContentTopbar
+        onAddPage={() => {
+          setShowAddPageDialog(true);
+        }}
+        onPreview={async () => {
+          // Flush any pending debounced updates before showing preview
+          await flushPendingUpdate();
+          openPreview(form ? { ...form, fields: pages } : null);
+        }}
+        isMobileView={isMobileView}
+        onToggleView={() => setIsMobileView((prev) => !prev)}
+        onOpenPages={isDesktop ? undefined : () => setShowPagesDrawer(true)}
+        onOpenSettings={
+          isDesktop ? undefined : () => setShowSettingsDrawer(true)
+        }
+      />
 
-            <div className="w-full h-full flex-1 flex items-center justify-center">
-              <div
-                className={cn(
-                  "w-full h-full bg-background border rounded-md shadow-sm transition-all duration-500 ease-in-out overflow-hidden px-5",
-                )}
-                style={{ width: isMobileView ? "420px" : "100%" }}
-              >
-                {selectedPage ? (
-                  <PageContentEditor
-                    page={selectedPage}
-                    pageIndex={selectedPageIndex}
-                    onUpdate={updatePage}
-                    isMobileView={isMobileView}
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    <p className="text-base">Select a page to edit</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </ResizablePanel>
-
-        <ResizableHandle className="w-3 bg-transparent after:hidden" />
-
-        <ResizablePanel defaultSize={300} minSize={300} maxSize={400}>
+      <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+        <div
+          className={cn(
+            "editorial-shadow h-full w-full overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--card)] px-4 sm:rounded-[24px] sm:px-6 lg:px-8",
+            "transition-all duration-500 ease-out",
+          )}
+          // The phone-frame preview must never exceed the available width.
+          style={{ width: isMobileView ? "min(420px, 100%)" : "100%" }}
+        >
           {selectedPage ? (
-            <SettingsPanel
+            <PageContentEditor
               page={selectedPage}
               pageIndex={selectedPageIndex}
               onUpdate={updatePage}
+              isMobileView={isMobileView}
             />
           ) : (
-            <div className="w-full h-full flex flex-col bg-background border rounded-md shadow-sm overflow-hidden">
-              <div className="p-3 border-b">
-                <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                  <span>Settings</span>
-                </h3>
-              </div>
-              <div className="flex items-center justify-center h-full text-muted-foreground p-4 text-center">
-                <p className="text-base">Select a page to view settings</p>
-              </div>
+            <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+              <p className="font-display text-xl text-[var(--foreground)] sm:text-2xl">
+                Nothing selected
+              </p>
+              <p className="mt-2 text-sm text-[var(--editorial-subtle)] sm:text-base">
+                {isDesktop
+                  ? "Choose a page from the left to begin editing."
+                  : "Open the pages panel to choose a page."}
+              </p>
             </div>
           )}
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="editorial h-full flex flex-col bg-[var(--editorial-canvas)]">
+      {isDesktop ? (
+        <ResizablePanelGroup
+          orientation="horizontal"
+          className="mx-auto w-full flex-1 min-h-0 px-8 py-4"
+        >
+          <ResizablePanel defaultSize={300} minSize={260} maxSize={400}>
+            {sidebarPanel}
+          </ResizablePanel>
+
+          <ResizableHandle className="w-4 bg-transparent after:hidden" />
+
+          <ResizablePanel defaultSize={600} minSize={300}>
+            {editorColumn}
+          </ResizablePanel>
+
+          <ResizableHandle className="w-4 bg-transparent after:hidden" />
+
+          <ResizablePanel defaultSize={340} minSize={300} maxSize={420}>
+            {settingsPanel}
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      ) : (
+        <>
+          <div className="flex min-h-0 w-full flex-1 flex-col px-3 py-3 sm:px-5 sm:py-4">
+            {editorColumn}
+          </div>
+
+          <Drawer
+            open={showPagesDrawer}
+            onOpenChange={setShowPagesDrawer}
+            side="left"
+            title="Pages"
+          >
+            {sidebarPanel}
+          </Drawer>
+
+          <Drawer
+            open={showSettingsDrawer}
+            onOpenChange={setShowSettingsDrawer}
+            side="right"
+            title="Settings"
+          >
+            {settingsPanel}
+          </Drawer>
+        </>
+      )}
 
       <AddPageDialog
         open={showAddPageDialog}

@@ -27,32 +27,29 @@ export function FormCard({ form, onDeleteClick }: FormCardProps) {
 
     return (
         <Card
-            className="cursor-pointer hover:shadow-lg transition-shadow rounded-lg"
+            className="editorial editorial-transition editorial-shadow-sm cursor-pointer rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)]"
             onClick={() => navigate(`/form-builder/${form.id}`)}
         >
-            <CardHeader>
+            <CardHeader className="p-0">
                 <div className="flex items-start justify-between gap-4">
-                    <CardTitle className="text-lg font-semibold">
+                    <CardTitle className="font-display text-2xl leading-tight text-[var(--foreground)]">
                         {form.title}
                     </CardTitle>
                     <Badge
-                        variant={
+                        className={
                             form.status === "published"
-                                ? "default"
-                                : form.status === "draft"
-                                    ? "secondary"
-                                    : "outline"
+                                ? "whitespace-nowrap rounded-full border border-[var(--editorial-success)]/30 bg-[var(--editorial-success)]/12 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#4E7F62]"
+                                : "whitespace-nowrap rounded-full border border-[var(--border)] bg-[var(--secondary)] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--editorial-subtle)]"
                         }
-                        className="whitespace-nowrap"
                     >
                         {form.status}
                     </Badge>
                 </div>
             </CardHeader>
-            <CardContent className="flex items-center justify-between pt-2">
-                <div className="flex gap-3 text-sm text-muted-foreground">
+            <CardContent className="flex items-center justify-between p-0 pt-6">
+                <div className="flex gap-2 text-sm text-[var(--editorial-body)]">
                     <span>{form.fields?.length || 0} pages</span>
-                    <span>•</span>
+                    <span className="text-[var(--editorial-disabled)]">•</span>
                     <span>{form.responses_count || 0} responses</span>
                 </div>
                 <DropdownMenu>
@@ -61,58 +58,63 @@ export function FormCard({ form, onDeleteClick }: FormCardProps) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8"
+                                aria-label="Form actions"
+                                className="editorial-transition h-9 w-9 rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:scale-[.98]"
                             />
                         }
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="h-5 w-5" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate(`/form-response/${form.id}/submissions`)}>
+                    <DropdownMenuContent
+                        align="end"
+                        className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)] p-2"
+                    >
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2" onClick={() => navigate(`/form-response/${form.id}/submissions`)}>
                             <BarChart3 className="h-4 w-4" />
                             <span>View Responses</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate(`/form-response/${form.id}/analytics`)}>
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2" onClick={() => navigate(`/form-response/${form.id}/analytics`)}>
                             <BarChart3 className="h-4 w-4" />
                             <span>Form Analytics</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate(`/form-settings/${form.id}`)}>
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2" onClick={() => navigate(`/form-settings/${form.id}`)}>
                             <FileText className="h-4 w-4" />
                             <span>Form Settings</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate(`/form-share/${form.id}`)}>
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2" onClick={() => navigate(`/form-share/${form.id}`)}>
                             <Eye className="h-4 w-4" />
                             <span>Form Share</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate(`/form-integrate/${form.id}`)}>
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2" onClick={() => navigate(`/form-integrate/${form.id}`)}>
                             <FileText className="h-4 w-4" />
                             <span>Form Integrations</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2">
                             <FileText className="h-4 w-4" />
                             <span>Duplicate Form</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2">
                             <BarChart3 className="h-4 w-4" />
                             <span>Resubmissions</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2">
                             <Eye className="h-4 w-4" />
                             <span>Theme</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2">
                             <Eye className="h-4 w-4" />
                             <span>Translations</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-[12px] px-3 py-2">
                             <FileText className="h-4 w-4" />
                             <span>Export Responses</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
                         <DropdownMenuItem
                             variant="destructive"
+                            className="rounded-[12px] px-3 py-2"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onDeleteClick(form.id);

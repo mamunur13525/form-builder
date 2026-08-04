@@ -6,6 +6,10 @@ import { HomePage } from "../../pages/Home"
 import { LoginPage } from "../../pages/Login"
 import { SignupPage } from "../../pages/Signup"
 import { DashboardPage } from "../../pages/Dashboard"
+import { FormsPage } from "../../pages/Forms"
+import { TemplatesPage } from "../../pages/Templates"
+import { SettingsPage } from "../../pages/Settings"
+import { PricingPage } from "../../pages/Pricing"
 import { FormBuilderPage } from "../../pages/FormBuilder"
 import { SubmissionsPage } from "../../pages/FormResponse"
 import { SummaryPage } from "../../pages/FormResponse"
@@ -57,6 +61,10 @@ export const router = createBrowserRouter([
                 element: <ProtectedLayout />,
                 children: [
                     { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
+                    { path: ROUTES.FORMS, element: <FormsPage /> },
+                    { path: ROUTES.TEMPLATES, element: <TemplatesPage /> },
+                    { path: ROUTES.SETTINGS, element: <SettingsPage /> },
+                    { path: ROUTES.PRICING, element: <PricingPage /> },
                     {
                         element: <FormLayout />,
                         children: [

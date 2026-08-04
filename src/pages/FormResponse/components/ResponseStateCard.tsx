@@ -13,15 +13,15 @@ interface ResponseStateCardProps {
 /** Uniform card used for the loading, error and empty states of the response pages. */
 export function ResponseStateCard({ loading = false, message, action }: ResponseStateCardProps) {
     return (
-        <Card>
-            <CardContent className="text-center py-12">
+        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)]">
+            <CardContent className="py-16 text-center">
                 <div className="flex items-center justify-center gap-2">
                     {loading && (
-                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />
                     )}
-                    <p className="text-base text-muted-foreground">{message}</p>
+                    <p className="text-base text-[var(--editorial-subtle)]">{message}</p>
                 </div>
-                {action && <div className="mt-4">{action}</div>}
+                {action && <div className="mt-8">{action}</div>}
             </CardContent>
         </Card>
     )

@@ -76,20 +76,20 @@ export function PageContentEditor({
   const isStatement = page.type === "statement";
 
   return (
-    <div className="w-full max-w-[800px] mx-auto h-full flex flex-col items-center justify-center">
+    <div className="mx-auto flex h-full w-full max-w-[800px] flex-col items-center justify-center">
       {/* Editor Content */}
-      <div className={cn("w-full overflow-y-auto")}>
+      <div className={cn("w-full min-h-0 overflow-y-auto")}>
         <div
           className={cn(
-            "mx-auto transition-all duration-500 ease-in-out px-6 py-8",
-            isMobileView ? "w-full" : "w-11/12",
+            "mx-auto transition-all duration-500 ease-out px-2 py-8 sm:px-6 sm:py-12",
+            isMobileView ? "w-full" : "w-full sm:w-11/12",
           )}
         >
           {page.coverImage?.url && (
             <img
               src={page.coverImage.url}
               alt={page.coverImage.alt || ""}
-              className="mb-5 max-h-56 w-full rounded-md border object-cover"
+              className="mb-8 max-h-56 w-full rounded-[22px] border border-[var(--editorial-border-light)] object-cover"
             />
           )}
 
@@ -106,7 +106,7 @@ export function PageContentEditor({
             onUpdate={(helperText) => onUpdate(pageIndex, { helperText })}
           />
 
-          <div className="mt-5">
+          <div className="mt-8">
             {/* Field-specific editor */}
             {FieldEditor && (
               <FieldEditor

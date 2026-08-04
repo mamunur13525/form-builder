@@ -51,8 +51,10 @@ export function AnalyticsPage() {
     // Only claim the form is missing once loading has finished.
     if (!formId || (!isLoading && !form)) {
         return (
-            <div className="text-center py-20">
-                <h2 className="text-3xl font-bold">Form not found</h2>
+            <div className="editorial py-32 text-center">
+                <h2 className="font-display text-[40px] leading-tight text-[var(--foreground)]">
+                    Form not found
+                </h2>
             </div>
         )
     }
@@ -60,8 +62,6 @@ export function AnalyticsPage() {
     return (
         <ResponsePageShell
             activeTab="analytics"
-            title="Analytics"
-            description="Detailed insights and statistics"
         >
             {isLoading ? (
                 <ResponseStateCard loading message="Loading analytics..." />
@@ -76,44 +76,50 @@ export function AnalyticsPage() {
                     className="space-y-6"
                 >
                     {/* Overview Stats */}
-                    <div className="grid gap-4 md:grid-cols-4">
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-base font-medium text-muted-foreground">
+                    <div className="grid gap-6 md:grid-cols-4">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Total Responses
                                     </p>
-                                    <p className="text-3xl font-bold">{totalResponses}</p>
+                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                        {totalResponses}
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-base font-medium text-muted-foreground">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Unique Respondents
                                     </p>
-                                    <p className="text-3xl font-bold">{uniqueRespondents}</p>
+                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                        {uniqueRespondents}
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-base font-medium text-muted-foreground">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Today's Responses
                                     </p>
-                                    <p className="text-3xl font-bold">{todayResponses}</p>
+                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                        {todayResponses}
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-base font-medium text-muted-foreground">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Completion Rate
                                     </p>
-                                    <p className="text-3xl font-bold">
+                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
                                         {formatPercent(completionRate)}%
                                     </p>
                                 </div>
@@ -122,26 +128,28 @@ export function AnalyticsPage() {
                     </div>
 
                     {/* Additional Stats */}
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-base font-medium text-muted-foreground">
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Avg. Completion Time
                                     </p>
-                                    <p className="text-2xl font-bold">
+                                    <p className="font-display text-[32px] leading-none text-[var(--foreground)]">
                                         {formatDuration(avgCompletionTime)}
                                     </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-base font-medium text-muted-foreground">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Total Fields
                                     </p>
-                                    <p className="text-2xl font-bold">{form?.fields.length ?? 0}</p>
+                                    <p className="font-display text-[32px] leading-none text-[var(--foreground)]">
+                                        {form?.fields.length ?? 0}
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>

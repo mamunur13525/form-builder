@@ -45,8 +45,9 @@ export function FormBuilderTopBar({
   const { saveStatus, showSaveStatus, openPreview, hasUnpublishedChanges } =
     useFormContext();
   const baseNavLinkClass =
-    "flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-md";
-  const activeNavLinkClass = "text-primary bg-primary/10";
+    "editorial-transition flex items-center gap-1.5 rounded-[16px] px-3.5 py-2 text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]";
+  const activeNavLinkClass =
+    "border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)] hover:text-[var(--primary)]";
 
   const [title, setTitle] = useState(initialTitle);
   const prevInitialTitleRef = useRef(initialTitle);
@@ -64,49 +65,51 @@ export function FormBuilderTopBar({
 
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 shrink-0 bg-background border-b">
-      <div className="flex items-center gap-2">
-        <nav className="flex items-center gap-1.5 text-sm">
+    <div className="bg-white editorial flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#EEE7E0] bg-[var(--editorial-canvas)] px-3 py-2 lg:h-[72px] lg:flex-nowrap lg:gap-0 lg:px-8 lg:py-0">
+      <div className="flex min-w-0 items-center gap-2">
+        <nav className="flex min-w-0 items-center gap-2 text-sm">
           <button
             onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors font-medium cursor-pointer"
+            className="editorial-transition cursor-pointer items-center gap-1.5 text-[var(--editorial-body)] hover:text-[var(--primary)] flex"
           >
-            <Home className="w-3 h-3 mb-0.5" />
-            forms
+            <Home className="h-4 w-4" />
+            Forms
           </button>
-          <span className="text-muted-foreground">/</span>
+          <span className="text-[var(--editorial-disabled)] inline">
+            /
+          </span>
           <button
             onClick={() => setDialogOpen(true)}
-            className="text-foreground hover:text-primary transition-colors font-semibold flex items-center gap-1 cursor-pointer group"
+            className="editorial-transition group flex min-w-0 cursor-pointer items-center gap-1.5 font-display text-lg text-[var(--foreground)] hover:text-[var(--primary)] lg:text-xl"
           >
-            {title}
-            <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-100 duration-300" />
+            <span className="truncate">{title}</span>
+            <Pencil className="h-4 w-4 shrink-0 opacity-0 transition-opacity duration-250 group-hover:opacity-100" />
           </button>
         </nav>
       </div>
 
-      <nav className="flex items-center gap-1">
+      <nav className="order-last flex w-full items-center gap-1 overflow-x-auto lg:order-none lg:w-auto lg:overflow-visible py-2">
         {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={label}
             to={to.replace(":formId", formId || "new")}
             className={({ isActive }) =>
-              cn(baseNavLinkClass, isActive && activeNavLinkClass)
+              cn(baseNavLinkClass, "shrink-0", isActive && activeNavLinkClass)
             }
             end={to === ROUTES.FORM_BUILDER}
           >
-            <Icon className="h-4 w-4" />
-            <span className="text-xs tracking-wider">
+            <Icon className="h-5 w-5" />
+            <span className="text-xs font-semibold uppercase tracking-[0.08em]">
               {label}
             </span>
           </NavLink>
         ))}
       </nav>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 lg:gap-3">
         <span
           className={cn(
-            "text-sm flex items-center gap-1.5 text-muted-foreground w-18",
+            "hidden w-20 items-center gap-1.5 text-xs text-[var(--editorial-subtle)] transition-opacity duration-250 ease-out sm:flex",
             saveStatus !== "idle" ? "opacity-100" : "opacity-0",
           )}
         >
@@ -114,10 +117,10 @@ export function FormBuilderTopBar({
             <Loader2 className="h-4 w-4 animate-spin" />
           )}
           {saveStatus === "saved" && (
-            <CheckCircle className="h-4 w-4 text-green-600" />
+            <CheckCircle className="h-4 w-4 text-[var(--editorial-success)]" />
           )}
           {saveStatus === "error" && (
-            <AlertCircle className="h-4 w-4 text-red-600" />
+            <AlertCircle className="h-4 w-4 text-[var(--destructive)]" />
           )}
           {saveStatus === "saving"
             ? "Saving..."
@@ -128,41 +131,41 @@ export function FormBuilderTopBar({
 
         <Button
           variant="outline"
-          size="sm"
-          className="h-9 gap-1.5 text-sm px-3"
+          aria-label="Preview"
+          className="editorial-transition h-10 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-3 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
           onClick={() => openPreview()}
         >
-          <Play className="h-4 w-4" />
-          Preview
+          <Play className="h-5 w-5" />
+          <span className="hidden sm:inline">Preview</span>
         </Button>
         {!isPublished ? (
           <Button
-            size="sm"
-            className="h-9 gap-1.5 text-sm font-medium px-3"
+            aria-label="Publish"
+            className="editorial-transition h-10 gap-2 rounded-[16px] bg-[var(--primary)] px-3 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] lg:h-11 lg:px-5"
             onClick={onPublish}
           >
-            <Share2 className="h-4 w-4" />
-            Publish
+            <Share2 className="h-5 w-5" />
+            <span className="hidden sm:inline">Publish</span>
           </Button>
         ) : hasUnpublishedChanges ? (
           <Button
-            size="sm"
             variant="default"
-            className="h-9 gap-1.5 text-sm font-medium px-3 bg-amber-500 hover:bg-amber-600 text-white"
+            aria-label="Publish changes"
+            className="editorial-transition h-10 gap-2 rounded-[16px] border border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] px-3 text-sm font-medium text-[var(--editorial-purple)] hover:-translate-y-0.5 hover:bg-[var(--editorial-purple-light)] active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
             onClick={onPublishedClick}
           >
-            <AlertCircle className="h-4 w-4" />
-            Publish changes
+            <AlertCircle className="h-5 w-5" />
+            <span className="hidden sm:inline">Publish changes</span>
           </Button>
         ) : (
           <Button
-            size="sm"
             variant="default"
-            className="h-9 gap-1.5 text-sm font-medium px-3 bg-green-600 hover:bg-green-700"
+            aria-label="Published"
+            className="editorial-transition h-10 gap-2 rounded-[16px] border border-[var(--editorial-success)]/30 bg-[var(--editorial-success)]/12 px-3 text-sm font-medium text-[#4E7F62] hover:-translate-y-0.5 hover:bg-[var(--editorial-success)]/20 active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
             onClick={onPublishedClick}
           >
-            <CheckCircle className="h-4 w-4" />
-            Published
+            <CheckCircle className="h-5 w-5" />
+            <span className="hidden sm:inline">Published</span>
           </Button>
         )}
       </div>

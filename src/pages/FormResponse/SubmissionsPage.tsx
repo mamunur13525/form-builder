@@ -104,9 +104,14 @@ export function SubmissionsPage() {
     // flashes "Form not found" on every visit.
     if (!formId || (!isLoading && !form)) {
         return (
-            <div className="text-center py-20">
-                <h2 className="text-3xl font-bold">Form not found</h2>
-                <Button className="mt-4" onClick={() => navigate(ROUTES.DASHBOARD)}>
+            <div className="editorial flex flex-col items-center py-32 text-center">
+                <h2 className="font-display text-[40px] leading-tight text-[var(--foreground)]">
+                    Form not found
+                </h2>
+                <Button
+                    className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                    onClick={() => navigate(ROUTES.DASHBOARD)}
+                >
                     Back to Dashboard
                 </Button>
             </div>
@@ -119,16 +124,16 @@ export function SubmissionsPage() {
     return (
         <ResponsePageShell activeTab="submissions" fill>
             {isLoading ? (
-                <div className="p-3">
+                <div className="p-8">
                     <ResponseStateCard loading message="Loading submissions..." />
                 </div>
             ) : formError || responsesError ? (
-                <div className="p-3">
+                <div className="p-8">
                     <ResponseStateCard message="Could not load submissions. Please try again." />
                 </div>
             ) : !hasResponses ? (
                 <motion.div
-                    className="p-3"
+                    className="p-8"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                 >
@@ -137,6 +142,7 @@ export function SubmissionsPage() {
                         action={
                             <Button
                                 variant="outline"
+                                className="editorial-transition h-[52px] rounded-[16px] border-[var(--border)] bg-[var(--secondary)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
                                 onClick={() =>
                                     navigate(ROUTES.FORM_SHARE.replace(":formId", formId))
                                 }
@@ -150,7 +156,7 @@ export function SubmissionsPage() {
 
             {showTable && (
                 <>
-                    <div className="border-b">
+                    <div className="border-b border-[var(--editorial-border-light)]">
                         <SubmissionsToolbar
                             layer={layer}
                             onLayerChange={setLayer}

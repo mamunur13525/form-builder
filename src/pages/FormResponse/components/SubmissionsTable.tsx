@@ -26,8 +26,9 @@ interface SubmissionsTableProps {
  * scrolling columns would show through), so they repaint the row state themselves.
  */
 const PINNED_BODY_CELL =
-    "bg-background group-hover:bg-muted/50 group-data-[state=selected]:bg-muted"
-const PINNED_HEAD_CELL = "bg-background"
+    "bg-[var(--card)] group-hover:bg-[var(--secondary)] group-data-[state=selected]:bg-[var(--editorial-primary-selected)]"
+const PINNED_HEAD_CELL =
+    "bg-[var(--card)] editorial-eyebrow text-[var(--editorial-subtle)]"
 
 export function SubmissionsTable({
     columns,
@@ -42,14 +43,14 @@ export function SubmissionsTable({
     return (
         <Table
             containerClassName="h-full overflow-auto"
-            className="border-separate border-spacing-0"
+            className="border-separate border-spacing-0 [&_td]:border-[var(--editorial-border-light)] [&_th]:border-[var(--editorial-border-light)]"
         >
             <TableHeader>
                 <TableRow className="hover:bg-transparent">
                     <TableHead
                         className={cn(
                             PINNED_HEAD_CELL,
-                            "sticky top-0 left-0 z-30 w-[180px] border-b border-r",
+                            "sticky top-0 left-0 z-30 w-[180px] border-b border-r px-6",
                         )}
                     >
                         <div className="flex items-center gap-3">
@@ -65,7 +66,7 @@ export function SubmissionsTable({
                     {columns.map((column) => (
                         <TableHead
                             key={column.id}
-                            className={cn(PINNED_HEAD_CELL, "sticky top-0 z-20 border-b")}
+                            className={cn(PINNED_HEAD_CELL, "sticky top-0 z-20 border-b px-6")}
                         >
                             <span className="block max-w-[240px] truncate" title={column.label}>
                                 {column.label}
@@ -75,7 +76,7 @@ export function SubmissionsTable({
                     <TableHead
                         className={cn(
                             PINNED_HEAD_CELL,
-                            "sticky top-0 right-0 z-30 border-b border-l text-right",
+                            "sticky top-0 right-0 z-30 border-b border-l px-6 text-right",
                         )}
                     >
                         Submitted At

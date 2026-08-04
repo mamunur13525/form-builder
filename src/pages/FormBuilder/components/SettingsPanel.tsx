@@ -100,25 +100,31 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
     }
 
     return (
-        <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">
-            <div className="p-3 border-b">
-                <h3 className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    <Settings2 className="h-4 w-4" />
+        <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+            <div className="flex items-center gap-2 border-b border-[var(--editorial-border-light)] px-6 py-5">
+                <Settings2 className="h-5 w-5 text-[var(--editorial-subtle)]" />
+                <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
                     Settings
                 </h3>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            <div className="flex-1 space-y-8 overflow-y-auto px-6 py-6">
                 {/* Field type — always available */}
                 <div className="space-y-2">
-                    <Label className="text-base">Field Type</Label>
+                    <Label className="text-base font-semibold text-[var(--foreground)]">
+                        Field Type
+                    </Label>
                     <Select value={page.type} onValueChange={handleTypeChange}>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="h-[52px] w-full rounded-full border-[var(--input)] bg-[var(--secondary)] text-base">
                             <SelectValue placeholder="Select field type" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)]">
                             {PAGE_TYPES.map((pt) => (
-                                <SelectItem key={pt.type} value={pt.type}>
+                                <SelectItem
+                                    key={pt.type}
+                                    value={pt.type}
+                                    className="rounded-[12px]"
+                                >
                                     {pt.label}
                                 </SelectItem>
                             ))}
@@ -346,9 +352,9 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                         value={page.validation?.message ?? ""}
                         onChange={(e) => patchValidation({ message: e.target.value })}
                         placeholder="This field is required"
-                        className="h-9 text-base"
+                        className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                     />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                         Shown to respondents when this field fails validation.
                     </p>
                 </SettingsSection>
@@ -359,35 +365,38 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                     description="Dynamically show or hide this field depending on how respondents answer other questions."
                 >
                     {page.logic.length === 0 ? (
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                             No logic rules configured
                         </p>
                     ) : (
                         page.logic.map((rule, ruleIndex) => (
                             <div
                                 key={ruleIndex}
-                                className="space-y-1 rounded border bg-muted/30 p-2"
+                                className="space-y-1 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-4"
                             >
-                                <p className="text-base">
+                                <p className="text-base leading-6">
                                     When <strong>{rule.whenFieldKey}</strong> {rule.operator} "
                                     {String(rule.value)}"
                                 </p>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-xs text-[var(--editorial-subtle)]">
                                     → {rule.action} {rule.targetFieldKey}
                                 </p>
                             </div>
                         ))
                     )}
-                    <Button variant="outline" size="sm" className="w-full text-base">
-                        <Plus className="mr-1 h-3 w-3" />
+                    <Button
+                        variant="outline"
+                        className="editorial-transition h-11 w-full rounded-[16px] border-[var(--border)] bg-[var(--secondary)] text-sm hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                    >
+                        <Plus className="mr-1.5 h-4 w-4" />
                         Add Logic
                     </Button>
                 </SettingsSection>
 
                 {/* Appearance — button text/color (shared with all types) */}
                 <SettingsSection title="Appearance">
-                    <div className="space-y-1">
-                        <Label className="text-base text-muted-foreground">Width</Label>
+                    <div className="space-y-1.5">
+                        <Label className="text-base text-[var(--editorial-body)]">Width</Label>
                         <Select
                             value={page.appearance.width}
                             onValueChange={(v: "full" | "half" | null) => {
@@ -397,17 +406,21 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                 })
                             }}
                         >
-                            <SelectTrigger className="w-full h-9 text-base">
+                            <SelectTrigger className="h-[52px] w-full rounded-full border-[var(--input)] bg-[var(--secondary)] text-base">
                                 <SelectValue placeholder="Select width" />
                             </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="full">Full Width</SelectItem>
-                                <SelectItem value="half">Half Width</SelectItem>
+                            <SelectContent className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)]">
+                                <SelectItem value="full" className="rounded-[12px]">
+                                    Full Width
+                                </SelectItem>
+                                <SelectItem value="half" className="rounded-[12px]">
+                                    Half Width
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-1">
-                        <Label className="text-base text-muted-foreground">Button Text</Label>
+                    <div className="space-y-1.5">
+                        <Label className="text-base text-[var(--editorial-body)]">Button Text</Label>
                         <Input
                             value={page.appearance.submitButtonText ?? ""}
                             onChange={(e) =>
@@ -419,14 +432,15 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                 })
                             }
                             placeholder="Submit"
-                            className="h-9 text-base"
+                            className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                         />
                     </div>
-                    <div className="space-y-1">
-                        <Label className="text-base text-muted-foreground">Button Color</Label>
-                        <div className="flex items-center gap-2">
+                    <div className="space-y-1.5">
+                        <Label className="text-base text-[var(--editorial-body)]">Button Color</Label>
+                        <div className="flex items-center gap-3">
                             <input
                                 type="color"
+                                aria-label="Button color"
                                 value={page.appearance.submitButtonColor ?? "#000000"}
                                 onChange={(e) =>
                                     onUpdate(pageIndex, {
@@ -436,7 +450,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                         },
                                     })
                                 }
-                                className="h-9 w-9 rounded border cursor-pointer p-0"
+                                className="h-[52px] w-[52px] cursor-pointer rounded-full border border-[var(--input)] bg-[var(--secondary)] p-1"
                             />
                             <Input
                                 type="text"
@@ -450,7 +464,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                     })
                                 }
                                 placeholder="#000000"
-                                className="h-9 text-base"
+                                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                             />
                         </div>
                     </div>

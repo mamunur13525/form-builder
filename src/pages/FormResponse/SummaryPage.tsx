@@ -33,8 +33,10 @@ export function SummaryPage() {
     // Only claim the form is missing once loading has finished.
     if (!formId || (!isLoading && !form)) {
         return (
-            <div className="text-center py-20">
-                <h2 className="text-3xl font-bold">Form not found</h2>
+            <div className="editorial py-32 text-center">
+                <h2 className="font-display text-[40px] leading-tight text-[var(--foreground)]">
+                    Form not found
+                </h2>
             </div>
         )
     }
@@ -42,8 +44,6 @@ export function SummaryPage() {
     return (
         <ResponsePageShell
             activeTab="summary"
-            title="Summary"
-            description="Overview of your form responses"
         >
             {isLoading ? (
                 <ResponseStateCard loading message="Loading summary..." />
@@ -55,52 +55,60 @@ export function SummaryPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="space-y-4"
+                    className="space-y-12"
                 >
-                    <div className="grid gap-4 md:grid-cols-3">
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium text-muted-foreground">
+                    <div className="grid gap-6 md:grid-cols-3">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Total Responses
                                     </p>
-                                    <p className="text-3xl font-bold">{totalResponses}</p>
+                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                        {totalResponses}
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium text-muted-foreground">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Total Fields
                                     </p>
-                                    <p className="text-3xl font-bold">{form?.fields.length ?? 0}</p>
+                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                        {form?.fields.length ?? 0}
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium text-muted-foreground">
+                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                            <CardContent className="p-0">
+                                <div className="space-y-3">
+                                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Unique Answers
                                     </p>
-                                    <p className="text-3xl font-bold">{uniqueAnswers}</p>
+                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                        {uniqueAnswers}
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
                     {fields.length > 0 && (
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-semibold">Response Breakdown</h3>
+                        <div className="space-y-6">
+                            <h3 className="font-display text-2xl text-[var(--foreground)]">
+                                Response Breakdown
+                            </h3>
                             <div className="grid gap-4">
                                 {fields.map((field, index) => {
                                     const percentage =
                                         totalResponses > 0
                                             ? Math.min(
-                                                  (field.answerCount / totalResponses) * 100,
-                                                  100,
-                                              )
+                                                (field.answerCount / totalResponses) * 100,
+                                                100,
+                                            )
                                             : 0
                                     return (
                                         <motion.div
@@ -109,30 +117,30 @@ export function SummaryPage() {
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.05 }}
                                         >
-                                            <Card>
-                                                <CardContent className="pt-6">
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center justify-between">
+                                            <Card className="editorial-shadow-sm rounded-[18px] border-[var(--border)] bg-[var(--card)] p-6">
+                                                <CardContent className="p-0">
+                                                    <div className="space-y-4">
+                                                        <div className="flex items-center justify-between gap-4">
                                                             <div className="space-y-1">
-                                                                <p className="font-medium">
+                                                                <p className="text-base text-[var(--foreground)]">
                                                                     {field.label}
                                                                 </p>
-                                                                <p className="text-xs text-muted-foreground">
+                                                                <p className="text-xs text-[var(--editorial-subtle)]">
                                                                     {field.type}
                                                                 </p>
                                                             </div>
                                                             <div className="text-right">
-                                                                <p className="text-sm font-medium">
+                                                                <p className="text-sm tabular-nums text-[var(--foreground)]">
                                                                     {field.answerCount}/
                                                                     {totalResponses}
                                                                 </p>
-                                                                <p className="text-xs text-muted-foreground">
+                                                                <p className="text-xs tabular-nums text-[var(--editorial-subtle)]">
                                                                     {percentage.toFixed(0)}%
                                                                 </p>
                                                             </div>
                                                         </div>
                                                         <div
-                                                            className="w-full bg-secondary rounded-full h-2"
+                                                            className="h-2 w-full rounded-full bg-[var(--muted)]"
                                                             role="progressbar"
                                                             aria-label={`${field.label} completion`}
                                                             aria-valuenow={Math.round(percentage)}
@@ -146,7 +154,7 @@ export function SummaryPage() {
                                                                     duration: 0.5,
                                                                     delay: index * 0.1,
                                                                 }}
-                                                                className="bg-primary h-2 rounded-full"
+                                                                className="h-2 rounded-full bg-[var(--primary)]"
                                                             />
                                                         </div>
                                                     </div>

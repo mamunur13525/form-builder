@@ -10,6 +10,11 @@ interface FormBuilderSidebarProps {
   pages: FormField[];
   selectedPageIndex: number;
   onSelectPage: (index: number) => void;
+  /**
+   * Called when a page is opened by tapping it (not when selection follows a
+   * reorder), so a drawer host can close itself.
+   */
+  onPageOpened?: () => void;
   /** Applies a reordered page list and persists the new order. */
   onReorderPages: (pages: FormField[]) => void;
   onAddPage: () => void;
@@ -21,11 +26,20 @@ export function FormBuilderSidebar({
   pages,
   selectedPageIndex,
   onSelectPage,
+  onPageOpened,
   onReorderPages,
   onAddPage,
   onDeletePage,
   onDuplicatePage,
 }: FormBuilderSidebarProps) {
+  const selectPage = useCallback(
+    (index: number) => {
+      onSelectPage(index);
+      onPageOpened?.();
+    },
+    [onSelectPage, onPageOpened],
+  );
+
   const duplicatePage = useCallback(
     async (index: number) => {
       await onDuplicatePage(index);
@@ -77,19 +91,19 @@ export function FormBuilderSidebar({
   );
 
   return (
-    <div className="w-full h-full flex flex-col bg-background border rounded-md overflow-hidden">
-      <div className="p-3 py-2 border-b flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+      <div className="flex items-center justify-between border-b border-[var(--editorial-border-light)] px-6 py-5">
+        <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
           Pages
         </h3>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-gray-200/80 rounded-md cursor-pointer"
+        <button
+          type="button"
           onClick={onAddPage}
+          aria-label="Add page"
+          className="editorial-transition flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:translate-y-0 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
         >
-          <Plus className="h-4 w-4" />
-        </Button>
+          <Plus className="h-5 w-5" />
+        </button>
       </div>
       <List
         values={pages}
@@ -98,7 +112,7 @@ export function FormBuilderSidebar({
         renderList={({ children, props }) => (
           <div
             {...props}
-            className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-2"
+            className="flex-1 space-y-2 overflow-y-auto overflow-x-hidden px-4 py-4"
           >
             {children}
           </div>
@@ -114,7 +128,7 @@ export function FormBuilderSidebar({
               isSelected={index === selectedPageIndex}
               isDragged={isDragged}
               isLifted={isSelected}
-              onSelect={onSelectPage}
+              onSelect={selectPage}
               onDuplicate={duplicatePage}
               onDelete={removePage}
               onMoveUp={movePageUp}
@@ -124,14 +138,13 @@ export function FormBuilderSidebar({
           );
         }}
       />
-      <div className="p-3 border-t">
+      <div className="border-t border-[var(--editorial-border-light)] p-4">
         <Button
           variant="outline"
-          className="w-full"
-          size="sm"
+          className="editorial-transition h-[52px] w-full rounded-[16px] border-[var(--border)] bg-[var(--secondary)] text-sm font-medium text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98]"
           onClick={onAddPage}
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="mr-2 h-5 w-5" />
           Add Page
         </Button>
       </div>

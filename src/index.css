@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -143,3 +144,111 @@
 [contenteditable][data-placeholder]:empty:focus:before {
     opacity: 0.35;
 }
+
+/* ------------------------------------------------------------------ */
+/* Premium editorial theme                                             */
+/*                                                                     */
+/* Scoped to `.editorial` so it can be adopted screen by screen. It    */
+/* re-points the shadcn design tokens at the editorial palette, so any */
+/* component rendered inside the scope inherits the new look without   */
+/* being rewritten. Portalled surfaces (dialogs, dropdowns, popovers)  */
+/* escape the DOM subtree, so they opt in with the same class.         */
+/* ------------------------------------------------------------------ */
+.editorial {
+    /* Surfaces */
+    --editorial-canvas: #f8f3ec;
+    --editorial-surface: #fdfbf8;
+    --background: #fffdfb;
+    --card: #fffdfb;
+    --card-foreground: #2e2825;
+    --popover: #fff9f2;
+    --popover-foreground: #2e2825;
+
+    /* Text — never pure black */
+    --foreground: #2e2825;
+    --editorial-body: #665f5b;
+    --muted-foreground: #665f5b;
+    --editorial-subtle: #a49a95;
+    --editorial-disabled: #ccc5be;
+
+    /* Coral is the single accent */
+    --primary: #ee7d69;
+    --primary-foreground: #ffffff;
+    --editorial-primary-hover: #e56b56;
+    --editorial-primary-pressed: #d95e49;
+    --editorial-primary-light: #ffe5de;
+    --editorial-primary-selected: #ffe9e5;
+    --editorial-primary-ring: #f4b3a8;
+
+    --secondary: #fff9f2;
+    --secondary-foreground: #2e2825;
+    --muted: #f6f0e9;
+    --accent: #ffe9e5;
+    --accent-foreground: #2e2825;
+
+    /* Borders */
+    --border: #e8ddd4;
+    --editorial-border-light: #f2ece6;
+    --input: #ddd3cb;
+    --ring: #ee7d69;
+
+    --destructive: #c05b45;
+
+    /* Status */
+    --editorial-purple: #8971c5;
+    --editorial-purple-light: #eee7fa;
+    --editorial-note: #fff2bc;
+    --editorial-success: #7cbf95;
+    --editorial-blue: #74a7ff;
+
+    color: var(--foreground);
+}
+
+/* Serif reserved for major headings only. */
+.font-display {
+    font-family: "Cormorant Garamond", ui-serif, Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+/* Small uppercase labels. */
+.editorial-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Soft, warm elevation — never dark or heavy. */
+.editorial-shadow {
+    box-shadow: 0 20px 60px rgba(110, 80, 60, 0.08);
+}
+
+.editorial-shadow-md {
+    box-shadow: 0 12px 40px rgba(90, 70, 50, 0.06);
+}
+
+.editorial-shadow-sm {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Calm, consistent motion. */
+.editorial-transition {
+    transition-property: color, background-color, border-color, box-shadow,
+        transform, opacity;
+    transition-duration: 250ms;
+    transition-timing-function: ease-out;
+}
+
+/* Lucide icons read best unfilled with a slightly lighter stroke. */
+.editorial svg {
+    stroke-width: 1.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .editorial-transition {
+        transition-duration: 1ms;
+    }
+}
+

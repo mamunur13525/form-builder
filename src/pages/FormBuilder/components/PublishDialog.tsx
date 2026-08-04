@@ -85,6 +85,19 @@ const CONFIRM_COPY: Record<
   },
 };
 
+/** Standardised editorial button treatments, shared by every footer state. */
+const primaryButtonClass =
+  "editorial-transition h-[52px] gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]";
+
+const secondaryButtonClass =
+  "editorial-transition h-[52px] gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]";
+
+const ghostButtonClass =
+  "editorial-transition h-[52px] gap-2 rounded-[16px] px-5 text-sm text-[var(--editorial-body)] hover:bg-[var(--card)] hover:text-[var(--foreground)] active:scale-[.98]";
+
+const destructiveButtonClass =
+  "editorial-transition h-[52px] gap-2 rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98]";
+
 export function PublishDialog({
   open,
   onOpenChange,
@@ -202,43 +215,46 @@ export function PublishDialog({
         if (!next) setConfirming(null);
         onOpenChange(next);
       }}
-      className="max-w-lg overflow-hidden rounded-2xl p-0"
+      className="editorial editorial-shadow max-w-xl overflow-hidden rounded-[30px] border-[var(--border)] bg-[var(--popover)] p-0"
     >
       <DialogContent>
-        <div className="px-6 pt-6">
-          {/* Status pill. Colours are alpha-composited so they hold up in
-              both light and dark themes. */}
+        <div className="px-10 pt-10">
+          {/* Status pill. Muted, warm tints keep the palette calm — the coral
+              accent stays reserved for the primary action. */}
           <span
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider",
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-semibold uppercase tracking-[0.08em]",
               state === "live" &&
-              "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+              "border-[var(--editorial-success)]/30 bg-[var(--editorial-success)]/12 text-[#4E7F62]",
               state === "pending" &&
-              "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-              state === "draft" && "border-border bg-muted text-muted-foreground",
+              "border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
+              state === "draft" &&
+              "border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-subtle)]",
             )}
           >
             {state === "live" ? (
               <span className="relative flex size-1.5">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-[var(--editorial-success)] opacity-75" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-[var(--editorial-success)]" />
               </span>
             ) : (
               <span
                 className={cn(
                   "size-1.5 rounded-full",
-                  state === "pending" ? "bg-amber-500" : "bg-muted-foreground/50",
+                  state === "pending"
+                    ? "bg-[var(--editorial-purple)]"
+                    : "bg-[var(--editorial-disabled)]",
                 )}
               />
             )}
             {copy.badge}
           </span>
 
-          <DialogHeader className="mt-3 mb-0 space-y-1.5">
-            <DialogTitle className="text-xl tracking-tight">
+          <DialogHeader className="mt-6 mb-0 space-y-2">
+            <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
               {confirmCopy?.title ?? title ?? copy.title}
             </DialogTitle>
-            <DialogDescription className="leading-relaxed">
+            <DialogDescription className="text-base leading-6 text-[var(--editorial-body)]">
               {confirmCopy?.body ?? description ?? copy.body}
             </DialogDescription>
           </DialogHeader>
@@ -247,30 +263,30 @@ export function PublishDialog({
         {/* The confirmation step replaces the body entirely to keep focus on
             the decision being made. */}
         {!confirming && (
-          <div className="space-y-4 px-6 pt-5">
+          <div className="space-y-6 px-10 pt-8">
             {state === "pending" && (
-              <Alert className="rounded-xl border-amber-500/25 bg-amber-500/[0.07]">
-                <AlertCircle className="text-amber-600 dark:text-amber-500" />
-                <AlertTitle className="text-amber-900 dark:text-amber-200">
+              <Alert className="rounded-[18px] border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)]">
+                <AlertCircle className="text-[var(--editorial-purple)]" />
+                <AlertTitle className="text-[var(--foreground)]">
                   Respondents still see the old version
                 </AlertTitle>
-                <AlertDescription className="text-xs leading-relaxed">
+                <AlertDescription className="text-xs leading-5 text-[var(--editorial-body)]">
                   Publishing replaces the live form with your current draft.
                 </AlertDescription>
               </Alert>
             )}
 
             {state === "draft" ? (
-              <ul className="rounded-xl bg-muted/30 text-sm">
-                <li className="flex items-center gap-3 px-3.5 py-3">
-                  <Globe className="size-4 shrink-0 text-muted-foreground" />
-                  <span className="text-muted-foreground">
+              <ul className="overflow-hidden rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--card)] text-sm">
+                <li className="flex items-center gap-3 px-5 py-4">
+                  <Globe className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
+                  <span className="text-[var(--editorial-body)]">
                     Reachable at a public link
                   </span>
                 </li>
-                <li className="flex items-center gap-3 px-3.5 py-3">
-                  <Inbox className="size-4 shrink-0 text-muted-foreground" />
-                  <span className="text-muted-foreground">
+                <li className="flex items-center gap-3 border-t border-[var(--editorial-border-light)] px-5 py-4">
+                  <Inbox className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
+                  <span className="text-[var(--editorial-body)]">
                     Starts collecting responses
                   </span>
                 </li>
@@ -279,18 +295,18 @@ export function PublishDialog({
               <div className="space-y-2">
                 <Label
                   htmlFor="published-form-url"
-                  className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground"
+                  className="editorial-eyebrow text-[var(--editorial-subtle)]"
                 >
                   Public link
                 </Label>
-                <div className="flex items-center gap-1 rounded-xl border bg-muted/40 pl-3 transition-colors focus-within:border-ring/60 focus-within:bg-muted/60">
-                  <Globe className="size-4 shrink-0 text-muted-foreground" />
+                <div className="editorial-transition flex items-center gap-2 rounded-full border border-[var(--input)] bg-[var(--card)] pl-5 pr-2 focus-within:border-[var(--primary)]">
+                  <Globe className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
                   <input
                     id="published-form-url"
                     readOnly
                     value={publishedFormUrl}
                     onFocus={(event) => event.currentTarget.select()}
-                    className="min-w-0 flex-1 bg-transparent py-2.5 font-mono text-xs text-foreground outline-none"
+                    className="min-w-0 flex-1 bg-transparent py-3.5 font-mono text-xs text-[var(--foreground)] outline-none"
                   />
                   <CopyToClipboard text={publishedFormUrl} />
                 </div>
@@ -301,7 +317,7 @@ export function PublishDialog({
 
         <DialogFooter
           className={cn(
-            "mt-6 items-center border-t bg-muted/30 px-6 py-4",
+            "mt-10 items-center gap-3 border-t border-[var(--editorial-border-light)] bg-[var(--secondary)] px-10 py-6",
             !confirming && state !== "draft" && "justify-between",
           )}
         >
@@ -311,6 +327,7 @@ export function PublishDialog({
                 variant="ghost"
                 onClick={() => setConfirming(null)}
                 disabled={isBusy}
+                className={ghostButtonClass}
               >
                 Keep it
               </Button>
@@ -320,6 +337,7 @@ export function PublishDialog({
                   confirming === "unpublish" ? handleUnpublish : handleDiscard
                 }
                 disabled={isBusy}
+                className={destructiveButtonClass}
               >
                 {isBusy && <Loader2 className="animate-spin" />}
                 {isBusy ? "Working…" : confirmCopy?.action}
@@ -327,10 +345,19 @@ export function PublishDialog({
             </>
           ) : state === "draft" ? (
             <>
-              <Button variant="ghost" onClick={closeDialog} disabled={isBusy}>
+              <Button
+                variant="ghost"
+                onClick={closeDialog}
+                disabled={isBusy}
+                className={ghostButtonClass}
+              >
                 Cancel
               </Button>
-              <Button onClick={handlePublish} disabled={isBusy}>
+              <Button
+                onClick={handlePublish}
+                disabled={isBusy}
+                className={primaryButtonClass}
+              >
                 {busy === "publish" && <Loader2 className="animate-spin" />}
                 {busy === "publish" ? "Publishing…" : "Publish form"}
               </Button>
@@ -339,19 +366,28 @@ export function PublishDialog({
             <>
               <Button
                 variant="ghost"
-                className="text-muted-foreground hover:text-destructive"
+                className={cn(ghostButtonClass, "hover:text-[var(--destructive)]")}
                 onClick={() => setConfirming("discard")}
                 disabled={isBusy}
               >
                 <Undo2 />
                 Discard changes
               </Button>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={onOpenForm} disabled={isBusy}>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  onClick={onOpenForm}
+                  disabled={isBusy}
+                  className={secondaryButtonClass}
+                >
                   <ExternalLink />
                   Open form
                 </Button>
-                <Button onClick={handlePublish} disabled={isBusy}>
+                <Button
+                  onClick={handlePublish}
+                  disabled={isBusy}
+                  className={primaryButtonClass}
+                >
                   {busy === "publish" && <Loader2 className="animate-spin" />}
                   {busy === "publish" ? "Publishing…" : "Publish changes"}
                 </Button>
@@ -361,17 +397,26 @@ export function PublishDialog({
             <>
               <Button
                 variant="ghost"
-                className="text-muted-foreground hover:text-destructive"
+                className={cn(ghostButtonClass, "hover:text-[var(--destructive)]")}
                 onClick={() => setConfirming("unpublish")}
                 disabled={isBusy}
               >
                 Unpublish
               </Button>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" onClick={closeDialog} disabled={isBusy}>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  onClick={closeDialog}
+                  disabled={isBusy}
+                  className={ghostButtonClass}
+                >
                   Done
                 </Button>
-                <Button onClick={onOpenForm} disabled={isBusy}>
+                <Button
+                  onClick={onOpenForm}
+                  disabled={isBusy}
+                  className={primaryButtonClass}
+                >
                   <ExternalLink />
                   Open form
                 </Button>

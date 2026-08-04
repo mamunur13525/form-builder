@@ -21,11 +21,15 @@ export function SettingsSection({
     className?: string
 }) {
     return (
-        <div className={cn("space-y-3", className)}>
-            <div className="space-y-1">
-                <Label className="text-base font-semibold">{title}</Label>
+        <div className={cn("space-y-4", className)}>
+            <div className="space-y-1.5">
+                <Label className="text-base font-semibold text-[var(--foreground)]">
+                    {title}
+                </Label>
                 {description && (
-                    <p className="text-xs text-muted-foreground">{description}</p>
+                    <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                        {description}
+                    </p>
                 )}
             </div>
             {children}
@@ -51,10 +55,13 @@ export function ToggleRow({
 }) {
     return (
         <div className="space-y-1.5">
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-1.5">
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-2">
                     {icon}
-                    <Label htmlFor={id} className="text-base cursor-pointer">
+                    <Label
+                        htmlFor={id}
+                        className="cursor-pointer text-base text-[var(--editorial-body)]"
+                    >
                         {label}
                     </Label>
                 </div>
@@ -66,7 +73,9 @@ export function ToggleRow({
                 />
             </div>
             {description && (
-                <p className="text-xs text-muted-foreground">{description}</p>
+                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                    {description}
+                </p>
             )}
         </div>
     )
@@ -89,7 +98,7 @@ export function RequiredToggle({
             description={description}
             checked={checked}
             onCheckedChange={onCheckedChange}
-            icon={<Asterisk className="h-3.5 w-3.5 text-red-500" />}
+            icon={<Asterisk className="h-4 w-4 text-[var(--primary)]" />}
         />
     )
 }
@@ -113,8 +122,8 @@ export function NumberSetting({
     max?: number
 }) {
     return (
-        <div className="space-y-1">
-            <Label className="text-base text-muted-foreground">{label}</Label>
+        <div className="space-y-1.5">
+            <Label className="text-base text-[var(--editorial-body)]">{label}</Label>
             <Input
                 type="number"
                 value={value ?? ""}
@@ -129,9 +138,13 @@ export function NumberSetting({
                     onChange(Number(raw))
                 }}
                 placeholder={placeholder}
-                className="h-9 text-base"
+                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
             />
-            {description && <p className="text-xs text-muted-foreground">{description}</p>}
+            {description && (
+                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                    {description}
+                </p>
+            )}
         </div>
     )
 }
@@ -151,15 +164,19 @@ export function TextSetting({
     placeholder?: string
 }) {
     return (
-        <div className="space-y-1">
-            <Label className="text-base text-muted-foreground">{label}</Label>
+        <div className="space-y-1.5">
+            <Label className="text-base text-[var(--editorial-body)]">{label}</Label>
             <Input
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="h-9 text-base"
+                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
             />
-            {description && <p className="text-xs text-muted-foreground">{description}</p>}
+            {description && (
+                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                    {description}
+                </p>
+            )}
         </div>
     )
 }
@@ -202,25 +219,25 @@ export function CoverImageField({
                 }}
             />
             {value?.url ? (
-                <div className="space-y-2">
-                    <div className="relative overflow-hidden rounded-md border">
+                <div className="space-y-3">
+                    <div className="relative overflow-hidden rounded-[22px] border border-[var(--editorial-border-light)]">
                         <img
                             src={value.url}
                             alt={value.alt || "Cover"}
                             className="h-28 w-full object-cover"
                         />
                         {uploading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-background/60">
-                                <Loader2 className="h-5 w-5 animate-spin" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-[var(--card)]/70">
+                                <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                         <button
                             type="button"
                             onClick={() => inputRef.current?.click()}
                             disabled={uploading}
-                            className="flex-1 rounded-md border px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+                            className="editorial-transition flex-1 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
                         >
                             Replace
                         </button>
@@ -228,9 +245,9 @@ export function CoverImageField({
                             type="button"
                             onClick={() => onChange(null)}
                             disabled={uploading}
-                            className="flex items-center justify-center gap-1 rounded-md border px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                            className="editorial-transition flex items-center justify-center gap-1.5 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--destructive)] hover:-translate-y-0.5 hover:border-[var(--destructive)]/30 active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
                         >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4" />
                             Remove
                         </button>
                     </div>
@@ -240,10 +257,10 @@ export function CoverImageField({
                     type="button"
                     onClick={() => inputRef.current?.click()}
                     disabled={uploading}
-                    className="flex w-full flex-col items-center justify-center gap-1.5 rounded-md border border-dashed py-6 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-50"
+                    className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-[22px] border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-50"
                 >
                     {uploading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />
                     ) : (
                         <ImagePlus className="h-5 w-5" />
                     )}

@@ -105,36 +105,57 @@ export function FormDialog({
     }, [open, initialTitle, reset]);
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog
+            open={open}
+            onOpenChange={onOpenChange}
+            className="editorial editorial-shadow rounded-[30px] border-[var(--border)] bg-[var(--popover)] p-10"
+        >
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{isCreate ? "Create New Form" : "Rename Form"}</DialogTitle>
+                <DialogHeader className="mb-6">
+                    <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+                        {isCreate ? "Create New Form" : "Rename Form"}
+                    </DialogTitle>
                     {isCreate && (
-                        <DialogDescription>
+                        <DialogDescription className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
                             Give your form a name to get started.
                         </DialogDescription>
                     )}
                 </DialogHeader>
                 <form onSubmit={handleFormSubmit(onSubmit)}>
-                    <div className="space-y-4 py-2">
+                    <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="form-title">Form Name</Label>
+                            <Label
+                                htmlFor="form-title"
+                                className="editorial-eyebrow text-[var(--editorial-subtle)]"
+                            >
+                                Form Name
+                            </Label>
                             <Input
                                 id="form-title"
                                 placeholder={isCreate ? "e.g. Customer Feedback Survey" : "Enter form title"}
                                 autoFocus
+                                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--card)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
                                 {...register("title")}
                             />
                             {errors.title && (
-                                <p className="text-sm text-destructive">{errors.title.message}</p>
+                                <p className="text-sm text-[var(--destructive)]">{errors.title.message}</p>
                             )}
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    <DialogFooter className="mt-8 gap-3">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => onOpenChange(false)}
+                            className="editorial-transition h-[52px] rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                        >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isPending}>
+                        <Button
+                            type="submit"
+                            disabled={isPending}
+                            className="editorial-transition h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                        >
                             {isPending ? (isCreate ? "Creating..." : "Saving...") : isCreate ? "Create Form" : "Save"}
                             {isPending && <Spinner data-icon="inline-start" />}
                         </Button>

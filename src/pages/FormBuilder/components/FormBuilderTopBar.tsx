@@ -88,7 +88,7 @@ export function FormBuilderTopBar({
         </nav>
       </div>
 
-      <nav className="order-last flex w-full items-center gap-1 overflow-x-auto lg:order-none lg:w-auto lg:overflow-visible py-2">
+      <nav className="order-last flex w-full items-center gap-1 overflow-x-auto lg:order-none lg:w-auto lg:overflow-visible py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={label}

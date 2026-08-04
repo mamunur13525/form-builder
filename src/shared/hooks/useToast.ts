@@ -69,12 +69,12 @@ export function showSuccess(title: string, description?: string) {
 /**
  * Show an error toast with a user-friendly message.
  * Extracts the message from an ApiError or generic Error.
+ * The error is optional — omit it for a title-only toast.
  */
-export function showError(title: string, error: unknown) {
-    const message = getUserFriendlyMessage(error)
+export function showError(title: string, error?: unknown) {
     toast.add({
         title,
-        description: message,
+        description: error === undefined ? undefined : getUserFriendlyMessage(error),
         type: "error",
         timeout: 6000,
     })
@@ -123,9 +123,13 @@ export function useToast() {
     )
 
     const error = useCallback(
-        (title: string, err: unknown) => {
-            const message = getUserFriendlyMessage(err)
-            toastManager.add({ title, description: message, type: "error", timeout: 6000 })
+        (title: string, err?: unknown) => {
+            toastManager.add({
+                title,
+                description: err === undefined ? undefined : getUserFriendlyMessage(err),
+                type: "error",
+                timeout: 6000,
+            })
         },
         [toastManager],
     )

@@ -1,19 +1,16 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "../../components/ui/card";
 import { ROUTES } from "../../shared/constants/routes";
 import { useLogin } from "../../features/auth/hooks/useAuth";
 import { GoogleSignInButton } from "../../features/auth/components/GoogleSignInButton";
+import {
+  AuthCard,
+  AuthDivider,
+  AuthField,
+  AuthSwitchPrompt,
+  authSubmitClass,
+} from "../../features/auth/components/auth-primitives";
 import { showError, showSuccess } from "@/shared/hooks/useToast";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -40,64 +37,56 @@ export function LoginPage() {
   };
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-3xl text-center">Sign in</CardTitle>
-        <CardDescription className="text-base text-center">
-          Enter your credentials to access your account
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-base">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-base">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-3">
-          <Button type="submit" className="w-full" disabled={login.isPending}>
-            {login.isPending ? "Signing in..." : "Sign in"}
+    <AuthCard
+      eyebrow="Welcome back"
+      title="Sign in"
+      description="Enter your credentials to pick up where you left off."
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <AuthField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          placeholder="m@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <AuthField
+          id="password"
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <div className="space-y-4 pt-1">
+          <Button
+            type="submit"
+            className={authSubmitClass}
+            disabled={login.isPending}
+          >
             {login.isPending && <Spinner data-icon="inline-start" />}
+            {login.isPending ? "Signing in..." : "Sign in"}
           </Button>
-          <div className="relative w-full">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-sm uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
+
+          <AuthDivider label="Or continue with" />
+
+          <div className="flex justify-center">
+            <GoogleSignInButton />
           </div>
-          <GoogleSignInButton />
-          <p className="text-center text-base text-muted-foreground">
-            Don't have an account?{" "}
-            <Link
-              to={ROUTES.SIGNUP}
-              className="font-medium text-primary hover:underline"
-            >
-              Sign up
-            </Link>
-          </p>
-        </CardFooter>
+
+          <AuthSwitchPrompt
+            prompt="Don't have an account?"
+            linkLabel="Sign up"
+            to={ROUTES.SIGNUP}
+          />
+        </div>
       </form>
-    </Card>
+    </AuthCard>
   );
 }

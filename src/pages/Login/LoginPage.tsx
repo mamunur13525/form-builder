@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { ROUTES } from "../../shared/constants/routes";
 import { useLogin } from "../../features/auth/hooks/useAuth";
@@ -63,6 +63,15 @@ export function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
+        <div className="text-right">
+          <Link
+            to={ROUTES.FORGOT_PASSWORD}
+            className="text-sm text-[var(--editorial-body)] hover:text-[var(--foreground)] transition-colors"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         <div className="space-y-4 pt-1">
           <Button

@@ -1,11 +1,19 @@
 /**
+ * Field-level validation error returned inside a 422 response.
+ */
+export interface ApiFieldError {
+    field: string
+    message: string
+}
+
+/**
  * API response envelope returned by every backend endpoint.
  */
 export interface ApiResponse<T = unknown> {
     success: boolean
     message: string
     data: T | null
-    errors?: string[]
+    errors?: ApiFieldError[]
 }
 
 /**
@@ -14,7 +22,7 @@ export interface ApiResponse<T = unknown> {
 export interface ApiErrorResponse {
     success: false
     message: string
-    errors?: string[]
+    errors?: ApiFieldError[]
 }
 
 /**
@@ -23,12 +31,12 @@ export interface ApiErrorResponse {
  */
 export class ApiError extends Error {
     public status: number
-    public errors?: string[]
+    public errors?: ApiFieldError[]
 
     constructor(
         message: string,
         status: number,
-        errors?: string[],
+        errors?: ApiFieldError[],
     ) {
         super(message)
         this.name = "ApiError"
@@ -36,9 +44,27 @@ export class ApiError extends Error {
         this.errors = errors
     }
 
+    /**
+     * Field errors keyed by field name — ready for `react-hook-form`'s `setError`
+     * or for driving inline messages on controlled inputs.
+     */
+    get byField(): Record<string, string> {
+        return Object.fromEntries((this.errors ?? []).map((e) => [e.field, e.message]))
+    }
+
     /** Convenience: is this a 401 Unauthorized error? */
     isUnauthorized(): boolean {
         return this.status === 401
+    }
+
+    /** Convenience: did the backend reject this as a validation failure? */
+    isValidationError(): boolean {
+        return this.status === 422
+    }
+
+    /** Convenience: is the caller being rate limited (10 req / 15 min on auth routes)? */
+    isRateLimited(): boolean {
+        return this.status === 429
     }
 
     /** Convenience: is this a network error (status 0)? */

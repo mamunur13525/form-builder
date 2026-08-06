@@ -1,6 +1,8 @@
 export const ROUTES = {
     HOME: "/",
     LOGIN: "/login",
+    SIGNUP: "/signup",
+    FORGOT_PASSWORD: "/forgot-password",
     DASHBOARD: "/dashboard",
     FORMS: "/forms",
     TEMPLATES: "/templates",
@@ -15,5 +17,4 @@ export const ROUTES = {
     FORM_RESPONSE_ANALYTICS: "/form-response/:formId/analytics",
     FORM_PREVIEW: "/form-preview/:formId",
     FORM_FILL: "/form/:slug",
-    SIGNUP: "/signup",
 } as const

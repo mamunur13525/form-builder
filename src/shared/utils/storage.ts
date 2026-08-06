@@ -1,32 +1,28 @@
 /**
- * Minimal localStorage wrapper for auth tokens.
- * Centralises key names and JSON (de)serialisation so that
- * no other module touches localStorage directly.
+ * Token storage wrapper using Zustand store.
+ * Centralizes token management with reactive state.
  */
 
-const ACCESS_TOKEN_KEY = "accessToken"
-const REFRESH_TOKEN_KEY = "refreshToken"
+import { useAuthStore } from "@/shared/stores/authStore"
 
 export const tokenStorage = {
     getAccessToken(): string | null {
-        return localStorage.getItem(ACCESS_TOKEN_KEY)
+        return useAuthStore.getState().getAccessToken()
     },
 
     getRefreshToken(): string | null {
-        return localStorage.getItem(REFRESH_TOKEN_KEY)
+        return useAuthStore.getState().getRefreshToken()
     },
 
     setTokens(accessToken: string, refreshToken: string): void {
-        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
-        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+        useAuthStore.getState().setTokens(accessToken, refreshToken)
     },
 
     setAccessToken(accessToken: string): void {
-        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+        useAuthStore.getState().setAccessToken(accessToken)
     },
 
     clearTokens(): void {
-        localStorage.removeItem(ACCESS_TOKEN_KEY)
-        localStorage.removeItem(REFRESH_TOKEN_KEY)
+        useAuthStore.getState().clearTokens()
     },
 }

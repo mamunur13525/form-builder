@@ -81,7 +81,7 @@ export function PageContentEditor({
       <div className={cn("w-full min-h-0 overflow-y-auto")}>
         <div
           className={cn(
-            "mx-auto transition-all duration-500 ease-out px-2 py-8 sm:px-6 sm:py-12",
+            "mx-auto transition-all duration-500 ease-out pl-5 pr-2 py-8 sm:px-6 sm:py-12",
             isMobileView ? "w-full" : "w-full sm:w-11/12",
           )}
         >

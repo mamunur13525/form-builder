@@ -66,16 +66,13 @@ export function FormPreviewDialog({
               </TooltipTrigger>
               <TooltipContent>Exit</TooltipContent>
             </Tooltip>
-
-
-
             <Tooltip>
               <TooltipTrigger render={<span />}>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsMobileView((prev) => !prev)}
-                  className="h-12 -12"
+                  className="h-12 -12 hidden sm:block"
                 >
                   {isMobileView ? (
                     <Monitor className="h-5! w-5!" />

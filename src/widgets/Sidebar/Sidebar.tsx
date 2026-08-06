@@ -80,7 +80,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
             <aside
                 className={cn(
-                    "editorial fixed left-0 top-0 z-40 flex h-dvh w-[20rem] max-w-[85vw] flex-col bg-[var(--editorial-canvas)] p-4",
+                    "editorial fixed left-0 top-0 z-40 flex h-dvh w-[20rem] max-w-[85vw] flex-col bg-transparent p-2",
                     "transition-transform duration-250 ease-out lg:translate-x-0",
                     open ? "translate-x-0" : "-translate-x-full",
                 )}

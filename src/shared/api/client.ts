@@ -186,7 +186,7 @@ async function tryRefreshToken(): Promise<boolean> {
                 return false
             }
 
-            const body: ApiResponse<{ tokens: { accessToken: string; refreshToken: string } }> =
+            const body: ApiResponse<{ accessToken: string; refreshToken: string }> =
                 await response.json()
 
             if (!body.success || !body.data) {
@@ -194,7 +194,7 @@ async function tryRefreshToken(): Promise<boolean> {
                 return false
             }
 
-            tokenStorage.setTokens(body.data.tokens.accessToken, body.data.tokens.refreshToken)
+            tokenStorage.setTokens(body.data.accessToken, body.data.refreshToken)
             return true
         } catch {
             tokenStorage.clearTokens()

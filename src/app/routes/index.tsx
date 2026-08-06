@@ -5,6 +5,7 @@ import { AuthLayout } from "../layouts/AuthLayout"
 import { HomePage } from "../../pages/Home"
 import { LoginPage } from "../../pages/Login"
 import { SignupPage } from "../../pages/Signup"
+import { ForgotPasswordPage } from "../../pages/ForgotPassword"
 import { DashboardPage } from "../../pages/Dashboard"
 import { FormsPage } from "../../pages/Forms"
 import { TemplatesPage } from "../../pages/Templates"
@@ -20,6 +21,7 @@ import { FormSharePage } from "../../pages/FormShare/FormSharePage"
 import { FormFillPage } from "../../pages/FormFill"
 import { FormLayout } from "../layouts/FormLayout"
 import { ROUTES } from "@/shared/constants/routes"
+import { tokenStorage } from "@/shared/utils/storage"
 
 function AppShell() {
     return (
@@ -30,6 +32,12 @@ function AppShell() {
 }
 
 function ProtectedLayout() {
+    const hasToken = !!tokenStorage.getAccessToken()
+    
+    if (!hasToken) {
+        return <Navigate to={ROUTES.LOGIN} replace />
+    }
+    
     return (
         <MainLayout>
             <Outlet />
@@ -55,6 +63,7 @@ export const router = createBrowserRouter([
                 children: [
                     { path: ROUTES.LOGIN, element: <LoginPage /> },
                     { path: ROUTES.SIGNUP, element: <SignupPage /> },
+                    { path: ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
                 ],
             },
             {

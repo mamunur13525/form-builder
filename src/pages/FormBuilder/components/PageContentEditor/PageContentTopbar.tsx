@@ -49,7 +49,7 @@ const leftButtons: LeftButton[] = [
 ];
 
 const iconButtonClass =
-  "editorial-transition h-10 w-10 shrink-0 rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:translate-y-0 active:scale-[.98] sm:h-11 sm:w-11";
+  "editorial-transition h-10 w-10 shrink-0 rounded-2xl border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:translate-y-0 active:scale-[.98] sm:h-11 sm:w-11";
 
 const PageContentTopbar = ({
   onAddPage,

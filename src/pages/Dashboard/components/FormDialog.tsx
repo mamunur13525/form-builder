@@ -134,7 +134,7 @@ export function FormDialog({
                                 id="form-title"
                                 placeholder={isCreate ? "e.g. Customer Feedback Survey" : "Enter form title"}
                                 autoFocus
-                                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--card)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
+                                className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--card)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
                                 {...register("title")}
                             />
                             {errors.title && (

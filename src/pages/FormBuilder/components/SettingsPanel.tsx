@@ -352,7 +352,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                         value={page.validation?.message ?? ""}
                         onChange={(e) => patchValidation({ message: e.target.value })}
                         placeholder="This field is required"
-                        className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                        className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                     />
                     <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                         Shown to respondents when this field fails validation.
@@ -406,8 +406,8 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                 })
                             }}
                         >
-                            <SelectTrigger className="h-[52px] w-full rounded-full border-[var(--input)] bg-[var(--secondary)] text-base">
-                                <SelectValue placeholder="Select width" />
+                            <SelectTrigger className="h-[52px] w-full rounded-2xl border-[var(--input)] bg-[var(--secondary)] text-base">
+                                <SelectValue className={'rounded'} placeholder="Select width" />
                             </SelectTrigger>
                             <SelectContent className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)]">
                                 <SelectItem value="full" className="rounded-[12px]">
@@ -432,7 +432,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                 })
                             }
                             placeholder="Submit"
-                            className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                            className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                         />
                     </div>
                     <div className="space-y-1.5">
@@ -450,7 +450,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                         },
                                     })
                                 }
-                                className="h-[52px] w-[52px] cursor-pointer rounded-full border border-[var(--input)] bg-[var(--secondary)] p-1"
+                                className="h-[52px] w-[52px] cursor-pointer rounded-lg border border-[var(--input)] bg-[var(--secondary)] p-1"
                             />
                             <Input
                                 type="text"
@@ -464,7 +464,7 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                                     })
                                 }
                                 placeholder="#000000"
-                                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                                className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                             />
                         </div>
                     </div>

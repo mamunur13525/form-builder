@@ -82,7 +82,7 @@ export function AddPageDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="editorial editorial-shadow w-full max-w-3xl -translate-y-30 rounded-[30px] border-[var(--border)] bg-[var(--popover)] p-10"
+            className="editorial editorial-shadow w-full max-w-3xl md:-translate-y-30 rounded-[30px] border-[var(--border)] bg-[var(--popover)] p-10"
         >
             <DialogContent>
                 <DialogHeader className="mb-6">
@@ -105,10 +105,9 @@ export function AddPageDialog({
                         autoFocus={true}
                     />
                 </div>
-
                 <div
                     key="page-types-grid"
-                    className="grid max-h-[45vh] min-h-32 grid-cols-3 gap-3 overflow-y-auto"
+                    className="grid max-h-[45vh] min-h-32 grid-cols-1 sm:grid-cols-3 gap-3 overflow-y-auto py-2"
                 >
                     {filteredPageTypes.length > 0 ? (
                         filteredPageTypes.map((pt) => {

@@ -138,7 +138,7 @@ export function NumberSetting({
                     onChange(Number(raw))
                 }}
                 placeholder={placeholder}
-                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
             />
             {description && (
                 <p className="text-xs leading-5 text-[var(--editorial-subtle)]">

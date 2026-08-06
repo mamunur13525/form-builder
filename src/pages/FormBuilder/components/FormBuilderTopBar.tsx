@@ -65,7 +65,7 @@ export function FormBuilderTopBar({
 
 
   return (
-    <div className="bg-white editorial flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#EEE7E0] bg-[var(--editorial-canvas)] px-3 py-2 lg:h-[72px] lg:flex-nowrap lg:gap-0 lg:px-8 lg:py-0">
+    <div className="bg-white editorial flex shrink-0 items-center justify-between border-b border-[#EEE7E0] bg-[var(--editorial-canvas)] px-3 py-2 lg:h-[72px] lg:flex-nowrap lg:gap-0 lg:px-8 lg:py-0">
       <div className="flex min-w-0 items-center gap-2">
         <nav className="flex min-w-0 items-center gap-2 text-sm">
           <button
@@ -109,7 +109,7 @@ export function FormBuilderTopBar({
       <div className="flex items-center gap-2 lg:gap-3">
         <span
           className={cn(
-            "hidden w-20 items-center gap-1.5 text-xs text-[var(--editorial-subtle)] transition-opacity duration-250 ease-out sm:flex",
+            "w-16 items-center gap-1.5 text-xs text-[var(--editorial-subtle)] transition-opacity duration-250 ease-out flex",
             saveStatus !== "idle" ? "opacity-100" : "opacity-0",
           )}
         >

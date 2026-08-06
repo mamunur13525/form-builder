@@ -123,7 +123,8 @@ export function useDuplicateForm() {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: duplicateForm,
+        mutationFn: ({ formId, title }: { formId: string; title: string }) =>
+            duplicateForm(formId, title),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: FORMS_QUERY_KEY })
         },

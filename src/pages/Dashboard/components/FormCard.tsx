@@ -11,18 +11,72 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import type { Form } from "@/entities/form/model/types";
+import type { ComponentProps } from "react";
 
 interface FormCardProps {
   form: Form;
   onDeleteClick: (formId: string) => void;
+  onDuplicateClick: (formId: string) => void;
 }
 
-export function FormCard({ form, onDeleteClick }: FormCardProps) {
+type MenuItemData =
+  | {
+      label: string;
+      icon: React.ForwardRefExoticComponent<
+        React.PropsWithRef<React.SVGProps<SVGSVGElement>>
+      >;
+      onClick: () => void;
+      variant?: ComponentProps<typeof DropdownMenuItem>["variant"];
+    }
+  | { isSeparator: true };
+
+export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProps) {
   const navigate = useNavigate();
+
+  const menuItems: MenuItemData[] = [
+    {
+      label: "View Responses",
+      icon: BarChart3,
+      onClick: () =>
+        navigate(`/form-response/6a74af911e8b59bb1c8c4152/submissions`),
+    },
+    {
+      label: "Form Analytics",
+      icon: BarChart3,
+      onClick: () => navigate(`/form-response/${form.id}/analytics`),
+    },
+    {
+      label: "Form Settings",
+      icon: FileText,
+      onClick: () => navigate(`/form-settings/${form.id}`),
+    },
+    {
+      label: "Form Share",
+      icon: Eye,
+      onClick: () => navigate(`/form-share/${form.id}`),
+    },
+    {
+      label: "Form Integrations",
+      icon: FileText,
+      onClick: () => navigate(`/form-integrate/${form.id}`),
+    },
+    { isSeparator: true },
+    {
+      label: "Duplicate Form",
+      icon: FileText,
+      onClick: () => onDuplicateClick(form.id),
+    },
+    {
+      label: "Delete Form",
+      icon: FileText,
+      variant: "destructive" as const,
+      onClick: () => onDeleteClick(form.id),
+    },
+  ];
 
   return (
     <Card
-      className="editorial editorial-transition editorial-shadow-sm cursor-pointer rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)]"
+      className="editorial editorial-transition editorial-shadow-sm cursor-pointer rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)] flex flex-col justify-between"
       onClick={() => navigate(`/form-builder/${form.id}`)}
     >
       <CardHeader className="p-0">
@@ -41,7 +95,7 @@ export function FormCard({ form, onDeleteClick }: FormCardProps) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="flex items-center justify-between p-0 pt-6">
+      <CardContent className="flex items-end justify-between p-0 pt-6">
         <div className="flex gap-2 text-sm text-[var(--editorial-body)]">
           <span>{form.fields?.length || 0} pages</span>
           <span className="text-[var(--editorial-disabled)]">•</span>
@@ -64,75 +118,32 @@ export function FormCard({ form, onDeleteClick }: FormCardProps) {
           <DropdownMenuContent
             align="end"
             className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)] p-2"
+            onClick={(e) => e.stopPropagation()}
           >
-            <DropdownMenuItem
-              className="rounded-[12px] px-3 py-2"
-              onClick={() => navigate(`/form-response/${form.id}/submissions`)}
-            >
-              <BarChart3 className="h-4 w-4" />
-              <span>View Responses</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="rounded-[12px] px-3 py-2"
-              onClick={() => navigate(`/form-response/${form.id}/analytics`)}
-            >
-              <BarChart3 className="h-4 w-4" />
-              <span>Form Analytics</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="rounded-[12px] px-3 py-2"
-              onClick={() => navigate(`/form-settings/${form.id}`)}
-            >
-              <FileText className="h-4 w-4" />
-              <span>Form Settings</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="rounded-[12px] px-3 py-2"
-              onClick={() => navigate(`/form-share/${form.id}`)}
-            >
-              <Eye className="h-4 w-4" />
-              <span>Form Share</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="rounded-[12px] px-3 py-2"
-              onClick={() => navigate(`/form-integrate/${form.id}`)}
-            >
-              <FileText className="h-4 w-4" />
-              <span>Form Integrations</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
-            <DropdownMenuItem className="rounded-[12px] px-3 py-2">
-              <FileText className="h-4 w-4" />
-              <span>Duplicate Form</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-[12px] px-3 py-2">
-              <BarChart3 className="h-4 w-4" />
-              <span>Resubmissions</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-[12px] px-3 py-2">
-              <Eye className="h-4 w-4" />
-              <span>Theme</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-[12px] px-3 py-2">
-              <Eye className="h-4 w-4" />
-              <span>Translations</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-[12px] px-3 py-2">
-              <FileText className="h-4 w-4" />
-              <span>Export Responses</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
-            <DropdownMenuItem
-              variant="destructive"
-              className="rounded-[12px] px-3 py-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteClick(form.id);
-              }}
-            >
-              <FileText className="h-4 w-4" />
-              <span>Delete Form</span>
-            </DropdownMenuItem>
+            {menuItems.map((item, index) => {
+              if ("isSeparator" in item) {
+                return (
+                  <DropdownMenuSeparator
+                    key={index}
+                    className="bg-[var(--editorial-border-light)]"
+                  />
+                );
+              }
+
+              const Icon = item.icon;
+
+              return (
+                <DropdownMenuItem
+                  key={index}
+                  className="rounded-[12px] px-3 py-2"
+                  variant={item.variant}
+                  onClick={item.onClick}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </DropdownMenuItem>
+              );
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
       </CardContent>

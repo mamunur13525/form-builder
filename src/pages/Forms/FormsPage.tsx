@@ -7,6 +7,7 @@ import { useForms } from "@/features/forms/hooks/useForms"
 import { FormCard } from "@/pages/Dashboard/components/FormCard"
 import { FormDialog } from "@/pages/Dashboard/components/FormDialog"
 import { DeleteFormDialog } from "@/pages/Dashboard/components/DeleteFormDialog"
+import { DuplicateFormDialog } from "@/pages/Dashboard/components/DuplicateFormDialog"
 import type { FormStatus } from "@/entities/form/model/types"
 import { cn } from "@/lib/utils"
 
@@ -26,6 +27,8 @@ export function FormsPage() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false)
     const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
     const [formToDelete, setFormToDelete] = useState<string | null>(null)
+    const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false)
+    const [formToDuplicate, setFormToDuplicate] = useState<{ id: string; title: string } | null>(null)
 
     const visibleForms = useMemo(() => {
         const term = query.trim().toLowerCase()
@@ -122,6 +125,11 @@ export function FormsPage() {
                                 setFormToDelete(formId)
                                 setDeleteAlertOpen(true)
                             }}
+                            onDuplicateClick={(formId) => {
+                                const form = forms.find((f) => f.id === formId)
+                                setFormToDuplicate({ id: formId, title: form?.title || "" })
+                                setDuplicateDialogOpen(true)
+                            }}
                         />
                     ))}
                 </div>
@@ -138,6 +146,13 @@ export function FormsPage() {
                 formTitle={forms.find((form) => form.id === formToDelete)?.title || ""}
                 open={deleteAlertOpen}
                 onOpenChange={setDeleteAlertOpen}
+            />
+
+            <DuplicateFormDialog
+                formId={formToDuplicate?.id || ""}
+                formTitle={formToDuplicate?.title+' copy' || ""}
+                open={duplicateDialogOpen}
+                onOpenChange={setDuplicateDialogOpen}
             />
         </div>
     )

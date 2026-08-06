@@ -55,19 +55,35 @@ export function SortablePageItem({
     FIELD_TYPE_ICONS[page.type as keyof typeof FIELD_TYPE_ICONS] || FileText;
 
   const isActive = isDragged || isLifted;
+  const { style: itemStyle, ...restItemProps } = itemProps;
+
+  // CRITICAL FIX FOR DRAG LAG:
+  // react-movable sets inline `transform: translate3d(...)` on every mousemove.
+  // If `editorial-transition` (or any CSS transition rule) is active on `transform`,
+  // the browser animates every single pixel movement over 250ms, causing massive drag lag.
+  // Disabling CSS transitions during drag guarantees 1:1 real-time 60-120fps tracking.
+  const combinedStyle: React.CSSProperties = {
+    ...itemStyle,
+    willChange: isDragged ? "transform" : undefined,
+    zIndex: isDragged ? 9999 : undefined,
+    transition: isDragged ? "none" : itemStyle?.transition,
+  };
 
   return (
     <div
-      {...itemProps}
+      {...restItemProps}
+      style={combinedStyle}
       onClick={() => onSelect(index)}
       className={`
-        editorial-transition group relative flex items-center gap-3 rounded-[18px] border px-4 py-3.5
-        text-sm cursor-pointer
+        group relative flex items-center gap-3 rounded-[18px] border px-4 py-3.5 text-sm cursor-pointer select-none
+        ${!isDragged ? "editorial-transition" : ""}
         ${isSelected
           ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--foreground)]"
-          : "border-transparent text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
+          : "border-transparent text-[var(--editorial-body)] hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
         }
-        ${isActive ? "border-[var(--editorial-primary-ring)] bg-[var(--card)] shadow-[0_12px_40px_rgba(90,70,50,.06)]" : ""}
+        ${!isDragged && !isSelected ? "hover:-translate-y-0.5" : ""}
+        ${isDragged ? "border-[var(--editorial-primary-ring)] bg-[var(--card)] shadow-[0_20px_50px_rgba(0,0,0,0.12)] scale-[1.02] cursor-grabbing" : ""}
+        ${isLifted ? "border-[var(--editorial-primary-ring)] bg-[var(--card)] shadow-[0_12px_40px_rgba(90,70,50,.06)]" : ""}
       `}
     >
       {/* Drag handle — dragging only starts from here, so clicks still select */}
@@ -77,8 +93,9 @@ export function SortablePageItem({
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={`
-          editorial-transition -ml-2 flex w-4 shrink-0 items-center justify-center rounded
-          text-[var(--editorial-disabled)]
+          -ml-2 flex w-4 shrink-0 items-center justify-center rounded
+          text-[var(--editorial-disabled)] touch-none select-none
+          ${!isDragged ? "editorial-transition" : ""}
           ${isDragged ? "cursor-grabbing" : "cursor-grab"}
           ${isSelected || isActive ? "opacity-80" : "opacity-0 group-hover:opacity-100"}
         `}

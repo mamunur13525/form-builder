@@ -108,11 +108,12 @@ export function FormBuilderSidebar({
       <List
         values={pages}
         onChange={({ oldIndex, newIndex }) => movePage(oldIndex, newIndex)}
+        transitionDuration={150}
         lockVertically
         renderList={({ children, props }) => (
           <div
             {...props}
-            className="flex-1 space-y-2 overflow-y-auto overflow-x-hidden px-4 py-4"
+            className="flex-1 space-y-2 overflow-y-auto overflow-x-hidden px-4 py-4 select-none"
           >
             {children}
           </div>

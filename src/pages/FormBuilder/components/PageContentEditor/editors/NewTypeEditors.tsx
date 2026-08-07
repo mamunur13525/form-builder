@@ -16,6 +16,8 @@ interface EditorProps {
     page: FormField
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormField>) => void
+    color?: string
+    fontSizeClass?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -45,7 +47,7 @@ export function StatementEditor({ page }: EditorProps) {
 // Dropdown — same option list editing as Select.
 // ---------------------------------------------------------------------------
 
-export function DropdownEditor({ page, pageIndex, onUpdate }: EditorProps) {
+export function DropdownEditor({ page, pageIndex, onUpdate, color }: EditorProps) {
     return (
         <div className="space-y-3">
             <div className="space-y-2">
@@ -64,6 +66,7 @@ export function DropdownEditor({ page, pageIndex, onUpdate }: EditorProps) {
                             }}
                             placeholder="Option label"
                             className="flex-1"
+                            style={color ? { color } : undefined}
                         />
                         <Button
                             variant="ghost"
@@ -100,7 +103,7 @@ export function DropdownEditor({ page, pageIndex, onUpdate }: EditorProps) {
 // Address — preview of the configured sub-fields.
 // ---------------------------------------------------------------------------
 
-export function AddressEditor({ page }: EditorProps) {
+export function AddressEditor({ page, color, fontSizeClass }: EditorProps) {
     const fields = page.settings?.address?.fields ?? []
 
     if (fields.length === 0) {
@@ -111,7 +114,7 @@ export function AddressEditor({ page }: EditorProps) {
         )
     }
 
-    return <AddressField fields={fields} disabled />
+    return <AddressField fields={fields} disabled color={color} fontSizeClass={fontSizeClass} />
 }
 
 // ---------------------------------------------------------------------------

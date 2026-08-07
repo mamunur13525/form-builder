@@ -14,6 +14,8 @@ interface ChoiceFieldProps {
     multiple: boolean
     name: string
     disabled?: boolean
+    color?: string
+    fontSizeClass?: string
 }
 
 // Literal class strings so Tailwind keeps them at build time.
@@ -51,6 +53,8 @@ export function ChoiceField({
     multiple,
     name,
     disabled,
+    color,
+    fontSizeClass,
 }: ChoiceFieldProps) {
     const { allowOther, otherLabel, horizontalAlign, optionsPerRow, hideLabels } = settings
     const knownValues = options.map((o) => o.value)
@@ -60,11 +64,11 @@ export function ChoiceField({
         ? Array.isArray(value)
             ? value
             : value
-              ? [value]
-              : []
+                ? [value]
+                : []
         : typeof value === "string" && value
-          ? [value]
-          : []
+            ? [value]
+            : []
 
     // Split the answer into known option values and the "Other" answer.
     const base = raw.filter((v) => knownValues.includes(v))
@@ -165,7 +169,14 @@ export function ChoiceField({
                                 disabled={disabled || blocked}
                                 className="h-4 w-4 shrink-0 accent-primary"
                             />
-                            {!hideLabels && <span className="text-sm">{opt.label}</span>}
+                            {!hideLabels && (
+                                <span
+                                    className={cn("text-sm", fontSizeClass)}
+                                    style={color ? { color } : undefined}
+                                >
+                                    {opt.label}
+                                </span>
+                            )}
                         </label>
                     )
                 })}
@@ -179,7 +190,11 @@ export function ChoiceField({
                     disabled={disabled}
                     placeholder={`${otherLabel || "Other"}...`}
                     onChange={(e) => changeOtherText(e.target.value)}
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className={cn(
+                        "h-10 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        fontSizeClass,
+                    )}
+                    style={color ? { color } : undefined}
                 />
             )}
 
@@ -188,9 +203,8 @@ export function ChoiceField({
                 <p className="text-xs text-muted-foreground">
                     {settings.selectionLimit.mode === "exact"
                         ? `Select exactly ${settings.selectionLimit.exact} option(s).`
-                        : `Select between ${settings.selectionLimit.min ?? 0} and ${
-                              settings.selectionLimit.max ?? 0
-                          } option(s).`}
+                        : `Select between ${settings.selectionLimit.min ?? 0} and ${settings.selectionLimit.max ?? 0
+                        } option(s).`}
                 </p>
             )}
         </div>

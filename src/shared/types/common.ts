@@ -27,11 +27,42 @@ export interface Appearance {
     submitButtonColor?: string
 }
 
-export interface Theme {
-    primaryColor: string
-    backgroundColor: string
-    textColor: string
+export type ContentAlignment = "left" | "center" | "right"
+export type FontSize = "small" | "medium" | "large"
+export type CornerRadius = "none" | "small" | "medium" | "large" | "full"
+export type ThemeFontSource = "google" | "system" | "custom"
+
+export interface IThemeBackgroundImage {
+    url: string
+    fileId?: string
+    alt?: string
+    brightness?: number
+    tile?: boolean
 }
+
+export interface IThemeFont {
+    family: string
+    source: ThemeFontSource
+    url?: string
+}
+
+export interface IFormTheme {
+    primaryColor?: string
+    backgroundColor?: string
+    textColor?: string
+    questionColor?: string
+    answerColor?: string
+    buttonColor?: string
+    buttonTextColor?: string
+    alignment?: ContentAlignment
+    fontSize?: FontSize
+    roundCorners?: CornerRadius
+    backgroundImage?: IThemeBackgroundImage | null
+    font?: IThemeFont
+}
+
+export type Theme = IFormTheme
+
 
 export interface FormSettings {
     oneQuestionAtATime: boolean

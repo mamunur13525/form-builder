@@ -1,11 +1,17 @@
+import { cn } from "@/lib/utils"
+
 interface FieldLabelProps {
     label: string
     pageNumber?: number
     editable?: boolean
     onUpdate?: (label: string) => void
+    color?: string
+    fontSizeClass?: string
 }
 
-export function FieldLabel({ label, pageNumber, editable, onUpdate }: FieldLabelProps) {
+export function FieldLabel({ label, pageNumber, editable, onUpdate, color, fontSizeClass }: FieldLabelProps) {
+    const sizeClass = fontSizeClass || "text-[26px]"
+
     if (editable) {
         return (
             <div className="relative space-y-1">
@@ -18,7 +24,8 @@ export function FieldLabel({ label, pageNumber, editable, onUpdate }: FieldLabel
                     contentEditable
                     suppressContentEditableWarning
                     data-placeholder="Type your question... Use @ to recall information."
-                    className="text-[26px] outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text"
+                    className={cn(sizeClass, "outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text font-semibold")}
+                    style={color ? { color } : undefined}
                     onBlur={(e) =>
                         onUpdate?.(e.currentTarget.textContent || "")
                     }
@@ -35,7 +42,10 @@ export function FieldLabel({ label, pageNumber, editable, onUpdate }: FieldLabel
                     {pageNumber}
                 </span>
             )}
-            <h2 className="text-[26px] outline-none border-b border-transparent pb-1">
+            <h2
+                className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-semibold")}
+                style={color ? { color } : undefined}
+            >
                 {label}
             </h2>
         </div>

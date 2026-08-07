@@ -1,5 +1,5 @@
 import React from "react"
-import { Settings2, Plus, Palette, Workflow } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
@@ -17,18 +17,24 @@ import {
     TabsContent,
 } from "../../../components/ui/tabs"
 import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from "../../../components/ui/sheet"
+import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
 } from "../../../components/ui/dialog"
-import { Drawer } from "../../../components/ui/drawer"
 import { DesignDrawer } from "./settings/DesignDrawer"
 import { FIELD_TYPE_LABELS } from "../../../shared/constants/form-types"
 import type {
     ChoiceSettings,
     FieldSettings,
     FormField,
+    IFormTheme,
     Validation,
 } from "../../../shared/types/common"
 import {
@@ -69,11 +75,25 @@ interface SettingsPanelProps {
     page: FormField
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormField>) => void
+    theme?: IFormTheme | null
+    designDrawerOpen: boolean
+    onOpenDesignDrawer: () => void
+    onCloseDesignDrawer: () => void
+    onSaveTheme: (theme: IFormTheme) => Promise<void>
 }
 
-export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps) {
+export function SettingsPanel({
+    page,
+    pageIndex,
+    onUpdate,
+    theme,
+    designDrawerOpen,
+    onOpenDesignDrawer,
+    onCloseDesignDrawer,
+    onSaveTheme
+}: SettingsPanelProps) {
     const [logicDialogOpen, setLogicDialogOpen] = React.useState(false)
-    const [designDrawerOpen, setDesignDrawerOpen] = React.useState(false)
+    const hasChangesRef = React.useRef(false)
     const settings = page.settings ?? {}
 
     /** Merge a single settings group, preserving the rest. */
@@ -119,21 +139,14 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
     return (
         <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
             <div className="flex flex-col border-b border-[var(--editorial-border-light)]">
-                <div className="flex items-center gap-2 px-6 py-5">
-                    <Settings2 className="h-5 w-5 text-[var(--editorial-subtle)]" />
-                    <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                        Settings
-                    </h3>
-                </div>
-
                 <div className="flex-1 overflow-y-auto">
                     <Tabs defaultValue="settings" className="flex h-full flex-col">
-                        <TabsList variant="line" className="w-full justify-start px-6 pt-2">
+                        <TabsList variant="line" className="w-full justify-start px-6 pt-2 mt-3">
                             <TabsTrigger value="settings" className="flex-1">Settings</TabsTrigger>
-                            <TabsTrigger value="design" className="flex-1" onClick={() => setDesignDrawerOpen(true)}>Design</TabsTrigger>
+                            <TabsTrigger value="design" className="flex-1" onClick={onOpenDesignDrawer}>Design</TabsTrigger>
                             <TabsTrigger value="logic" className="flex-1" onClick={() => setLogicDialogOpen(true)}>Logic</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="settings" className="h-full">
+                        <TabsContent value="settings" className="h-full overflow-y-auto">
                             <div className="space-y-8 px-6 py-6">
                                 {/* Field type — always available */}
                                 <div className="space-y-2">
@@ -411,15 +424,43 @@ export function SettingsPanel({ page, pageIndex, onUpdate }: SettingsPanelProps)
                     </Tabs>
                 </div>
 
-                <Drawer open={designDrawerOpen} onOpenChange={setDesignDrawerOpen} side="right" title="Design">
-                    <DesignDrawer
-                        open={designDrawerOpen}
-                        onOpenChange={setDesignDrawerOpen}
-                        page={page}
-                        pageIndex={pageIndex}
-                        onUpdate={onUpdate}
-                    />
-                </Drawer>
+                <Sheet
+                    open={designDrawerOpen}
+                    onOpenChange={(_open, eventDetails) => {
+                        // Prevent closing when clicking outside the sheet if there are unsaved changes
+                        if (hasChangesRef.current && (eventDetails?.reason === "outside-press" || eventDetails?.reason === "focus-out")) {
+                            return
+                        }
+                        onCloseDesignDrawer()
+                    }}
+                    modal
+                >
+                    <SheetContent
+                        side="right"
+                        className="h-full flex flex-col w-[70.666%] max-w-none min-w-0 overflow-hidden p-0 data-[side=right]:w-[70.666%] data-[side=right]:sm:max-w-none"
+                        showCloseButton={false}
+                    >
+                        <SheetHeader className="px-6 pt-6 shrink-0">
+                            <SheetTitle className="flex justify-between items-center">
+                                <span className="font-medium text-[var(--editorial-body)]">Live Preview</span>
+                                <span className="font-medium text-[var(--editorial-body)]">Design</span>
+                            </SheetTitle>
+                        </SheetHeader>
+                        <div className="flex-1 min-h-0 w-full">
+                            <DesignDrawer
+                                open={designDrawerOpen}
+                                onOpenChange={onCloseDesignDrawer}
+                                theme={theme}
+                                page={page}
+                                pageIndex={pageIndex}
+                                onUpdatePage={onUpdate}
+                                onSaveTheme={onSaveTheme}
+                                onCancel={onCloseDesignDrawer}
+                                hasChangesRef={hasChangesRef}
+                            />
+                        </div>
+                    </SheetContent>
+                </Sheet>
 
                 <Dialog open={logicDialogOpen} onOpenChange={setLogicDialogOpen}>
                     <DialogContent className="sm:max-w-[600px]">

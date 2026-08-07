@@ -41,6 +41,8 @@ export interface OptionListEditorProps {
     isMobileView?: boolean
     /** Leading glyph that hints at the input type (radio, checkbox, list…). */
     icon: LucideIcon
+    color?: string
+    fontSizeClass?: string
 }
 
 /**
@@ -56,6 +58,8 @@ export function OptionListEditor({
     onUpdate,
     isMobileView = false,
     icon: Icon,
+    color,
+    fontSizeClass,
 }: OptionListEditorProps) {
     const choice = page.settings?.choice ?? FALLBACK_CHOICE
     const { allowOther, otherLabel, horizontalAlign, optionsPerRow, hideLabels } = choice
@@ -89,15 +93,16 @@ export function OptionListEditor({
                                         page.options.map((o, i) =>
                                             i === optIndex
                                                 ? {
-                                                      label: e.target.value,
-                                                      value: toValue(e.target.value),
-                                                  }
+                                                    label: e.target.value,
+                                                    value: toValue(e.target.value),
+                                                }
                                                 : o,
                                         ),
                                     )
                                 }
                                 placeholder="Option label"
-                                className="min-w-0 flex-1"
+                                className={cn("min-w-0 flex-1", fontSizeClass)}
+                                style={color ? { color } : undefined}
                             />
                         )}
                         <Button
@@ -124,7 +129,12 @@ export function OptionListEditor({
                     >
                         <Icon className="h-4 w-4 shrink-0" />
                         {!hideLabels && (
-                            <span className="truncate text-sm">{otherLabel || "Other"}</span>
+                            <span
+                                className={cn("truncate text-sm", fontSizeClass)}
+                                style={color ? { color } : undefined}
+                            >
+                                {otherLabel || "Other"}
+                            </span>
                         )}
                     </div>
                 )}

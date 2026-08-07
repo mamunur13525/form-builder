@@ -1,5 +1,7 @@
-import type { FormField } from "@/shared/types/common";
+import type { FormField, IFormTheme } from "@/shared/types/common";
 import { FieldLabel, FieldHelperText, FieldSubmitButton } from "@/shared/components/fields";
+import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme";
+import { useEffect } from "react";
 
 import {
   ShortTextEditor,
@@ -31,6 +33,7 @@ interface PageContentEditorProps {
   pageIndex: number;
   onUpdate: (index: number, updates: Partial<FormField>) => void;
   isMobileView: boolean;
+  theme?: IFormTheme | null;
 }
 
 const editorMap: Record<
@@ -40,6 +43,8 @@ const editorMap: Record<
     pageIndex: number;
     onUpdate: (index: number, updates: Partial<FormField>) => void;
     isMobileView?: boolean;
+    color?: string;
+    fontSizeClass?: string;
   }>
 > = {
   shortText: ShortTextEditor,
@@ -70,18 +75,64 @@ export function PageContentEditor({
   pageIndex,
   onUpdate,
   isMobileView,
+  theme,
 }: PageContentEditorProps) {
   const FieldEditor = editorMap[page.type];
-  // Statement pages are display-only, so they get no submit button.
   const isStatement = page.type === "statement";
+  const themeResolved = resolveFormTheme(theme);
+
+  useEffect(() => {
+    if (themeResolved.font) {
+      loadThemeFont(themeResolved.font);
+    }
+  }, [themeResolved.font]);
+
+  const fontSizes = getFontSizeClasses(themeResolved.fontSize);
+  const alignClass =
+    themeResolved.alignment === "center"
+      ? "text-center items-center"
+      : themeResolved.alignment === "right"
+        ? "text-right items-end"
+        : "text-left items-start";
+
+  const containerStyle: React.CSSProperties = {
+    backgroundColor: themeResolved.backgroundColor,
+    color: themeResolved.textColor,
+    fontFamily: themeResolved.font?.family ? `"${themeResolved.font.family}", sans-serif` : undefined,
+  };
+
+  const bgImageStyle: React.CSSProperties = themeResolved.backgroundImage?.url
+    ? {
+      backgroundImage: `url(${themeResolved.backgroundImage.url})`,
+      backgroundRepeat: themeResolved.backgroundImage.tile ? "repeat" : "no-repeat",
+      backgroundSize: themeResolved.backgroundImage.tile ? "auto" : "cover",
+      backgroundPosition: "center",
+      filter:
+        themeResolved.backgroundImage.brightness !== undefined
+          ? `brightness(${(100 + themeResolved.backgroundImage.brightness) / 100})`
+          : undefined,
+    }
+    : {};
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-[800px] flex-col items-center justify-center">
+    <div
+      className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
+      style={containerStyle}
+    >
+      {/* Background Image Layer */}
+      {themeResolved.backgroundImage?.url && (
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={bgImageStyle}
+        />
+      )}
+
       {/* Editor Content */}
-      <div className={cn("w-full min-h-0 overflow-y-auto")}>
+      <div className={cn("relative z-10 w-full min-h-0 overflow-y-auto max-w-[800px]")}>
         <div
           className={cn(
-            "mx-auto transition-all duration-500 ease-out pl-5 pr-2 py-8 sm:px-6 sm:py-12",
+            "mx-auto flex flex-col transition-all duration-500 ease-out pl-5 pr-2 py-8 sm:px-6 sm:py-12",
+            alignClass,
             isMobileView ? "w-full" : "w-full sm:w-11/12",
           )}
         >
@@ -98,15 +149,19 @@ export function PageContentEditor({
             pageNumber={pageIndex + 1}
             editable
             onUpdate={(label) => onUpdate(pageIndex, { label })}
+            color={themeResolved.questionColor}
+            fontSizeClass={fontSizes.question}
           />
 
           <FieldHelperText
             helperText={page.helperText}
             editable
             onUpdate={(helperText) => onUpdate(pageIndex, { helperText })}
+            color={themeResolved.textColor}
+            fontSizeClass={fontSizes.helper}
           />
 
-          <div className="mt-8">
+          <div className="mt-8 w-full" style={{ color: themeResolved.answerColor }}>
             {/* Field-specific editor */}
             {FieldEditor && (
               <FieldEditor
@@ -114,6 +169,8 @@ export function PageContentEditor({
                 pageIndex={pageIndex}
                 onUpdate={onUpdate}
                 isMobileView={isMobileView}
+                color={themeResolved.answerColor}
+                fontSizeClass={fontSizes.input}
               />
             )}
           </div>
@@ -123,10 +180,14 @@ export function PageContentEditor({
               page.appearance.submitButtonText ||
               (isStatement ? "Continue" : "Submit")
             }
-            color={page.appearance.submitButtonColor}
+            color={page.appearance.submitButtonColor || themeResolved.buttonColor}
+            textColor={themeResolved.buttonTextColor}
+            roundCorners={themeResolved.roundCorners}
+            fontSizeClass={fontSizes.button}
           />
         </div>
       </div>
     </div>
   );
 }
+

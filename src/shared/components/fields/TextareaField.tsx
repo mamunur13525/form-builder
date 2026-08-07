@@ -12,6 +12,8 @@ interface TextareaFieldProps {
     disabled?: boolean
     autoFocus?: boolean
     error?: string | null
+    color?: string
+    fontSizeClass?: string
 }
 
 export function TextareaField({
@@ -22,6 +24,8 @@ export function TextareaField({
     disabled,
     autoFocus,
     error,
+    color,
+    fontSizeClass,
 }: TextareaFieldProps) {
     const isError = !!error
     const errorClasses = isError ? "border-destructive" : ""
@@ -34,7 +38,8 @@ export function TextareaField({
             rows={rows}
             disabled={disabled}
             autoFocus={autoFocus}
-            className={cn(inputBaseClasses, errorClasses)}
+            className={cn(inputBaseClasses, fontSizeClass, errorClasses)}
+            style={color ? { color } : undefined}
         />
     )
 }

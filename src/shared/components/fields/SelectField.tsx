@@ -10,6 +10,8 @@ interface SelectFieldProps {
     placeholder?: string
     disabled?: boolean
     error?: string | null
+    color?: string
+    fontSizeClass?: string
 }
 
 export function SelectField({
@@ -19,6 +21,8 @@ export function SelectField({
     placeholder = "Select an option",
     disabled,
     error,
+    color,
+    fontSizeClass,
 }: SelectFieldProps) {
     const isError = !!error
     const errorClasses = isError ? "border-destructive" : ""
@@ -30,9 +34,11 @@ export function SelectField({
             disabled={disabled}
             className={cn(
                 inputBaseClasses,
+                fontSizeClass,
                 "flex h-10 w-full bg-background py-2 text-base placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
                 errorClasses,
             )}
+            style={color ? { color } : undefined}
         >
             <option value="">{placeholder}</option>
             {options.map((opt) => (

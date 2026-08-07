@@ -12,9 +12,11 @@ interface AddressFieldProps {
     onChange?: (value: AddressValue) => void
     fields: AddressFieldSetting[]
     disabled?: boolean
+    color?: string
+    fontSizeClass?: string
 }
 
-export function AddressField({ value, onChange, fields, disabled }: AddressFieldProps) {
+export function AddressField({ value, onChange, fields, disabled, color, fontSizeClass }: AddressFieldProps) {
     const current = value ?? {}
     const visible = fields
         .filter((f) => !f.hidden)
@@ -43,7 +45,11 @@ export function AddressField({ value, onChange, fields, disabled }: AddressField
                         onChange={(e) =>
                             onChange?.({ ...current, [field.key]: e.target.value })
                         }
-                        className="h-10 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                        className={cn(
+                            "h-10 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+                            fontSizeClass,
+                        )}
+                        style={color ? { color } : undefined}
                     />
                 </div>
             ))}

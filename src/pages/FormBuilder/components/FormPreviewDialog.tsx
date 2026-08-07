@@ -132,7 +132,7 @@ export function FormPreviewDialog({
                 width: isMobileView ? "450px" : "100%",
                 height: "100%",
               }}
-              className="w-full flex-1  bg-background transition-all duration-500 ease-in-out overflow-hidden rounded-md border shadow-sm px-6"
+              className="w-full flex-1  bg-background transition-all duration-500 ease-in-out overflow-hidden rounded-md border shadow-sm"
             >
               {form && <FormView key={`${formKey}-${restartCount}`} form={form} mode="preview" />}
             </div>

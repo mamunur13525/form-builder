@@ -5,7 +5,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "../../components/ui/resizable";
-import type { FormField } from "../../shared/types/common";
+import type { FormField, IFormTheme } from "../../shared/types/common";
 import {
   createField,
   updateField,
@@ -13,6 +13,7 @@ import {
   duplicateField,
   reorderFields,
 } from "../../entities/form/api/field.api";
+import { updateFormTheme } from "@/entities/form/api/form.api";
 import { useDebounce } from "../../shared/hooks/useDebounce";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
 import { FormBuilderSidebar } from "./components/FormBuilderSidebar";
@@ -37,6 +38,7 @@ export function FormBuilderPage() {
     formRevision,
     setPreviewForm,
     openPreview,
+    updateFormData,
   } = useFormContext();
 
   const [pages, setPages] = useState<FormField[]>([]);
@@ -49,6 +51,7 @@ export function FormBuilderPage() {
   const [isMobileView, setIsMobileView] = useState(false);
   const [showPagesDrawer, setShowPagesDrawer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
+  const [designDrawerOpen, setDesignDrawerOpen] = useState(false);
   const syncedKeyRef = useRef<string | undefined>(undefined);
   const isDesktop = useIsDesktop();
 
@@ -211,6 +214,36 @@ export function FormBuilderPage() {
       }
     },
     [formId, pages, debouncedFieldUpdate],
+  );
+
+  /**
+   * Persist the form theme via PATCH /forms/:formId/theme and update the
+   * local form state so the builder, preview, and published views all
+   * reflect the saved theme immediately.
+   */
+  const handleSaveTheme = useCallback(
+    async (themeData: IFormTheme) => {
+      if (!formId || formId === "new") {
+        // For new (unsaved) forms, just update local state.
+        updateFormData({ theme: themeData });
+        return;
+      }
+
+      try {
+        showSaveStatus("saving");
+        const updated = await updateFormTheme(formId, themeData);
+        // Update local form state with the server response theme.
+        updateFormData({ theme: updated.theme });
+        showSaveStatus("saved");
+        // Changing the theme on a published form makes it out of date.
+        setHasUnpublishedChanges(true);
+      } catch (error) {
+        console.error("Failed to save theme:", error);
+        showSaveStatus("error");
+        throw error;
+      }
+    },
+    [formId, showSaveStatus, setHasUnpublishedChanges, updateFormData],
   );
 
   const addPage = useCallback(
@@ -405,6 +438,11 @@ export function FormBuilderPage() {
       page={selectedPage}
       pageIndex={selectedPageIndex}
       onUpdate={updatePage}
+      theme={form?.theme}
+      designDrawerOpen={designDrawerOpen}
+      onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
+      onCloseDesignDrawer={() => setDesignDrawerOpen(false)}
+      onSaveTheme={handleSaveTheme}
     />
   ) : (
     <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
@@ -443,7 +481,7 @@ export function FormBuilderPage() {
       <div className="flex min-h-0 w-full flex-1 items-center justify-center">
         <div
           className={cn(
-            "editorial-shadow h-full w-full overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--card)] px-4 sm:rounded-[24px] sm:px-6 lg:px-8",
+            "editorial-shadow h-full w-full overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--card)] sm:rounded-[24px]",
             "transition-all duration-500 ease-out",
           )}
           // The phone-frame preview must never exceed the available width.
@@ -455,6 +493,7 @@ export function FormBuilderPage() {
               pageIndex={selectedPageIndex}
               onUpdate={updatePage}
               isMobileView={isMobileView}
+              theme={form?.theme}
             />
           ) : (
             <div className="flex h-full flex-col items-center justify-center px-4 text-center">

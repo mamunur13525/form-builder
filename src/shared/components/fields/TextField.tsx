@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 const inputBaseClasses =
-    "text-2xl rounded-none border-0 border-b outline-0 ring-0 focus:outline-0 focus:ring-0 focus-visible:outline-0 focus-visible:ring-0 focus-within:ring-0 focus-within:outline-0"
+    "text-2xl rounded-none border-0 outline-0 ring-0 focus:outline-0 focus:ring-0 focus-visible:outline-0 focus-visible:ring-0 focus-within:ring-0 focus-within:outline-0 bg-transparent"
 
 interface TextFieldProps {
     value: string
@@ -12,6 +12,8 @@ interface TextFieldProps {
     disabled?: boolean
     autoFocus?: boolean
     error?: string | null
+    color?: string
+    fontSizeClass?: string
 }
 
 export function TextField({
@@ -22,6 +24,8 @@ export function TextField({
     disabled,
     autoFocus,
     error,
+    color,
+    fontSizeClass,
 }: TextFieldProps) {
     const isError = !!error
     const errorClasses = isError ? "border-destructive" : ""
@@ -34,7 +38,8 @@ export function TextField({
             placeholder={placeholder}
             disabled={disabled}
             autoFocus={autoFocus}
-            className={cn(inputBaseClasses, errorClasses)}
+            className={cn(inputBaseClasses, fontSizeClass, errorClasses)}
+            style={color ? { color } : undefined}
         />
     )
 }

@@ -2,11 +2,27 @@
 
 export type FormStatus = "draft" | "published" | "archived"
 
-export interface FormTheme {
-    primaryColor: string
-    backgroundColor: string
-    textColor: string
+import type {
+    IFormTheme,
+    IThemeBackgroundImage,
+    IThemeFont,
+    ContentAlignment,
+    FontSize,
+    CornerRadius,
+    ThemeFontSource,
+} from "@/shared/types/common"
+
+export type {
+    IFormTheme,
+    IThemeBackgroundImage,
+    IThemeFont,
+    ContentAlignment,
+    FontSize,
+    CornerRadius,
+    ThemeFontSource,
 }
+
+export type FormTheme = IFormTheme
 
 export interface FormSettings {
     oneQuestionAtATime: boolean
@@ -84,11 +100,7 @@ export interface UpdateFormSettingsRequest {
     collectIP?: boolean
 }
 
-export interface UpdateFormThemeRequest {
-    primaryColor?: string
-    backgroundColor?: string
-    textColor?: string
-}
+export type UpdateFormThemeRequest = IFormTheme
 
 // ---------------------------------------------------------------------------
 // Fields

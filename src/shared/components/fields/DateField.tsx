@@ -9,9 +9,11 @@ interface DateFieldProps {
     onChange?: (value: string) => void
     disabled?: boolean
     error?: string | null
+    color?: string
+    fontSizeClass?: string
 }
 
-export function DateField({ value, onChange, disabled, error }: DateFieldProps) {
+export function DateField({ value, onChange, disabled, error, color, fontSizeClass }: DateFieldProps) {
     const isError = !!error
     const errorClasses = isError ? "border-destructive" : ""
 
@@ -21,7 +23,8 @@ export function DateField({ value, onChange, disabled, error }: DateFieldProps) 
             value={value}
             onChange={(e) => onChange?.(e.target.value)}
             disabled={disabled}
-            className={cn(inputBaseClasses, errorClasses)}
+            className={cn(inputBaseClasses, fontSizeClass, errorClasses)}
+            style={color ? { color } : undefined}
         />
     )
 }

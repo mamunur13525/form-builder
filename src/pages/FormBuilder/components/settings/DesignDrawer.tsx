@@ -1,31 +1,36 @@
 import React from "react"
-import { Label } from "../../../../components/ui/label"
-import { Input } from "../../../../components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "../../../../components/ui/select"
-import { Button } from "../../../../components/ui/button"
-import { SettingsSection } from "./primitives"
-import type { FormField, IFormTheme, ContentAlignment, FontSize, CornerRadius, ThemeFontSource } from "../../../../shared/types/common"
+    ColorSetting,
+    ConfirmPopover,
+    IconChoiceSetting,
+    InputSetting,
+    PRIMARY_BUTTON_CLASS,
+    RangeSetting,
+    SECONDARY_BUTTON_CLASS,
+    SelectSetting,
+    SettingsSection,
+    ToggleRow,
+    type IconChoiceOption,
+    type SelectSettingOption,
+} from "./primitives"
+import type {
+    ContentAlignment,
+    CornerRadius,
+    FontSize,
+    FormField,
+    IFormTheme,
+    IThemeBackgroundImage,
+    IThemeFont,
+    ThemeFontSource,
+} from "@/shared/types/common"
 import { PageContentEditor } from "../PageContentEditor/PageContentEditor"
-import { Save, X, Trash2 } from "lucide-react"
-import {
-    Popover,
-    PopoverContent,
-    PopoverDescription,
-    PopoverHeader,
-    PopoverTitle,
-    PopoverTrigger,
-} from "../../../../components/ui/popover"
-import { resolveFormTheme, loadThemeFont } from "@/shared/utils/theme"
+import { Save, X, Trash2, AArrowDown, ALargeSmall, AArrowUp, AlignLeft, AlignCenter, AlignRight } from "lucide-react"
+import { resolveFormTheme, loadThemeFont, getCornerRadiusCss, type ResolvedFormTheme } from "@/shared/utils/theme"
+import { cn } from "@/lib/utils"
 
 interface DesignDrawerProps {
     open: boolean
-    onOpenChange: (open: boolean) => void
     theme?: IFormTheme | null
     page?: FormField
     pageIndex?: number
@@ -35,7 +40,26 @@ interface DesignDrawerProps {
     hasChangesRef: React.MutableRefObject<boolean>
 }
 
-const FONT_PRESETS = [
+type ThemeColorKey =
+    | "questionColor"
+    | "answerColor"
+    | "buttonColor"
+    | "buttonTextColor"
+    | "primaryColor"
+    | "backgroundColor"
+    | "textColor"
+
+const COLOR_FIELDS: readonly { key: ThemeColorKey; label: string; fallback: string }[] = [
+    { key: "questionColor", label: "Question Color", fallback: "#111111" },
+    { key: "answerColor", label: "Answer / Input Color", fallback: "#111111" },
+    { key: "buttonColor", label: "Button Background", fallback: "#000000" },
+    { key: "buttonTextColor", label: "Button Text Color", fallback: "#ffffff" },
+    { key: "primaryColor", label: "Primary Color", fallback: "#000000" },
+    { key: "backgroundColor", label: "Form Background Color", fallback: "#ffffff" },
+    { key: "textColor", label: "Fallback Text Color", fallback: "#111111" },
+]
+
+const FONT_FAMILY_OPTIONS: readonly SelectSettingOption<string>[] = [
     { label: "Inter", value: "Inter" },
     { label: "Roboto", value: "Roboto" },
     { label: "Outfit", value: "Outfit" },
@@ -45,6 +69,71 @@ const FONT_PRESETS = [
     { label: "Lora", value: "Lora" },
     { label: "System UI", value: "sans-serif" },
 ]
+
+const FONT_SOURCE_OPTIONS: readonly SelectSettingOption<ThemeFontSource>[] = [
+    { label: "Google Fonts", value: "google" },
+    { label: "System Font", value: "system" },
+    { label: "Custom URL", value: "custom" },
+]
+
+const FONT_SIZE_OPTIONS: readonly IconChoiceOption<FontSize>[] = [
+    { label: "Small", value: "small", icon: AArrowDown },
+    { label: "Medium", value: "medium", icon: ALargeSmall },
+    { label: "Large", value: "large", icon: AArrowUp },
+]
+
+const ALIGNMENT_OPTIONS: readonly IconChoiceOption<ContentAlignment>[] = [
+    { label: "Left", value: "left", icon: AlignLeft, title: "Left aligned" },
+    { label: "Center", value: "center", icon: AlignCenter, title: "Centered" },
+    { label: "Right", value: "right", icon: AlignRight, title: "Right aligned" },
+]
+
+/** Renders the actual radius so the tile previews what it selects. */
+function CornerPreview({ radius, className }: { radius: CornerRadius; className?: string }) {
+    return (
+        <span
+            aria-hidden
+            className={cn("block border-2 border-current bg-current/10", className)}
+            style={{ borderRadius: getCornerRadiusCss(radius) }}
+        />
+    )
+}
+
+const CORNER_RADIUS_OPTIONS: readonly IconChoiceOption<CornerRadius>[] = (
+    [
+        { value: "none", label: "Square", title: "Square (0px)" },
+        { value: "small", label: "Small", title: "Small (6px)" },
+        { value: "medium", label: "Medium", title: "Medium (12px)" },
+        { value: "large", label: "Large", title: "Large (16px)" },
+        { value: "full", label: "Pill", title: "Full (Pill/Rounded)" },
+    ] as const
+).map(({ value, label, title }) => ({
+    value,
+    label,
+    title,
+    icon: ({ className }: { className?: string }) => (
+        <CornerPreview radius={value} className={cn("size-[18px]", className)} />
+    ),
+}))
+
+/**
+ * Portal-rendered overlays live outside the drawer subtree, so a click inside
+ * one still reads as an "outside" click without this guard.
+ */
+const OVERLAY_SELECTORS = [
+    "[data-slot='select-content']",
+    "[data-slot='popover-content']",
+    "[data-slot='dialog-content']",
+    "[data-slot='drawer-content']",
+    "[data-slot='sheet-content']",
+    "[data-slot='tooltip-content']",
+    "[role='listbox']",
+    "[role='dialog']",
+    "[role='tooltip']",
+    "[data-radix-popper-content-wrapper]",
+].join(",")
+
+const noop = () => { }
 
 export function DesignDrawer({
     open,
@@ -56,82 +145,126 @@ export function DesignDrawer({
     onCancel,
     hasChangesRef,
 }: DesignDrawerProps) {
-    const [draftTheme, setDraftTheme] = React.useState<IFormTheme>(() => resolveFormTheme(theme))
     const [isSaving, setIsSaving] = React.useState(false)
-    const [vibratingButton, setVibratingButton] = React.useState<string | null>(null)
+    const [vibratingButton, setVibratingButton] = React.useState<"cancel" | "save" | null>(null)
     const [cancelPopoverOpen, setCancelPopoverOpen] = React.useState(false)
     const [savePopoverOpen, setSavePopoverOpen] = React.useState(false)
     const containerRef = React.useRef<HTMLDivElement>(null)
+    const nudgeTimers = React.useRef<number[]>([])
 
-    // Sync draft theme when prop theme changes or drawer reopens
-    React.useEffect(() => {
-        if (open) {
-            setDraftTheme(resolveFormTheme(theme))
-        }
-    }, [theme, open])
+    const baseTheme = React.useMemo(() => resolveFormTheme(theme), [theme])
+    const baseSignature = React.useMemo(() => JSON.stringify(baseTheme), [baseTheme])
+
+    /**
+     * The draft is stamped with the editing session it belongs to, so reopening
+     * the drawer or receiving a new theme discards stale edits without an
+     * effect that copies props into state.
+     */
+    const sessionKey = `${open}:${baseSignature}`
+    const [draft, setDraft] = React.useState<{ key: string; theme: ResolvedFormTheme } | null>(null)
+    const draftTheme = draft?.key === sessionKey ? draft.theme : baseTheme
+
+    const updateDraft = React.useCallback(
+        (updater: (prev: ResolvedFormTheme) => ResolvedFormTheme) => {
+            setDraft((prev) => ({
+                key: sessionKey,
+                theme: updater(prev?.key === sessionKey ? prev.theme : baseTheme),
+            }))
+        },
+        [sessionKey, baseTheme]
+    )
 
     // Load font in document head for live preview
     React.useEffect(() => {
-        if (draftTheme.font) {
-            loadThemeFont(draftTheme.font)
-        }
+        loadThemeFont(draftTheme.font)
     }, [draftTheme.font])
 
-    // Reset hasChanges when the drawer opens
+    // Publish unsaved-change state so the parent Sheet can block outside dismissal
     React.useEffect(() => {
-        if (open) {
-            hasChangesRef.current = false
-        }
-    }, [open, hasChangesRef])
+        hasChangesRef.current = open && JSON.stringify(draftTheme) !== baseSignature
+    }, [draftTheme, baseSignature, open, hasChangesRef])
 
-    // Track whether the draft has unsaved changes
-    React.useEffect(() => {
-        const initial = JSON.stringify(resolveFormTheme(theme))
-        const current = JSON.stringify(resolveFormTheme(draftTheme))
-        hasChangesRef.current = initial !== current
-    }, [draftTheme, theme, hasChangesRef])
+    const clearNudgeTimers = React.useCallback(() => {
+        nudgeTimers.current.forEach(window.clearTimeout)
+        nudgeTimers.current = []
+    }, [])
 
-    // Handle outside clicks: vibrate buttons if there are changes, otherwise close.
-    // Clicks inside portal-rendered overlays (Select dropdown, Popover content,
-    // Dialog, Drawer, Sheet, Tooltip) must not close the drawer.
+    React.useEffect(() => clearNudgeTimers, [clearNudgeTimers])
+
+    /** Draw the eye to Cancel, then Save, when an outside click is ignored. */
+    const nudgeFooterButtons = React.useCallback(() => {
+        clearNudgeTimers()
+        setVibratingButton("cancel")
+        nudgeTimers.current.push(
+            window.setTimeout(() => setVibratingButton(null), 300),
+            window.setTimeout(() => setVibratingButton("save"), 300),
+            window.setTimeout(() => setVibratingButton(null), 600)
+        )
+    }, [clearNudgeTimers])
+
+    // Outside clicks close the drawer, unless there are unsaved changes to resolve.
     React.useEffect(() => {
         if (!open) return
 
-        const isOverlayClick = (target: EventTarget | null) => {
-            if (!(target instanceof Element)) return false
-            const overlaySelectors = [
-                "[data-slot='select-content']",
-                "[data-slot='popover-content']",
-                "[data-slot='dialog-content']",
-                "[data-slot='drawer-content']",
-                "[data-slot='sheet-content']",
-                "[data-slot='tooltip-content']",
-                "[role='listbox']",
-                "[role='dialog']",
-                "[role='tooltip']",
-                "[data-radix-popper-content-wrapper]",
-            ]
-            return overlaySelectors.some((selector) => target.closest(selector))
-        }
-
         const handleClickOutside = (e: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node) && !isOverlayClick(e.target)) {
-                if (hasChangesRef.current) {
-                    setVibratingButton("cancel")
-                    setTimeout(() => setVibratingButton(null), 300)
-                    setTimeout(() => {
-                        setVibratingButton("save")
-                        setTimeout(() => setVibratingButton(null), 300)
-                    }, 300)
-                } else {
-                    onCancel()
-                }
+            const target = e.target
+            if (!containerRef.current || !(target instanceof Node)) return
+            if (containerRef.current.contains(target)) return
+            if (target instanceof Element && target.closest(OVERLAY_SELECTORS)) return
+
+            if (hasChangesRef.current) {
+                nudgeFooterButtons()
+            } else {
+                onCancel()
             }
         }
 
         document.addEventListener("mousedown", handleClickOutside)
         return () => document.removeEventListener("mousedown", handleClickOutside)
-    }, [open, hasChangesRef, onCancel])
+    }, [open, hasChangesRef, onCancel, nudgeFooterButtons])
+
+    const patchTheme = React.useCallback(
+        (patch: Partial<ResolvedFormTheme>) => {
+            updateDraft((prev) => ({ ...prev, ...patch }))
+        },
+        [updateDraft]
+    )
+
+    const patchFont = React.useCallback(
+        (patch: Partial<IThemeFont>) => {
+            updateDraft((prev) => ({ ...prev, font: { ...prev.font, ...patch } }))
+        },
+        [updateDraft]
+    )
+
+    const patchBackgroundImage = React.useCallback(
+        (patch: Partial<IThemeBackgroundImage>) => {
+            updateDraft((prev) => ({
+                ...prev,
+                backgroundImage: prev.backgroundImage
+                    ? { ...prev.backgroundImage, ...patch }
+                    : null,
+            }))
+        },
+        [updateDraft]
+    )
+
+    const setBackgroundImageUrl = React.useCallback(
+        (url: string) => {
+            updateDraft((prev) => ({
+                ...prev,
+                backgroundImage: url
+                    ? {
+                        brightness: 0,
+                        tile: false,
+                        ...prev.backgroundImage,
+                        url,
+                    }
+                    : null,
+            }))
+        },
+        [updateDraft]
+    )
 
     const handleSaveClick = async () => {
         setIsSaving(true)
@@ -148,63 +281,28 @@ export function DesignDrawer({
 
     const handleCancelClick = () => {
         hasChangesRef.current = false
-        onCancel()
         setCancelPopoverOpen(false)
+        onCancel()
     }
 
-    const updateColor = (key: keyof IFormTheme, value: string) => {
-        setDraftTheme((prev) => ({ ...prev, [key]: value }))
-    }
-
-    const renderColorPicker = (label: string, key: keyof IFormTheme, fallback: string) => {
-        const currentValue = (draftTheme[key] as string) || fallback
-        return (
-            <div className="space-y-1.5" key={key}>
-                <Label className="text-sm font-medium text-[var(--editorial-body)]">{label}</Label>
-                <div className="flex items-center gap-3">
-                    <input
-                        type="color"
-                        aria-label={label}
-                        value={currentValue}
-                        onChange={(e) => updateColor(key, e.target.value)}
-                        className="h-[44px] w-[44px] cursor-pointer rounded-lg border border-[var(--input)] bg-[var(--secondary)] p-1 shrink-0"
-                    />
-                    <Input
-                        type="text"
-                        value={currentValue}
-                        onChange={(e) => updateColor(key, e.target.value)}
-                        placeholder={fallback}
-                        className="h-[44px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-4 text-sm"
-                    />
-                </div>
-            </div>
-        )
-    }
+    const backgroundImage = draftTheme.backgroundImage
 
     return (
-        <div ref={containerRef} className="flex w-full h-full min-h-0 overflow-hidden">
-            <style>{`
-                @keyframes vibrate {
-                    0%, 100% { transform: translateX(0); }
-                    25% { transform: translateX(-3px); }
-                    75% { transform: translateX(3px); }
-                }
-            `}</style>
-
+        <div ref={containerRef} className="flex h-full min-h-0 w-full overflow-hidden">
             {/* Preview area */}
-            <div className="flex-1 h-full min-h-0 overflow-y-auto bg-[var(--editorial-canvas)] p-6">
-                <div className="w-full min-h-full flex flex-col justify-center">
-                    <div className="w-full h-full max-h-full editorial-shadow overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+            <div className="h-full min-h-0 flex-1 overflow-y-auto bg-[var(--editorial-canvas)] p-6">
+                <div className="flex min-h-full w-full flex-col justify-center">
+                    <div className="editorial-shadow h-full max-h-full w-full overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
                         {page ? (
                             <PageContentEditor
                                 page={page}
                                 pageIndex={pageIndex}
-                                onUpdate={onUpdatePage || (() => { })}
+                                onUpdate={onUpdatePage ?? noop}
                                 isMobileView={false}
                                 theme={draftTheme}
                             />
                         ) : (
-                            <div className="flex items-center justify-center h-64 text-muted-foreground">
+                            <div className="flex h-64 items-center justify-center text-sm text-[var(--editorial-subtle)]">
                                 Select a page to see live preview
                             </div>
                         )}
@@ -213,278 +311,128 @@ export function DesignDrawer({
             </div>
 
             {/* Controls sidebar */}
-            <div className="w-[380px] shrink-0 h-full flex flex-col border-l border-[var(--border)] bg-[var(--card)]">
-                <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    <h3 className="text-lg font-semibold text-[var(--foreground)] border-b pb-3">
-                        Theme Settings
+            <div className="flex h-full w-[380px] shrink-0 flex-col border-l border-[var(--border)] bg-[var(--editorial-surface)]">
+                <div className="shrink-0 border-b border-[var(--editorial-border-light)] px-6 pt-6 pb-4">
+                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">Design</p>
+                    <h3 className="font-display mt-1 text-2xl text-[var(--foreground)]">
+                        Theme settings
                     </h3>
+                </div>
 
-                    {/* Colors section */}
+                <div className="flex-1 space-y-8 overflow-y-auto px-6 py-6">
                     <SettingsSection title="Colors">
                         <div className="grid grid-cols-1 gap-4">
-                            {renderColorPicker("Question Color", "questionColor", "#111111")}
-                            {renderColorPicker("Answer / Input Color", "answerColor", "#111111")}
-                            {renderColorPicker("Button Background", "buttonColor", "#000000")}
-                            {renderColorPicker("Button Text Color", "buttonTextColor", "#ffffff")}
-                            {renderColorPicker("Primary Color", "primaryColor", "#000000")}
-                            {renderColorPicker("Form Background Color", "backgroundColor", "#ffffff")}
-                            {renderColorPicker("Fallback Text Color", "textColor", "#111111")}
+                            {COLOR_FIELDS.map(({ key, label, fallback }) => (
+                                <ColorSetting
+                                    key={key}
+                                    label={label}
+                                    fallback={fallback}
+                                    value={draftTheme[key]}
+                                    onChange={(value) => patchTheme({ [key]: value })}
+                                />
+                            ))}
                         </div>
                     </SettingsSection>
 
-                    {/* Typography section */}
                     <SettingsSection title="Typography">
                         <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <Label className="text-sm font-medium text-[var(--editorial-body)]">Font Family</Label>
-                                <Select
-                                    value={draftTheme.font?.family || "Inter"}
-                                    onValueChange={(v) => {
-                                        if (!v) return
-                                        setDraftTheme((prev) => ({
-                                            ...prev,
-                                            font: {
-                                                family: v,
-                                                source: prev.font?.source || "google",
-                                                url: prev.font?.url,
-                                            },
-                                        }))
-                                    }}
-                                >
-                                    <SelectTrigger className="h-[44px] w-full rounded-xl border-[var(--input)] bg-[var(--secondary)] text-sm">
-                                        <SelectValue placeholder="Select Font Family" />
-                                    </SelectTrigger>
-                                    <SelectContent className="editorial rounded-xl border-[var(--border)] bg-[var(--popover)]">
-                                        {FONT_PRESETS.map((f) => (
-                                            <SelectItem key={f.value} value={f.value} className="rounded-lg">
-                                                {f.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            <SelectSetting
+                                label="Font Family"
+                                value={draftTheme.font.family}
+                                options={FONT_FAMILY_OPTIONS}
+                                onChange={(family) => patchFont({ family })}
+                            />
 
-                            <div className="space-y-1.5">
-                                <Label className="text-sm font-medium text-[var(--editorial-body)]">Font Source</Label>
-                                <Select
-                                    value={draftTheme.font?.source || "google"}
-                                    onValueChange={(v: ThemeFontSource | null) => {
-                                        if (!v) return
-                                        setDraftTheme((prev) => ({
-                                            ...prev,
-                                            font: {
-                                                family: prev.font?.family || "Inter",
-                                                source: v,
-                                                url: prev.font?.url,
-                                            },
-                                        }))
-                                    }}
-                                >
-                                    <SelectTrigger className="h-[44px] w-full rounded-xl border-[var(--input)] bg-[var(--secondary)] text-sm">
-                                        <SelectValue placeholder="Select Source" />
-                                    </SelectTrigger>
-                                    <SelectContent onClick={(e) => e.stopPropagation()} className="editorial rounded-xl border-[var(--border)] bg-[var(--popover)]">
-                                        <SelectItem value="google" className="rounded-lg">Google Fonts</SelectItem>
-                                        <SelectItem value="system" className="rounded-lg">System Font</SelectItem>
-                                        <SelectItem value="custom" className="rounded-lg">Custom URL</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            <SelectSetting
+                                label="Font Source"
+                                value={draftTheme.font.source}
+                                options={FONT_SOURCE_OPTIONS}
+                                onChange={(source) => patchFont({ source })}
+                            />
 
-                            {draftTheme.font?.source === "custom" && (
-                                <div className="space-y-1.5">
-                                    <Label className="text-sm font-medium text-[var(--editorial-body)]">Font File URL</Label>
-                                    <Input
-                                        type="text"
-                                        value={draftTheme.font?.url || ""}
-                                        onChange={(e) => {
-                                            const val = e.target.value
-                                            setDraftTheme((prev) => ({
-                                                ...prev,
-                                                font: {
-                                                    family: prev.font?.family || "CustomFont",
-                                                    source: "custom",
-                                                    url: val,
-                                                },
-                                            }))
-                                        }}
-                                        placeholder="https://example.com/font.woff2"
-                                        className="h-[44px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-4 text-sm"
-                                    />
-                                </div>
+                            {draftTheme.font.source === "custom" && (
+                                <InputSetting
+                                    label="Font File URL"
+                                    value={draftTheme.font.url ?? ""}
+                                    onChange={(url) => patchFont({ url })}
+                                    placeholder="https://example.com/font.woff2"
+                                />
                             )}
 
-                            <div className="space-y-1.5">
-                                <Label className="text-sm font-medium text-[var(--editorial-body)]">Font Size Preset</Label>
-                                <Select
-                                    value={draftTheme.fontSize || "medium"}
-                                    onValueChange={(v: FontSize | null) => {
-                                        if (!v) return
-                                        setDraftTheme((prev) => ({ ...prev, fontSize: v }))
-                                    }}
-                                >
-                                    <SelectTrigger className="h-[44px] w-full rounded-xl border-[var(--input)] bg-[var(--secondary)] text-sm">
-                                        <SelectValue placeholder="Select Font Size" />
-                                    </SelectTrigger>
-                                    <SelectContent onClick={(e) => e.stopPropagation()} className="editorial rounded-xl border-[var(--border)] bg-[var(--popover)]">
-                                        <SelectItem value="small" className="rounded-lg">Small</SelectItem>
-                                        <SelectItem value="medium" className="rounded-lg">Medium</SelectItem>
-                                        <SelectItem value="large" className="rounded-lg">Large</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            <IconChoiceSetting
+                                label="Font Size Preset"
+                                value={draftTheme.fontSize}
+                                options={FONT_SIZE_OPTIONS}
+                                onChange={(fontSize) => patchTheme({ fontSize })}
+                            />
                         </div>
                     </SettingsSection>
 
-                    {/* Layout & Style section */}
                     <SettingsSection title="Layout & Corners">
                         <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <Label className="text-sm font-medium text-[var(--editorial-body)]">Content Alignment</Label>
-                                <Select
-                                    value={draftTheme.alignment || "left"}
-                                    onValueChange={(v: ContentAlignment | null) => {
-                                        if (!v) return
-                                        setDraftTheme((prev) => ({ ...prev, alignment: v }))
-                                    }}
-                                >
-                                    <SelectTrigger className="h-[44px] w-full rounded-xl border-[var(--input)] bg-[var(--secondary)] text-sm">
-                                        <SelectValue placeholder="Select Alignment" />
-                                    </SelectTrigger>
-                                    <SelectContent onClick={(e) => e.stopPropagation()} className="editorial rounded-xl border-[var(--border)] bg-[var(--popover)]">
-                                        <SelectItem value="left" className="rounded-lg">Left Aligned</SelectItem>
-                                        <SelectItem value="center" className="rounded-lg">Centered</SelectItem>
-                                        <SelectItem value="right" className="rounded-lg">Right Aligned</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            <IconChoiceSetting
+                                label="Content Alignment"
+                                value={draftTheme.alignment}
+                                options={ALIGNMENT_OPTIONS}
+                                onChange={(alignment) => patchTheme({ alignment })}
+                            />
 
-                            <div className="space-y-1.5">
-                                <Label className="text-sm font-medium text-[var(--editorial-body)]">Corner Radius Preset</Label>
-                                <Select
-                                    value={draftTheme.roundCorners || "medium"}
-                                    onValueChange={(v: CornerRadius | null) => {
-                                        if (!v) return
-                                        setDraftTheme((prev) => ({ ...prev, roundCorners: v }))
-                                    }}
-                                >
-                                    <SelectTrigger className="h-[44px] w-full rounded-xl border-[var(--input)] bg-[var(--secondary)] text-sm">
-                                        <SelectValue placeholder="Select Corner Radius" />
-                                    </SelectTrigger>
-                                    <SelectContent onClick={(e) => e.stopPropagation()} className="editorial rounded-xl border-[var(--border)] bg-[var(--popover)]">
-                                        <SelectItem value="none" className="rounded-lg">Square (0px)</SelectItem>
-                                        <SelectItem value="small" className="rounded-lg">Small (6px)</SelectItem>
-                                        <SelectItem value="medium" className="rounded-lg">Medium (12px)</SelectItem>
-                                        <SelectItem value="large" className="rounded-lg">Large (16px)</SelectItem>
-                                        <SelectItem value="full" className="rounded-lg">Full (Pill/Rounded)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            <IconChoiceSetting
+                                label="Corner Radius Preset"
+                                hint="Applies to inputs, buttons and cards."
+                                value={draftTheme.roundCorners}
+                                options={CORNER_RADIUS_OPTIONS}
+                                onChange={(roundCorners) => patchTheme({ roundCorners })}
+                            />
                         </div>
                     </SettingsSection>
 
-                    {/* Background Image section */}
                     <SettingsSection title="Background Image">
                         <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <Label className="text-sm font-medium text-[var(--editorial-body)]">Image URL</Label>
-                                <div className="flex items-center gap-2">
-                                    <Input
-                                        type="text"
-                                        value={draftTheme.backgroundImage?.url || ""}
-                                        onChange={(e) => {
-                                            const url = e.target.value
-                                            setDraftTheme((prev) => ({
-                                                ...prev,
-                                                backgroundImage: url
-                                                    ? {
-                                                        url,
-                                                        brightness: prev.backgroundImage?.brightness ?? 0,
-                                                        tile: prev.backgroundImage?.tile ?? false,
-                                                        alt: prev.backgroundImage?.alt,
-                                                        fileId: prev.backgroundImage?.fileId,
-                                                    }
-                                                    : null,
-                                            }))
-                                        }}
-                                        placeholder="https://images.unsplash.com/..."
-                                        className="h-[44px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-4 text-sm flex-1"
-                                    />
-                                    {draftTheme.backgroundImage?.url && (
+                            <InputSetting
+                                label="Image URL"
+                                value={backgroundImage?.url ?? ""}
+                                onChange={setBackgroundImageUrl}
+                                placeholder="https://images.unsplash.com/..."
+                                trailing={
+                                    backgroundImage?.url ? (
                                         <Button
                                             type="button"
                                             variant="ghost"
                                             size="icon"
-                                            onClick={() => setDraftTheme((prev) => ({ ...prev, backgroundImage: null }))}
-                                            className="h-[44px] w-[44px] text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                            aria-label="Remove background image"
+                                            onClick={() => patchTheme({ backgroundImage: null })}
+                                            className="editorial-transition h-[44px] w-[44px] shrink-0 rounded-[14px] text-[var(--destructive)] hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
-                                    )}
-                                </div>
-                            </div>
+                                    ) : null
+                                }
+                            />
 
-                            {draftTheme.backgroundImage?.url && (
+                            {backgroundImage?.url && (
                                 <>
-                                    <div className="space-y-1.5">
-                                        <div className="flex justify-between items-center text-sm font-medium text-[var(--editorial-body)]">
-                                            <span>Brightness Offset</span>
-                                            <span>{draftTheme.backgroundImage?.brightness ?? 0}</span>
-                                        </div>
-                                        <input
-                                            type="range"
-                                            min="-100"
-                                            max="100"
-                                            value={draftTheme.backgroundImage?.brightness ?? 0}
-                                            onChange={(e) => {
-                                                const val = parseInt(e.target.value, 10)
-                                                setDraftTheme((prev) => ({
-                                                    ...prev,
-                                                    backgroundImage: prev.backgroundImage
-                                                        ? { ...prev.backgroundImage, brightness: val }
-                                                        : null,
-                                                }))
-                                            }}
-                                            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer"
-                                        />
-                                    </div>
+                                    <RangeSetting
+                                        label="Brightness Offset"
+                                        min={-100}
+                                        max={100}
+                                        value={backgroundImage.brightness ?? 0}
+                                        onChange={(brightness) => patchBackgroundImage({ brightness })}
+                                    />
 
-                                    <div className="flex items-center justify-between">
-                                        <Label className="text-sm font-medium text-[var(--editorial-body)]">Tile Image</Label>
-                                        <input
-                                            type="checkbox"
-                                            checked={draftTheme.backgroundImage?.tile ?? false}
-                                            onChange={(e) => {
-                                                const checked = e.target.checked
-                                                setDraftTheme((prev) => ({
-                                                    ...prev,
-                                                    backgroundImage: prev.backgroundImage
-                                                        ? { ...prev.backgroundImage, tile: checked }
-                                                        : null,
-                                                }))
-                                            }}
-                                            className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
-                                        />
-                                    </div>
+                                    <ToggleRow
+                                        id="background-tile"
+                                        label="Tile Image"
+                                        checked={backgroundImage.tile ?? false}
+                                        onCheckedChange={(tile) => patchBackgroundImage({ tile })}
+                                    />
 
-                                    <div className="space-y-1.5">
-                                        <Label className="text-sm font-medium text-[var(--editorial-body)]">Alt Text</Label>
-                                        <Input
-                                            type="text"
-                                            value={draftTheme.backgroundImage?.alt || ""}
-                                            onChange={(e) => {
-                                                const alt = e.target.value
-                                                setDraftTheme((prev) => ({
-                                                    ...prev,
-                                                    backgroundImage: prev.backgroundImage
-                                                        ? { ...prev.backgroundImage, alt }
-                                                        : null,
-                                                }))
-                                            }}
-                                            placeholder="Background description"
-                                            className="h-[44px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-4 text-sm"
-                                        />
-                                    </div>
+                                    <InputSetting
+                                        label="Alt Text"
+                                        value={backgroundImage.alt ?? ""}
+                                        onChange={(alt) => patchBackgroundImage({ alt })}
+                                        placeholder="Background description"
+                                    />
                                 </>
                             )}
                         </div>
@@ -492,96 +440,54 @@ export function DesignDrawer({
                 </div>
 
                 {/* Footer action buttons */}
-                <div className="shrink-0 p-4 border-t border-[var(--border)] flex items-center justify-between gap-3 bg-[var(--card)]">
-                    <Popover open={cancelPopoverOpen} onOpenChange={setCancelPopoverOpen}>
-                        <PopoverTrigger
-                            render={
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setCancelPopoverOpen(true)}
-                                    style={{
-                                        animation: vibratingButton === "cancel" ? "vibrate 0.3s ease-in-out" : "none",
-                                    }}
-                                    className="h-11 gap-2 rounded-[16px]"
-                                >
-                                    <X className="h-4 w-4" />
-                                    Cancel
-                                </Button>
-                            }
-                        />
-                        <PopoverContent className="w-80" align="start" side="top" sideOffset={16}>
-                            <PopoverHeader>
-                                <PopoverTitle>Discard theme changes?</PopoverTitle>
-                                <PopoverDescription>
-                                    You have unsaved theme changes. If you cancel, all changes will be lost.
-                                </PopoverDescription>
-                            </PopoverHeader>
-                            <div className="flex justify-end gap-2 mt-4">
-                                <Button
-                                    variant="outline"
-                                    size="lg"
-                                    className="rounded-xl"
-                                    onClick={() => setCancelPopoverOpen(false)}
-                                >
-                                    No
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    onClick={handleCancelClick}
-                                    className="rounded-xl bg-red-500 hover:bg-red-600 text-white"
-                                >
-                                    Yes
-                                </Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[var(--editorial-border-light)] bg-[var(--card)] p-4">
+                    <ConfirmPopover
+                        open={cancelPopoverOpen}
+                        onOpenChange={setCancelPopoverOpen}
+                        align="start"
+                        title="Discard theme changes?"
+                        description="You have unsaved theme changes. If you cancel, all changes will be lost."
+                        onConfirm={handleCancelClick}
+                        destructive
+                        trigger={
+                            <Button
+                                variant="outline"
+                                className={cn(
+                                    SECONDARY_BUTTON_CLASS,
+                                    "flex-1",
+                                    vibratingButton === "cancel" && "editorial-vibrate"
+                                )}
+                            >
+                                <X className="h-4 w-4" />
+                                Cancel
+                            </Button>
+                        }
+                    />
 
-                    <Popover open={savePopoverOpen} onOpenChange={setSavePopoverOpen}>
-                        <PopoverTrigger
-                            render={
-                                <Button
-                                    onClick={() => setSavePopoverOpen(true)}
-                                    disabled={isSaving}
-                                    style={{
-                                        animation: vibratingButton === "save" ? "vibrate 0.3s ease-in-out" : "none",
-                                    }}
-                                    className="editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <Save className="h-4 w-4" />
-                                    {isSaving ? "Saving..." : "Save Design"}
-                                </Button>
-                            }
-                        />
-                        <PopoverContent className="w-80" align="end" side="top" sideOffset={16}>
-                            <PopoverHeader>
-                                <PopoverTitle>Save theme changes?</PopoverTitle>
-                                <PopoverDescription>
-                                    This will apply the theme changes to the entire form and update the server.
-                                </PopoverDescription>
-                            </PopoverHeader>
-                            <div className="flex justify-end gap-2 mt-4">
-                                <Button
-                                    variant="outline"
-                                    size="lg"
-                                    className="rounded-xl"
-                                    onClick={() => setSavePopoverOpen(false)}
-                                >
-                                    No
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    className="rounded-xl"
-                                    onClick={handleSaveClick}
-                                    disabled={isSaving}
-                                >
-                                    Yes
-                                </Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                    <ConfirmPopover
+                        open={savePopoverOpen}
+                        onOpenChange={setSavePopoverOpen}
+                        align="end"
+                        title="Save theme changes?"
+                        description="This will apply the theme changes to the entire form and update the server."
+                        onConfirm={handleSaveClick}
+                        confirmDisabled={isSaving}
+                        trigger={
+                            <Button
+                                disabled={isSaving}
+                                className={cn(
+                                    PRIMARY_BUTTON_CLASS,
+                                    "flex-1",
+                                    vibratingButton === "save" && "editorial-vibrate"
+                                )}
+                            >
+                                <Save className="h-4 w-4" />
+                                {isSaving ? "Saving..." : "Save Design"}
+                            </Button>
+                        }
+                    />
                 </div>
             </div>
         </div>
     )
 }
-

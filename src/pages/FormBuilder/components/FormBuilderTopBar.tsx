@@ -98,8 +98,8 @@ export function FormBuilderTopBar({
             }
             end={to === ROUTES.FORM_BUILDER}
           >
-            <Icon className="h-5 w-5" />
-            <span className="text-xs font-semibold uppercase tracking-[0.08em]">
+            <Icon className="h-4 w-4" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.08em]">
               {label}
             </span>
           </NavLink>

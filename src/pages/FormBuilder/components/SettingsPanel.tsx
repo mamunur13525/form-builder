@@ -1,5 +1,6 @@
-import React from "react"
-import { Plus } from "lucide-react"
+import React, { type ComponentType } from "react"
+import { GitBranch, Palette, Plus, SlidersHorizontal } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
@@ -16,12 +17,7 @@ import {
     TabsTrigger,
     TabsContent,
 } from "../../../components/ui/tabs"
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-} from "../../../components/ui/sheet"
+import { Sheet, SheetContent } from "../../../components/ui/sheet"
 import {
     Dialog,
     DialogContent,
@@ -71,6 +67,16 @@ const PAGE_TYPES = Object.entries(FIELD_TYPE_LABELS).map(([type, label]) => ({
     label,
 }))
 
+/** Raised-card active state, matching the drawer's choice tiles. */
+const TAB_TRIGGER_CLASS = cn(
+    "editorial-transition flex-1 gap-2 rounded-[13px] border border-transparent px-3 py-2.5",
+    "text-sm font-medium text-[var(--editorial-subtle)]",
+    "hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]",
+    "data-[state=active]:border-[var(--editorial-border-light)] data-[state=active]:bg-[var(--card)]",
+    "data-[state=active]:text-[var(--foreground)] data-[state=active]:shadow-[0_2px_8px_rgba(24,20,18,.06)]",
+    "focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
+)
+
 interface SettingsPanelProps {
     page: FormField
     pageIndex: number
@@ -95,6 +101,18 @@ export function SettingsPanel({
     const [logicDialogOpen, setLogicDialogOpen] = React.useState(false)
     const hasChangesRef = React.useRef(false)
     const settings = page.settings ?? {}
+
+    // Design and Logic open overlays rather than swapping tab panels.
+    const SETTINGS_TABS: {
+        value: string
+        label: string
+        icon: ComponentType<{ className?: string }>
+        onSelect?: () => void
+    }[] = [
+            { value: "settings", label: "Settings", icon: SlidersHorizontal },
+            { value: "design", label: "Design", icon: Palette, onSelect: onOpenDesignDrawer },
+            { value: "logic", label: "Logic", icon: GitBranch, onSelect: () => setLogicDialogOpen(true) },
+        ]
 
     /** Merge a single settings group, preserving the rest. */
     const patchSettings = (group: Partial<FieldSettings>) => {
@@ -141,13 +159,31 @@ export function SettingsPanel({
             <div className="flex flex-col border-b border-[var(--editorial-border-light)]">
                 <div className="flex-1 overflow-y-auto">
                     <Tabs defaultValue="settings" className="flex h-full flex-col">
-                        <TabsList variant="line" className="w-full justify-start px-6 pt-2 mt-3">
-                            <TabsTrigger value="settings" className="flex-1">Settings</TabsTrigger>
-                            <TabsTrigger value="design" className="flex-1" onClick={onOpenDesignDrawer}>Design</TabsTrigger>
-                            <TabsTrigger value="logic" className="flex-1" onClick={() => setLogicDialogOpen(true)}>Logic</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="settings" className="h-full overflow-y-auto">
-                            <div className="space-y-8 px-6 py-6">
+                        {/* Pill tabs on the editorial palette: the list is the track,
+                            the active tab is a raised card. */}
+                        <div className="px-6 pt-5">
+                            <TabsList
+                                className={cn(
+                                    "h-auto w-full gap-1 rounded-[18px] border border-[var(--editorial-border-light)]",
+                                    "bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)]",
+                                    "group-data-horizontal/tabs:h-auto"
+                                )}
+                            >
+                                {SETTINGS_TABS.map((tab) => (
+                                    <TabsTrigger
+                                        key={tab.value}
+                                        value={tab.value}
+                                        onClick={() => tab.onSelect?.()}
+                                        className={TAB_TRIGGER_CLASS}
+                                    >
+                                        <tab.icon className="h-4 w-4" />
+                                        {tab.label}
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                        </div>
+                        <TabsContent value="settings" className="h-full flex-1 overflow-y-auto">
+                            <div className="space-y-8 px-6 py-6 overflow-y-auto">
                                 {/* Field type — always available */}
                                 <div className="space-y-2">
                                     <Label className="text-base font-semibold text-[var(--foreground)]">
@@ -435,21 +471,15 @@ export function SettingsPanel({
                     }}
                     modal
                 >
+                    {/* `editorial` re-points the design tokens for this portalled surface. */}
                     <SheetContent
                         side="right"
-                        className="h-full flex flex-col w-[70.666%] max-w-none min-w-0 overflow-hidden p-0 data-[side=right]:w-[70.666%] data-[side=right]:sm:max-w-none"
+                        className="editorial h-full flex flex-col w-[70.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[70.666%] data-[side=right]:sm:max-w-none"
                         showCloseButton={false}
                     >
-                        <SheetHeader className="px-6 pt-6 shrink-0">
-                            <SheetTitle className="flex justify-between items-center">
-                                <span className="font-medium text-[var(--editorial-body)]">Live Preview</span>
-                                <span className="font-medium text-[var(--editorial-body)]">Design</span>
-                            </SheetTitle>
-                        </SheetHeader>
                         <div className="flex-1 min-h-0 w-full">
                             <DesignDrawer
                                 open={designDrawerOpen}
-                                onOpenChange={onCloseDesignDrawer}
                                 theme={theme}
                                 page={page}
                                 pageIndex={pageIndex}

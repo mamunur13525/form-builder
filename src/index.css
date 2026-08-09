@@ -241,6 +241,24 @@
     transition-timing-function: ease-out;
 }
 
+/* Nudge to draw attention to an action that still needs a decision. */
+@keyframes editorial-vibrate {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-3px);
+    }
+    75% {
+        transform: translateX(3px);
+    }
+}
+
+.editorial-vibrate {
+    animation: editorial-vibrate 300ms ease-in-out;
+}
+
 /* Lucide icons read best unfilled with a slightly lighter stroke. */
 .editorial svg {
     stroke-width: 1.75;
@@ -249,6 +267,10 @@
 @media (prefers-reduced-motion: reduce) {
     .editorial-transition {
         transition-duration: 1ms;
+    }
+
+    .editorial-vibrate {
+        animation: none;
     }
 }
 

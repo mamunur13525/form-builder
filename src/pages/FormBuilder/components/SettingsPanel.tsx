@@ -72,8 +72,8 @@ const TAB_TRIGGER_CLASS = cn(
     "editorial-transition flex-1 gap-2 rounded-[13px] border border-transparent px-3 py-2.5",
     "text-sm font-medium text-[var(--editorial-subtle)]",
     "hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]",
-    "data-[state=active]:border-[var(--editorial-border-light)] data-[state=active]:bg-[var(--card)]",
-    "data-[state=active]:text-[var(--foreground)] data-[state=active]:shadow-[0_2px_8px_rgba(24,20,18,.06)]",
+    "data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)]",
+    "data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)]",
     "focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
 )
 
@@ -474,7 +474,7 @@ export function SettingsPanel({
                     {/* `editorial` re-points the design tokens for this portalled surface. */}
                     <SheetContent
                         side="right"
-                        className="editorial h-full flex flex-col w-[70.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[70.666%] data-[side=right]:sm:max-w-none"
+                        className="editorial h-full flex flex-col w-[80.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[80.666%] data-[side=right]:sm:max-w-none"
                         showCloseButton={false}
                     >
                         <div className="flex-1 min-h-0 w-full">

@@ -133,7 +133,6 @@ export function PublishDialog({
       // Republishing brings the live form back in sync with the draft.
       onHasUnpublishedChangesChange?.(updated.hasUnpublishedChanges ?? false);
       showSuccess("Form published", "Your form is live.");
-      closeDialog();
     } catch (error) {
       showError("Failed to publish form", error);
     } finally {
@@ -157,7 +156,6 @@ export function PublishDialog({
       onIsPublishedChange(updated.status === "published");
       onHasUnpublishedChangesChange?.(updated.hasUnpublishedChanges ?? false);
       showSuccess("Form unpublished", "The public link is no longer active.");
-      closeDialog();
     } catch (error) {
       showError("Failed to unpublish form", error);
     } finally {

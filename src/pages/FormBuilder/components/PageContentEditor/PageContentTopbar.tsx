@@ -5,7 +5,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { showWarning } from "@/shared/hooks/useToast";
 import {
   GitBranch,
   Paintbrush,
@@ -27,6 +26,8 @@ interface PageContentTopbarProps {
   onOpenPages?: () => void;
   /** Provided on compact layouts, where settings live in a drawer. */
   onOpenSettings?: () => void;
+  onOpenDesignDrawer: () => void;
+  onOpenLogicDialog: () => void;
 }
 
 interface LeftButton {
@@ -58,6 +59,8 @@ const PageContentTopbar = ({
   onToggleView,
   onOpenPages,
   onOpenSettings,
+  onOpenDesignDrawer,
+  onOpenLogicDialog
 }: PageContentTopbarProps) => {
   // The drawer triggers are only passed on compact layouts, where the canvas is
   // already phone-sized and the desktop/mobile toggle would be meaningless.
@@ -67,26 +70,18 @@ const PageContentTopbar = ({
     ...(isCompact
       ? []
       : [
-          {
-            icon: isMobileView ? Monitor : Smartphone,
-            tooltip: isMobileView ? "Desktop view" : "Mobile view",
-            type: "view",
-          },
-        ]),
+        {
+          icon: isMobileView ? Monitor : Smartphone,
+          tooltip: isMobileView ? "Desktop view" : "Mobile view",
+          type: "view",
+        },
+      ]),
     {
       icon: Play,
       tooltip: "Preview",
       type: "preview",
     },
   ];
-
-  const handleDesign = () => {
-    showWarning("Coming Soon!");
-  };
-
-  const handleLogic = () => {
-    showWarning("Coming Soon!");
-  };
 
   const handleBtnClick = (type: string) => {
     switch (type) {
@@ -100,10 +95,10 @@ const PageContentTopbar = ({
         onToggleView();
         break;
       case "design":
-        handleDesign();
+        onOpenDesignDrawer();
         break;
       case "logic":
-        handleLogic();
+        onOpenLogicDialog();
         break;
 
       default:

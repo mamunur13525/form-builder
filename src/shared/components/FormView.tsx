@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import type { Form, FormField } from "../../shared/types/common";
@@ -8,6 +9,7 @@ import { FormProgressBar } from "./FormProgressBar";
 import { FormSubmittedView } from "./FormSubmittedView";
 import { FormNavigationFooter } from "./FormNavigationFooter";
 import { FieldLabel, FieldHelperText, FieldSubmitButton } from "./fields";
+import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "../utils/theme";
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -48,8 +50,43 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
     handleNavNext,
   } = useFormNavigation({ form, mode, onSubmit });
 
+  const themeResolved = resolveFormTheme(form.theme);
+
+  useEffect(() => {
+    if (themeResolved.font) {
+      loadThemeFont(themeResolved.font);
+    }
+  }, [themeResolved.font]);
+
+  const fontSizes = getFontSizeClasses(themeResolved.fontSize);
+  const alignClass =
+    themeResolved.alignment === "center"
+      ? "text-center items-center"
+      : themeResolved.alignment === "right"
+        ? "text-right items-end"
+        : "text-left items-start";
+
+  const containerStyle: React.CSSProperties = {
+    backgroundColor: themeResolved.backgroundColor,
+    color: themeResolved.textColor,
+    fontFamily: themeResolved.font?.family ? `"${themeResolved.font.family}", sans-serif` : undefined,
+  };
+
+  const bgImageStyle: React.CSSProperties = themeResolved.backgroundImage?.url
+    ? {
+      backgroundImage: `url(${themeResolved.backgroundImage.url})`,
+      backgroundRepeat: themeResolved.backgroundImage.tile ? "repeat" : "no-repeat",
+      backgroundSize: themeResolved.backgroundImage.tile ? "auto" : "cover",
+      backgroundPosition: "center",
+      filter:
+        themeResolved.backgroundImage.brightness !== undefined
+          ? `brightness(${(100 + themeResolved.backgroundImage.brightness) / 100})`
+          : undefined,
+    }
+    : {};
+
   const renderFieldQuestion = (field: FormField) => (
-    <div className="w-full">
+    <div className={cn("w-full flex flex-col", alignClass)}>
       {field.coverImage?.url && (
         <img
           src={field.coverImage.url}
@@ -61,19 +98,25 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
       <FieldLabel
         label={field.label}
         pageNumber={currentStep + 1}
+        color={themeResolved.questionColor}
+        fontSizeClass={fontSizes.question}
       />
 
       <FieldHelperText
         helperText={field.helperText}
+        color={themeResolved.textColor}
+        fontSizeClass={fontSizes.helper}
       />
 
       {/* Field-specific input */}
-      <div className="mt-5">
+      <div className="mt-5 w-full" style={{ color: themeResolved.answerColor }}>
         <FormFieldRenderer
           field={field}
           value={answers[field.fieldKey]}
           error={error}
           onAnswer={handleAnswer}
+          color={themeResolved.answerColor}
+          fontSizeClass={fontSizes.input}
         />
         {error && (
           <motion.div
@@ -93,9 +136,12 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
           isSubmitting
             ? "Submitting..."
             : field.appearance.submitButtonText ||
-              (field.type === "statement" ? "Continue" : "Submit")
+            (field.type === "statement" ? "Continue" : "Submit")
         }
-        color={field.appearance.submitButtonColor}
+        color={field.appearance.submitButtonColor || themeResolved.buttonColor}
+        textColor={themeResolved.buttonTextColor}
+        roundCorners={themeResolved.roundCorners}
+        fontSizeClass={fontSizes.button}
         onClick={handleNext}
         disabled={isSubmitting}
       />
@@ -103,21 +149,34 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
   );
 
   if (submitted) {
-    return <FormSubmittedView onReset={() => {}} />;
+    return <FormSubmittedView onReset={() => { }} />;
   }
 
   return (
-    <div className={cn("flex flex-col bg-background h-full")}>
-      {/* Progress bar */}
-      {form.settings?.showProgressBar && (
-        <FormProgressBar
-          currentStep={currentStep}
-          totalSteps={activeFields.length}
+    <div
+      className="relative flex flex-col h-full w-full overflow-hidden"
+      style={containerStyle}
+    >
+      {/* Background Image Layer */}
+      {themeResolved.backgroundImage?.url && (
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={bgImageStyle}
         />
       )}
 
+      {/* Progress bar */}
+      {form.settings?.showProgressBar && (
+        <div className="relative z-10">
+          <FormProgressBar
+            currentStep={currentStep}
+            totalSteps={activeFields.length}
+          />
+        </div>
+      )}
+
       {/* Content area */}
-      <div className="flex-1 min-h-0 relative">
+      <div className="relative z-10 flex-1 min-h-0">
         <div className="absolute inset-0">
           <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
@@ -155,13 +214,15 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
       </div>
 
       {/* Footer */}
-      <FormNavigationFooter
-        currentStep={currentStep}
-        isLastStep={isLastStep}
-        hasSubmittedCurrent={submittedPages.has(currentStep)}
-        onPrev={handlePrev}
-        onNavNext={handleNavNext}
-      />
+      <div className="relative z-10">
+        <FormNavigationFooter
+          currentStep={currentStep}
+          isLastStep={isLastStep}
+          hasSubmittedCurrent={submittedPages.has(currentStep)}
+          onPrev={handlePrev}
+          onNavNext={handleNavNext}
+        />
+      </div>
     </div>
   );
 }

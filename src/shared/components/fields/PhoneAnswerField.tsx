@@ -17,6 +17,8 @@ interface PhoneAnswerFieldProps {
     placeholder?: string
     error?: string | null
     disabled?: boolean
+    color?: string
+    fontSizeClass?: string
 }
 
 /** Split a stored "+880 1712..." answer into its dial code and local part. */
@@ -42,6 +44,8 @@ export function PhoneAnswerField({
     placeholder,
     error,
     disabled,
+    color,
+    fontSizeClass,
 }: PhoneAnswerFieldProps) {
     const configuredDial =
         settings.countryCodeMode === "specific" && settings.defaultCountry
@@ -104,8 +108,10 @@ export function PhoneAnswerField({
                     onChange={(e) => emit(dialCode, e.target.value)}
                     className={cn(
                         "h-11 flex-1 rounded-md border bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+                        fontSizeClass,
                         error ? "border-destructive" : "border-input",
                     )}
+                    style={color ? { color } : undefined}
                 />
             </div>
             {settings.phoneVerification && (

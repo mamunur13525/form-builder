@@ -5,13 +5,14 @@ interface EditorProps {
     page: FormField
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormField>) => void
+    color?: string
+    fontSizeClass?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function YesNoEditor(_props: EditorProps) {
+export function YesNoEditor({ color, fontSizeClass }: EditorProps) {
     return (
         <div className="space-y-2">
-            <YesNoField />
+            <YesNoField color={color} fontSizeClass={fontSizeClass} />
         </div>
     )
 }

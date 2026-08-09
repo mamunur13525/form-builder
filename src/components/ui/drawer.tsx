@@ -57,7 +57,7 @@ export function Drawer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           />
           <motion.div
             role="dialog"
@@ -71,7 +71,7 @@ export function Drawer({
             initial={{ x: offscreen }}
             animate={{ x: 0 }}
             exit={{ x: offscreen }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
             <div className="flex shrink-0 items-center justify-between px-2 pb-2">
               <span className="editorial-eyebrow text-[var(--editorial-subtle)]">

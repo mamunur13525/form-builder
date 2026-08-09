@@ -23,6 +23,8 @@ interface FormFieldRendererProps {
     value: unknown
     error: string | null
     onAnswer: (fieldKey: string, value: unknown) => void
+    color?: string
+    fontSizeClass?: string
 }
 
 /** Fall back to sane defaults so a field missing its settings group still renders. */
@@ -34,7 +36,7 @@ const CHOICE_FALLBACK = {
     hideLabels: false,
 }
 
-export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRendererProps) {
+export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSizeClass }: FormFieldRendererProps) {
     const settings = field.settings ?? {}
 
     switch (field.type) {
@@ -47,6 +49,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     error={error}
                     autoFocus
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "email":
@@ -58,6 +62,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     error={error}
                     autoFocus
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "phone":
@@ -74,6 +80,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     }
                     placeholder={field.placeholder}
                     error={error}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "url":
@@ -85,6 +93,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     error={error}
                     autoFocus
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "longText":
@@ -96,6 +106,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     rows={4}
                     error={error}
                     autoFocus
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "number":
@@ -107,6 +119,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     error={error}
                     autoFocus
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "date":
@@ -115,6 +129,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     value={(value as string) || ""}
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     error={error}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "time":
@@ -123,6 +139,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     value={(value as string) || ""}
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     error={error}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "dropdown":
@@ -132,6 +150,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     options={field.options}
                     error={error}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "select":
@@ -144,6 +164,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     settings={settings.choice ?? CHOICE_FALLBACK}
                     multiple={false}
                     name={field.fieldKey}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "checkbox":
@@ -161,6 +183,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     }
                     multiple
                     name={field.fieldKey}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "yesNo":
@@ -168,6 +192,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                 <YesNoField
                     value={(value as string) || ""}
                     onChange={(v) => onAnswer(field.fieldKey, v)}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "rating":
@@ -199,6 +225,8 @@ export function FormFieldRenderer({ field, value, error, onAnswer }: FormFieldRe
                     value={value as Record<string, string> | undefined}
                     onChange={(v) => onAnswer(field.fieldKey, v)}
                     fields={settings.address?.fields ?? []}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "matrix":

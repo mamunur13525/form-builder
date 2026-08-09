@@ -18,7 +18,7 @@ export function FormNavigationFooter({
     onNavNext,
 }: FormNavigationFooterProps) {
     return (
-        <div className="flex items-center justify-between px-6 py-4 border-t shrink-0 bg-background">
+        <div className="flex items-center justify-between px-6 py-4 shrink-0 bg-transparent">
             <Badge variant="outline" className="text-sm text-muted-foreground font-normal">
                 powered by typeform alternative
             </Badge>

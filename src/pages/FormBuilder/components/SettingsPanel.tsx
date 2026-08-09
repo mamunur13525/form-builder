@@ -1,6 +1,5 @@
-import React, { useEffect, type ComponentType } from "react"
-import { GitBranch, Palette, Plus, SlidersHorizontal } from "lucide-react"
-import { cn } from "@/lib/utils"
+import React, { type ComponentType } from "react"
+import { GitBranch, ImagePlus, Palette, Plus, SlidersHorizontal, Trash2 } from "lucide-react"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
@@ -40,12 +39,14 @@ import {
     MULTI_ANSWER_TYPES,
 } from "@/features/forms/model/field-defaults"
 import {
-    CoverImageField,
     NumberSetting,
     RequiredToggle,
     SettingsSection,
+    TAB_LIST_CLASS,
+    TAB_TRIGGER_CLASS,
     ToggleRow,
 } from "./settings/primitives"
+import { ImagePickerDialog } from "./settings/ImagePickerDialog"
 import {
     HideLabelsSetting,
     HorizontalAlignSetting,
@@ -66,16 +67,6 @@ const PAGE_TYPES = Object.entries(FIELD_TYPE_LABELS).map(([type, label]) => ({
     type,
     label,
 }))
-
-/** Raised-card active state, matching the drawer's choice tiles. */
-const TAB_TRIGGER_CLASS = cn(
-    "editorial-transition flex-1 gap-2 rounded-[13px] border border-transparent px-3 py-2.5",
-    "text-sm font-medium text-[var(--editorial-subtle)]",
-    "hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]",
-    "data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)]",
-    "data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)]",
-    "focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
-)
 
 interface SettingsPanelProps {
     page: FormField
@@ -106,6 +97,7 @@ export function SettingsPanel({
 }: SettingsPanelProps) {
 
     const hasChangesRef = React.useRef(false)
+    const [coverDialogOpen, setCoverDialogOpen] = React.useState(false)
     const settings = page.settings ?? {}
 
     // Design and Logic open overlays rather than swapping tab panels.
@@ -168,13 +160,7 @@ export function SettingsPanel({
                         {/* Pill tabs on the editorial palette: the list is the track,
                             the active tab is a raised card. */}
                         <div className="px-6 pt-5">
-                            <TabsList
-                                className={cn(
-                                    "h-auto w-full gap-1 rounded-[18px] border border-[var(--editorial-border-light)]",
-                                    "bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)]",
-                                    "group-data-horizontal/tabs:h-auto"
-                                )}
-                            >
+                            <TabsList className={TAB_LIST_CLASS}>
                                 {SETTINGS_TABS.map((tab) => (
                                     <TabsTrigger
                                         key={tab.value}
@@ -422,10 +408,45 @@ export function SettingsPanel({
                                 )}
 
                                 {/* Cover image — available on every field type */}
-                                <CoverImageField
-                                    value={page.coverImage}
-                                    onChange={(coverImage) => onUpdate(pageIndex, { coverImage })}
-                                />
+                                <SettingsSection title="Cover image">
+                                    {page.coverImage?.url ? (
+                                        <div className="space-y-3">
+                                            <div className="relative overflow-hidden rounded-[22px] border border-[var(--editorial-border-light)]">
+                                                <img
+                                                    src={page.coverImage.url}
+                                                    alt={page.coverImage.alt || "Cover"}
+                                                    className="h-28 w-full object-cover"
+                                                />
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setCoverDialogOpen(true)}
+                                                    className="editorial-transition flex-1 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                                                >
+                                                    Replace
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onUpdate(pageIndex, { coverImage: null })}
+                                                    className="editorial-transition flex items-center justify-center gap-1.5 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--destructive)] hover:-translate-y-0.5 hover:border-[var(--destructive)]/30 active:translate-y-0 active:scale-[.98]"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => setCoverDialogOpen(true)}
+                                            className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-[22px] border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]"
+                                        >
+                                            <ImagePlus className="h-5 w-5" />
+                                            <span>Add a cover image</span>
+                                        </button>
+                                    )}
+                                </SettingsSection>
 
                                 {/* Custom validation error message — available on every type */}
                                 <SettingsSection title="Validation message">
@@ -480,7 +501,7 @@ export function SettingsPanel({
                     {/* `editorial` re-points the design tokens for this portalled surface. */}
                     <SheetContent
                         side="right"
-                        className="editorial h-full flex flex-col w-[80.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[80.666%] data-[side=right]:sm:max-w-none"
+                        className="editorial h-full flex flex-col w-[90.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[90.666%] data-[side=right]:sm:max-w-none"
                         showCloseButton={false}
                     >
                         <div className="flex-1 min-h-0 w-full">
@@ -497,6 +518,13 @@ export function SettingsPanel({
                         </div>
                     </SheetContent>
                 </Sheet>
+
+                <ImagePickerDialog
+                    open={coverDialogOpen}
+                    onOpenChange={setCoverDialogOpen}
+                    onSelect={(coverImage) => onUpdate(pageIndex, { coverImage })}
+                    currentImage={page.coverImage}
+                />
 
                 <Dialog open={logicDialogOpen} onOpenChange={onCloseLogicDialog}>
                     <DialogContent className="sm:max-w-[600px]">

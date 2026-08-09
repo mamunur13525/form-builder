@@ -52,6 +52,17 @@ export const SECONDARY_BUTTON_CLASS =
 export const DESTRUCTIVE_BUTTON_CLASS =
     "editorial-transition h-11 gap-2 rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
 
+/**
+ * Segmented pill tabs: the list is an inset track, the active tab a raised
+ * card. Keep `TabsList` on its default variant — the `line` variant forces
+ * `data-active:bg-transparent` and would cancel the raised fill.
+ */
+export const TAB_LIST_CLASS =
+    "h-auto w-full gap-1 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)] group-data-horizontal/tabs:h-auto"
+
+export const TAB_TRIGGER_CLASS =
+    "editorial-transition flex-1 gap-2 rounded-[13px] border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
+
 const FIELD_LABEL_CLASS = "text-sm font-medium text-[var(--editorial-body)]"
 
 const HINT_CLASS = "text-xs leading-5 text-[var(--editorial-subtle)]"

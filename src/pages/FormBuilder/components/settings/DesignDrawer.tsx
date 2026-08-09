@@ -1,5 +1,6 @@
 import React from "react"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
     ColorSetting,
     ConfirmPopover,
@@ -10,10 +11,14 @@ import {
     SECONDARY_BUTTON_CLASS,
     SelectSetting,
     SettingsSection,
+    TAB_LIST_CLASS,
+    TAB_TRIGGER_CLASS,
     ToggleRow,
     type IconChoiceOption,
     type SelectSettingOption,
 } from "./primitives"
+import { ThemePresetGrid } from "./ThemePresetGrid"
+import { THEME_PRESETS, type ThemePreset } from "./theme-presets"
 import type {
     ContentAlignment,
     CornerRadius,
@@ -25,7 +30,19 @@ import type {
     ThemeFontSource,
 } from "@/shared/types/common"
 import { PageContentEditor } from "../PageContentEditor/PageContentEditor"
-import { Save, X, Trash2, AArrowDown, ALargeSmall, AArrowUp, AlignLeft, AlignCenter, AlignRight } from "lucide-react"
+import {
+    Save,
+    X,
+    Trash2,
+    AArrowDown,
+    ALargeSmall,
+    AArrowUp,
+    AlignLeft,
+    AlignCenter,
+    AlignRight,
+    SlidersHorizontal,
+    Sparkles,
+} from "lucide-react"
 import { resolveFormTheme, loadThemeFont, getCornerRadiusCss, type ResolvedFormTheme } from "@/shared/utils/theme"
 import { cn } from "@/lib/utils"
 
@@ -135,6 +152,8 @@ const OVERLAY_SELECTORS = [
 
 const noop = () => { }
 
+type SidebarTab = "settings" | "presets"
+
 export function DesignDrawer({
     open,
     theme,
@@ -146,6 +165,7 @@ export function DesignDrawer({
     hasChangesRef,
 }: DesignDrawerProps) {
     const [isSaving, setIsSaving] = React.useState(false)
+    const [sidebarTab, setSidebarTab] = React.useState<SidebarTab>("settings")
     const [vibratingButton, setVibratingButton] = React.useState<"cancel" | "save" | null>(null)
     const [cancelPopoverOpen, setCancelPopoverOpen] = React.useState(false)
     const [savePopoverOpen, setSavePopoverOpen] = React.useState(false)
@@ -222,6 +242,26 @@ export function DesignDrawer({
         document.addEventListener("mousedown", handleClickOutside)
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [open, hasChangesRef, onCancel, nudgeFooterButtons])
+
+    /**
+     * Which preset the draft currently equals, or null when the theme has been
+     * hand-tuned. Comparing resolved themes keeps the match stable regardless of
+     * key order or omitted optional fields.
+     */
+    const activePresetId = React.useMemo(() => {
+        const current = JSON.stringify(draftTheme)
+        const match = THEME_PRESETS.find(
+            (preset) => JSON.stringify(resolveFormTheme(preset.theme)) === current
+        )
+        return match?.id ?? null
+    }, [draftTheme])
+
+    const applyPreset = React.useCallback(
+        (preset: ThemePreset) => {
+            updateDraft(() => resolveFormTheme(preset.theme))
+        },
+        [updateDraft]
+    )
 
     const patchTheme = React.useCallback(
         (patch: Partial<ResolvedFormTheme>) => {
@@ -311,7 +351,7 @@ export function DesignDrawer({
             </div>
 
             {/* Controls sidebar */}
-            <div className="flex h-full w-[380px] shrink-0 flex-col border-l border-[var(--border)] bg-[var(--editorial-surface)]">
+            <div className="flex h-full w-[470px] shrink-0 flex-col border-l border-[var(--border)] bg-[var(--editorial-surface)]">
                 <div className="shrink-0 border-b border-[var(--editorial-border-light)] px-6 pt-6 pb-4">
                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">Design</p>
                     <h3 className="font-display mt-1 text-2xl text-[var(--foreground)]">
@@ -319,125 +359,170 @@ export function DesignDrawer({
                     </h3>
                 </div>
 
-                <div className="flex-1 space-y-8 overflow-y-auto px-6 py-6">
-                    <SettingsSection title="Colors">
-                        <div className="grid grid-cols-1 gap-4">
-                            {COLOR_FIELDS.map(({ key, label, fallback }) => (
-                                <ColorSetting
-                                    key={key}
-                                    label={label}
-                                    fallback={fallback}
-                                    value={draftTheme[key]}
-                                    onChange={(value) => patchTheme({ [key]: value })}
-                                />
-                            ))}
-                        </div>
-                    </SettingsSection>
+                <Tabs
+                    value={sidebarTab}
+                    onValueChange={(next) => setSidebarTab(next === "presets" ? "presets" : "settings")}
+                    className="flex min-h-0 flex-1 flex-col"
+                >
+                    <div className="shrink-0 px-6 pt-4">
+                        <TabsList className={TAB_LIST_CLASS}>
+                            <TabsTrigger value="settings" className={TAB_TRIGGER_CLASS}>
+                                <SlidersHorizontal className="h-4 w-4" />
+                                Current
+                            </TabsTrigger>
+                            <TabsTrigger value="presets" className={TAB_TRIGGER_CLASS}>
+                                <Sparkles className="h-4 w-4" />
+                                Themes
+                            </TabsTrigger>
+                        </TabsList>
+                    </div>
 
-                    <SettingsSection title="Typography">
-                        <div className="space-y-4">
-                            <SelectSetting
-                                label="Font Family"
-                                value={draftTheme.font.family}
-                                options={FONT_FAMILY_OPTIONS}
-                                onChange={(family) => patchFont({ family })}
-                            />
-
-                            <SelectSetting
-                                label="Font Source"
-                                value={draftTheme.font.source}
-                                options={FONT_SOURCE_OPTIONS}
-                                onChange={(source) => patchFont({ source })}
-                            />
-
-                            {draftTheme.font.source === "custom" && (
-                                <InputSetting
-                                    label="Font File URL"
-                                    value={draftTheme.font.url ?? ""}
-                                    onChange={(url) => patchFont({ url })}
-                                    placeholder="https://example.com/font.woff2"
-                                />
-                            )}
-
-                            <IconChoiceSetting
-                                label="Font Size Preset"
-                                value={draftTheme.fontSize}
-                                options={FONT_SIZE_OPTIONS}
-                                onChange={(fontSize) => patchTheme({ fontSize })}
-                            />
-                        </div>
-                    </SettingsSection>
-
-                    <SettingsSection title="Layout & Corners">
-                        <div className="space-y-4">
-                            <IconChoiceSetting
-                                label="Content Alignment"
-                                value={draftTheme.alignment}
-                                options={ALIGNMENT_OPTIONS}
-                                onChange={(alignment) => patchTheme({ alignment })}
-                            />
-
-                            <IconChoiceSetting
-                                label="Corner Radius Preset"
-                                hint="Applies to inputs, buttons and cards."
-                                value={draftTheme.roundCorners}
-                                options={CORNER_RADIUS_OPTIONS}
-                                onChange={(roundCorners) => patchTheme({ roundCorners })}
-                            />
-                        </div>
-                    </SettingsSection>
-
-                    <SettingsSection title="Background Image">
-                        <div className="space-y-4">
-                            <InputSetting
-                                label="Image URL"
-                                value={backgroundImage?.url ?? ""}
-                                onChange={setBackgroundImageUrl}
-                                placeholder="https://images.unsplash.com/..."
-                                trailing={
-                                    backgroundImage?.url ? (
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            aria-label="Remove background image"
-                                            onClick={() => patchTheme({ backgroundImage: null })}
-                                            className="editorial-transition h-[44px] w-[44px] shrink-0 rounded-[14px] text-[var(--destructive)] hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    ) : null
-                                }
-                            />
-
-                            {backgroundImage?.url && (
-                                <>
-                                    <RangeSetting
-                                        label="Brightness Offset"
-                                        min={-100}
-                                        max={100}
-                                        value={backgroundImage.brightness ?? 0}
-                                        onChange={(brightness) => patchBackgroundImage({ brightness })}
+                    <TabsContent
+                        value="settings"
+                        className="min-h-0 flex-1 space-y-8 overflow-y-auto px-6 py-6"
+                    >
+                        <SettingsSection title="Colors">
+                            <div className="grid grid-cols-1 gap-4">
+                                {COLOR_FIELDS.map(({ key, label, fallback }) => (
+                                    <ColorSetting
+                                        key={key}
+                                        label={label}
+                                        fallback={fallback}
+                                        value={draftTheme[key]}
+                                        onChange={(value) => patchTheme({ [key]: value })}
                                     />
+                                ))}
+                            </div>
+                        </SettingsSection>
 
-                                    <ToggleRow
-                                        id="background-tile"
-                                        label="Tile Image"
-                                        checked={backgroundImage.tile ?? false}
-                                        onCheckedChange={(tile) => patchBackgroundImage({ tile })}
-                                    />
+                        <SettingsSection title="Typography">
+                            <div className="space-y-4">
+                                <SelectSetting
+                                    label="Font Family"
+                                    value={draftTheme.font.family}
+                                    options={FONT_FAMILY_OPTIONS}
+                                    onChange={(family) => patchFont({ family })}
+                                />
 
+                                <SelectSetting
+                                    label="Font Source"
+                                    value={draftTheme.font.source}
+                                    options={FONT_SOURCE_OPTIONS}
+                                    onChange={(source) => patchFont({ source })}
+                                />
+
+                                {draftTheme.font.source === "custom" && (
                                     <InputSetting
-                                        label="Alt Text"
-                                        value={backgroundImage.alt ?? ""}
-                                        onChange={(alt) => patchBackgroundImage({ alt })}
-                                        placeholder="Background description"
+                                        label="Font File URL"
+                                        value={draftTheme.font.url ?? ""}
+                                        onChange={(url) => patchFont({ url })}
+                                        placeholder="https://example.com/font.woff2"
                                     />
-                                </>
+                                )}
+
+                                <IconChoiceSetting
+                                    label="Font Size Preset"
+                                    value={draftTheme.fontSize}
+                                    options={FONT_SIZE_OPTIONS}
+                                    onChange={(fontSize) => patchTheme({ fontSize })}
+                                />
+                            </div>
+                        </SettingsSection>
+
+                        <SettingsSection title="Layout & Corners">
+                            <div className="space-y-4">
+                                <IconChoiceSetting
+                                    label="Content Alignment"
+                                    value={draftTheme.alignment}
+                                    options={ALIGNMENT_OPTIONS}
+                                    onChange={(alignment) => patchTheme({ alignment })}
+                                />
+
+                                <IconChoiceSetting
+                                    label="Corner Radius Preset"
+                                    hint="Applies to inputs, buttons and cards."
+                                    value={draftTheme.roundCorners}
+                                    options={CORNER_RADIUS_OPTIONS}
+                                    onChange={(roundCorners) => patchTheme({ roundCorners })}
+                                />
+                            </div>
+                        </SettingsSection>
+
+                        <SettingsSection title="Background Image">
+                            <div className="space-y-4">
+                                <InputSetting
+                                    label="Image URL"
+                                    value={backgroundImage?.url ?? ""}
+                                    onChange={setBackgroundImageUrl}
+                                    placeholder="https://images.unsplash.com/..."
+                                    trailing={
+                                        backgroundImage?.url ? (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                aria-label="Remove background image"
+                                                onClick={() => patchTheme({ backgroundImage: null })}
+                                                className="editorial-transition h-[44px] w-[44px] shrink-0 rounded-[14px] text-[var(--destructive)] hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        ) : null
+                                    }
+                                />
+
+                                {backgroundImage?.url && (
+                                    <>
+                                        <RangeSetting
+                                            label="Brightness Offset"
+                                            min={-100}
+                                            max={100}
+                                            value={backgroundImage.brightness ?? 0}
+                                            onChange={(brightness) => patchBackgroundImage({ brightness })}
+                                        />
+
+                                        <ToggleRow
+                                            id="background-tile"
+                                            label="Tile Image"
+                                            checked={backgroundImage.tile ?? false}
+                                            onCheckedChange={(tile) => patchBackgroundImage({ tile })}
+                                        />
+
+                                        <InputSetting
+                                            label="Alt Text"
+                                            value={backgroundImage.alt ?? ""}
+                                            onChange={(alt) => patchBackgroundImage({ alt })}
+                                            placeholder="Background description"
+                                        />
+                                    </>
+                                )}
+                            </div>
+                        </SettingsSection>
+                    </TabsContent>
+
+                    <TabsContent
+                        value="presets"
+                        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-6"
+                    >
+                        <div className="space-y-1.5">
+                            <p className="text-sm text-[var(--editorial-body)]">
+                                Pick a starting point. Applying a theme updates the live preview
+                                only — nothing is saved until you press Save design.
+                            </p>
+                            {activePresetId === null && (
+                                <p className="text-xs text-[var(--editorial-subtle)]">
+                                    Your current theme is customised, so no preset is highlighted.
+                                </p>
                             )}
                         </div>
-                    </SettingsSection>
-                </div>
+
+                        <ThemePresetGrid
+                            presets={THEME_PRESETS}
+                            selectedId={activePresetId}
+                            onSelect={applyPreset}
+                        />
+                    </TabsContent>
+                </Tabs>
 
                 {/* Footer action buttons */}
                 <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[var(--editorial-border-light)] bg-[var(--card)] p-4">

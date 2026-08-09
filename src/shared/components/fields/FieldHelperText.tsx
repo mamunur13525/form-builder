@@ -15,7 +15,7 @@ export function FieldHelperText({ helperText, editable, onUpdate, color, fontSiz
 
     if (editable) {
         return (
-            <div className="space-y-1 mt-1">
+            <div className="w-full space-y-1 mt-1">
                 <div
                     contentEditable
                     suppressContentEditableWarning
@@ -34,9 +34,9 @@ export function FieldHelperText({ helperText, editable, onUpdate, color, fontSiz
     if (!helperText) return null
 
     return (
-        <div className="space-y-1 mt-1">
+        <div className="w-full space-y-1 mt-1">
             <p
-                className={cn(sizeClass, "text-muted-foreground pb-1")}
+                className={cn(sizeClass, "w-full text-muted-foreground pb-1")}
                 style={color ? { color } : undefined}
             >
                 {helperText}

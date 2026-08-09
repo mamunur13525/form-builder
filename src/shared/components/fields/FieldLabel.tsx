@@ -14,7 +14,7 @@ export function FieldLabel({ label, pageNumber, editable, onUpdate, color, fontS
 
     if (editable) {
         return (
-            <div className="relative space-y-1">
+            <div className="w-full relative space-y-1">
                 {pageNumber !== undefined && (
                     <span className="absolute right-[102%] top-2 text-xs font-bold text-muted select-none bg-gray-900 px-1 rounded">
                         {pageNumber}
@@ -36,7 +36,7 @@ export function FieldLabel({ label, pageNumber, editable, onUpdate, color, fontS
     }
 
     return (
-        <div className="relative space-y-1">
+        <div className="w-full relative space-y-1">
             {pageNumber !== undefined && (
                 <span className="absolute right-[102%] top-2 text-xs font-bold text-muted select-none bg-gray-900 px-1 rounded">
                     {pageNumber}

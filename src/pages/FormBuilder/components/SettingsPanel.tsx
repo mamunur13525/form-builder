@@ -1,4 +1,4 @@
-import React, { type ComponentType } from "react"
+import React, { useEffect, type ComponentType } from "react"
 import { GitBranch, Palette, Plus, SlidersHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Label } from "../../../components/ui/label"
@@ -85,6 +85,9 @@ interface SettingsPanelProps {
     designDrawerOpen: boolean
     onOpenDesignDrawer: () => void
     onCloseDesignDrawer: () => void
+    logicDialogOpen: boolean
+    onCloseLogicDialog: () => void
+    onOpenLogicDialog: () => void
     onSaveTheme: (theme: IFormTheme) => Promise<void>
 }
 
@@ -94,11 +97,14 @@ export function SettingsPanel({
     onUpdate,
     theme,
     designDrawerOpen,
+    logicDialogOpen,
     onOpenDesignDrawer,
+    onOpenLogicDialog,
     onCloseDesignDrawer,
+    onCloseLogicDialog,
     onSaveTheme
 }: SettingsPanelProps) {
-    const [logicDialogOpen, setLogicDialogOpen] = React.useState(false)
+
     const hasChangesRef = React.useRef(false)
     const settings = page.settings ?? {}
 
@@ -111,7 +117,7 @@ export function SettingsPanel({
     }[] = [
             { value: "settings", label: "Settings", icon: SlidersHorizontal },
             { value: "design", label: "Design", icon: Palette, onSelect: onOpenDesignDrawer },
-            { value: "logic", label: "Logic", icon: GitBranch, onSelect: () => setLogicDialogOpen(true) },
+            { value: "logic", label: "Logic", icon: GitBranch, onSelect: onOpenLogicDialog },
         ]
 
     /** Merge a single settings group, preserving the rest. */
@@ -492,7 +498,7 @@ export function SettingsPanel({
                     </SheetContent>
                 </Sheet>
 
-                <Dialog open={logicDialogOpen} onOpenChange={setLogicDialogOpen}>
+                <Dialog open={logicDialogOpen} onOpenChange={onCloseLogicDialog}>
                     <DialogContent className="sm:max-w-[600px]">
                         <DialogHeader>
                             <DialogTitle>Logic Rules</DialogTitle>

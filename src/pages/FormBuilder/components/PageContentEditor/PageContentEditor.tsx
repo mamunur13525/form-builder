@@ -113,7 +113,7 @@ export function PageContentEditor({
           : undefined,
     }
     : {};
-
+  console.log({ bgcolor: themeResolved.buttonColor })
   return (
     <div
       className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
@@ -180,7 +180,7 @@ export function PageContentEditor({
               page.appearance.submitButtonText ||
               (isStatement ? "Continue" : "Submit")
             }
-            color={page.appearance.submitButtonColor || themeResolved.buttonColor}
+            color={themeResolved.buttonColor || page.appearance.submitButtonColor}
             textColor={themeResolved.buttonTextColor}
             roundCorners={themeResolved.roundCorners}
             fontSizeClass={fontSizes.button}

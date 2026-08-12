@@ -123,7 +123,7 @@ const PageContentTopbar = ({
         {leftButtons.map((button) => (
           <Button
             key={button.label}
-            variant={button.variant ?? "ghost"}
+            variant={"ghost"}
             aria-label={button.label}
             className={
               button.variant === "default"

@@ -17,6 +17,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "../FormBuilder/components/settings/primitives"
+import { cn } from "@/lib/utils"
 
 export function FormSharePage() {
     const { formId } = useParams<{ formId: string }>()
@@ -46,25 +48,26 @@ export function FormSharePage() {
                 </Button>
             </div>
 
-            <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)]">
+            <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
                 <CardContent className="p-8">
                     <Tabs defaultValue="share" className="w-full">
-                        <TabsList className="mb-8 grid h-auto w-full grid-cols-3 gap-2 bg-transparent p-0">
+                        <TabsList className={cn(TAB_LIST_CLASS, 'mb-5')}>
                             <TabsTrigger
                                 value="share"
-                                className="editorial-transition h-11 gap-2 rounded-[16px] text-sm text-[var(--editorial-body)] data-[selected]:border data-[selected]:border-[var(--editorial-primary-ring)] data-[selected]:bg-[var(--editorial-primary-selected)] data-[selected]:text-[var(--primary)]"
+                                className={TAB_TRIGGER_CLASS}
                             >
                                 <Share2 className="h-5 w-5" /> Share link
                             </TabsTrigger>
                             <TabsTrigger
                                 value="website"
-                                className="editorial-transition h-11 gap-2 rounded-[16px] text-sm text-[var(--editorial-body)] data-[selected]:border data-[selected]:border-[var(--editorial-primary-ring)] data-[selected]:bg-[var(--editorial-primary-selected)] data-[selected]:text-[var(--primary)]"
+                                className={TAB_TRIGGER_CLASS}
+
                             >
                                 <Code className="h-5 w-5" /> Embed in website
                             </TabsTrigger>
                             <TabsTrigger
                                 value="email"
-                                className="editorial-transition h-11 gap-2 rounded-[16px] text-sm text-[var(--editorial-body)] data-[selected]:border data-[selected]:border-[var(--editorial-primary-ring)] data-[selected]:bg-[var(--editorial-primary-selected)] data-[selected]:text-[var(--primary)]"
+                                className={TAB_TRIGGER_CLASS}
                             >
                                 <Mail className="h-5 w-5" /> Embed in email
                             </TabsTrigger>
@@ -74,11 +77,11 @@ export function FormSharePage() {
                                 <Input
                                     value={formUrl}
                                     readOnly
-                                    className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-6 text-base"
+                                    className="h-[52px] rounded-lg border-[var(--input)] bg-[var(--secondary)] px-6 text-base"
                                 />
                                 <Button
                                     onClick={handleCopy}
-                                    className="editorial-transition h-[52px] w-36 gap-2 rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                                    className="editorial-transition h-[52px] w-36 gap-2 rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
                                 >
                                     {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                                     {copied ? "Copied" : "Copy Link"}
@@ -105,11 +108,17 @@ export function FormSharePage() {
                                 </div>
                             </div>
                         </TabsContent>
+                        <TabsContent value={'website'}>
+                            No Data website
+                        </TabsContent>
+                        <TabsContent value="email">
+                            No Data Email
+                        </TabsContent>
                     </Tabs>
                 </CardContent>
             </Card>
 
-            <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)]">
+            <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
                 <CardHeader className="flex flex-row items-center justify-between gap-8 p-8">
                     <div>
                         <CardTitle className="font-display text-2xl text-[var(--foreground)]">
@@ -119,13 +128,13 @@ export function FormSharePage() {
                             Update the form title, share image, and favicon that appear when this link is opened or shared.
                         </CardDescription>
                     </div>
-                    <Button className="editorial-transition h-[52px] shrink-0 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]">
+                    <Button className="editorial-transition h-[52px] shrink-0 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]">
                         Open Link Settings
                     </Button>
                 </CardHeader>
             </Card>
 
-            <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)]">
+            <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
                 <CardHeader className="flex flex-row items-center justify-between p-8">
                     <div>
                         <CardTitle className="flex items-center gap-3 font-display text-2xl text-[var(--foreground)]">

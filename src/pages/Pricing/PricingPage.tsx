@@ -70,16 +70,16 @@ export function PricingPage() {
         <div className="editorial mx-auto w-full max-w-[1600px] px-8 pt-12 pb-16">
             <div className="mx-auto max-w-2xl text-center">
 
-        </div>
-        <div className="min-w-0 mx-auto text-center flex-1">
-          <h1 className="font-display text-4xl leading-tight sm:text-5xl text-[var(--foreground)]">
-              Simple, honest pricing
-          </h1>
-          <p className="mt-1 text-sm leading-6 sm:text-base text-[var(--editorial-body)]">
-              Start free and upgrade when your forms outgrow it. Every plan
-              includes the full editor — no feature held hostage.
-          </p>
-        </div>
+            </div>
+            <div className="min-w-0 mx-auto text-center flex-1">
+                <h1 className="font-display text-4xl leading-tight sm:text-5xl text-[var(--foreground)]">
+                    Simple, honest pricing
+                </h1>
+                <p className="mt-1 text-sm leading-6 sm:text-base text-[var(--editorial-body)]">
+                    Start free and upgrade when your forms outgrow it. Every plan
+                    includes the full editor — no feature held hostage.
+                </p>
+            </div>
 
             {/* Billing cycle toggle */}
             <div className="mt-12 flex justify-center">
@@ -92,7 +92,7 @@ export function PricingPage() {
                             className={cn(
                                 "editorial-transition h-11 rounded-full px-6 text-sm capitalize",
                                 cycle === value
-                                    ? "bg-[var(--primary)] text-white shadow-[0_8px_24px_rgba(238,125,105,.25)]"
+                                    ? "bg-[var(--primary)] text-white "
                                     : "text-[var(--editorial-body)] hover:text-[var(--foreground)]",
                             )}
                         >
@@ -112,10 +112,10 @@ export function PricingPage() {
                         <Card
                             key={plan.id}
                             className={cn(
-                                "editorial-transition flex flex-col rounded-[24px] p-8",
+                                "editorial-transition flex flex-col rounded-xl p-8",
                                 plan.featured
                                     ? "editorial-shadow border-[var(--editorial-primary-ring)] bg-[var(--card)]"
-                                    : "editorial-shadow-sm border-[var(--border)] bg-[var(--card)] hover:-translate-y-0.5",
+                                    : "editorial-shadow-sm border-[var(--border)] bg-[var(--card)] ",
                             )}
                         >
                             <CardContent className="flex flex-1 flex-col p-0">
@@ -143,8 +143,8 @@ export function PricingPage() {
                                         {price === 0
                                             ? "forever"
                                             : cycle === "monthly"
-                                              ? "per month"
-                                              : "per year"}
+                                                ? "per month"
+                                                : "per year"}
                                     </span>
                                 </div>
 
@@ -163,8 +163,8 @@ export function PricingPage() {
                                     className={cn(
                                         "editorial-transition mt-8 h-[52px] w-full rounded-[16px] text-sm font-medium active:scale-[.98]",
                                         plan.featured
-                                            ? "bg-[var(--primary)] text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:bg-[var(--editorial-primary-pressed)]"
-                                            : "border border-[var(--border)] bg-[var(--secondary)] text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]",
+                                            ? "bg-[var(--primary)] text-white   hover:bg-[var(--editorial-primary-hover)] active:bg-[var(--editorial-primary-pressed)]"
+                                            : "border border-[var(--border)] bg-[var(--secondary)] text-[var(--foreground)]  hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]",
                                     )}
                                 >
                                     {plan.monthly === 0 ? "Current plan" : `Choose ${plan.name}`}

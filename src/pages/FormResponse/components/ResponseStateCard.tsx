@@ -13,7 +13,7 @@ interface ResponseStateCardProps {
 /** Uniform card used for the loading, error and empty states of the response pages. */
 export function ResponseStateCard({ loading = false, message, action }: ResponseStateCardProps) {
     return (
-        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)]">
+        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
             <CardContent className="py-16 text-center">
                 <div className="flex items-center justify-center gap-2">
                     {loading && (

@@ -71,7 +71,7 @@ export function ResponsePageShell({
     }
 
     return (
-        <div className="editorial editorial-shadow-md m-8 flex h-[calc(100%-4rem)] flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+        <div className="editorial editorial-shadow-md m-8 flex h-[calc(100%-4rem)] flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
             {/* Navigation Tabs — controlled by the active route */}
             <div className="flex items-center justify-between gap-4 border-b border-[var(--editorial-border-light)] px-6 py-3">
                 <Tabs

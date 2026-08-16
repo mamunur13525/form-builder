@@ -91,7 +91,7 @@ export function FormBuilderSidebar({
   );
 
   return (
-    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden  bg-[var(--card)] border-r border-[var(--border)]">
       <div className="flex items-center justify-between border-b border-[var(--editorial-border-light)] px-6 py-5">
         <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
           Pages
@@ -142,7 +142,7 @@ export function FormBuilderSidebar({
       <div className="border-t border-[var(--editorial-border-light)] p-4">
         <Button
           variant="outline"
-          className="editorial-transition h-[52px] w-full rounded-[16px] border-[var(--border)] bg-[var(--secondary)] text-sm font-medium text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98]"
+          className="w-full border-[var(--border)] bg-[var(--card)]"
           onClick={onAddPage}
         >
           <Plus className="mr-2 h-5 w-5" />

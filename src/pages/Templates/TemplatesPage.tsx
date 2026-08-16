@@ -146,7 +146,7 @@ export function TemplatesPage() {
             </div>
 
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-full border border-[var(--input)] bg-[var(--card)] px-5 py-1 focus-within:border-[var(--primary)] sm:px-6 lg:min-w-[280px] lg:flex-1">
+                <div className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-lg border border-[var(--input)] bg-[var(--card)] px-5 py-1 focus-within:border-[var(--primary)] sm:px-6 lg:min-w-[280px] lg:flex-1">
                     <Search className="h-5 w-5 shrink-0 text-[var(--editorial-subtle)]" />
                     <Input
                         value={query}
@@ -179,7 +179,7 @@ export function TemplatesPage() {
 
             {/* Template grid */}
             {visibleTemplates.length === 0 ? (
-                <Card className="editorial-shadow-sm mt-8 rounded-[24px] border-[var(--border)] bg-[var(--card)] sm:mt-10">
+                <Card className="editorial-shadow-sm mt-8 border-[var(--border)] bg-[var(--card)] sm:mt-10">
                     <CardContent className="flex flex-col items-center py-20 text-center">
                         <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
                             <FileSearch className="h-6 w-6" />
@@ -196,7 +196,6 @@ export function TemplatesPage() {
                                 setQuery("")
                                 setCategory("All")
                             }}
-                            className="editorial-transition mt-8 h-11 gap-2 rounded-[16px] border border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
                         >
                             Clear filters
                         </Button>
@@ -212,7 +211,6 @@ export function TemplatesPage() {
                             <Card
                                 key={template.id}
                                 className={cn(
-                                    "editorial-transition editorial-shadow-sm group relative flex flex-col overflow-hidden rounded-[24px] border bg-[var(--card)] p-6 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)] sm:p-7",
                                     isFeatured
                                         ? "border-[var(--editorial-primary-ring)]/60"
                                         : "border-[var(--border)]",
@@ -226,7 +224,7 @@ export function TemplatesPage() {
                                     </div>
                                 )}
 
-                                <CardContent className="flex flex-1 flex-col p-0">
+                                <CardContent className="flex flex-1 flex-col">
                                     {/* Icon tile — soft tinted square, not a generic circle */}
                                     <div
                                         className={cn(
@@ -256,7 +254,7 @@ export function TemplatesPage() {
                                         <Button
                                             onClick={() => createFromTemplate(template)}
                                             disabled={createForm.isPending}
-                                            className="editorial-transition h-11 shrink-0 gap-2 rounded-[16px] bg-[var(--primary)] px-5 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"
+                                            className={'text-sm'}
                                         >
                                             Use template
                                             <ArrowRight className="h-4 w-4 transition-transform duration-250 group-hover:translate-x-0.5" />

@@ -107,7 +107,7 @@ const PageContentTopbar = ({
   };
 
   return (
-    <div className="editorial-shadow-sm flex shrink-0 items-center justify-between gap-2 rounded-[20px] border border-[var(--border)] bg-[var(--card)] px-3 py-3 sm:rounded-[24px] sm:px-6 sm:py-4">
+    <div className="editorial-shadow-sm flex shrink-0 items-center justify-between gap-2 rounded-[20px] border border-[var(--border)] bg-[var(--card)] px-3 py-3 sm:rounded-xl sm:px-6 sm:py-4">
       <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
         {onOpenPages && (
           <Button
@@ -127,7 +127,7 @@ const PageContentTopbar = ({
             aria-label={button.label}
             className={
               button.variant === "default"
-                ? "editorial-transition h-10 shrink-0 gap-2 rounded-[16px] bg-[var(--primary)] px-3 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] sm:h-11 sm:px-5"
+                ? "editorial-transition h-10 shrink-0 gap-2 rounded-[16px] bg-[var(--primary)] px-3 text-sm font-medium text-white hover:text-white hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] sm:h-11 sm:px-5"
                 : "editorial-transition h-10 shrink-0 gap-2 rounded-[16px] px-3 text-sm text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] sm:h-11 sm:px-4"
             }
             onClick={() => handleBtnClick(button.type)}

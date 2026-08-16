@@ -101,7 +101,7 @@ export function AddPageDialog({
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-[52px] rounded-full border-[var(--input)] bg-[var(--card)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
+                        className="h-[52px] rounded-lg border-[var(--input)] bg-[var(--card)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
                         autoFocus={true}
                     />
                 </div>
@@ -144,7 +144,7 @@ export function AddPageDialog({
                     <Button
                         variant="outline"
                         onClick={() => onOpenChange(false)}
-                        className="editorial-transition h-[52px] rounded-[16px] border-[var(--border)] bg-[var(--card)] px-8 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                        className=" border-[var(--border)] bg-[var(--card)]"
                     >
                         Cancel
                     </Button>

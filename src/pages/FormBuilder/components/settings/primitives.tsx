@@ -43,14 +43,6 @@ const OVERLAY_CLASS =
  * Editorial button treatments, matching PublishDialog so confirmation prompts
  * and drawer footers read as the same product surface.
  */
-export const PRIMARY_BUTTON_CLASS =
-    "editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-[var(--primary-foreground)] shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"
-
-export const SECONDARY_BUTTON_CLASS =
-    "editorial-transition h-11 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
-
-export const DESTRUCTIVE_BUTTON_CLASS =
-    "editorial-transition h-11 gap-2 rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
 
 /**
  * Segmented pill tabs: the list is an inset track, the active tab a raised
@@ -562,7 +554,7 @@ export function ConfirmPopover({
                     <Button
                         variant="outline"
                         size="lg"
-                        className={SECONDARY_BUTTON_CLASS}
+                        className="editorial-transition h-11 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
                         onClick={() => onOpenChange(false)}
                     >
                         {cancelLabel}
@@ -571,7 +563,9 @@ export function ConfirmPopover({
                         size="lg"
                         onClick={onConfirm}
                         disabled={confirmDisabled}
-                        className={destructive ? DESTRUCTIVE_BUTTON_CLASS : PRIMARY_BUTTON_CLASS}
+                        className={destructive ?
+                            "editorial-transition h-11 gap-2 rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
+                            : "editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-[var(--primary-foreground)] hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"}
                     >
                         {confirmLabel}
                     </Button>

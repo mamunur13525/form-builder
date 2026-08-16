@@ -20,7 +20,7 @@ export function FieldHelperText({ helperText, editable, onUpdate, color, fontSiz
                     contentEditable
                     suppressContentEditableWarning
                     data-placeholder="Description (optional)"
-                    className={cn(sizeClass, "text-muted-foreground outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text")}
+                    className={cn(sizeClass, "text-muted-foreground outline-none border-0 border-transparent pb-1 transition-colors cursor-text")}
                     style={color ? { color } : undefined}
                     onBlur={(e) =>
                         onUpdate?.(e.currentTarget.textContent || "")

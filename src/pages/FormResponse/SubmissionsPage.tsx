@@ -109,7 +109,7 @@ export function SubmissionsPage() {
                     Form not found
                 </h2>
                 <Button
-                    className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                    className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
                     onClick={() => navigate(ROUTES.DASHBOARD)}
                 >
                     Back to Dashboard

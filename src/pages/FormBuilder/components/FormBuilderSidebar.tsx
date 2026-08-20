@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { Plus } from "lucide-react";
-import { Button } from "../../../components/ui/button";
 import { List } from "react-movable";
 import { SortablePageItem } from "./SortablePageItem";
 import type { FormField } from "../../../shared/types/common";
@@ -19,6 +18,7 @@ interface FormBuilderSidebarProps {
   onReorderPages: (pages: FormField[]) => void;
   onAddPage: () => void;
   onDeletePage: (index: number) => void;
+  /** Retained for API compatibility; duplicate is no longer surfaced here. */
   onDuplicatePage: (index: number) => void;
 }
 
@@ -30,7 +30,6 @@ export function FormBuilderSidebar({
   onReorderPages,
   onAddPage,
   onDeletePage,
-  onDuplicatePage,
 }: FormBuilderSidebarProps) {
   const selectPage = useCallback(
     (index: number) => {
@@ -38,13 +37,6 @@ export function FormBuilderSidebar({
       onPageOpened?.();
     },
     [onSelectPage, onPageOpened],
-  );
-
-  const duplicatePage = useCallback(
-    async (index: number) => {
-      await onDuplicatePage(index);
-    },
-    [onDuplicatePage],
   );
 
   const removePage = useCallback(
@@ -70,41 +62,43 @@ export function FormBuilderSidebar({
       }));
       onReorderPages(reordered);
 
-      // Select the moved page
+      // Keep the moved page selected after the reorder settles.
       onSelectPage(to);
     },
     [pages, onReorderPages, onSelectPage],
   );
 
   const movePageUp = useCallback(
-    (index: number) => {
-      movePage(index, index - 1);
-    },
+    (index: number) => movePage(index, index - 1),
     [movePage],
   );
 
   const movePageDown = useCallback(
-    (index: number) => {
-      movePage(index, index + 1);
-    },
+    (index: number) => movePage(index, index + 1),
     [movePage],
   );
 
   return (
-    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden  bg-[var(--card)] border-r border-[var(--border)]">
-      <div className="flex items-center justify-between border-b border-[var(--editorial-border-light)] px-6 py-5">
-        <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
-          Pages
-        </h3>
+    <div className="flex h-full w-full flex-col overflow-hidden border-r border-[var(--border)] bg-[var(--card)]">
+      {/* Header — "Pages" with a count and an add button. */}
+      <div className="flex items-center justify-between gap-2 px-4 py-4">
+        <div className="flex items-center gap-2 text-[var(--foreground)]">
+          <span className="text-[15px] font-semibold">Pages</span>
+          <span className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-1.5 py-0.5 text-xs font-medium tabular-nums text-[var(--muted-foreground)]">
+            {pages.length}
+          </span>
+        </div>
+
         <button
           type="button"
           onClick={onAddPage}
           aria-label="Add page"
-          className="editorial-transition flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:translate-y-0 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+          className="editorial-transition flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
         >
           <Plus className="h-5 w-5" />
         </button>
       </div>
+
       <List
         values={pages}
         onChange={({ oldIndex, newIndex }) => movePage(oldIndex, newIndex)}
@@ -113,7 +107,7 @@ export function FormBuilderSidebar({
         renderList={({ children, props }) => (
           <div
             {...props}
-            className="flex-1 space-y-2 overflow-y-auto overflow-x-hidden px-4 py-4 select-none"
+            className="flex-1 space-y-2.5 overflow-y-auto overflow-x-hidden px-3 pb-4 select-none"
           >
             {children}
           </div>
@@ -126,29 +120,18 @@ export function FormBuilderSidebar({
               itemProps={itemProps}
               page={value}
               index={index}
+              pagesCount={pages.length}
               isSelected={index === selectedPageIndex}
               isDragged={isDragged}
               isLifted={isSelected}
               onSelect={selectPage}
-              onDuplicate={duplicatePage}
               onDelete={removePage}
               onMoveUp={movePageUp}
-              pagesCount={pages.length}
               onMoveDown={movePageDown}
             />
           );
         }}
       />
-      <div className="border-t border-[var(--editorial-border-light)] p-4">
-        <Button
-          variant="outline"
-          className="w-full border-[var(--border)] bg-[var(--card)]"
-          onClick={onAddPage}
-        >
-          <Plus className="mr-2 h-5 w-5" />
-          Add Page
-        </Button>
-      </div>
     </div>
   );
 }

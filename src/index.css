@@ -64,7 +64,7 @@
     --muted-foreground: oklch(0.556 0 0);
     --accent: oklch(0.97 0 0);
     --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
+    --destructive: oklch(0.37 0 0);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
     --ring: oklch(0.708 0 0);
@@ -99,7 +99,7 @@
     --muted-foreground: oklch(0.708 0 0);
     --accent: oklch(0.269 0 0);
     --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
+    --destructive: oklch(0.72 0 0);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.556 0 0);
@@ -110,7 +110,7 @@
     --chart-5: oklch(0.269 0 0);
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary: oklch(0.371 0 0);
     --sidebar-primary-foreground: oklch(0.985 0 0);
     --sidebar-accent: oklch(0.269 0 0);
     --sidebar-accent-foreground: oklch(0.985 0 0);
@@ -125,6 +125,23 @@
 
     body {
         @apply bg-background text-foreground;
+        /* Ambient monochrome wash — a soft light-from-above gradient,
+           fixed to the viewport so it stays put while content scrolls. */
+        background-image:
+            radial-gradient(1200px 760px at 50% -12%,
+                color-mix(in oklch, var(--foreground) 5%, transparent),
+                transparent 60%);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+    }
+
+    /* Whisper of a top-down gradient on card surfaces for gentle depth.
+       Layers over the card's solid `background-color`, so it also reads
+       as a subtle sheen on dark cards (foreground flips to near-white). */
+    .bg-card {
+        background-image: linear-gradient(180deg,
+                color-mix(in oklch, var(--foreground) 3%, transparent),
+                transparent 60%);
     }
 
 
@@ -144,34 +161,36 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Premium editorial theme — Slate Mono                                */
+/* Monochrome editorial theme — Mono (black · white · gray)            */
 /*                                                                     */
 /* Scoped to `.editorial` so it can be adopted screen by screen. It    */
-/* re-points the shadcn design tokens at the editorial palette, so any */
-/* component rendered inside the scope inherits the new look without   */
-/* being rewritten. Portalled surfaces (dialogs, dropdowns, popovers)  */
-/* escape the DOM subtree, so they opt in with the same class.         */
+/* re-points the shadcn design tokens at a pure neutral palette, so    */
+/* any component rendered inside the scope inherits the new look       */
+/* without being rewritten. Portalled surfaces (dialogs, dropdowns,    */
+/* popovers) escape the DOM subtree, so they opt in with the same      */
+/* class.                                                              */
 /*                                                                     */
-/* Everything below is driven by the nine `--palette-*` values. The    */
-/* semantic (success/warning/error) and neutral UI colors are shared   */
-/* across palettes, so switching to Matcha Fog, Icy Indigo, Warm       */
-/* Sandstone, Modern Mauve or Deep Mint means editing only that first  */
-/* block.                                                              */
+/* Everything below is driven by the nine `--palette-*` values, all of */
+/* which are pure grays (R=G=B, zero hue). The brand accent is simply  */
+/* near-black. Semantic (success/warning/error) and status colors are  */
+/* also mapped onto the grayscale — strength reads as darkness rather  */
+/* than hue. A subtle ambient gradient wash is layered over the canvas */
+/* and card surfaces further down.                                     */
 /* ------------------------------------------------------------------ */
 .editorial {
-    /* Palette — Slate Mono */
+    /* Palette — Mono */
     --palette-background: #ffffff;
-    --palette-surface: #f4f4f6;
-    --palette-text-dark: #182334;
-    --palette-text: #667085;
-    --palette-muted: #667085;
-    --palette-brand: #475569;
-    --palette-brand-hover: #334155;
-    --palette-brand-dark: #0f172a;
-    --palette-soft: #e5e7eb;
+    --palette-surface: #f5f5f5;
+    --palette-text-dark: #0a0a0a;
+    --palette-text: #5c5c5c;
+    --palette-muted: #757575;
+    --palette-brand: #191919;
+    --palette-brand-hover: #2e2e2e;
+    --palette-brand-dark: #000000;
+    --palette-soft: #e6e6e6;
 
     /* Surfaces */
-    --editorial-canvas: #f6f6f8;
+    --editorial-canvas: #f6f6f6;
     --editorial-surface: var(--palette-surface);
     --background: var(--palette-background);
     --card: var(--palette-background);
@@ -179,21 +198,21 @@
     --popover: var(--palette-background);
     --popover-foreground: var(--palette-text-dark);
 
-    /* Text — never pure black */
+    /* Text — near-black, never pure black for body */
     --foreground: var(--palette-text-dark);
     --editorial-body: var(--palette-text);
     --muted-foreground: var(--palette-muted);
-    --editorial-subtle: #94a3b8;
-    --editorial-disabled: #d0d5dd;
+    --editorial-subtle: #a1a1a1;
+    --editorial-disabled: #d4d4d4;
 
-    /* Brand is the single accent */
+    /* Brand is the single accent — black */
     --primary: var(--palette-brand);
     --primary-foreground: #ffffff;
     --editorial-primary-hover: var(--palette-brand-hover);
     --editorial-primary-pressed: var(--palette-brand-dark);
     --editorial-primary-light: var(--palette-soft);
-    --editorial-primary-selected: #eef0f3;
-    --editorial-primary-ring: #94a3b8;
+    --editorial-primary-selected: #f0f0f0;
+    --editorial-primary-ring: #a1a1a1;
 
     --secondary: var(--palette-surface);
     --secondary-foreground: var(--palette-text-dark);
@@ -202,36 +221,48 @@
     --accent-foreground: var(--palette-text-dark);
 
     /* Borders */
-    --border: #e5e7eb;
-    --editorial-border-light: #ececef;
-    --input: #d0d5dd;
+    --border: #e5e5e5;
+    --editorial-border-light: #ececec;
+    --input: #d4d4d4;
     --ring: var(--palette-brand);
 
-    --destructive: #ef4444;
+    --destructive: #2b2b2b;
 
-    /* Semantic — shared across palettes */
-    --editorial-success: #22c55e;
-    --editorial-success-soft: #dcfce7;
-    --editorial-warning: #f59e0b;
-    --editorial-warning-soft: #fef3c7;
-    --editorial-error: #ef4444;
-    --editorial-error-soft: #fee2e2;
+    /* Semantic — fully monochrome; strength maps to darkness */
+    --editorial-success: #3f3f3f;
+    --editorial-success-soft: #ededed;
+    --editorial-warning: #6b6b6b;
+    --editorial-warning-soft: #ebebeb;
+    --editorial-error: #2b2b2b;
+    --editorial-error-soft: #e9e9e9;
 
     /* Status */
-    --editorial-note: #fef3c7;
-    --editorial-purple: #7c5cd6;
-    --editorial-purple-light: #e6ddf8;
-    --editorial-blue: #5b8def;
+    --editorial-note: #ededed;
+    --editorial-purple: #525252;
+    --editorial-purple-light: #e8e8e8;
+    --editorial-blue: #4d4d4d;
 
-    /* Theme accents */
-    --editorial-matcha: #91be80;
-    --editorial-slate: #475569;
-    --editorial-indigo: #5b8def;
-    --editorial-sandstone: #f39a68;
-    --editorial-mauve: #7c5cd6;
-    --editorial-mint: #168a8a;
+    /* Theme accents — distinct grays so any coding stays legible */
+    --editorial-matcha: #8a8a8a;
+    --editorial-slate: #4a4a4a;
+    --editorial-indigo: #5f5f5f;
+    --editorial-sandstone: #9c9c9c;
+    --editorial-mauve: #6e6e6e;
+    --editorial-mint: #3f3f3f;
 
     color: var(--foreground);
+
+    /* Ambient monochrome wash — soft, fixed to the viewport so it reads
+       as one continuous gradient even across nested editorial regions. */
+    background-image:
+        radial-gradient(900px 620px at 12% -6%,
+            color-mix(in oklch, var(--foreground) 4.5%, transparent),
+            transparent 55%),
+        radial-gradient(1000px 720px at 104% 2%,
+            color-mix(in oklch, var(--foreground) 3.5%, transparent),
+            transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 /* Serif reserved for major headings only. */

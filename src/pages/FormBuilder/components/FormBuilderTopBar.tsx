@@ -48,6 +48,9 @@ export function FormBuilderTopBar({
     "editorial-transition flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]";
   const activeNavLinkClass =
     "border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)] hover:text-[var(--primary)]";
+  // Publish CTA accent — green gradient (#4a7f11); overrides the monochrome default button
+  const publishButtonClass =
+    "border-[#2f4f0a] from-[#4a7f11] to-[#355b0c]";
 
   const [title, setTitle] = useState(initialTitle);
   const prevInitialTitleRef = useRef(initialTitle);
@@ -65,7 +68,7 @@ export function FormBuilderTopBar({
 
 
   return (
-    <div className="bg-white editorial flex shrink-0 items-center justify-between border-b border-[#EEE7E0] bg-[var(--editorial-canvas)] px-3 py-2 lg:h-[72px] lg:flex-nowrap lg:gap-0 lg:px-8 lg:py-0">
+    <div className="bg-white editorial flex shrink-0 items-center justify-between border-b border-[var(--border)] px-3 py-2 lg:h-[72px] lg:flex-nowrap lg:gap-0 lg:px-8 lg:py-0">
       <div className="flex min-w-0 items-center gap-2">
         <nav className="flex min-w-0 items-center gap-2 text-sm">
           <button
@@ -140,6 +143,7 @@ export function FormBuilderTopBar({
         {!isPublished ? (
           <Button
             aria-label="Publish"
+            className={publishButtonClass}
             onClick={onPublish}
           >
             <Share2 className="h-5 w-5" />
@@ -149,6 +153,7 @@ export function FormBuilderTopBar({
           <Button
             variant="default"
             aria-label="Publish changes"
+            className={publishButtonClass}
             onClick={onPublishedClick}
           >
             <AlertCircle className="h-5 w-5" />
@@ -158,6 +163,7 @@ export function FormBuilderTopBar({
           <Button
             variant="default"
             aria-label="Published"
+            className={publishButtonClass}
             onClick={onPublishedClick}
           >
             <CheckCircle className="h-5 w-5" />

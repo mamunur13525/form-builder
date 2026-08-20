@@ -85,6 +85,8 @@ const CONFIRM_COPY: Record<
   },
 };
 
+/** Green publish CTA accent — matches the Publish button in FormBuilderTopBar. */
+const PUBLISH_BUTTON_CLASS = "border-[#2f4f0a] from-[#4a7f11] to-[#355b0c]";
 
 export function PublishDialog({
   open,
@@ -341,7 +343,7 @@ export function PublishDialog({
               <Button
                 onClick={handlePublish}
                 disabled={isBusy}
-                className="bg-[var(--primary)] text-white"
+                className={PUBLISH_BUTTON_CLASS}
               >
                 {busy === "publish" && <Loader2 className="animate-spin" />}
                 {busy === "publish" ? "Publishing…" : "Publish form"}
@@ -371,7 +373,7 @@ export function PublishDialog({
                 <Button
                   onClick={handlePublish}
                   disabled={isBusy}
-                  className="bg-[var(--primary)] text-white"
+                  className={PUBLISH_BUTTON_CLASS}
                 >
                   {busy === "publish" && <Loader2 className="animate-spin" />}
                   {busy === "publish" ? "Publishing…" : "Publish changes"}

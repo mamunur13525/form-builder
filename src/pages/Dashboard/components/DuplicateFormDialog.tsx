@@ -53,7 +53,7 @@ export function DuplicateFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="editorial editorial-shadow rounded-[30px] bg-[var(--popover)] p-10 ring-0 sm:max-w-[480px]">
+      <DialogContent className="editorial editorial-shadow rounded-[30px] bg-[var(--popover)] px-7 py-7 ring-0 w-full">
         <DialogHeader>
           <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
             Duplicate Form
@@ -64,7 +64,7 @@ export function DuplicateFormDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
+        <div className="space-y-2 mb-4">
           <label
             htmlFor="duplicate-form-title"
             className="text-sm font-medium text-[var(--foreground)]"
@@ -86,16 +86,15 @@ export function DuplicateFormDialog({
 
         <DialogFooter className="gap-3">
           <Button
+            variant="ghost"
             onClick={() => handleOpenChange(false)}
             disabled={duplicateFormMutation.isPending}
-            className="editorial-transition h-[52px] rounded-[16px] border border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
           >
             Cancel
           </Button>
           <Button
             onClick={handleDuplicate}
             disabled={duplicateFormMutation.isPending || !title.trim()}
-            className="editorial-transition h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
           >
             {duplicateFormMutation.isPending ? "Duplicating..." : "Duplicate"}
           </Button>

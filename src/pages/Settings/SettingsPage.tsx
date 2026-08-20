@@ -13,10 +13,8 @@ import { useChangePassword } from "@/features/auth/hooks/useAuth"
 import { showError, showSuccess } from "@/shared/hooks/useToast"
 
 const inputClass =
-    "h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
+    "h-[52px] rounded-lg border-[var(--input)] bg-[var(--secondary)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
 
-const primaryButtonClass =
-    "editorial-transition h-[52px] w-full rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white sm:w-auto shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
 
 /** A titled settings block, matching the editorial card treatment. */
 function SettingsCard({
@@ -31,7 +29,7 @@ function SettingsCard({
     children: React.ReactNode
 }) {
     return (
-        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)]">
+        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
             <CardContent className="p-5 sm:p-8">
                 <div className="flex items-start gap-4">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
@@ -162,7 +160,6 @@ export function SettingsPage() {
                     <Button
                         onClick={handleProfileSave}
                         disabled={updateProfile.isPending}
-                        className={primaryButtonClass}
                     >
                         {updateProfile.isPending ? "Saving..." : "Save changes"}
                     </Button>
@@ -204,7 +201,6 @@ export function SettingsPage() {
                     <Button
                         onClick={handlePasswordChange}
                         disabled={changePassword.isPending}
-                        className={primaryButtonClass}
                     >
                         {changePassword.isPending ? "Updating..." : "Change password"}
                     </Button>

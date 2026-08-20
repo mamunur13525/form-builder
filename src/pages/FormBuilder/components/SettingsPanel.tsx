@@ -153,7 +153,7 @@ export function SettingsPanel({
     }
 
     return (
-        <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+        <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden bg-[var(--card)] border-l border-[var(--border)]">
             <div className="flex flex-col border-b border-[var(--editorial-border-light)]">
                 <div className="flex-1 overflow-y-auto">
                     <Tabs defaultValue="settings" className="flex h-full flex-col">
@@ -504,7 +504,7 @@ export function SettingsPanel({
                         className="editorial h-full flex flex-col w-[90.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[90.666%] data-[side=right]:sm:max-w-none"
                         showCloseButton={false}
                     >
-                        <div className="flex-1 min-h-0 w-full">
+                        <div className=" flex-1 min-h-0 w-full">
                             <DesignDrawer
                                 open={designDrawerOpen}
                                 theme={theme}
@@ -554,7 +554,6 @@ export function SettingsPanel({
                             )}
                             <Button
                                 variant="outline"
-                                className="editorial-transition h-11 w-full rounded-[16px] border-[var(--border)] bg-[var(--secondary)] text-sm hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
                             >
                                 <Plus className="mr-1.5 h-4 w-4" />
                                 Add Logic

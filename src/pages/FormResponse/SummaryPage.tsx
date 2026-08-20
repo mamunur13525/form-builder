@@ -58,7 +58,7 @@ export function SummaryPage() {
                     className="space-y-12"
                 >
                     <div className="grid gap-6 md:grid-cols-3">
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -70,7 +70,7 @@ export function SummaryPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -82,7 +82,7 @@ export function SummaryPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">

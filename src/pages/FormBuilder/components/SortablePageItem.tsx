@@ -75,7 +75,7 @@ export function SortablePageItem({
       style={combinedStyle}
       onClick={() => onSelect(index)}
       className={`
-        group relative flex items-center gap-3 rounded-[18px] border px-4 py-3.5 text-sm cursor-pointer select-none
+        group relative flex items-center gap-3 rounded-lg border px-4 py-3.5 text-sm cursor-pointer select-none
         ${!isDragged ? "editorial-transition" : ""}
         ${isSelected
           ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--foreground)]"

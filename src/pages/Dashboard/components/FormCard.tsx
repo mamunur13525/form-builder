@@ -21,13 +21,13 @@ interface FormCardProps {
 
 type MenuItemData =
   | {
-      label: string;
-      icon: React.ForwardRefExoticComponent<
-        React.PropsWithRef<React.SVGProps<SVGSVGElement>>
-      >;
-      onClick: () => void;
-      variant?: ComponentProps<typeof DropdownMenuItem>["variant"];
-    }
+    label: string;
+    icon: React.ForwardRefExoticComponent<
+      React.PropsWithRef<React.SVGProps<SVGSVGElement>>
+    >;
+    onClick: () => void;
+    variant?: ComponentProps<typeof DropdownMenuItem>["variant"];
+  }
   | { isSeparator: true };
 
 export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProps) {
@@ -76,7 +76,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
 
   return (
     <Card
-      className="editorial editorial-transition editorial-shadow-sm cursor-pointer rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)] flex flex-col justify-between"
+      className="editorial editorial-transition editorial-shadow-sm cursor-pointer border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)] flex flex-col justify-between"
       onClick={() => navigate(`/form-builder/${form.id}`)}
     >
       <CardHeader className="p-0">
@@ -108,7 +108,6 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
                 variant="ghost"
                 size="icon"
                 aria-label="Form actions"
-                className="editorial-transition h-9 w-9 rounded-xl border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:scale-[.98]"
               />
             }
             onClick={(e) => e.stopPropagation()}

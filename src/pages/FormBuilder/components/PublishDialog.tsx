@@ -85,18 +85,6 @@ const CONFIRM_COPY: Record<
   },
 };
 
-/** Standardised editorial button treatments, shared by every footer state. */
-const primaryButtonClass =
-  "editorial-transition h-[52px] gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]";
-
-const secondaryButtonClass =
-  "editorial-transition h-[52px] gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]";
-
-const ghostButtonClass =
-  "editorial-transition h-[52px] gap-2 rounded-[16px] px-5 text-sm text-[var(--editorial-body)] hover:bg-[var(--card)] hover:text-[var(--foreground)] active:scale-[.98]";
-
-const destructiveButtonClass =
-  "editorial-transition h-[52px] gap-2 rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98]";
 
 export function PublishDialog({
   open,
@@ -297,7 +285,7 @@ export function PublishDialog({
                 >
                   Public link
                 </Label>
-                <div className="editorial-transition flex items-center gap-2 rounded-full border border-[var(--input)] bg-[var(--card)] pl-5 pr-2 focus-within:border-[var(--primary)]">
+                <div className="editorial-transition flex items-center gap-2 rounded-xl border border-[var(--input)] bg-[var(--card)] pl-5 pr-2 focus-within:border-[var(--primary)]">
                   <Globe className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
                   <input
                     id="published-form-url"
@@ -325,7 +313,6 @@ export function PublishDialog({
                 variant="ghost"
                 onClick={() => setConfirming(null)}
                 disabled={isBusy}
-                className={ghostButtonClass}
               >
                 Keep it
               </Button>
@@ -335,7 +322,7 @@ export function PublishDialog({
                   confirming === "unpublish" ? handleUnpublish : handleDiscard
                 }
                 disabled={isBusy}
-                className={destructiveButtonClass}
+                className="border border-[var(--destructive)]/25 bg-[var(--destructive)]/10"
               >
                 {isBusy && <Loader2 className="animate-spin" />}
                 {isBusy ? "Working…" : confirmCopy?.action}
@@ -347,14 +334,14 @@ export function PublishDialog({
                 variant="ghost"
                 onClick={closeDialog}
                 disabled={isBusy}
-                className={ghostButtonClass}
+                className="border border-[var(--border)] bg-[var(--card)]"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handlePublish}
                 disabled={isBusy}
-                className={primaryButtonClass}
+                className="bg-[var(--primary)] text-white"
               >
                 {busy === "publish" && <Loader2 className="animate-spin" />}
                 {busy === "publish" ? "Publishing…" : "Publish form"}
@@ -364,7 +351,7 @@ export function PublishDialog({
             <>
               <Button
                 variant="ghost"
-                className={cn(ghostButtonClass, "hover:text-[var(--destructive)]")}
+                className="border border-[var(--border)] bg-[var(--card)] hover:text-[var(--destructive)]"
                 onClick={() => setConfirming("discard")}
                 disabled={isBusy}
               >
@@ -376,7 +363,7 @@ export function PublishDialog({
                   variant="outline"
                   onClick={onOpenForm}
                   disabled={isBusy}
-                  className={secondaryButtonClass}
+                  className="border border-[var(--border)] bg-[var(--card)]"
                 >
                   <ExternalLink />
                   Open form
@@ -384,7 +371,7 @@ export function PublishDialog({
                 <Button
                   onClick={handlePublish}
                   disabled={isBusy}
-                  className={primaryButtonClass}
+                  className="bg-[var(--primary)] text-white"
                 >
                   {busy === "publish" && <Loader2 className="animate-spin" />}
                   {busy === "publish" ? "Publishing…" : "Publish changes"}
@@ -395,7 +382,7 @@ export function PublishDialog({
             <>
               <Button
                 variant="ghost"
-                className={cn(ghostButtonClass, "hover:text-[var(--destructive)]")}
+                className="border border-[var(--border)] bg-[var(--card)] hover:text-[var(--destructive)]"
                 onClick={() => setConfirming("unpublish")}
                 disabled={isBusy}
               >
@@ -406,14 +393,13 @@ export function PublishDialog({
                   variant="ghost"
                   onClick={closeDialog}
                   disabled={isBusy}
-                  className={ghostButtonClass}
                 >
-                  Done
+                  Cancel
                 </Button>
                 <Button
                   onClick={onOpenForm}
                   disabled={isBusy}
-                  className={primaryButtonClass}
+                  className="bg-[var(--primary)] text-white"
                 >
                   <ExternalLink />
                   Open form

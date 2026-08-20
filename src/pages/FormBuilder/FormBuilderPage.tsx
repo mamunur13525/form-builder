@@ -400,7 +400,7 @@ export function FormBuilderPage() {
   if (formError) {
     return (
       <div className="editorial h-screen flex items-center justify-center bg-[var(--editorial-canvas)] px-8">
-        <div className="editorial-shadow-md flex max-w-md flex-col items-center rounded-[24px] border border-[var(--border)] bg-[var(--card)] px-10 py-12 text-center">
+        <div className="editorial-shadow-md flex max-w-md flex-col items-center rounded-xl border border-[var(--border)] bg-[var(--card)] px-10 py-12 text-center">
           <h2 className="font-display text-[32px] leading-tight text-[var(--foreground)]">
             Something went wrong
           </h2>
@@ -409,7 +409,7 @@ export function FormBuilderPage() {
           </p>
           <button
             onClick={() => navigate("/dashboard")}
-            className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-8 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-8 text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           >
             Back to Dashboard
           </button>
@@ -450,7 +450,7 @@ export function FormBuilderPage() {
 
     />
   ) : (
-    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden border border-[var(--border)] bg-[var(--card)]">
       <div className="border-b border-[var(--editorial-border-light)] px-6 py-5">
         <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
           Settings
@@ -465,7 +465,7 @@ export function FormBuilderPage() {
   );
 
   const editorColumn = (
-    <div className="flex h-full min-h-0 w-full flex-col gap-3 sm:gap-4">
+    <div className="flex h-full min-h-0 w-full flex-col gap-3 sm:gap-4 py-4">
       <PageContentTopbar
         onAddPage={() => {
           setShowAddPageDialog(true);
@@ -488,7 +488,7 @@ export function FormBuilderPage() {
       <div className="flex min-h-0 w-full flex-1 items-center justify-center">
         <div
           className={cn(
-            "editorial-shadow h-full w-full overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--card)] sm:rounded-[24px]",
+            "editorial-shadow h-full w-full overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--card)] sm:rounded-xl",
             "transition-all duration-500 ease-out",
           )}
           // The phone-frame preview must never exceed the available width.
@@ -524,7 +524,7 @@ export function FormBuilderPage() {
       {isDesktop ? (
         <ResizablePanelGroup
           orientation="horizontal"
-          className="mx-auto w-full flex-1 min-h-0 px-8 py-4"
+          className="mx-auto w-full flex-1 min-h-0"
         >
           <ResizablePanel defaultSize={300} minSize={260} maxSize={400}>
             {sidebarPanel}

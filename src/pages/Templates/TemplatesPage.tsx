@@ -8,6 +8,8 @@ import {
     GraduationCap,
     Search,
     ArrowRight,
+    Sparkles,
+    FileSearch,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -24,6 +26,10 @@ interface Template {
     category: string
     fieldCount: number
     icon: LucideIcon
+    /** Soft tint used for the icon tile background. */
+    tint: string
+    /** A short, human label for the category badge. */
+    badge: string
 }
 
 /**
@@ -38,6 +44,8 @@ const TEMPLATES: Template[] = [
         category: "General",
         fieldCount: 4,
         icon: ClipboardList,
+        tint: "bg-[var(--editorial-primary-light)] text-[var(--primary)]",
+        badge: "Everyday",
     },
     {
         id: "feedback",
@@ -46,6 +54,8 @@ const TEMPLATES: Template[] = [
         category: "Research",
         fieldCount: 6,
         icon: MessageSquareHeart,
+        tint: "bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
+        badge: "Research",
     },
     {
         id: "event",
@@ -54,6 +64,8 @@ const TEMPLATES: Template[] = [
         category: "Events",
         fieldCount: 7,
         icon: CalendarCheck,
+        tint: "bg-[var(--editorial-blue)]/12 text-[var(--editorial-blue)]",
+        badge: "Events",
     },
     {
         id: "application",
@@ -62,6 +74,8 @@ const TEMPLATES: Template[] = [
         category: "Hiring",
         fieldCount: 8,
         icon: Briefcase,
+        tint: "bg-[var(--editorial-success)]/12 text-[#4E7F62]",
+        badge: "Hiring",
     },
     {
         id: "survey",
@@ -70,6 +84,8 @@ const TEMPLATES: Template[] = [
         category: "Research",
         fieldCount: 10,
         icon: Users,
+        tint: "bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
+        badge: "Research",
     },
     {
         id: "course",
@@ -78,10 +94,15 @@ const TEMPLATES: Template[] = [
         category: "Education",
         fieldCount: 6,
         icon: GraduationCap,
+        tint: "bg-[var(--editorial-blue)]/12 text-[var(--editorial-blue)]",
+        badge: "Education",
     },
 ]
 
 const CATEGORIES = ["All", ...Array.from(new Set(TEMPLATES.map((t) => t.category)))]
+
+/** The first template gets a "Featured" treatment in the grid. */
+const FEATURED_ID = "contact"
 
 export function TemplatesPage() {
     const navigate = useNavigate()
@@ -125,7 +146,7 @@ export function TemplatesPage() {
             </div>
 
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-full border border-[var(--input)] bg-[var(--card)] px-5 py-1 focus-within:border-[var(--primary)] sm:px-6 lg:min-w-[280px] lg:flex-1">
+                <div className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-lg border border-[var(--input)] bg-[var(--card)] px-5 py-1 focus-within:border-[var(--primary)] sm:px-6 lg:min-w-[280px] lg:flex-1">
                     <Search className="h-5 w-5 shrink-0 text-[var(--editorial-subtle)]" />
                     <Input
                         value={query}
@@ -135,18 +156,19 @@ export function TemplatesPage() {
                         className="h-full flex-1 border-0 bg-transparent p-0 text-base shadow-none placeholder:text-[var(--editorial-subtle)] focus-visible:ring-0"
                     />
                 </div>
-                {/* Chips scroll sideways on narrow screens rather than wrapping. */}
-                <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 lg:pb-0">
+
+                {/* Segmented control — inset track with a raised active item. */}
+                <div className="flex items-center gap-1 overflow-x-auto rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible">
                     {CATEGORIES.map((item) => (
                         <button
                             key={item}
                             type="button"
                             onClick={() => setCategory(item)}
                             className={cn(
-                                "editorial-transition h-11 shrink-0 rounded-[16px] border px-4 text-sm",
+                                "editorial-transition shrink-0 rounded-[13px] border px-4 py-2.5 text-sm font-medium",
                                 category === item
-                                    ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)]"
-                                    : "border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]",
+                                    ? "border-[var(--editorial-border-light)] bg-[var(--card)] text-[var(--foreground)] shadow-[0_2px_8px_rgba(24,20,18,.06)]"
+                                    : "border-transparent text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]",
                             )}
                         >
                             {item}
@@ -155,49 +177,93 @@ export function TemplatesPage() {
                 </div>
             </div>
 
+            {/* Template grid */}
             {visibleTemplates.length === 0 ? (
-                <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)]">
-                    <CardContent className="py-20 text-center">
-                        <p className="text-base text-[var(--editorial-subtle)]">
+                <Card className="editorial-shadow-sm mt-8 border-[var(--border)] bg-[var(--card)] sm:mt-10">
+                    <CardContent className="flex flex-col items-center py-20 text-center">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
+                            <FileSearch className="h-6 w-6" />
+                        </div>
+                        <h2 className="font-display mt-5 text-2xl text-[var(--foreground)]">
                             No templates match your search
+                        </h2>
+                        <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--editorial-body)]">
+                            Try a different keyword or clear the category filter to
+                            see the full collection.
                         </p>
+                        <Button
+                            onClick={() => {
+                                setQuery("")
+                                setCategory("All")
+                            }}
+                        >
+                            Clear filters
+                        </Button>
                     </CardContent>
                 </Card>
             ) : (
-                <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {visibleTemplates.map((template) => (
-                        <Card
-                            key={template.id}
-                            className="editorial-transition editorial-shadow-sm flex flex-col rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)]"
-                        >
-                            <CardContent className="flex flex-1 flex-col p-0">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-[16px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
-                                    <template.icon className="h-5 w-5" />
-                                </div>
+                <div className="mt-8 grid gap-5 sm:mt-10 sm:grid-cols-2 xl:grid-cols-3">
+                    {visibleTemplates.map((template) => {
+                        const isFeatured = template.id === FEATURED_ID
+                        const Icon = template.icon
 
-                                <h2 className="mt-6 font-display text-2xl leading-tight text-[var(--foreground)]">
-                                    {template.title}
-                                </h2>
-                                <p className="mt-2 flex-1 text-base leading-6 text-[var(--editorial-body)]">
-                                    {template.description}
-                                </p>
+                        return (
+                            <Card
+                                key={template.id}
+                                className={cn(
+                                    isFeatured
+                                        ? "border-[var(--editorial-primary-ring)]/60"
+                                        : "border-[var(--border)]",
+                                )}
+                            >
+                                {/* Featured ribbon */}
+                                {isFeatured && (
+                                    <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-[16px] bg-[var(--editorial-primary-selected)] px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] text-[var(--primary)] uppercase">
+                                        <Sparkles className="h-3.5 w-3.5" />
+                                        Featured
+                                    </div>
+                                )}
 
-                                <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-                                    <span className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                                        {template.fieldCount} questions
-                                    </span>
-                                    <Button
-                                        onClick={() => createFromTemplate(template)}
-                                        disabled={createForm.isPending}
-                                        className="editorial-transition h-11 shrink-0 gap-2 rounded-[16px] bg-[var(--primary)] px-5 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                                <CardContent className="flex flex-1 flex-col">
+                                    {/* Icon tile — soft tinted square, not a generic circle */}
+                                    <div
+                                        className={cn(
+                                            "flex h-14 w-14 items-center justify-center rounded-[18px]",
+                                            template.tint,
+                                        )}
                                     >
-                                        Use template
-                                        <ArrowRight className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
+                                        <Icon className="h-6 w-6" />
+                                    </div>
+
+                                    {/* Category badge */}
+                                    <span className="editorial-eyebrow mt-6 text-[var(--editorial-subtle)]">
+                                        {template.badge}
+                                    </span>
+
+                                    <h2 className="font-display mt-2 text-[26px] leading-tight text-[var(--foreground)] [text-wrap:balance]">
+                                        {template.title}
+                                    </h2>
+                                    <p className="mt-2 flex-1 text-[15px] leading-6 text-[var(--editorial-body)]">
+                                        {template.description}
+                                    </p>
+
+                                    <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--editorial-border-light)] pt-5">
+                                        <span className="text-sm tabular-nums text-[var(--editorial-subtle)]">
+                                            {template.fieldCount} questions
+                                        </span>
+                                        <Button
+                                            onClick={() => createFromTemplate(template)}
+                                            disabled={createForm.isPending}
+                                            className={'text-sm'}
+                                        >
+                                            Use template
+                                            <ArrowRight className="h-4 w-4 transition-transform duration-250 group-hover:translate-x-0.5" />
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )
+                    })}
                 </div>
             )}
         </div>

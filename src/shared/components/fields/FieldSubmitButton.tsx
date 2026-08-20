@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { getCornerRadiusCss } from "@/shared/utils/theme"
 
@@ -23,9 +22,9 @@ export function FieldSubmitButton({
 }: FieldSubmitButtonProps) {
     return (
         <div className="mt-8">
-            <Button
-                size="lg"
-                className={cn("w-full sm:w-auto px-8!", fontSizeClass)}
+            <button
+                type="button"
+                className={cn("w-full h-10 sm:w-auto px-8!", fontSizeClass)}
                 onClick={onClick}
                 disabled={disabled}
                 style={{
@@ -35,7 +34,7 @@ export function FieldSubmitButton({
                 }}
             >
                 {text}
-            </Button>
+            </button>
         </div>
     )
 }

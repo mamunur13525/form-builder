@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "./primitives"
 
 
-const PRIMARY_BUTTON_CLASS = "editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-[var(--primary-foreground)] shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"
+const PRIMARY_BUTTON_CLASS = "editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-[var(--primary-foreground)]  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"
 
 // ── Types ───────────────────────────────────────────────────────────────────
 interface ImagePickerDialogProps {

@@ -45,7 +45,7 @@ export function FormBuilderTopBar({
   const { saveStatus, showSaveStatus, openPreview, hasUnpublishedChanges } =
     useFormContext();
   const baseNavLinkClass =
-    "editorial-transition flex items-center gap-1.5 rounded-[16px] px-3.5 py-2 text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]";
+    "editorial-transition flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]";
   const activeNavLinkClass =
     "border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)] hover:text-[var(--primary)]";
 
@@ -132,7 +132,6 @@ export function FormBuilderTopBar({
         <Button
           variant="outline"
           aria-label="Preview"
-          className="editorial-transition h-10 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-3 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
           onClick={() => openPreview()}
         >
           <Play className="h-5 w-5" />
@@ -141,7 +140,6 @@ export function FormBuilderTopBar({
         {!isPublished ? (
           <Button
             aria-label="Publish"
-            className="editorial-transition h-10 gap-2 rounded-[16px] bg-[var(--primary)] px-3 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] lg:h-11 lg:px-5"
             onClick={onPublish}
           >
             <Share2 className="h-5 w-5" />
@@ -151,7 +149,6 @@ export function FormBuilderTopBar({
           <Button
             variant="default"
             aria-label="Publish changes"
-            className="editorial-transition h-10 gap-2 rounded-[16px] border border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] px-3 text-sm font-medium text-[var(--editorial-purple)] hover:-translate-y-0.5 hover:bg-[var(--editorial-purple-light)] active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
             onClick={onPublishedClick}
           >
             <AlertCircle className="h-5 w-5" />
@@ -161,7 +158,6 @@ export function FormBuilderTopBar({
           <Button
             variant="default"
             aria-label="Published"
-            className="editorial-transition h-10 gap-2 rounded-[16px] border border-[var(--editorial-success)]/30 bg-[var(--editorial-success)]/12 px-3 text-sm font-medium text-[#4E7F62] hover:-translate-y-0.5 hover:bg-[var(--editorial-success)]/20 active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
             onClick={onPublishedClick}
           >
             <CheckCircle className="h-5 w-5" />

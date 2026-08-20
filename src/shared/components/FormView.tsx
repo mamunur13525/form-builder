@@ -138,7 +138,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
             : field.appearance.submitButtonText ||
             (field.type === "statement" ? "Continue" : "Submit")
         }
-        color={field.appearance.submitButtonColor || themeResolved.buttonColor}
+        color={themeResolved.buttonColor || field.appearance.submitButtonColor}
         textColor={themeResolved.buttonTextColor}
         roundCorners={themeResolved.roundCorners}
         fontSizeClass={fontSizes.button}

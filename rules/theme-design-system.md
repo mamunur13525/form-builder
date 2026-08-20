@@ -127,7 +127,7 @@ Shadows are warm and soft, never dark or heavy.
 - `.editorial-shadow-md` — `0 12px 40px rgba(90,70,50,.06)`, panels, overlays
 - `.editorial-shadow-sm` — subtle lift
 - Selected item inside a track: `shadow-[0_2px_8px_rgba(24,20,18,.06)]`
-- Coral button glow: `shadow-[0_8px_24px_rgba(238,125,105,.25)]`
+- Coral button glow: ``
 
 `.editorial-transition` — 250ms ease-out on colour, border, shadow, transform,
 opacity. Put it on anything interactive.

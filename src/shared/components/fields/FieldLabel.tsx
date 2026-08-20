@@ -24,7 +24,7 @@ export function FieldLabel({ label, pageNumber, editable, onUpdate, color, fontS
                     contentEditable
                     suppressContentEditableWarning
                     data-placeholder="Type your question... Use @ to recall information."
-                    className={cn(sizeClass, "outline-none border-b border-transparent focus:border-primary pb-1 transition-colors cursor-text font-semibold")}
+                    className={cn(sizeClass, "outline-none border-0 border-transparent pb-1 transition-colors cursor-text")}
                     style={color ? { color } : undefined}
                     onBlur={(e) =>
                         onUpdate?.(e.currentTarget.textContent || "")

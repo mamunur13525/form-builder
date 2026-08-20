@@ -82,7 +82,7 @@ export function AuthField({
 
 /** Primary coral submit button used by both auth forms. */
 export const authSubmitClass =
-  "editorial-transition h-[52px] w-full rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none";
+  "editorial-transition h-[52px] w-full rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none";
 
 /** "Or continue with" rule. */
 export function AuthDivider({ label }: { label: string }) {

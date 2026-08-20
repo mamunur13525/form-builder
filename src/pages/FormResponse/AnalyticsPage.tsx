@@ -77,7 +77,7 @@ export function AnalyticsPage() {
                 >
                     {/* Overview Stats */}
                     <div className="grid gap-6 md:grid-cols-4">
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -89,7 +89,7 @@ export function AnalyticsPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -101,7 +101,7 @@ export function AnalyticsPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -113,7 +113,7 @@ export function AnalyticsPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -129,7 +129,7 @@ export function AnalyticsPage() {
 
                     {/* Additional Stats */}
                     <div className="grid gap-6 md:grid-cols-2">
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -141,7 +141,7 @@ export function AnalyticsPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">

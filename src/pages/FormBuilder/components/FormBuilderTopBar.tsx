@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Home,
   Pencil,
+  CheckCheck,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
@@ -120,7 +121,7 @@ export function FormBuilderTopBar({
             <Loader2 className="h-4 w-4 animate-spin" />
           )}
           {saveStatus === "saved" && (
-            <CheckCircle className="h-4 w-4 text-[var(--editorial-success)]" />
+            <CheckCheck className="h-4 w-4 text-[var(--editorial-success)]" />
           )}
           {saveStatus === "error" && (
             <AlertCircle className="h-4 w-4 text-[var(--destructive)]" />

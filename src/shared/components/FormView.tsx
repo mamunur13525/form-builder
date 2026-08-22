@@ -7,6 +7,7 @@ import { useFormNavigation } from "../hooks/useFormNavigation";
 import { FormPageRenderer } from "./FormPageRenderer";
 import { FormProgressBar } from "./FormProgressBar";
 import { FormSubmittedView } from "./FormSubmittedView";
+import { EndPageView } from "./EndPageView";
 import { FormNavigationFooter } from "./FormNavigationFooter";
 import { PageLabel, PageHelperText, PageSubmitButton } from "./pages";
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "../utils/theme";
@@ -149,7 +150,14 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
   );
 
   if (submitted) {
-    return <FormSubmittedView onReset={() => { }} />;
+    // Only the FIRST end page is shown to respondents on submit. Other end
+    // pages exist in the builder but never render here.
+    const endPage = form.endPages?.[0];
+    return endPage ? (
+      <EndPageView endPage={endPage} theme={form.theme} mode={mode} />
+    ) : (
+      <FormSubmittedView onReset={() => { }} />
+    );
   }
 
   return (

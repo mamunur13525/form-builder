@@ -330,7 +330,7 @@ export function DesignDrawer({
             {/* Preview area */}
             <div className="h-full min-h-0 flex-1 overflow-y-auto bg-[var(--editorial-canvas)] p-6 grid place-items-center">
                 <div className="h-8/12 flex w-full flex-col justify-center ">
-                    <div className="editorial-shadow h-full max-h-full w-full overflow-hidden rounded-xl bg-[var(--card)] border border-gray-400/80 pointer-events-none">
+                    <div className="editorial-shadow h-full max-h-full w-full overflow-hidden rounded-xl bg-[var(--card)] border-dashed border-gray-400/80 pointer-events-none">
                         {page ? (
                             <PageContentEditor
                                 page={page}

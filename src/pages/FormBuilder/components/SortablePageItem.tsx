@@ -7,6 +7,11 @@ import {
 } from "../../../components/ui/popover";
 import { Button } from "../../../components/ui/button";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../components/ui/tooltip";
+import {
   PAGE_TYPE_ICONS,
   PAGE_TYPE_LABELS,
 } from "../../../shared/constants/form-types";
@@ -115,33 +120,47 @@ export function SortablePageItem({
           </span>
 
           {/* Drag handle — dragging only starts from here, so clicks still select. */}
-          <span
-            data-movable-handle
-            aria-hidden="true"
-            tabIndex={-1}
-            onClick={(e) => e.stopPropagation()}
-            className={`
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <span
+                  data-movable-handle
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  onClick={(e) => e.stopPropagation()}
+                  className={`
               editorial-transition flex h-7 w-7 shrink-0 items-center justify-center rounded-md
               text-[var(--editorial-subtle)] hover:bg-[var(--card)] hover:text-[var(--foreground)]
               touch-none select-none
               ${isActive ? "cursor-grabbing" : "cursor-grab"}
             `}
-          >
-            <GripVertical className="h-[18px] w-[18px]" />
-          </span>
+                >
+                  <GripVertical className="h-[18px] w-[18px]" />
+                </span>
+              }
+            />
+            <TooltipContent>Drag to reorder</TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Right: delete (with confirm) + move up + move down */}
         <div className="flex shrink-0 items-center gap-0.5">
           <Popover open={confirmOpen} onOpenChange={setConfirmOpen}>
-            <PopoverTrigger
-              type="button"
-              aria-label="Delete page"
-              onClick={(e) => e.stopPropagation()}
-              className={`${actionBtn} hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)] data-[popup-open]:bg-[var(--destructive)]/10 data-[popup-open]:text-[var(--destructive)]`}
-            >
-              <Trash2 className="h-4 w-4" />
-            </PopoverTrigger>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <PopoverTrigger
+                    type="button"
+                    aria-label="Delete page"
+                    onClick={(e) => e.stopPropagation()}
+                    className={`${actionBtn} hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)] data-[popup-open]:bg-[var(--destructive)]/10 data-[popup-open]:text-[var(--destructive)]`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </PopoverTrigger>
+                }
+              />
+              <TooltipContent>Delete</TooltipContent>
+            </Tooltip>
             <PopoverContent
               side="top"
               align="end"
@@ -178,31 +197,45 @@ export function SortablePageItem({
             </PopoverContent>
           </Popover>
 
-          <button
-            type="button"
-            aria-label="Move page up"
-            disabled={isFirst}
-            onClick={(e) => {
-              e.stopPropagation();
-              onMoveUp(index);
-            }}
-            className={actionBtn}
-          >
-            <ChevronUp className="h-4 w-4" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  aria-label="Move page up"
+                  disabled={isFirst}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveUp(index);
+                  }}
+                  className={actionBtn}
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </button>
+              }
+            />
+            <TooltipContent>Move up</TooltipContent>
+          </Tooltip>
 
-          <button
-            type="button"
-            aria-label="Move page down"
-            disabled={isLast}
-            onClick={(e) => {
-              e.stopPropagation();
-              onMoveDown(index);
-            }}
-            className={actionBtn}
-          >
-            <ChevronDown className="h-4 w-4" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  aria-label="Move page down"
+                  disabled={isLast}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveDown(index);
+                  }}
+                  className={actionBtn}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              }
+            />
+            <TooltipContent>Move down</TooltipContent>
+          </Tooltip>
         </div>
       </div>
     </div>

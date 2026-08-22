@@ -10,6 +10,12 @@ import type {
     FontSize,
     CornerRadius,
     ThemeFontSource,
+    EndPage,
+    EndPageButton,
+    EndPageRedirect,
+    EndPageEmbed,
+    EndPageEmbedProvider,
+    EndPageSocialShareMedia,
 } from "@/shared/types/common"
 
 export type {
@@ -20,6 +26,12 @@ export type {
     FontSize,
     CornerRadius,
     ThemeFontSource,
+    EndPage,
+    EndPageButton,
+    EndPageRedirect,
+    EndPageEmbed,
+    EndPageEmbedProvider,
+    EndPageSocialShareMedia,
 }
 
 export type FormTheme = IFormTheme
@@ -42,6 +54,7 @@ export interface Form {
     createdBy: string
     updatedBy?: string
     pages: FormPage[]
+    endPages?: EndPage[]
     createdAt: string
     updatedAt: string
     draftVersionId?: string
@@ -59,6 +72,7 @@ export interface PublishedForm {
     formVersionId: string
     version: number
     pages: FormPage[]
+    endPages?: EndPage[]
     theme: FormTheme
     settings: FormSettings
 }
@@ -289,6 +303,44 @@ export interface ReorderPagesRequest {
 
 export interface UpdatePageLogicRequest {
     logic: PageLogic[]
+}
+
+// ---------------------------------------------------------------------------
+// End Pages
+// ---------------------------------------------------------------------------
+
+export interface CreateEndPageRequest {
+    title?: string
+    helperText?: string
+    paragraph?: string
+    coverImage?: PageCoverImage | null
+    embed?: EndPageEmbed
+    alignment?: ContentAlignment
+    button?: EndPageButton
+    redirect?: EndPageRedirect
+    showConfetti?: boolean
+    socialShareButtons?: boolean
+    socialShareMessage?: string
+    socialShareMedia?: EndPageSocialShareMedia
+}
+
+export interface UpdateEndPageRequest {
+    title?: string
+    helperText?: string
+    paragraph?: string
+    coverImage?: PageCoverImage | null
+    embed?: EndPageEmbed
+    alignment?: ContentAlignment
+    button?: EndPageButton
+    redirect?: EndPageRedirect
+    showConfetti?: boolean
+    socialShareButtons?: boolean
+    socialShareMessage?: string
+    socialShareMedia?: EndPageSocialShareMedia
+}
+
+export interface ReorderEndPagesRequest {
+    endPageIds: string[]
 }
 
 // ---------------------------------------------------------------------------

@@ -6,9 +6,9 @@
  * `shared/types/common.ts` types used throughout the pages.
  */
 
-import type { Form as ApiForm, FormPage as ApiPage, PublishedForm } from "@/entities/form/model/types"
+import type { Form as ApiForm, FormPage as ApiPage, EndPage as ApiEndPage, PublishedForm } from "@/entities/form/model/types"
 import type { FormResponse as ApiResponse } from "@/entities/response/model/types"
-import type { Form, FormPage, FormResponse as CommonFormResponse } from "@/shared/types/common"
+import type { Form, FormPage, EndPage, FormResponse as CommonFormResponse } from "@/shared/types/common"
 
 /** Convert an API Form into the legacy Form type. Pages are now embedded in the form. */
 export function adaptApiForm(apiForm: ApiForm): Form {
@@ -22,6 +22,7 @@ export function adaptApiForm(apiForm: ApiForm): Form {
         createdBy: apiForm.createdBy,
         updatedBy: undefined,
         pages: (apiForm.pages ?? []).map((a) => adaptApiPage(a, apiForm.id)),
+        endPages: (apiForm.endPages ?? []).map(adaptApiEndPage),
         createdAt: apiForm.createdAt,
         updatedAt: apiForm.updatedAt,
     }
@@ -39,6 +40,7 @@ export function adaptPublishedForm(publishedForm: PublishedForm): Form {
         createdBy: "",
         updatedBy: undefined,
         pages: (publishedForm.pages ?? []).map((a) => adaptApiPage(a, publishedForm.id)),
+        endPages: (publishedForm.endPages ?? []).map(adaptApiEndPage),
         createdAt: "",
         updatedAt: "",
     }
@@ -72,6 +74,37 @@ export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
         isActive: apiPage.isActive,
         coverImage: apiPage.coverImage ?? null,
         settings: apiPage.settings,
+    }
+}
+
+/**
+ * Convert an API EndPage into the legacy EndPage type, filling in defaults so
+ * the UI never sees a missing button / redirect / socialShareMedia object.
+ */
+export function adaptApiEndPage(apiEndPage: ApiEndPage): EndPage {
+    return {
+        _id: apiEndPage._id,
+        key: apiEndPage.key,
+        title: apiEndPage.title ?? "",
+        helperText: apiEndPage.helperText ?? apiEndPage.paragraph ?? "",
+        paragraph: apiEndPage.paragraph,
+        coverImage: apiEndPage.coverImage ?? null,
+        embed: apiEndPage.embed ?? { url: "" },
+        alignment: apiEndPage.alignment ?? "left",
+        button: apiEndPage.button ?? { text: "", link: "" },
+        redirect: apiEndPage.redirect ?? { isRedirect: false, link: "" },
+        showConfetti: apiEndPage.showConfetti ?? false,
+        socialShareButtons: apiEndPage.socialShareButtons ?? false,
+        socialShareMessage: apiEndPage.socialShareMessage ?? "",
+        socialShareMedia: apiEndPage.socialShareMedia ?? {
+            facebook: false,
+            twitter: false,
+            linkedin: false,
+            whatsapp: false,
+        },
+        order: apiEndPage.order ?? 1,
+        createdAt: apiEndPage.createdAt as string | undefined,
+        updatedAt: apiEndPage.updatedAt as string | undefined,
     }
 }
 

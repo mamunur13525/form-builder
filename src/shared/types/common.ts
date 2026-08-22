@@ -248,6 +248,63 @@ export interface FormPage {
     settings?: PageSettings
 }
 
+// ---------------------------------------------------------------------------
+// End pages (Thank You / completion screens). A form can hold several; the
+// first one is what respondents see after submitting. See doc/end-page-api.md.
+// ---------------------------------------------------------------------------
+
+export type EndPageEmbedProvider =
+    | "youtube"
+    | "loom"
+    | "vimeo"
+    | "pdf"
+    | "image"
+    | "other"
+
+export interface EndPageEmbed {
+    url: string
+    provider?: EndPageEmbedProvider
+    title?: string
+}
+
+export interface EndPageButton {
+    text: string
+    link: string
+}
+
+export interface EndPageRedirect {
+    isRedirect: boolean
+    link: string
+}
+
+export interface EndPageSocialShareMedia {
+    facebook: boolean
+    twitter: boolean
+    linkedin: boolean
+    whatsapp?: boolean
+}
+
+export interface EndPage {
+    _id?: string
+    key?: string
+    title: string
+    helperText?: string
+    /** Backwards-compatible alias for helperText. */
+    paragraph?: string
+    coverImage?: CoverImage | null
+    embed?: EndPageEmbed
+    alignment: ContentAlignment
+    button: EndPageButton
+    redirect: EndPageRedirect
+    showConfetti: boolean
+    socialShareButtons: boolean
+    socialShareMessage: string
+    socialShareMedia: EndPageSocialShareMedia
+    order: number
+    createdAt?: string
+    updatedAt?: string
+}
+
 export interface Form {
     id?: string
     title: string
@@ -258,6 +315,7 @@ export interface Form {
     createdBy: string
     updatedBy?: string
     pages: FormPage[]
+    endPages?: EndPage[]
     createdAt?: string
     updatedAt?: string
 }

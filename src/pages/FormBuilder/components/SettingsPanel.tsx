@@ -1,15 +1,16 @@
 import React, { type ComponentType } from "react"
-import { GitBranch, ImagePlus, Palette, Plus, SlidersHorizontal, Trash2 } from "lucide-react"
+import { ImagePlus, Palette, Plus, SlidersHorizontal, Trash2 } from "lucide-react"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "../../../components/ui/select"
+    Combobox,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxItem,
+    ComboboxList,
+    ComboboxTrigger,
+} from "../../../components/ui/combobox"
 import {
     Tabs,
     TabsList,
@@ -24,7 +25,7 @@ import {
     DialogTitle,
 } from "../../../components/ui/dialog"
 import { DesignDrawer } from "./settings/DesignDrawer"
-import { FIELD_TYPE_LABELS } from "../../../shared/constants/form-types"
+import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, FIELD_TYPES, type FieldType } from "../../../shared/constants/form-types"
 import type {
     ChoiceSettings,
     FieldSettings,
@@ -63,10 +64,6 @@ import {
     UploadSettingsWidget,
 } from "./settings/type-settings"
 
-const PAGE_TYPES = Object.entries(FIELD_TYPE_LABELS).map(([type, label]) => ({
-    type,
-    label,
-}))
 
 interface SettingsPanelProps {
     page: FormField
@@ -76,9 +73,6 @@ interface SettingsPanelProps {
     designDrawerOpen: boolean
     onOpenDesignDrawer: () => void
     onCloseDesignDrawer: () => void
-    logicDialogOpen: boolean
-    onCloseLogicDialog: () => void
-    onOpenLogicDialog: () => void
     onSaveTheme: (theme: IFormTheme) => Promise<void>
 }
 
@@ -88,11 +82,8 @@ export function SettingsPanel({
     onUpdate,
     theme,
     designDrawerOpen,
-    logicDialogOpen,
     onOpenDesignDrawer,
-    onOpenLogicDialog,
     onCloseDesignDrawer,
-    onCloseLogicDialog,
     onSaveTheme
 }: SettingsPanelProps) {
 
@@ -109,7 +100,6 @@ export function SettingsPanel({
     }[] = [
             { value: "settings", label: "Settings", icon: SlidersHorizontal },
             { value: "design", label: "Design", icon: Palette, onSelect: onOpenDesignDrawer },
-            { value: "logic", label: "Logic", icon: GitBranch, onSelect: onOpenLogicDialog },
         ]
 
     /** Merge a single settings group, preserving the rest. */
@@ -181,22 +171,41 @@ export function SettingsPanel({
                                     <Label className="text-base font-semibold text-[var(--foreground)]">
                                         Field Type
                                     </Label>
-                                    <Select value={page.type} onValueChange={handleTypeChange}>
-                                        <SelectTrigger className="h-[52px] w-full rounded-full border-[var(--input)] bg-[var(--secondary)] text-base">
-                                            <SelectValue placeholder="Select field type" />
-                                        </SelectTrigger>
-                                        <SelectContent className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)]">
-                                            {PAGE_TYPES.map((pt) => (
-                                                <SelectItem
-                                                    key={pt.type}
-                                                    value={pt.type}
-                                                    className="rounded-[12px]"
-                                                >
-                                                    {pt.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <Combobox
+                                        items={FIELD_TYPES}
+                                        value={page.type}
+                                        onValueChange={handleTypeChange}
+                                    >
+                                        <ComboboxTrigger className="h-[52px] w-full rounded-md border-[var(--input)] bg-[var(--secondary)] text-base flex items-center px-4 justify-between">
+                                            {page.type && FIELD_TYPE_ICONS[page.type] ? (
+                                                (() => {
+                                                    const Icon = FIELD_TYPE_ICONS[page.type]
+                                                    return (
+                                                        <div className="flex items-center">
+                                                            <Icon className="h-4 w-4 mr-2" />
+                                                            <span>{FIELD_TYPE_LABELS[page.type]}</span>
+                                                        </div>
+                                                    )
+                                                })()
+                                            ) : (
+                                                <span className="text-muted-foreground">Select field type</span>
+                                            )}
+                                        </ComboboxTrigger>
+                                        <ComboboxContent className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)]">
+                                            <ComboboxEmpty>No items found.</ComboboxEmpty>
+                                            <ComboboxList>
+                                                    {(item: FieldType) => {
+                                                    const Icon = FIELD_TYPE_ICONS[item]
+                                                    return (
+                                                        <ComboboxItem key={item} value={item} className="rounded-[12px]">
+                                                            <Icon className="h-4 w-4" />
+                                                            {FIELD_TYPE_LABELS[item]}
+                                                        </ComboboxItem>
+                                                    )
+                                                }}
+                                            </ComboboxList>
+                                        </ComboboxContent>
+                                    </Combobox>
                                 </div>
 
                                 {/* Required — every type except statement (forced false server-side) */}
@@ -525,42 +534,6 @@ export function SettingsPanel({
                     onSelect={(coverImage) => onUpdate(pageIndex, { coverImage })}
                     currentImage={page.coverImage}
                 />
-
-                <Dialog open={logicDialogOpen} onOpenChange={onCloseLogicDialog}>
-                    <DialogContent className="sm:max-w-[600px]">
-                        <DialogHeader>
-                            <DialogTitle>Logic Rules</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                            {page.logic.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">
-                                    No logic rules configured
-                                </p>
-                            ) : (
-                                page.logic.map((rule, ruleIndex) => (
-                                    <div
-                                        key={ruleIndex}
-                                        className="space-y-1 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-4"
-                                    >
-                                        <p className="text-base leading-6">
-                                            When <strong>{rule.whenFieldKey}</strong> {rule.operator} "
-                                            {String(rule.value)}"
-                                        </p>
-                                        <p className="text-xs text-[var(--editorial-subtle)]">
-                                            → {rule.action} {rule.targetFieldKey}
-                                        </p>
-                                    </div>
-                                ))
-                            )}
-                            <Button
-                                variant="outline"
-                            >
-                                <Plus className="mr-1.5 h-4 w-4" />
-                                Add Logic
-                            </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
             </div>
         </div>
     )

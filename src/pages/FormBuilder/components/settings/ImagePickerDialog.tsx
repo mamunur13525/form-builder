@@ -302,7 +302,7 @@ export function ImagePickerDialog({
         <Dialog
             open={open}
             onOpenChange={(next) => { if (!next) reset(); onOpenChange(next); }}
-            className="editorial editorial-shadow w-full max-w-3xl md:-translate-y-30 rounded-[30px] border-[var(--border)] bg-[var(--popover)] p-10"
+            className="editorial editorial-shadow w-full max-w-3xl rounded-2xl border-[var(--border)] bg-[var(--popover)] p-10"
         >
             <DialogContent>
                 <DialogHeader className="mb-6">

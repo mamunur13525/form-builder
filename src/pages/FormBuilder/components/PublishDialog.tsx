@@ -86,7 +86,7 @@ const CONFIRM_COPY: Record<
 };
 
 /** Green publish CTA accent — matches the Publish button in FormBuilderTopBar. */
-const PUBLISH_BUTTON_CLASS = "border-[#2f4f0a] from-[#4a7f11] to-[#355b0c]";
+const PUBLISH_BUTTON_CLASS = "border-0 from-[#4a7f11] to-[#355b0c]";
 
 export function PublishDialog({
   open,

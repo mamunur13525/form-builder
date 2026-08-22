@@ -80,7 +80,7 @@ export function SortablePageItem({
         cursor-pointer select-none
         ${!isDragged ? "editorial-transition" : ""}
         ${isSelected
-          ? "border-[var(--primary)] bg-[var(--card)] shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+          ? "border-green-900/50 bg-green-700/5! shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
           : "border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--editorial-primary-ring)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
         }
         ${isDragged ? "border-[var(--primary)] bg-[var(--card)] shadow-[0_20px_50px_rgba(0,0,0,0.14)] scale-[1.02] cursor-grabbing" : ""}

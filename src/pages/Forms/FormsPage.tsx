@@ -106,7 +106,7 @@ export function FormsPage() {
                         </p>
                         {forms.length === 0 && (
                             <Button
-                                className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                                className="mt-7"
                                 onClick={() => setCreateDialogOpen(true)}
                             >
                                 Create your first form

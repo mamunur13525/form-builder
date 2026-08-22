@@ -113,7 +113,7 @@ export function PageContentEditor({
           : undefined,
     }
     : {};
-  console.log({ bgcolor: themeResolved.buttonColor })
+  
   return (
     <div
       className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden"

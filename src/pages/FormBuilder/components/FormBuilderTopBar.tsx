@@ -3,6 +3,7 @@ import {
   CheckCircle,
   Play,
   Wrench,
+  Workflow,
   Settings,
   Puzzle,
   Share2,
@@ -50,7 +51,7 @@ export function FormBuilderTopBar({
     "border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)] hover:text-[var(--primary)]";
   // Publish CTA accent — green gradient (#4a7f11); overrides the monochrome default button
   const publishButtonClass =
-    "border-[#2f4f0a] from-[#4a7f11] to-[#355b0c]";
+    "border-0 from-[#4a7f11] to-[#355b0c]";
 
   const [title, setTitle] = useState(initialTitle);
   const prevInitialTitleRef = useRef(initialTitle);

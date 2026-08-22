@@ -145,7 +145,6 @@ export function ToggleRow({
                     id={id}
                     checked={checked}
                     onCheckedChange={onCheckedChange}
-                    size="sm"
                 />
             </div>
             {description && (

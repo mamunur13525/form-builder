@@ -52,7 +52,6 @@ export function FormBuilderPage() {
   const [showPagesDrawer, setShowPagesDrawer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   const [designDrawerOpen, setDesignDrawerOpen] = useState(false);
-  const [logicDialogOpen, setLogicDialogOpen] = useState(false);
   const syncedKeyRef = useRef<string | undefined>(undefined);
   const isDesktop = useIsDesktop();
 
@@ -441,13 +440,9 @@ export function FormBuilderPage() {
       onUpdate={updatePage}
       theme={form?.theme}
       designDrawerOpen={designDrawerOpen}
-      logicDialogOpen={logicDialogOpen}
       onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
-      onOpenLogicDialog={() => setLogicDialogOpen(true)}
       onCloseDesignDrawer={() => setDesignDrawerOpen(false)}
-      onCloseLogicDialog={() => setLogicDialogOpen(false)}
       onSaveTheme={handleSaveTheme}
-
     />
   ) : (
     <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden border border-[var(--border)] bg-[var(--card)]">
@@ -482,7 +477,7 @@ export function FormBuilderPage() {
           isDesktop ? undefined : () => setShowSettingsDrawer(true)
         }
         onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
-        onOpenLogicDialog={() => setLogicDialogOpen(true)}
+
       />
 
       <div className="flex min-h-0 w-full flex-1 items-center justify-center">

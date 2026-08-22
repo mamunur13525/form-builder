@@ -1,8 +1,7 @@
 import React, { type ComponentType } from "react"
-import { ImagePlus, Palette, Plus, SlidersHorizontal, Trash2 } from "lucide-react"
+import { ImagePlus, Palette, SlidersHorizontal, Trash2 } from "lucide-react"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
-import { Button } from "../../../components/ui/button"
 import {
     Combobox,
     ComboboxContent,
@@ -18,12 +17,7 @@ import {
     TabsContent,
 } from "../../../components/ui/tabs"
 import { Sheet, SheetContent } from "../../../components/ui/sheet"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "../../../components/ui/dialog"
+
 import { DesignDrawer } from "./settings/DesignDrawer"
 import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, FIELD_TYPES, type FieldType } from "../../../shared/constants/form-types"
 import type {
@@ -176,7 +170,7 @@ export function SettingsPanel({
                                         value={page.type}
                                         onValueChange={handleTypeChange}
                                     >
-                                        <ComboboxTrigger className="h-[52px] w-full rounded-md border-[var(--input)] bg-[var(--secondary)] text-base flex items-center px-4 justify-between">
+                                        <ComboboxTrigger className="h-[52px] w-full rounded-xl border border-[var(--input)] bg-[var(--secondary)] text-base flex items-center px-4 justify-between">
                                             {page.type && FIELD_TYPE_ICONS[page.type] ? (
                                                 (() => {
                                                     const Icon = FIELD_TYPE_ICONS[page.type]
@@ -191,14 +185,14 @@ export function SettingsPanel({
                                                 <span className="text-muted-foreground">Select field type</span>
                                             )}
                                         </ComboboxTrigger>
-                                        <ComboboxContent className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)]">
+                                        <ComboboxContent className="editorial rounded-xl border border-[var(--border)] bg-[var(--popover)]">
                                             <ComboboxEmpty>No items found.</ComboboxEmpty>
                                             <ComboboxList>
                                                     {(item: FieldType) => {
                                                     const Icon = FIELD_TYPE_ICONS[item]
                                                     return (
-                                                        <ComboboxItem key={item} value={item} className="rounded-[12px]">
-                                                            <Icon className="h-4 w-4" />
+                                                        <ComboboxItem key={item} value={item} className="rounded-[12px] py-3.5!">
+                                                            <Icon className="h-5 w-5" />
                                                             {FIELD_TYPE_LABELS[item]}
                                                         </ComboboxItem>
                                                     )
@@ -449,7 +443,7 @@ export function SettingsPanel({
                                         <button
                                             type="button"
                                             onClick={() => setCoverDialogOpen(true)}
-                                            className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-[22px] border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]"
+                                            className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]"
                                         >
                                             <ImagePlus className="h-5 w-5" />
                                             <span>Add a cover image</span>
@@ -463,7 +457,7 @@ export function SettingsPanel({
                                         value={page.validation?.message ?? ""}
                                         onChange={(e) => patchValidation({ message: e.target.value })}
                                         placeholder="This field is required"
-                                        className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                                        className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                                     />
                                     <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                                         Shown to respondents when this field fails validation.
@@ -485,7 +479,7 @@ export function SettingsPanel({
                                                 })
                                             }
                                             placeholder="Submit"
-                                            className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                                            className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                                         />
                                     </div>
                                 </SettingsSection>

@@ -40,7 +40,7 @@ export function StatementSettingsWidget({
                         })
                     }
                 >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full h-[52px]! rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base ">
                         <SelectValue placeholder="Select provider" />
                     </SelectTrigger>
                     <SelectContent>

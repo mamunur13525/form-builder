@@ -37,7 +37,7 @@ const CONTROL_CLASS =
 
 /** Portalled surfaces escape the `.editorial` subtree, so they opt back in. */
 const OVERLAY_CLASS =
-    "editorial rounded-[18px] border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
+    "editorial rounded-xl border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
 
 /**
  * Editorial button treatments, matching PublishDialog so confirmation prompts
@@ -50,10 +50,10 @@ const OVERLAY_CLASS =
  * `data-active:bg-transparent` and would cancel the raised fill.
  */
 export const TAB_LIST_CLASS =
-    "h-auto w-full gap-1 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)] group-data-horizontal/tabs:h-auto"
+    "h-auto w-full gap-1 rounded-xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)] group-data-horizontal/tabs:h-auto"
 
 export const TAB_TRIGGER_CLASS =
-    "editorial-transition flex-1 gap-2 rounded-[13px] border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
+    "editorial-transition flex-1 gap-2 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
 
 const FIELD_LABEL_CLASS = "text-sm font-medium text-[var(--editorial-body)]"
 
@@ -213,7 +213,7 @@ export function NumberSetting({
                     onChange(Number(raw))
                 }}
                 placeholder={placeholder}
-                className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
             />
             {description && (
                 <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
@@ -245,7 +245,7 @@ export function TextSetting({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
             />
             {description && (
                 <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
@@ -299,7 +299,6 @@ export function SelectSetting<T extends string>({
                         <SelectItem
                             key={option.value}
                             value={option.value}
-                            className="rounded-[12px]"
                         >
                             {option.label}
                         </SelectItem>
@@ -613,7 +612,7 @@ export function CoverImageField({
             />
             {value?.url ? (
                 <div className="space-y-3">
-                    <div className="relative overflow-hidden rounded-[22px] border border-[var(--editorial-border-light)]">
+                    <div className="relative overflow-hidden rounded-xl border border-[var(--editorial-border-light)]">
                         <img
                             src={value.url}
                             alt={value.alt || "Cover"}
@@ -650,7 +649,7 @@ export function CoverImageField({
                     type="button"
                     onClick={() => inputRef.current?.click()}
                     disabled={uploading}
-                    className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-[22px] border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-50"
+                    className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-50"
                 >
                     {uploading ? (
                         <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />

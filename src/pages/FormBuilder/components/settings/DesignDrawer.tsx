@@ -21,7 +21,7 @@ import type {
     ContentAlignment,
     CornerRadius,
     FontSize,
-    FormField,
+    FormPage,
     IFormTheme,
     IThemeBackgroundImage,
     IThemeFont,
@@ -47,9 +47,9 @@ import { cn } from "@/lib/utils"
 interface DesignDrawerProps {
     open: boolean
     theme?: IFormTheme | null
-    page?: FormField
+    page?: FormPage
     pageIndex?: number
-    onUpdatePage?: (index: number, updates: Partial<FormField>) => void
+    onUpdatePage?: (index: number, updates: Partial<FormPage>) => void
     onSaveTheme: (theme: IFormTheme) => Promise<void>
     onCancel: () => void
     hasChangesRef: React.MutableRefObject<boolean>
@@ -64,7 +64,7 @@ type ThemeColorKey =
     | "backgroundColor"
     | "textColor"
 
-const COLOR_FIELDS: readonly { key: ThemeColorKey; label: string; fallback: string }[] = [
+const COLOR_PAGES: readonly { key: ThemeColorKey; label: string; fallback: string }[] = [
     { key: "questionColor", label: "Question Color", fallback: "#111111" },
     { key: "answerColor", label: "Answer / Input Color", fallback: "#111111" },
     { key: "buttonColor", label: "Button Background", fallback: "#000000" },
@@ -244,7 +244,7 @@ export function DesignDrawer({
     /**
      * Which preset the draft currently equals, or null when the theme has been
      * hand-tuned. Comparing resolved themes keeps the match stable regardless of
-     * key order or omitted optional fields.
+     * key order or omitted optional pages.
      */
     const activePresetId = React.useMemo(() => {
         const current = JSON.stringify(draftTheme)
@@ -381,7 +381,7 @@ export function DesignDrawer({
                     >
                         <SettingsSection title="Colors">
                             <div className="grid grid-cols-1 gap-4">
-                                {COLOR_FIELDS.map(({ key, label, fallback }) => (
+                                {COLOR_PAGES.map(({ key, label, fallback }) => (
                                     <ColorSetting
                                         key={key}
                                         label={label}

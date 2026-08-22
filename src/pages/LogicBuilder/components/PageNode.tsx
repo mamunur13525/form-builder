@@ -1,10 +1,10 @@
 import { memo } from "react";
 import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import {
-  FIELD_TYPE_ICONS,
-  FIELD_TYPE_LABELS,
+  PAGE_TYPE_ICONS,
+  PAGE_TYPE_LABELS,
 } from "../../../shared/constants/form-types";
-import type { FieldType } from "../../../shared/types/common";
+import type { PageType } from "../../../shared/types/common";
 
 /**
  * Data carried by each page node on the Logic Builder canvas.
@@ -14,7 +14,7 @@ import type { FieldType } from "../../../shared/types/common";
 export interface PageNodeData {
   index: number;
   label: string;
-  type: FieldType;
+  type: PageType;
   required: boolean;
   ruleCount: number;
   [key: string]: unknown;
@@ -33,8 +33,8 @@ export type PageNodeType = Node<PageNodeData, "pageNode">;
  * `onNodeClick`, so the node itself stays presentational.
  */
 function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
-  const TypeIcon = FIELD_TYPE_ICONS[data.type];
-  const typeLabel = FIELD_TYPE_LABELS[data.type];
+  const TypeIcon = PAGE_TYPE_ICONS[data.type];
+  const typeLabel = PAGE_TYPE_LABELS[data.type];
   const pageNumber = String(data.index + 1).padStart(2, "0");
 
   const handleClass =

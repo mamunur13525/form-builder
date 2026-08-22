@@ -3,7 +3,6 @@ import {
   CheckCircle,
   Play,
   Wrench,
-  Workflow,
   Settings,
   Puzzle,
   Share2,

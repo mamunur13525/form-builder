@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useCallback } from "react"
 import { Eraser } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-interface SignatureFieldProps {
+interface SignaturePageProps {
     value?: string
     onChange?: (value: string) => void
     disabled?: boolean
@@ -12,7 +12,7 @@ interface SignatureFieldProps {
  * A blank white board the respondent signs on. Emits a PNG data URL.
  * Supports mouse and touch input, and can be cleared and re-signed.
  */
-export function SignatureField({ value, onChange, disabled }: SignatureFieldProps) {
+export function SignaturePage({ value, onChange, disabled }: SignaturePageProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const [isDrawing, setIsDrawing] = useState(false)
     const [hasInk, setHasInk] = useState(Boolean(value))

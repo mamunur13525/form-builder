@@ -97,7 +97,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
       </CardHeader>
       <CardContent className="flex items-end justify-between p-0 pt-6">
         <div className="flex gap-2 text-sm text-[var(--editorial-body)]">
-          <span>{form.fields?.length || 0} pages</span>
+          <span>{form.pages?.length || 0} pages</span>
           <span className="text-[var(--editorial-disabled)]">•</span>
           <span>{form.responses_count || 0} responses</span>
         </div>

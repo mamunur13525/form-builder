@@ -218,7 +218,7 @@ async function tryRefreshToken(): Promise<boolean> {
  * Throws `ApiError` when:
  *  - The HTTP status is non-2xx.
  *  - The application reports `success: false`.
- *  - The `data` field is `null` or `undefined` (no data returned).
+ *  - The `data` page is `null` or `undefined` (no data returned).
  */
 export async function apiRequest<T>(
     endpoint: string,

@@ -2,7 +2,7 @@ import { Star } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { RatingSettings } from "@/shared/types/common"
 
-interface StarRatingFieldProps {
+interface StarRatingPageProps {
     value?: number
     onChange?: (value: number) => void
     settings: RatingSettings
@@ -10,12 +10,12 @@ interface StarRatingFieldProps {
 }
 
 /** Rating renderer that honours the `rating` settings group (star vs number, max). */
-export function StarRatingField({
+export function StarRatingPage({
     value = 0,
     onChange,
     settings,
     disabled,
-}: StarRatingFieldProps) {
+}: StarRatingPageProps) {
     const { style, max } = settings
     const items = Array.from({ length: max }, (_, i) => i + 1)
 

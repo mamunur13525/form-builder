@@ -6,11 +6,11 @@
  * `shared/types/common.ts` types used throughout the pages.
  */
 
-import type { Form as ApiForm, FormField as ApiField, PublishedForm } from "@/entities/form/model/types"
+import type { Form as ApiForm, FormPage as ApiPage, PublishedForm } from "@/entities/form/model/types"
 import type { FormResponse as ApiResponse } from "@/entities/response/model/types"
-import type { Form, FormField, FormResponse as CommonFormResponse } from "@/shared/types/common"
+import type { Form, FormPage, FormResponse as CommonFormResponse } from "@/shared/types/common"
 
-/** Convert an API Form into the legacy Form type. Fields are now embedded in the form. */
+/** Convert an API Form into the legacy Form type. Pages are now embedded in the form. */
 export function adaptApiForm(apiForm: ApiForm): Form {
     return {
         id: apiForm.id,
@@ -21,7 +21,7 @@ export function adaptApiForm(apiForm: ApiForm): Form {
         settings: apiForm.settings,
         createdBy: apiForm.createdBy,
         updatedBy: undefined,
-        fields: (apiForm.fields ?? []).map((a) => adaptApiField(a, apiForm.id)),
+        pages: (apiForm.pages ?? []).map((a) => adaptApiPage(a, apiForm.id)),
         createdAt: apiForm.createdAt,
         updatedAt: apiForm.updatedAt,
     }
@@ -38,40 +38,40 @@ export function adaptPublishedForm(publishedForm: PublishedForm): Form {
         settings: publishedForm.settings,
         createdBy: "",
         updatedBy: undefined,
-        fields: (publishedForm.fields ?? []).map((a) => adaptApiField(a, publishedForm.id)),
+        pages: (publishedForm.pages ?? []).map((a) => adaptApiPage(a, publishedForm.id)),
         createdAt: "",
         updatedAt: "",
     }
 }
 
-/** Convert an API FormField into the legacy FormField type. */
-export function adaptApiField(apiField: ApiField, formId: string): FormField {
+/** Convert an API FormPage into the legacy FormPage type. */
+export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
     return {
-        _id: apiField._id,
+        _id: apiPage._id,
         formId: formId,
-        fieldKey: apiField.fieldKey,
-        label: apiField.label,
-        helperText: apiField.helperText,
-        placeholder: apiField.placeholder,
-        type: apiField.type,
-        required: apiField.required,
-        order: apiField.order,
-        options: apiField.options.map((opt) => ({
+        pageKey: apiPage.pageKey,
+        label: apiPage.label,
+        helperText: apiPage.helperText,
+        placeholder: apiPage.placeholder,
+        type: apiPage.type,
+        required: apiPage.required,
+        order: apiPage.order,
+        options: apiPage.options.map((opt) => ({
             label: opt.label ?? "",
             value: opt.value ?? "",
         })),
-        validation: apiField.validation,
-        logic: apiField.logic.map((rule) => ({
-            whenFieldKey: rule.whenFieldKey ?? "",
+        validation: apiPage.validation,
+        logic: apiPage.logic.map((rule) => ({
+            whenPageKey: rule.whenPageKey ?? "",
             operator: rule.operator ?? "equals",
             value: rule.value,
             action: rule.action ?? "show",
-            targetFieldKey: rule.targetFieldKey,
-        })) as FormField["logic"],
-        appearance: apiField.appearance,
-        isActive: apiField.isActive,
-        coverImage: apiField.coverImage ?? null,
-        settings: apiField.settings,
+            targetPageKey: rule.targetPageKey,
+        })) as FormPage["logic"],
+        appearance: apiPage.appearance,
+        isActive: apiPage.isActive,
+        coverImage: apiPage.coverImage ?? null,
+        settings: apiPage.settings,
     }
 }
 

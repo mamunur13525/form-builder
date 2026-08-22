@@ -73,7 +73,7 @@ Return the answer in this order:
 
 * Include label, input, error, helper text, and validation support.
 * Support controlled value and onChange.
-* Support required fields and disabled state.
+* Support required pages and disabled state.
 
 ## If the user asks for a data table component
 

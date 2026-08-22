@@ -7,7 +7,7 @@ import { GoogleSignInButton } from "../../features/auth/components/GoogleSignInB
 import {
   AuthCard,
   AuthDivider,
-  AuthField,
+  AuthPage,
   AuthSwitchPrompt,
   authSubmitClass,
 } from "../../features/auth/components/auth-primitives";
@@ -59,7 +59,7 @@ export function SignupPage() {
       description="Sign up to start building beautiful forms."
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        <AuthField
+        <AuthPage
           id="name"
           label="Full name"
           type="text"
@@ -69,7 +69,7 @@ export function SignupPage() {
           onChange={(e) => setName(e.target.value)}
           required
         />
-        <AuthField
+        <AuthPage
           id="email"
           label="Email"
           type="email"
@@ -79,7 +79,7 @@ export function SignupPage() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <AuthField
+        <AuthPage
           id="password"
           label="Password"
           type="password"
@@ -89,7 +89,7 @@ export function SignupPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <AuthField
+        <AuthPage
           id="confirm-password"
           label="Confirm password"
           type="password"

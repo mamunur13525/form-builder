@@ -6,7 +6,7 @@ import { apiRequest } from "@/shared/api/client"
 import type {
     AnalyticsConversion,
     AnalyticsDropoff,
-    AnalyticsField,
+    AnalyticsPage,
     AnalyticsOverview,
     AnalyticsSubmissions,
     AnalyticsSummary,
@@ -38,12 +38,12 @@ export async function getAnalyticsConversion(formId: string): Promise<AnalyticsC
     return apiRequest<AnalyticsConversion>(`/forms/${formId}/analytics/conversion`)
 }
 
-/** GET /forms/:formId/analytics/dropoff — get field dropoff analytics. */
+/** GET /forms/:formId/analytics/dropoff — get page dropoff analytics. */
 export async function getAnalyticsDropoff(formId: string): Promise<AnalyticsDropoff> {
     return apiRequest<AnalyticsDropoff>(`/forms/${formId}/analytics/dropoff`)
 }
 
-/** GET /forms/:formId/analytics/field/:fieldId — get analytics for a specific field. */
-export async function getAnalyticsField(formId: string, fieldId: string): Promise<AnalyticsField> {
-    return apiRequest<AnalyticsField>(`/forms/${formId}/analytics/field/${fieldId}`)
+/** GET /forms/:formId/analytics/page/:pageId — get analytics for a specific page. */
+export async function getAnalyticsPage(formId: string, pageId: string): Promise<AnalyticsPage> {
+    return apiRequest<AnalyticsPage>(`/forms/${formId}/analytics/page/${pageId}`)
 }

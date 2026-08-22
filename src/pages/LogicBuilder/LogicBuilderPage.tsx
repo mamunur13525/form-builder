@@ -17,7 +17,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { RotateCcw } from "lucide-react";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
-import type { FormField } from "../../shared/types/common";
+import type { FormPage } from "../../shared/types/common";
 import { PageNode, type PageNodeData, type PageNodeType } from "./components/PageNode";
 import { PageRulesDialog } from "./components/PageRulesDialog";
 
@@ -28,15 +28,15 @@ import { PageRulesDialog } from "./components/PageRulesDialog";
 const NODE_STEP_X = 320;
 
 /** Stable id for a page, used for both nodes and edge endpoints. */
-function pageId(page: FormField, index: number): string {
-  return page._id ?? page.fieldKey ?? `page-${index}`;
+function pageId(page: FormPage, index: number): string {
+  return page._id ?? page.pageKey ?? `page-${index}`;
 }
 
 /**
  * Lay the pages out left-to-right using React Flow's own coordinate system
  * (deterministic x positions), rather than CSS flow. Page 1 → Page 2 → …
  */
-function buildNodes(pages: FormField[]): PageNodeType[] {
+function buildNodes(pages: FormPage[]): PageNodeType[] {
   return pages.map((page, index) => ({
     id: pageId(page, index),
     type: "pageNode",
@@ -52,7 +52,7 @@ function buildNodes(pages: FormField[]): PageNodeType[] {
 }
 
 /** Connect each page to the next so the canvas reads as a linear flow. */
-function buildEdges(pages: FormField[]): Edge[] {
+function buildEdges(pages: FormPage[]): Edge[] {
   const edges: Edge[] = [];
   for (let i = 1; i < pages.length; i++) {
     const source = pageId(pages[i - 1], i - 1);
@@ -83,12 +83,12 @@ const defaultEdgeOptions = {
  */
 function LogicFlow() {
   const { form, isLoading, error } = useFormContext();
-  const pages = useMemo(() => form?.fields ?? [], [form]);
+  const pages = useMemo(() => form?.pages ?? [], [form]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<PageNodeType>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selected, setSelected] = useState<{
-    page: FormField;
+    page: FormPage;
     index: number;
   } | null>(null);
 

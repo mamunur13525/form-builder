@@ -3,26 +3,24 @@ import { FileText } from "lucide-react"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "../../../components/ui/input"
-import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, type FieldType } from "../../../shared/constants/form-types"
-import type { FormField } from "../../../shared/types/common"
-import { defaultOptionsForType, defaultSettingsForType } from "@/features/forms/model/field-defaults"
+import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, type PageType } from "../../../shared/constants/form-types"
+import type { FormPage } from "../../../shared/types/common"
+import { defaultOptionsForType, defaultSettingsForType } from "@/features/forms/model/page-defaults"
 import type { LucideIcon } from "lucide-react"
-
-type PageType = keyof typeof FIELD_TYPE_LABELS
 
 interface AddPageDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     id: string | undefined
     pagesLength: number
-    onAddPage: (page: FormField) => void
+    onAddPage: (page: FormPage) => void
     onShowSaveStatus: (status: "saving" | "saved" | "error") => void
 }
 
-const PAGE_TYPES = (Object.entries(FIELD_TYPE_LABELS) as [PageType, string][]).map(([type, label]) => ({
+const PAGE_TYPES = (Object.entries(PAGE_TYPE_LABELS) as [PageType, string][]).map(([type, label]) => ({
     type,
     label,
-    icon: FIELD_TYPE_ICONS[type],
+    icon: PAGE_TYPE_ICONS[type],
 }))
 
 export function AddPageDialog({
@@ -49,24 +47,24 @@ export function AddPageDialog({
         async (type: PageType) => {
             onOpenChange(false)
 
-            // Fields are now embedded in the form, so we create them locally
+            // Pages are now embedded in the form, so we create them locally
             // and they will be saved when the form is updated
-            const newPage: FormField = {
+            const newPage: FormPage = {
                 _id: undefined,
                 formId: id || "",
-                fieldKey: `field_${Date.now()}`,
-                label: FIELD_TYPE_LABELS[type as FieldType] || "New Question",
+                pageKey: `page_${Date.now()}`,
+                label: PAGE_TYPE_LABELS[type as PageType] || "New Question",
                 helperText: "",
                 placeholder: "",
                 type,
                 required: false,
                 order: pagesLength + 1,
-                options: defaultOptionsForType(type as FieldType),
+                options: defaultOptionsForType(type as PageType),
                 logic: [],
                 appearance: { width: "full", icon: "" },
                 isActive: true,
                 coverImage: null,
-                settings: defaultSettingsForType(type as FieldType),
+                settings: defaultSettingsForType(type as PageType),
             }
             onAddPage(newPage)
         },

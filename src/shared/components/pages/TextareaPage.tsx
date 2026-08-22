@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 const inputBaseClasses =
     "text-2xl rounded-lg h-32 border outline-0 ring-0 focus:outline-0 focus:ring-0 focus-visible:outline-0 focus-visible:ring-0 focus-within:ring-0 focus-within:outline-0 bg-white/10"
 
-interface TextareaFieldProps {
+interface TextareaPageProps {
     value: string
     onChange?: (value: string) => void
     placeholder?: string
@@ -16,7 +16,7 @@ interface TextareaFieldProps {
     fontSizeClass?: string
 }
 
-export function TextareaField({
+export function TextareaPage({
     value,
     onChange,
     placeholder,
@@ -26,7 +26,7 @@ export function TextareaField({
     error,
     color,
     fontSizeClass,
-}: TextareaFieldProps) {
+}: TextareaPageProps) {
     const isError = !!error
     const errorClasses = isError ? "border-destructive" : ""
 

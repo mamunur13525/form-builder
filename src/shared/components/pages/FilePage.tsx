@@ -1,10 +1,10 @@
 import { Upload } from "lucide-react"
 
-interface FileFieldProps {
+interface FilePageProps {
     disabled?: boolean
 }
 
-export function FileField({ disabled }: FileFieldProps) {
+export function FilePage({ disabled }: FilePageProps) {
     return (
         <div
             className={`border-2 border-dashed rounded-lg p-8 text-center ${

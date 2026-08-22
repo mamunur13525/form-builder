@@ -23,7 +23,7 @@ import {
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
-export const FIELD_TYPES = [
+export const PAGE_TYPES = [
     "shortText",
     "longText",
     "email",
@@ -47,9 +47,9 @@ export const FIELD_TYPES = [
     "matrix",
 ] as const
 
-export type FieldType = (typeof FIELD_TYPES)[number]
+export type PageType = (typeof PAGE_TYPES)[number]
 
-export const FIELD_TYPE_LABELS: Record<FieldType, string> = {
+export const PAGE_TYPE_LABELS: Record<PageType, string> = {
     shortText: "Short Text",
     longText: "Long Text",
     email: "Email",
@@ -73,7 +73,7 @@ export const FIELD_TYPE_LABELS: Record<FieldType, string> = {
     matrix: "Matrix",
 }
 
-export const FIELD_TYPE_ICONS: Record<FieldType, LucideIcon> = {
+export const PAGE_TYPE_ICONS: Record<PageType, LucideIcon> = {
     shortText: Type,
     longText: AlignLeft,
     email: Mail,
@@ -97,7 +97,7 @@ export const FIELD_TYPE_ICONS: Record<FieldType, LucideIcon> = {
     matrix: Grid3x3,
 }
 
-export const FIELD_TYPE_COLORS: Record<FieldType, string> = {
+export const PAGE_TYPE_COLORS: Record<PageType, string> = {
     shortText: "from-blue-500/20 to-blue-600/10 text-blue-600 dark:text-blue-400",
     longText: "from-sky-500/20 to-sky-600/10 text-sky-600 dark:text-sky-400",
     email: "from-violet-500/20 to-violet-600/10 text-violet-600 dark:text-violet-400",

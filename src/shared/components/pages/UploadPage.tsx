@@ -11,7 +11,7 @@ export interface UploadedFile {
     size: number
 }
 
-interface UploadFieldProps {
+interface UploadPageProps {
     value?: UploadedFile[]
     onChange?: (value: UploadedFile[]) => void
     settings: UploadSettings
@@ -32,7 +32,7 @@ function acceptAttr(allowed: string[]): string | undefined {
         .join(",")
 }
 
-export function UploadField({ value, onChange, settings, disabled }: UploadFieldProps) {
+export function UploadPage({ value, onChange, settings, disabled }: UploadPageProps) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState<string | null>(null)

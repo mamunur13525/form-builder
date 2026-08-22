@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { FileText, Link as LinkIcon } from "lucide-react"
 import type { StatementSettings } from "@/shared/types/common"
 
-interface StatementFieldProps {
+interface StatementPageProps {
     settings: StatementSettings
 }
 
@@ -39,10 +39,10 @@ function toEmbedUrl(url: string, provider: StatementSettings["embedProvider"]): 
 
 /**
  * Display-only content block. Renders an embedded video/PDF/image when an
- * embed URL is configured. The heading/description come from the field's
+ * embed URL is configured. The heading/description come from the page's
  * label and helperText, which the page layout renders above this.
  */
-export function StatementField({ settings }: StatementFieldProps) {
+export function StatementPage({ settings }: StatementPageProps) {
     const { embedUrl, embedProvider, embedTitle } = settings
     const src = useMemo(() => toEmbedUrl(embedUrl, embedProvider), [embedUrl, embedProvider])
 

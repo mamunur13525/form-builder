@@ -24,7 +24,7 @@ interface Template {
     title: string
     description: string
     category: string
-    fieldCount: number
+    pageCount: number
     icon: LucideIcon
     /** Soft tint used for the icon tile background. */
     tint: string
@@ -34,7 +34,7 @@ interface Template {
 
 /**
  * Starter templates. Creating from one currently seeds a new blank form with
- * the template's title — the field presets are added in the builder.
+ * the template's title — the page presets are added in the builder.
  */
 const TEMPLATES: Template[] = [
     {
@@ -42,7 +42,7 @@ const TEMPLATES: Template[] = [
         title: "Contact Form",
         description: "A calm way to let people reach you without exposing an inbox.",
         category: "General",
-        fieldCount: 4,
+        pageCount: 4,
         icon: ClipboardList,
         tint: "bg-[var(--editorial-primary-light)] text-[var(--primary)]",
         badge: "Everyday",
@@ -52,7 +52,7 @@ const TEMPLATES: Template[] = [
         title: "Customer Feedback",
         description: "Understand how people feel about your product in a few questions.",
         category: "Research",
-        fieldCount: 6,
+        pageCount: 6,
         icon: MessageSquareHeart,
         tint: "bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
         badge: "Research",
@@ -62,7 +62,7 @@ const TEMPLATES: Template[] = [
         title: "Event Registration",
         description: "Collect attendee details, dietary needs and session choices.",
         category: "Events",
-        fieldCount: 7,
+        pageCount: 7,
         icon: CalendarCheck,
         tint: "bg-[var(--editorial-blue)]/12 text-[var(--editorial-blue)]",
         badge: "Events",
@@ -72,7 +72,7 @@ const TEMPLATES: Template[] = [
         title: "Job Application",
         description: "Gather candidate information and portfolio links in one pass.",
         category: "Hiring",
-        fieldCount: 8,
+        pageCount: 8,
         icon: Briefcase,
         tint: "bg-[var(--editorial-success)]/12 text-[#4E7F62]",
         badge: "Hiring",
@@ -82,7 +82,7 @@ const TEMPLATES: Template[] = [
         title: "Community Survey",
         description: "A longer questionnaire for research and audience discovery.",
         category: "Research",
-        fieldCount: 10,
+        pageCount: 10,
         icon: Users,
         tint: "bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
         badge: "Research",
@@ -92,7 +92,7 @@ const TEMPLATES: Template[] = [
         title: "Course Enrolment",
         description: "Sign students up and record their prior experience.",
         category: "Education",
-        fieldCount: 6,
+        pageCount: 6,
         icon: GraduationCap,
         tint: "bg-[var(--editorial-blue)]/12 text-[var(--editorial-blue)]",
         badge: "Education",
@@ -249,7 +249,7 @@ export function TemplatesPage() {
 
                                     <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--editorial-border-light)] pt-5">
                                         <span className="text-sm tabular-nums text-[var(--editorial-subtle)]">
-                                            {template.fieldCount} questions
+                                            {template.pageCount} questions
                                         </span>
                                         <Button
                                             onClick={() => createFromTemplate(template)}

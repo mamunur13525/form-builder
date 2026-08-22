@@ -3,7 +3,7 @@ import { Plus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import type { ChoiceSettings, FormField, Option } from "@/shared/types/common"
+import type { ChoiceSettings, FormPage, Option } from "@/shared/types/common"
 
 /**
  * Column classes are written out literally so Tailwind keeps them at build
@@ -34,9 +34,9 @@ function toValue(label: string) {
 }
 
 export interface OptionListEditorProps {
-    page: FormField
+    page: FormPage
     pageIndex: number
-    onUpdate: (index: number, updates: Partial<FormField>) => void
+    onUpdate: (index: number, updates: Partial<FormPage>) => void
     /** Mobile canvas uses `optionsPerRow.mobile`, desktop uses `.desktop`. */
     isMobileView?: boolean
     /** Leading glyph that hints at the input type (radio, checkbox, list…). */
@@ -46,7 +46,7 @@ export interface OptionListEditorProps {
 }
 
 /**
- * Option editor for the choice field types. It mirrors the `choice` settings
+ * Option editor for the choice page types. It mirrors the `choice` settings
  * from the settings panel so the builder preview matches what respondents see:
  * horizontal alignment lays the options out on a grid of `optionsPerRow`,
  * hidden labels collapse each row to its glyph, and the "Other" option is

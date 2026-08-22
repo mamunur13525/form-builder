@@ -5,14 +5,14 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "../../components/ui/resizable";
-import type { FormField, IFormTheme } from "../../shared/types/common";
+import type { FormPage, IFormTheme } from "../../shared/types/common";
 import {
-  createField,
-  updateField,
-  deleteField,
-  duplicateField,
-  reorderFields,
-} from "../../entities/form/api/field.api";
+  createPage,
+  updatePage as updatePageApi,
+  deletePage as deletePageApi,
+  duplicatePage as duplicatePageApi,
+  reorderPages as reorderPagesApi,
+} from "../../entities/form/api/page.api";
 import { updateFormTheme } from "@/entities/form/api/form.api";
 import { useDebounce } from "../../shared/hooks/useDebounce";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
@@ -41,11 +41,11 @@ export function FormBuilderPage() {
     updateFormData,
   } = useFormContext();
 
-  const [pages, setPages] = useState<FormField[]>([]);
+  const [pages, setPages] = useState<FormPage[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
-  const pendingFieldUpdateRef = useRef<
-    { fieldId: string; data: Record<string, unknown> } | null
+  const pendingPageUpdateRef = useRef<
+    { pageId: string; data: Record<string, unknown> } | null
   >(null);
   const pendingReorderRef = useRef<string[] | null>(null);
   const [isMobileView, setIsMobileView] = useState(false);
@@ -69,15 +69,15 @@ export function FormBuilderPage() {
 
   // Sync pages from context form data when a different form loads, or when the
   // form is re-fetched (formRevision changes) because the server rewrote the
-  // fields underneath us — e.g. after discarding a draft.
+  // pages underneath us — e.g. after discarding a draft.
   useEffect(() => {
     const currentFormId = form?.id;
     const syncKey = `${currentFormId}:${formRevision}`;
-    if (form?.fields && syncKey !== syncedKeyRef.current) {
+    if (form?.pages && syncKey !== syncedKeyRef.current) {
       syncedKeyRef.current = syncKey;
-      setPages(form.fields);
+      setPages(form.pages);
       setSelectedPageIndex((prev) =>
-        prev < form.fields.length ? prev : 0,
+        prev < form.pages.length ? prev : 0,
       );
     }
   }, [form, formRevision]);
@@ -88,20 +88,20 @@ export function FormBuilderPage() {
   // preview dialog shows unsaved changes.
   useEffect(() => {
     if (!form) return;
-    setPreviewForm({ ...form, fields: pages });
+    setPreviewForm({ ...form, pages: pages });
   }, [form, pages, setPreviewForm]);
 
-  const executeFieldUpdate = useCallback(async () => {
-    const pending = pendingFieldUpdateRef.current;
+  const executePageUpdate = useCallback(async () => {
+    const pending = pendingPageUpdateRef.current;
     if (!pending || !formId || formId === "new") return;
 
     try {
       showSaveStatus("saving");
-      const updated = await updateField(formId, pending.fieldId, pending.data);
+      const updated = await updatePageApi(formId, pending.pageId, pending.data);
       // Drop the payload once it lands so a later flush cannot re-send it.
       // Only if a newer edit has not replaced it in the meantime.
-      if (pendingFieldUpdateRef.current === pending) {
-        pendingFieldUpdateRef.current = null;
+      if (pendingPageUpdateRef.current === pending) {
+        pendingPageUpdateRef.current = null;
       }
       showSaveStatus("saved");
       // The backend reports whether the published form is now out of date.
@@ -109,26 +109,26 @@ export function FormBuilderPage() {
         setHasUnpublishedChanges(updated.hasUnpublishedChanges);
       }
     } catch (error) {
-      console.error("Failed to update field:", error);
+      console.error("Failed to update page:", error);
       showSaveStatus("error");
     }
   }, [formId, showSaveStatus, setHasUnpublishedChanges]);
 
-  const debouncedFieldUpdate = useDebounce(executeFieldUpdate, 1000);
+  const debouncedPageUpdate = useDebounce(executePageUpdate, 1000);
 
   const executeReorder = useCallback(async () => {
-    const fieldIds = pendingReorderRef.current;
+    const pageIds = pendingReorderRef.current;
     pendingReorderRef.current = null;
-    if (!fieldIds || !formId || formId === "new") return;
+    if (!pageIds || !formId || formId === "new") return;
 
     try {
       showSaveStatus("saving");
-      await reorderFields(formId, { fieldIds });
+      await reorderPagesApi(formId, { pageIds });
       showSaveStatus("saved");
       // Reordering a published form makes it out of date.
       setHasUnpublishedChanges(true);
     } catch (error) {
-      console.error("Failed to reorder fields:", error);
+      console.error("Failed to reorder pages:", error);
       showSaveStatus("error");
     }
   }, [formId, showSaveStatus, setHasUnpublishedChanges]);
@@ -140,22 +140,22 @@ export function FormBuilderPage() {
   /**
    * Apply a reordered page list and persist the new order.
    *
-   * The reorder endpoint identifies fields by `_id`, so a page that has not
+   * The reorder endpoint identifies pages by `_id`, so a page that has not
    * been created server-side yet (the window between adding/duplicating and
    * the POST resolving) cannot be described in the payload. Sending a partial
-   * list would drop that field's ordering, so the persist is skipped and the
+   * list would drop that page's ordering, so the persist is skipped and the
    * next re-fetch reconciles.
    */
   const reorderPages = useCallback(
-    (reordered: FormField[]) => {
+    (reordered: FormPage[]) => {
       setPages(reordered);
 
       if (!formId || formId === "new") return;
 
-      const fieldIds = reordered.map((page) => page._id).filter(Boolean) as string[];
-      if (fieldIds.length !== reordered.length) return;
+      const pageIds = reordered.map((page) => page._id).filter(Boolean) as string[];
+      if (pageIds.length !== reordered.length) return;
 
-      pendingReorderRef.current = fieldIds;
+      pendingReorderRef.current = pageIds;
       debouncedReorder();
     },
     [formId, debouncedReorder],
@@ -165,20 +165,20 @@ export function FormBuilderPage() {
   const flushPendingUpdate = useCallback(async () => {
     const pendingOrder = pendingReorderRef.current;
     pendingReorderRef.current = null;
-    const pending = pendingFieldUpdateRef.current;
-    pendingFieldUpdateRef.current = null;
+    const pending = pendingPageUpdateRef.current;
+    pendingPageUpdateRef.current = null;
 
     if (!formId || formId === "new") return;
 
     try {
       if (pending) {
-        const updated = await updateField(formId, pending.fieldId, pending.data);
+        const updated = await updatePageApi(formId, pending.pageId, pending.data);
         if (updated.hasUnpublishedChanges !== undefined) {
           setHasUnpublishedChanges(updated.hasUnpublishedChanges);
         }
       }
       if (pendingOrder) {
-        await reorderFields(formId, { fieldIds: pendingOrder });
+        await reorderPagesApi(formId, { pageIds: pendingOrder });
         setHasUnpublishedChanges(true);
       }
     } catch (error) {
@@ -187,12 +187,12 @@ export function FormBuilderPage() {
   }, [formId, setHasUnpublishedChanges]);
 
   const updatePage = useCallback(
-    async (index: number, updates: Partial<FormField>) => {
-      const field = pages[index];
-      if (!field) return;
+    async (index: number, updates: Partial<FormPage>) => {
+      const page = pages[index];
+      if (!page) return;
 
-      const fieldId = field._id as string | undefined;
-      if (!fieldId) return;
+      const pageId = page._id as string | undefined;
+      if (!pageId) return;
 
       // Optimistically update local state
       const updated = [...pages];
@@ -209,11 +209,11 @@ export function FormBuilderPage() {
         if (appearance && !appearance.icon) {
           updateData.appearance = { ...appearance, icon: "" };
         }
-        pendingFieldUpdateRef.current = { fieldId, data: updateData };
-        debouncedFieldUpdate();
+        pendingPageUpdateRef.current = { pageId, data: updateData };
+        debouncedPageUpdate();
       }
     },
-    [formId, pages, debouncedFieldUpdate],
+    [formId, pages, debouncedPageUpdate],
   );
 
   /**
@@ -247,7 +247,7 @@ export function FormBuilderPage() {
   );
 
   const addPage = useCallback(
-    async (page: FormField) => {
+    async (page: FormPage) => {
       if (!formId || formId === "new") {
         // For new forms, just add to local state
         setPages((prev) => [...prev, page]);
@@ -257,8 +257,8 @@ export function FormBuilderPage() {
 
       try {
         showSaveStatus("saving");
-        // Create field via API
-        const createdField = await createField(formId, {
+        // Create page via API
+        const createdPage = await createPage(formId, {
           type: page.type,
           label: page.label,
           helperText: page.helperText,
@@ -274,17 +274,17 @@ export function FormBuilderPage() {
           settings: page.settings,
         });
 
-        // Update local state with the created field (which has id from server)
+        // Update local state with the created page (which has id from server)
         setPages((prev) => [
           ...prev,
-          { ...page, _id: createdField._id, fieldKey: createdField.fieldKey },
+          { ...page, _id: createdPage._id, pageKey: createdPage.pageKey },
         ]);
         setSelectedPageIndex(pages.length);
         showSaveStatus("saved");
-        // Adding a field to a published form makes it out of date.
+        // Adding a page to a published form makes it out of date.
         setHasUnpublishedChanges(true);
       } catch (error) {
-        console.error("Failed to create field:", error);
+        console.error("Failed to create page:", error);
         showSaveStatus("error");
       }
     },
@@ -296,7 +296,7 @@ export function FormBuilderPage() {
       if (pages.length <= 1) return;
 
       const pageToDelete = pages[index];
-      const fieldId = "_id" in pageToDelete ? pageToDelete._id : undefined;
+      const pageId = "_id" in pageToDelete ? pageToDelete._id : undefined;
 
       // Optimistically update local state
       const updatedPages = pages.filter((_, i) => i !== index);
@@ -307,15 +307,15 @@ export function FormBuilderPage() {
       }
 
       // If form is persisted, delete via API
-      if (formId && formId !== "new" && fieldId !== undefined) {
+      if (formId && formId !== "new" && pageId !== undefined) {
         try {
           showSaveStatus("saving");
-          await deleteField(formId, fieldId);
+          await deletePageApi(formId, pageId);
           showSaveStatus("saved");
-          // Removing a field from a published form makes it out of date.
+          // Removing a page from a published form makes it out of date.
           setHasUnpublishedChanges(true);
         } catch (error) {
-          console.error("Failed to delete field:", error);
+          console.error("Failed to delete page:", error);
           showSaveStatus("error");
           // Revert on error
           setPages(pages);
@@ -328,13 +328,13 @@ export function FormBuilderPage() {
   const duplicatePage = useCallback(
     async (index: number) => {
       const page = pages[index];
-      const fieldId = page._id as string | undefined;
-      if (!fieldId) return;
+      const pageId = page._id as string | undefined;
+      if (!pageId) return;
 
       // Optimistically update local state
-      const newPage: FormField = {
+      const newPage: FormPage = {
         ...page,
-        fieldKey: `field_${Date.now()}`,
+        pageKey: `page_${Date.now()}`,
         label: page.label + " (copy)",
         order: pages.length + 1,
         appearance: {
@@ -352,23 +352,23 @@ export function FormBuilderPage() {
       if (formId && formId !== "new") {
         try {
           showSaveStatus("saving");
-          const duplicatedField = await duplicateField(formId, fieldId);
+          const duplicatedPage = await duplicatePageApi(formId, pageId);
 
-          // Update the temporary field with the real one from server
+          // Update the temporary page with the real one from server
           setPages((prev) => {
             const updated = [...prev];
             updated[index + 1] = {
               ...newPage,
-              _id: duplicatedField._id,
-              fieldKey: duplicatedField.fieldKey,
-            } as FormField;
+              _id: duplicatedPage._id,
+              pageKey: duplicatedPage.pageKey,
+            } as FormPage;
             return updated;
           });
           showSaveStatus("saved");
-          // Duplicating a field on a published form makes it out of date.
+          // Duplicating a page on a published form makes it out of date.
           setHasUnpublishedChanges(true);
         } catch (error) {
-          console.error("Failed to duplicate field:", error);
+          console.error("Failed to duplicate page:", error);
           showSaveStatus("error");
           // Revert on error
           setPages(pages);
@@ -468,7 +468,7 @@ export function FormBuilderPage() {
         onPreview={async () => {
           // Flush any pending debounced updates before showing preview
           await flushPendingUpdate();
-          openPreview(form ? { ...form, fields: pages } : null);
+          openPreview(form ? { ...form, pages: pages } : null);
         }}
         isMobileView={isMobileView}
         onToggleView={() => setIsMobileView((prev) => !prev)}

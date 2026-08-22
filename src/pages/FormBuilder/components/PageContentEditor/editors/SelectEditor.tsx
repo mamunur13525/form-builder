@@ -1,11 +1,11 @@
 import { List } from "lucide-react"
-import type { FormField } from "@/shared/types/common"
+import type { FormPage } from "@/shared/types/common"
 import { OptionListEditor } from "./OptionListEditor"
 
 interface EditorProps {
-    page: FormField
+    page: FormPage
     pageIndex: number
-    onUpdate: (index: number, updates: Partial<FormField>) => void
+    onUpdate: (index: number, updates: Partial<FormPage>) => void
     isMobileView?: boolean
 }
 

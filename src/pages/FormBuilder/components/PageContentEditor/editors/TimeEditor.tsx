@@ -1,10 +1,10 @@
-import type { FormField } from "@/shared/types/common";
-import { TimeField } from "@/shared/components/fields";
+import type { FormPage } from "@/shared/types/common";
+import { TimePage } from "@/shared/components/pages";
 
 interface EditorProps {
-  page: FormField;
+  page: FormPage;
   pageIndex: number;
-  onUpdate: (index: number, updates: Partial<FormField>) => void;
+  onUpdate: (index: number, updates: Partial<FormPage>) => void;
   color?: string;
   fontSizeClass?: string;
 }
@@ -12,7 +12,7 @@ interface EditorProps {
 export function TimeEditor({ page, pageIndex, onUpdate, color, fontSizeClass }: EditorProps) {
   return (
     <div className="space-y-1">
-      <TimeField
+      <TimePage
         value={page.placeholder}
         onChange={(v) => onUpdate(pageIndex, { placeholder: v })}
         color={color}

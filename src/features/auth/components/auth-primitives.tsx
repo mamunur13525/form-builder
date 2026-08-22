@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 /**
  * Shared building blocks for the sign-in / sign-up screens.
  *
- * Both screens are the same layout with different fields, so the chrome lives
+ * Both screens are the same layout with different pages, so the chrome lives
  * here to keep the two pages in sync.
  */
 
@@ -41,7 +41,7 @@ export function AuthCard({
 }
 
 /** A labelled text input with optional inline error copy. */
-export function AuthField({
+export function AuthPage({
   id,
   label,
   error,

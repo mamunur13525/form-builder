@@ -1,8 +1,8 @@
 /**
- * Field-level validation error returned inside a 422 response.
+ * Page-level validation error returned inside a 422 response.
  */
-export interface ApiFieldError {
-    field: string
+export interface ApiPageError {
+    page: string
     message: string
 }
 
@@ -13,7 +13,7 @@ export interface ApiResponse<T = unknown> {
     success: boolean
     message: string
     data: T | null
-    errors?: ApiFieldError[]
+    errors?: ApiPageError[]
 }
 
 /**
@@ -22,21 +22,21 @@ export interface ApiResponse<T = unknown> {
 export interface ApiErrorResponse {
     success: false
     message: string
-    errors?: ApiFieldError[]
+    errors?: ApiPageError[]
 }
 
 /**
  * Custom error class for all API failures.
- * Carries HTTP status, backend message, and optional field-level errors.
+ * Carries HTTP status, backend message, and optional page-level errors.
  */
 export class ApiError extends Error {
     public status: number
-    public errors?: ApiFieldError[]
+    public errors?: ApiPageError[]
 
     constructor(
         message: string,
         status: number,
-        errors?: ApiFieldError[],
+        errors?: ApiPageError[],
     ) {
         super(message)
         this.name = "ApiError"
@@ -45,11 +45,11 @@ export class ApiError extends Error {
     }
 
     /**
-     * Field errors keyed by field name — ready for `react-hook-form`'s `setError`
+     * Page errors keyed by page name — ready for `react-hook-form`'s `setError`
      * or for driving inline messages on controlled inputs.
      */
-    get byField(): Record<string, string> {
-        return Object.fromEntries((this.errors ?? []).map((e) => [e.field, e.message]))
+    get byPage(): Record<string, string> {
+        return Object.fromEntries((this.errors ?? []).map((e) => [e.page, e.message]))
     }
 
     /** Convenience: is this a 401 Unauthorized error? */

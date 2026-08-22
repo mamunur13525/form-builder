@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-interface FieldLabelProps {
+interface PageLabelProps {
     label: string
     pageNumber?: number
     editable?: boolean
@@ -9,7 +9,7 @@ interface FieldLabelProps {
     fontSizeClass?: string
 }
 
-export function FieldLabel({ label, pageNumber, editable, onUpdate, color, fontSizeClass }: FieldLabelProps) {
+export function PageLabel({ label, pageNumber, editable, onUpdate, color, fontSizeClass }: PageLabelProps) {
     const sizeClass = fontSizeClass || "text-[26px]"
 
     if (editable) {

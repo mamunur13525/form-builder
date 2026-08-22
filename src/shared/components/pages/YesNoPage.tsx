@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-interface YesNoFieldProps {
+interface YesNoPageProps {
     value?: string
     onChange?: (value: string) => void
     disabled?: boolean
@@ -9,7 +9,7 @@ interface YesNoFieldProps {
     fontSizeClass?: string
 }
 
-export function YesNoField({ value, onChange, disabled, color, fontSizeClass }: YesNoFieldProps) {
+export function YesNoPage({ value, onChange, disabled, color, fontSizeClass }: YesNoPageProps) {
     return (
         <div className="flex gap-3">
             {["Yes", "No"].map((opt) => (

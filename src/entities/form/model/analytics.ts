@@ -11,7 +11,7 @@ export interface AnalyticsOverview {
 export interface AnalyticsSummary {
     totalResponses: number
     todayResponses: number
-    totalFields: number
+    totalPages: number
     averageResponsesPerDay: string
 }
 
@@ -39,8 +39,8 @@ export interface AnalyticsConversion {
 }
 
 export interface DropoffData {
-    fieldId: string
-    fieldKey: string
+    pageId: string
+    pageKey: string
     label: string
     reached: number
     answered: number
@@ -52,8 +52,8 @@ export interface AnalyticsDropoff {
     dropoffData: DropoffData[]
 }
 
-export interface AnalyticsField {
-    field: unknown
+export interface AnalyticsPage {
+    page: unknown
     totalResponses: number
-    answers: { fieldKey: string; label: string; type: string; value: unknown }[]
+    answers: { pageKey: string; label: string; type: string; value: unknown }[]
 }

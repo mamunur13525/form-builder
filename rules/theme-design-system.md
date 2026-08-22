@@ -49,7 +49,7 @@ Depth order, low to high: `canvas` → `surface` → `card`. An "active" or
 | Token | Value | Use |
 |---|---|---|
 | `--foreground` | `#2e2825` | Headings, primary text, active labels |
-| `--editorial-body` | `#665f5b` | Body copy, field labels |
+| `--editorial-body` | `#665f5b` | Body copy, page labels |
 | `--editorial-subtle` | `#a49a95` | Hints, captions, inactive tabs, eyebrows |
 | `--editorial-disabled` | `#ccc5be` | Disabled text |
 
@@ -163,7 +163,7 @@ Before building a labeled control, check
 
 `SettingsSection` · `ToggleRow` · `RequiredToggle` · `TextSetting` ·
 `NumberSetting` · `InputSetting` · `SelectSetting` · `IconChoiceSetting` ·
-`ColorSetting` · `RangeSetting` · `ConfirmPopover` · `CoverImageField`
+`ColorSetting` · `RangeSetting` · `ConfirmPopover` · `CoverImagePage`
 
 All are **data-driven** — pass an options array, not repeated JSX. Follow that
 pattern for anything new.

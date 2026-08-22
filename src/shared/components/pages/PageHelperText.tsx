@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-interface FieldHelperTextProps {
+interface PageHelperTextProps {
     helperText?: string
     editable?: boolean
     onUpdate?: (helperText: string) => void
@@ -8,7 +8,7 @@ interface FieldHelperTextProps {
     fontSizeClass?: string
 }
 
-export function FieldHelperText({ helperText, editable, onUpdate, color, fontSizeClass }: FieldHelperTextProps) {
+export function PageHelperText({ helperText, editable, onUpdate, color, fontSizeClass }: PageHelperTextProps) {
     const sizeClass = fontSizeClass || "text-[18px]"
 
     if (!helperText && !editable) return null

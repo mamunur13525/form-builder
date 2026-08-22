@@ -20,7 +20,7 @@ export async function getPublicForm(slug: string): Promise<PublishedForm> {
     return apiRequest<PublishedForm>(`/public/forms/${slug}`)
 }
 
-/** GET /public/forms/:slug/schema — get form schema with fields (public, no auth). */
+/** GET /public/forms/:slug/schema — get form schema with pages (public, no auth). */
 export async function getPublicFormSchema(slug: string): Promise<PublicFormSchema> {
     return apiRequest<PublicFormSchema>(`/public/forms/${slug}/schema`)
 }
@@ -30,7 +30,7 @@ export async function getPublicFormTheme(slug: string): Promise<PublicFormTheme>
     return apiRequest<PublicFormTheme>(`/public/forms/${slug}/theme`)
 }
 
-/** GET /public/forms/:slug/preview — get form preview with all fields (public, no auth). */
+/** GET /public/forms/:slug/preview — get form preview with all pages (public, no auth). */
 export async function getPublicFormPreview(slug: string): Promise<PublicFormPreview> {
     return apiRequest<PublicFormPreview>(`/public/forms/${slug}/preview`)
 }

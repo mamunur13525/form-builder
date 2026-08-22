@@ -1,4 +1,4 @@
-/** Form, field, block, logic, and share types that match the backend API documentation. */
+/** Form, page, block, logic, and share types that match the backend API documentation. */
 
 export type FormStatus = "draft" | "published" | "archived"
 
@@ -41,7 +41,7 @@ export interface Form {
     settings: FormSettings
     createdBy: string
     updatedBy?: string
-    fields: FormField[]
+    pages: FormPage[]
     createdAt: string
     updatedAt: string
     draftVersionId?: string
@@ -58,7 +58,7 @@ export interface PublishedForm {
     status: FormStatus
     formVersionId: string
     version: number
-    fields: FormField[]
+    pages: FormPage[]
     theme: FormTheme
     settings: FormSettings
 }
@@ -103,10 +103,10 @@ export interface UpdateFormSettingsRequest {
 export type UpdateFormThemeRequest = IFormTheme
 
 // ---------------------------------------------------------------------------
-// Fields
+// Pages
 // ---------------------------------------------------------------------------
 
-export type FieldType =
+export type PageType =
     | "shortText"
     | "longText"
     | "email"
@@ -129,35 +129,35 @@ export type FieldType =
     | "signature"
     | "matrix"
 
-export interface FieldOption {
+export interface PageOption {
     label?: string
     value?: string
 }
 
-export interface FieldCoverImage {
+export interface PageCoverImage {
     url: string
     fileId?: string
     alt?: string
 }
 
-export interface FieldEmailSettings {
+export interface PageEmailSettings {
     businessEmailsOnly: boolean
     emailVerification: boolean
 }
 
-export interface FieldPhoneSettings {
+export interface PagePhoneSettings {
     phoneVerification: boolean
     countryCodeMode: "auto" | "specific"
     defaultCountry?: { iso2: string; name: string; dialCode: string } | null
 }
 
-export interface FieldStatementSettings {
+export interface PageStatementSettings {
     embedUrl: string
     embedProvider: "youtube" | "loom" | "vimeo" | "pdf" | "image" | "other"
     embedTitle: string
 }
 
-export interface FieldChoiceSettings {
+export interface PageChoiceSettings {
     allowOther: boolean
     otherLabel: string
     horizontalAlign: boolean
@@ -166,8 +166,8 @@ export interface FieldChoiceSettings {
     selectionLimit?: { mode: "none" | "exact" | "range"; exact?: number; min?: number; max?: number }
 }
 
-export interface FieldAddressSettings {
-    fields: Array<{
+export interface PageAddressSettings {
+    pages: Array<{
         key: "address1" | "address2" | "city" | "state" | "zip" | "country"
         label: string
         placeholder: string
@@ -177,43 +177,43 @@ export interface FieldAddressSettings {
     }>
 }
 
-export interface FieldRatingSettings {
+export interface PageRatingSettings {
     style: "star" | "number"
     max: number
 }
 
-export interface FieldOpinionScaleSettings {
+export interface PageOpinionScaleSettings {
     min: number
     max: number
     leftLabel: string
     rightLabel: string
 }
 
-export interface FieldUploadSettings {
+export interface PageUploadSettings {
     allowMultiple: boolean
     allowedFileTypes: string[]
     maxFileSizeMb: number
 }
 
-export interface FieldMatrixSettings {
+export interface PageMatrixSettings {
     rows: Array<{ key: string; label: string; order: number }>
     columns: Array<{ key: string; label: string; order: number }>
     allowMultiplePerRow: boolean
 }
 
-export interface FieldSettings {
-    email?: FieldEmailSettings
-    phone?: FieldPhoneSettings
-    statement?: FieldStatementSettings
-    choice?: FieldChoiceSettings
-    address?: FieldAddressSettings
-    rating?: FieldRatingSettings
-    opinionScale?: FieldOpinionScaleSettings
-    upload?: FieldUploadSettings
-    matrix?: FieldMatrixSettings
+export interface PageSettings {
+    email?: PageEmailSettings
+    phone?: PagePhoneSettings
+    statement?: PageStatementSettings
+    choice?: PageChoiceSettings
+    address?: PageAddressSettings
+    rating?: PageRatingSettings
+    opinionScale?: PageOpinionScaleSettings
+    upload?: PageUploadSettings
+    matrix?: PageMatrixSettings
 }
 
-export interface FieldValidation {
+export interface PageValidation {
     minLength?: number
     maxLength?: number
     min?: number
@@ -222,73 +222,73 @@ export interface FieldValidation {
     message?: string
 }
 
-export interface FieldLogic {
-    whenFieldKey?: string
+export interface PageLogic {
+    whenPageKey?: string
     operator?: "equals" | "notEquals" | "contains" | "greaterThan" | "lessThan"
     value?: unknown
-    action?: "show" | "hide" | "goToField" | "goToEnd"
-    targetFieldKey?: string
+    action?: "show" | "hide" | "goToPage" | "goToEnd"
+    targetPageKey?: string
 }
 
-export interface FieldAppearance {
+export interface PageAppearance {
     width: "full" | "half"
     icon: string
     submitButtonText?: string
     submitButtonColor?: string
 }
 
-export interface FormField {
+export interface FormPage {
     _id: string
     formId: string
-    fieldKey: string
+    pageKey: string
     label: string
     helperText: string
     placeholder: string
-    type: FieldType
+    type: PageType
     required: boolean
     order: number
-    options: FieldOption[]
-    validation?: FieldValidation
-    logic: FieldLogic[]
-    appearance: FieldAppearance
+    options: PageOption[]
+    validation?: PageValidation
+    logic: PageLogic[]
+    appearance: PageAppearance
     isActive: boolean
-    coverImage?: FieldCoverImage | null
-    settings?: FieldSettings
+    coverImage?: PageCoverImage | null
+    settings?: PageSettings
     createdAt: string
     updatedAt: string
 }
 
-export interface CreateFieldRequest {
-    type: FieldType
+export interface CreatePageRequest {
+    type: PageType
     label: string
     helperText?: string
     placeholder?: string
     required?: boolean
-    options?: FieldOption[]
-    validation?: FieldValidation
-    appearance?: FieldAppearance
-    coverImage?: FieldCoverImage | null
-    settings?: FieldSettings
+    options?: PageOption[]
+    validation?: PageValidation
+    appearance?: PageAppearance
+    coverImage?: PageCoverImage | null
+    settings?: PageSettings
 }
 
-export interface UpdateFieldRequest {
+export interface UpdatePageRequest {
     label?: string
     helperText?: string
     placeholder?: string
     required?: boolean
-    options?: FieldOption[]
-    validation?: FieldValidation
-    appearance?: FieldAppearance
-    coverImage?: FieldCoverImage | null
-    settings?: FieldSettings
+    options?: PageOption[]
+    validation?: PageValidation
+    appearance?: PageAppearance
+    coverImage?: PageCoverImage | null
+    settings?: PageSettings
 }
 
-export interface ReorderFieldsRequest {
-    fieldIds: string[]
+export interface ReorderPagesRequest {
+    pageIds: string[]
 }
 
-export interface UpdateFieldLogicRequest {
-    logic: FieldLogic[]
+export interface UpdatePageLogicRequest {
+    logic: PageLogic[]
 }
 
 // ---------------------------------------------------------------------------
@@ -326,10 +326,10 @@ export interface ReorderBlocksRequest {
 // ---------------------------------------------------------------------------
 
 export type LogicOperator = "equals" | "notEquals" | "contains" | "greaterThan" | "lessThan"
-export type LogicAction = "show" | "hide" | "goToField" | "goToEnd" | "skipTo"
+export type LogicAction = "show" | "hide" | "goToPage" | "goToEnd" | "skipTo"
 
 export interface LogicCondition {
-    fieldKey: string
+    pageKey: string
     operator: LogicOperator
     value: unknown
 }

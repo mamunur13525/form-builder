@@ -35,7 +35,7 @@ interface PublishDialogProps {
   onHasUnpublishedChangesChange?: (hasChanges: boolean) => void;
   onOpenForm: () => void;
   /**
-   * Called after the server rewrites the form's fields (discarding a draft), so
+   * Called after the server rewrites the form's pages (discarding a draft), so
    * the builder can re-sync the reverted content.
    */
   onAfterDiscard?: () => void | Promise<void>;
@@ -160,7 +160,7 @@ export function PublishDialog({
   ]);
 
   // Throws away draft edits and reverts to the live version. The server
-  // rewrites the fields, so the builder has to re-sync afterwards.
+  // rewrites the pages, so the builder has to re-sync afterwards.
   const handleDiscard = useCallback(async () => {
     if (!formId || formId === "new") return;
     setBusy("discard");

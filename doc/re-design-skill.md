@@ -125,7 +125,7 @@ Check for these problems and fix them:
 - **No legal links.** Add privacy policy and terms of service links in the footer.
 - **No "back" navigation.** Dead ends in user flows. Every page needs a way back.
 - **No custom 404 page.** Design a helpful, branded "page not found" experience.
-- **No form validation.** Add client-side validation for emails, required fields, and format checks.
+- **No form validation.** Add client-side validation for emails, required pages, and format checks.
 - **No "skip to content" link.** Essential for keyboard users. Add a hidden skip-link.
 - **No cookie consent.** If required by jurisdiction, add a compliant consent banner.
 

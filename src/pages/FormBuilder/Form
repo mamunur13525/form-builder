@@ -6,13 +6,13 @@ import {
   ResizableHandle,
 } from "../../components/ui/resizable";
 import { useFormStore } from "../../app/store/formStore";
-import type { FormField } from "../../shared/types/common";
+import type { FormPage } from "../../shared/types/common";
 import {
-  createField,
-  updateField,
-  deleteField,
-  duplicateField,
-} from "../../entities/form/api/field.api";
+  createPage,
+  updatePage,
+  deletePage,
+  duplicatePage,
+} from "../../entities/form/api/page.api";
 import { useDebounce } from "../../shared/hooks/useDebounce";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
 import { FormBuilderSidebar } from "./components/FormBuilderSidebar";
@@ -29,12 +29,12 @@ export function FormBuilderPage() {
   const { forms, fetchForms } = useFormStore();
   const { form, isLoading: isLoadingForm, error: formError, isPublished, setIsPublished, showSaveStatus } = useFormContext();
 
-  const [pages, setPages] = useState<FormField[]>([]);
+  const [pages, setPages] = useState<FormPage[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
-  const pendingFieldUpdateRef = useRef<
-    { fieldId: string; data: Record<string, unknown> } | null
+  const pendingPageUpdateRef = useRef<
+    { pageId: string; data: Record<string, unknown> } | null
   >(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const prevFormIdRef = useRef<string | undefined>(undefined);
@@ -51,38 +51,38 @@ export function FormBuilderPage() {
   // Sync pages from context form data when form changes
   useEffect(() => {
     const currentFormId = form?.id;
-    if (form?.fields && currentFormId !== prevFormIdRef.current) {
+    if (form?.pages && currentFormId !== prevFormIdRef.current) {
       prevFormIdRef.current = currentFormId;
-      setPages(form.fields);
+      setPages(form.pages);
       setSelectedPageIndex(0);
     }
   }, [form]);
 
   const selectedPage = pages[selectedPageIndex];
 
-  const executeFieldUpdate = useCallback(async () => {
-    const pending = pendingFieldUpdateRef.current;
+  const executePageUpdate = useCallback(async () => {
+    const pending = pendingPageUpdateRef.current;
     if (!pending || !formId || formId === "new") return;
 
     try {
       showSaveStatus("saving");
-      await updateField(formId, pending.fieldId, pending.data);
+      await updatePage(formId, pending.pageId, pending.data);
       showSaveStatus("saved");
     } catch (error) {
-      console.error("Failed to update field:", error);
+      console.error("Failed to update page:", error);
       showSaveStatus("error");
     }
   }, [formId, showSaveStatus]);
 
-  const debouncedFieldUpdate = useDebounce(executeFieldUpdate, 1000);
+  const debouncedPageUpdate = useDebounce(executePageUpdate, 1000);
 
   const updatePage = useCallback(
-    async (index: number, updates: Partial<FormField>) => {
-      const field = pages[index];
-      if (!field) return;
+    async (index: number, updates: Partial<FormPage>) => {
+      const page = pages[index];
+      if (!page) return;
 
-      const fieldId = field._id as string | undefined;
-      if (!fieldId) return;
+      const pageId = page._id as string | undefined;
+      if (!pageId) return;
 
       // Optimistically update local state
       const updated = [...pages];
@@ -99,15 +99,15 @@ export function FormBuilderPage() {
         if (appearance && !appearance.icon) {
           updateData.appearance = { ...appearance, icon: "" };
         }
-        pendingFieldUpdateRef.current = { fieldId, data: updateData };
-        debouncedFieldUpdate();
+        pendingPageUpdateRef.current = { pageId, data: updateData };
+        debouncedPageUpdate();
       }
     },
-    [formId, pages, debouncedFieldUpdate],
+    [formId, pages, debouncedPageUpdate],
   );
 
   const addPage = useCallback(
-    async (page: FormField) => {
+    async (page: FormPage) => {
       if (!formId || formId === "new") {
         // For new forms, just add to local state
         setPages((prev) => [...prev, page]);
@@ -117,8 +117,8 @@ export function FormBuilderPage() {
 
       try {
         showSaveStatus("saving");
-        // Create field via API
-        const createdField = await createField(formId, {
+        // Create page via API
+        const createdPage = await createPage(formId, {
           type: page.type,
           label: page.label,
           helperText: page.helperText,
@@ -132,15 +132,15 @@ export function FormBuilderPage() {
           },
         });
 
-        // Update local state with the created field (which has id from server)
+        // Update local state with the created page (which has id from server)
         setPages((prev) => [
           ...prev,
-          { ...page, _id: createdField._id, fieldKey: createdField.fieldKey },
+          { ...page, _id: createdPage._id, pageKey: createdPage.pageKey },
         ]);
         setSelectedPageIndex(pages.length);
         showSaveStatus("saved");
       } catch (error) {
-        console.error("Failed to create field:", error);
+        console.error("Failed to create page:", error);
         showSaveStatus("error");
       }
     },
@@ -152,7 +152,7 @@ export function FormBuilderPage() {
       if (pages.length <= 1) return;
 
       const pageToDelete = pages[index];
-      const fieldId = pageToDelete._id as string | undefined;
+      const pageId = pageToDelete._id as string | undefined;
 
       // Optimistically update local state
       const updatedPages = pages.filter((_, i) => i !== index);
@@ -163,13 +163,13 @@ export function FormBuilderPage() {
       }
 
       // If form is persisted, delete via API
-      if (formId && formId !== "new" && fieldId !== undefined) {
+      if (formId && formId !== "new" && pageId !== undefined) {
         try {
           showSaveStatus("saving");
-          await deleteField(formId, fieldId);
+          await deletePage(formId, pageId);
           showSaveStatus("saved");
         } catch (error) {
-          console.error("Failed to delete field:", error);
+          console.error("Failed to delete page:", error);
           showSaveStatus("error");
           // Revert on error
           setPages(pages);
@@ -182,13 +182,13 @@ export function FormBuilderPage() {
   const duplicatePage = useCallback(
     async (index: number) => {
       const page = pages[index];
-      const fieldId = page._id as string | undefined;
-      if (!fieldId) return;
+      const pageId = page._id as string | undefined;
+      if (!pageId) return;
 
       // Optimistically update local state
-      const newPage: FormField = {
+      const newPage: FormPage = {
         ...page,
-        fieldKey: `field_${Date.now()}`,
+        pageKey: `page_${Date.now()}`,
         label: page.label + " (copy)",
         order: pages.length + 1,
         appearance: {
@@ -206,21 +206,21 @@ export function FormBuilderPage() {
       if (formId && formId !== "new") {
         try {
           showSaveStatus("saving");
-          const duplicatedField = await duplicateField(formId, fieldId);
+          const duplicatedPage = await duplicatePage(formId, pageId);
 
-          // Update the temporary field with the real one from server
+          // Update the temporary page with the real one from server
           setPages((prev) => {
             const updated = [...prev];
             updated[index + 1] = {
               ...newPage,
-              _id: duplicatedField._id,
-              fieldKey: duplicatedField.fieldKey,
-            } as FormField;
+              _id: duplicatedPage._id,
+              pageKey: duplicatedPage.pageKey,
+            } as FormPage;
             return updated;
           });
           showSaveStatus("saved");
         } catch (error) {
-          console.error("Failed to duplicate field:", error);
+          console.error("Failed to duplicate page:", error);
           showSaveStatus("error");
           // Revert on error
           setPages(pages);

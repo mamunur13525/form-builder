@@ -1,21 +1,21 @@
 import { List, Plus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import type { FormField } from "@/shared/types/common"
+import type { FormPage } from "@/shared/types/common"
 import {
-    AddressField,
-    MatrixField,
-    OpinionScaleField,
-    SignatureField,
-    StatementField,
-    StarRatingField,
-    UploadField,
-} from "@/shared/components/fields"
+    AddressPage,
+    MatrixPage,
+    OpinionScalePage,
+    SignaturePage,
+    StatementPage,
+    StarRatingPage,
+    UploadPage,
+} from "@/shared/components/pages"
 
 interface EditorProps {
-    page: FormField
+    page: FormPage
     pageIndex: number
-    onUpdate: (index: number, updates: Partial<FormField>) => void
+    onUpdate: (index: number, updates: Partial<FormPage>) => void
     color?: string
     fontSizeClass?: string
 }
@@ -40,7 +40,7 @@ export function StatementEditor({ page }: EditorProps) {
         )
     }
 
-    return <StatementField settings={settings} />
+    return <StatementPage settings={settings} />
 }
 
 // ---------------------------------------------------------------------------
@@ -100,21 +100,21 @@ export function DropdownEditor({ page, pageIndex, onUpdate, color }: EditorProps
 }
 
 // ---------------------------------------------------------------------------
-// Address — preview of the configured sub-fields.
+// Address — preview of the configured sub-pages.
 // ---------------------------------------------------------------------------
 
 export function AddressEditor({ page, color, fontSizeClass }: EditorProps) {
-    const fields = page.settings?.address?.fields ?? []
+    const pages = page.settings?.address?.pages ?? []
 
-    if (fields.length === 0) {
+    if (pages.length === 0) {
         return (
             <p className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
-                Configure the address fields in the settings panel.
+                Configure the address pages in the settings panel.
             </p>
         )
     }
 
-    return <AddressField fields={fields} disabled color={color} fontSizeClass={fontSizeClass} />
+    return <AddressPage pages={pages} disabled color={color} fontSizeClass={fontSizeClass} />
 }
 
 // ---------------------------------------------------------------------------
@@ -123,7 +123,7 @@ export function AddressEditor({ page, color, fontSizeClass }: EditorProps) {
 
 export function OpinionScaleEditor({ page }: EditorProps) {
     return (
-        <OpinionScaleField
+        <OpinionScalePage
             settings={
                 page.settings?.opinionScale ?? {
                     min: 0,
@@ -142,7 +142,7 @@ export function OpinionScaleEditor({ page }: EditorProps) {
 // ---------------------------------------------------------------------------
 
 export function SignatureEditor() {
-    return <SignatureField disabled />
+    return <SignaturePage disabled />
 }
 
 // ---------------------------------------------------------------------------
@@ -151,7 +151,7 @@ export function SignatureEditor() {
 
 export function MatrixEditor({ page }: EditorProps) {
     return (
-        <MatrixField
+        <MatrixPage
             settings={
                 page.settings?.matrix ?? {
                     rows: [],
@@ -170,7 +170,7 @@ export function MatrixEditor({ page }: EditorProps) {
 
 export function UploadEditor({ page }: EditorProps) {
     return (
-        <UploadField
+        <UploadPage
             settings={
                 page.settings?.upload ?? {
                     allowMultiple: false,
@@ -189,7 +189,7 @@ export function UploadEditor({ page }: EditorProps) {
 
 export function RatingSettingsAwareEditor({ page }: EditorProps) {
     return (
-        <StarRatingField
+        <StarRatingPage
             settings={page.settings?.rating ?? { style: "star", max: 5 }}
             disabled
         />

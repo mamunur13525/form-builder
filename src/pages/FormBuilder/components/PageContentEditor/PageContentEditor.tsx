@@ -1,5 +1,5 @@
-import type { FormField, IFormTheme } from "@/shared/types/common";
-import { FieldLabel, FieldHelperText, FieldSubmitButton } from "@/shared/components/fields";
+import type { FormPage, IFormTheme } from "@/shared/types/common";
+import { PageLabel, PageHelperText, PageSubmitButton } from "@/shared/components/pages";
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme";
 import { useEffect } from "react";
 
@@ -29,9 +29,9 @@ import {
 import { cn } from "@/lib/utils";
 
 interface PageContentEditorProps {
-  page: FormField;
+  page: FormPage;
   pageIndex: number;
-  onUpdate: (index: number, updates: Partial<FormField>) => void;
+  onUpdate: (index: number, updates: Partial<FormPage>) => void;
   isMobileView: boolean;
   theme?: IFormTheme | null;
 }
@@ -39,9 +39,9 @@ interface PageContentEditorProps {
 const editorMap: Record<
   string,
   React.ComponentType<{
-    page: FormField;
+    page: FormPage;
     pageIndex: number;
-    onUpdate: (index: number, updates: Partial<FormField>) => void;
+    onUpdate: (index: number, updates: Partial<FormPage>) => void;
     isMobileView?: boolean;
     color?: string;
     fontSizeClass?: string;
@@ -77,7 +77,7 @@ export function PageContentEditor({
   isMobileView,
   theme,
 }: PageContentEditorProps) {
-  const FieldEditor = editorMap[page.type];
+  const PageEditor = editorMap[page.type];
   const isStatement = page.type === "statement";
   const themeResolved = resolveFormTheme(theme);
 
@@ -144,7 +144,7 @@ export function PageContentEditor({
             />
           )}
 
-          <FieldLabel
+          <PageLabel
             label={page.label}
             pageNumber={pageIndex + 1}
             editable
@@ -153,7 +153,7 @@ export function PageContentEditor({
             fontSizeClass={fontSizes.question}
           />
 
-          <FieldHelperText
+          <PageHelperText
             helperText={page.helperText}
             editable
             onUpdate={(helperText) => onUpdate(pageIndex, { helperText })}
@@ -162,9 +162,9 @@ export function PageContentEditor({
           />
 
           <div className="mt-8 w-full" style={{ color: themeResolved.answerColor }}>
-            {/* Field-specific editor */}
-            {FieldEditor && (
-              <FieldEditor
+            {/* Page-specific editor */}
+            {PageEditor && (
+              <PageEditor
                 page={page}
                 pageIndex={pageIndex}
                 onUpdate={onUpdate}
@@ -175,7 +175,7 @@ export function PageContentEditor({
             )}
           </div>
 
-          <FieldSubmitButton
+          <PageSubmitButton
             text={
               page.appearance.submitButtonText ||
               (isStatement ? "Continue" : "Submit")

@@ -1,7 +1,7 @@
 /**
- * Hook that fetches a public form (by slug) along with its fields.
+ * Hook that fetches a public form (by slug) along with its pages.
  *
- * Fields are now embedded in the form response, so we only need
+ * Pages are now embedded in the form response, so we only need
  * to call GET /public/forms/:slug once.
  */
 

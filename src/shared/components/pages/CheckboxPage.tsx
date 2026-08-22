@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils"
 
-interface CheckboxFieldProps {
+interface CheckboxPageProps {
     value: string[]
     onChange?: (value: string[]) => void
     options: Array<{ label: string; value: string }>
     disabled?: boolean
 }
 
-export function CheckboxField({ value, onChange, options, disabled }: CheckboxFieldProps) {
+export function CheckboxPage({ value, onChange, options, disabled }: CheckboxPageProps) {
     const checked = value || []
 
     return (

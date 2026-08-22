@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils"
 import { getCornerRadiusCss } from "@/shared/utils/theme"
 
-interface FieldSubmitButtonProps {
+interface PageSubmitButtonProps {
     text: string
     color?: string
     textColor?: string
@@ -11,7 +11,7 @@ interface FieldSubmitButtonProps {
     disabled?: boolean
 }
 
-export function FieldSubmitButton({
+export function PageSubmitButton({
     text,
     color,
     textColor,
@@ -19,7 +19,7 @@ export function FieldSubmitButton({
     fontSizeClass,
     onClick,
     disabled,
-}: FieldSubmitButtonProps) {
+}: PageSubmitButtonProps) {
     return (
         <div className="mt-8">
             <button

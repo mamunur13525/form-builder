@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-interface RatingFieldProps {
+interface RatingPageProps {
     value?: number
     onChange?: (value: number) => void
     disabled?: boolean
     max?: number
 }
 
-export function RatingField({ value, onChange, disabled, max = 5 }: RatingFieldProps) {
+export function RatingPage({ value, onChange, disabled, max = 5 }: RatingPageProps) {
     return (
         <div className="flex gap-2">
             {Array.from({ length: max }, (_, i) => i + 1).map((star) => (

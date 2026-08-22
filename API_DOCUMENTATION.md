@@ -768,10 +768,10 @@ Update form share settings.
 
 ---
 
-## Form Fields Endpoints
+## Form Pages Endpoints
 
-### POST /forms/:formId/fields
-Create a new field in a form.
+### POST /forms/:formId/pages
+Create a new page in a form.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -795,17 +795,17 @@ Create a new field in a form.
 }
 ```
 
-**Field Types:** `shortText`, `longText`, `email`, `phone`, `number`, `date`, `time`, `radio`, `checkbox`, `select`, `multiSelect`, `file`, `rating`, `yesNo`, `url`
+**Page Types:** `shortText`, `longText`, `email`, `phone`, `number`, `date`, `time`, `radio`, `checkbox`, `select`, `multiSelect`, `file`, `rating`, `yesNo`, `url`
 
 **Response (201):**
 ```json
 {
   "success": true,
-  "message": "Field created successfully",
+  "message": "Page created successfully",
   "data": {
     "id": "65f1a2b3c4d5e6f7a8b9c0d3",
     "formId": "65f1a2b3c4d5e6f7a8b9c0d2",
-    "fieldKey": "field_abc123",
+    "pageKey": "page_abc123",
     "label": "What is your name?",
     "helperText": "Please enter your full name",
     "placeholder": "John Doe",
@@ -823,8 +823,8 @@ Create a new field in a form.
 }
 ```
 
-### GET /forms/:formId/fields
-Get all fields for a form.
+### GET /forms/:formId/pages
+Get all pages for a form.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -832,15 +832,15 @@ Get all fields for a form.
 ```json
 {
   "success": true,
-  "message": "Fields retrieved successfully",
+  "message": "Pages retrieved successfully",
   "data": [
-    { ...field object... }
+    { ...page object... }
   ]
 }
 ```
 
-### GET /forms/:formId/fields/:fieldId
-Get a specific field by ID.
+### GET /forms/:formId/pages/:pageId
+Get a specific page by ID.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -848,13 +848,13 @@ Get a specific field by ID.
 ```json
 {
   "success": true,
-  "message": "Field retrieved successfully",
-  "data": { ...field object... }
+  "message": "Page retrieved successfully",
+  "data": { ...page object... }
 }
 ```
 
-### PATCH /forms/:formId/fields/:fieldId
-Update a field.
+### PATCH /forms/:formId/pages/:pageId
+Update a page.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -874,13 +874,13 @@ Update a field.
 ```json
 {
   "success": true,
-  "message": "Field updated successfully",
-  "data": { ...updated field object... }
+  "message": "Page updated successfully",
+  "data": { ...updated page object... }
 }
 ```
 
-### DELETE /forms/:formId/fields/:fieldId
-Delete a field.
+### DELETE /forms/:formId/pages/:pageId
+Delete a page.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -888,20 +888,20 @@ Delete a field.
 ```json
 {
   "success": true,
-  "message": "Field deleted successfully",
+  "message": "Page deleted successfully",
   "data": null
 }
 ```
 
-### PATCH /forms/:formId/fields/reorder
-Reorder fields in a form.
+### PATCH /forms/:formId/pages/reorder
+Reorder pages in a form.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Request Body:**
 ```json
 {
-  "fieldIds": ["65f1a2b3c4d5e6f7a8b9c0d4", "65f1a2b3c4d5e6f7a8b9c0d3", "65f1a2b3c4d5e6f7a8b9c0d5"]
+  "pageIds": ["65f1a2b3c4d5e6f7a8b9c0d4", "65f1a2b3c4d5e6f7a8b9c0d3", "65f1a2b3c4d5e6f7a8b9c0d5"]
 }
 ```
 
@@ -909,13 +909,13 @@ Reorder fields in a form.
 ```json
 {
   "success": true,
-  "message": "Fields reordered successfully",
+  "message": "Pages reordered successfully",
   "data": null
 }
 ```
 
-### PATCH /forms/:formId/fields/:fieldId/duplicate
-Duplicate a field.
+### PATCH /forms/:formId/pages/:pageId/duplicate
+Duplicate a page.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -923,13 +923,13 @@ Duplicate a field.
 ```json
 {
   "success": true,
-  "message": "Field duplicated successfully",
-  "data": { ...duplicated field object... }
+  "message": "Page duplicated successfully",
+  "data": { ...duplicated page object... }
 }
 ```
 
-### PATCH /forms/:formId/fields/:fieldId/logic
-Update field logic (conditional logic).
+### PATCH /forms/:formId/pages/:pageId/logic
+Update page logic (conditional logic).
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -938,11 +938,11 @@ Update field logic (conditional logic).
 {
   "logic": [
     {
-      "whenFieldKey": "field_abc123",
+      "whenPageKey": "page_abc123",
       "operator": "equals",
       "value": "John Doe",
       "action": "show",
-      "targetFieldKey": "field_def456"
+      "targetPageKey": "page_def456"
     }
   ]
 }
@@ -952,13 +952,13 @@ Update field logic (conditional logic).
 ```json
 {
   "success": true,
-  "message": "Field logic updated successfully",
-  "data": { ...field object with updated logic... }
+  "message": "Page logic updated successfully",
+  "data": { ...page object with updated logic... }
 }
 ```
 
-### DELETE /forms/:formId/fields/:fieldId/logic
-Delete field logic.
+### DELETE /forms/:formId/pages/:pageId/logic
+Delete page logic.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -966,8 +966,8 @@ Delete field logic.
 ```json
 {
   "success": true,
-  "message": "Field logic deleted successfully",
-  "data": { ...field object with empty logic... }
+  "message": "Page logic deleted successfully",
+  "data": { ...page object with empty logic... }
 }
 ```
 
@@ -1092,15 +1092,15 @@ Create form-level logic.
 {
   "conditions": [
     {
-      "fieldKey": "field_abc123",
+      "pageKey": "page_abc123",
       "operator": "equals",
       "value": "Yes"
     }
   ],
   "actions": [
     {
-      "action": "goToField",
-      "target": "field_def456"
+      "action": "goToPage",
+      "target": "page_def456"
     }
   ]
 }
@@ -1108,7 +1108,7 @@ Create form-level logic.
 
 **Operators:** `equals`, `notEquals`, `contains`, `greaterThan`, `lessThan`
 
-**Actions:** `show`, `hide`, `goToField`, `goToEnd`, `skipTo`
+**Actions:** `show`, `hide`, `goToPage`, `goToEnd`, `skipTo`
 
 **Response (201):**
 ```json
@@ -1118,8 +1118,8 @@ Create form-level logic.
   "data": {
     "id": "65f1a2b3c4d5e6f7a8b9c0d8",
     "formId": "65f1a2b3c4d5e6f7a8b9c0d2",
-    "conditions": [ { "fieldKey": "field_abc123", "operator": "equals", "value": "Yes" } ],
-    "actions": [ { "action": "goToField", "target": "field_def456" } ],
+    "conditions": [ { "pageKey": "page_abc123", "operator": "equals", "value": "Yes" } ],
+    "actions": [ { "action": "goToPage", "target": "page_def456" } ],
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z"
   }
@@ -1149,7 +1149,7 @@ Update a logic rule.
 ```json
 {
   "conditions": [
-    { "fieldKey": "field_abc123", "operator": "equals", "value": "No" }
+    { "pageKey": "page_abc123", "operator": "equals", "value": "No" }
   ],
   "actions": [
     { "action": "goToEnd" }
@@ -1207,7 +1207,7 @@ Get all responses for a form.
       "sessionId": "session_1704067200000",
       "answers": [
         {
-          "fieldKey": "field_abc123",
+          "pageKey": "page_abc123",
           "label": "What is your name?",
           "type": "shortText",
           "value": "John Doe"
@@ -1266,7 +1266,7 @@ Update a response.
 {
   "answers": [
     {
-      "fieldKey": "field_abc123",
+      "pageKey": "page_abc123",
       "label": "What is your name?",
       "type": "shortText",
       "value": "Jane Doe"
@@ -1342,9 +1342,9 @@ Get response summary.
   "message": "Response summary retrieved successfully",
   "data": {
     "totalResponses": 150,
-    "fields": [
+    "pages": [
       {
-        "fieldKey": "field_abc123",
+        "pageKey": "page_abc123",
         "label": "What is your name?",
         "type": "shortText",
         "answerCount": 150,
@@ -1438,7 +1438,7 @@ Get a published form by slug (public, no auth).
 ```
 
 ### GET /public/forms/:slug/schema
-Get form schema with fields (public, no auth).
+Get form schema with pages (public, no auth).
 
 **Response (200):**
 ```json
@@ -1451,7 +1451,7 @@ Get form schema with fields (public, no auth).
       "title": "Customer Feedback Form",
       "settings": { "oneQuestionAtATime": true, "showProgressBar": true, "allowMultipleSubmissions": true, "requireLogin": false, "collectIP": false }
     },
-    "fields": [ { ...field object... } ]
+    "pages": [ { ...page object... } ]
   }
 }
 ```
@@ -1473,7 +1473,7 @@ Get form theme (public, no auth).
 ```
 
 ### GET /public/forms/:slug/preview
-Get form preview with all fields (public, no auth).
+Get form preview with all pages (public, no auth).
 
 **Response (200):**
 ```json
@@ -1482,7 +1482,7 @@ Get form preview with all fields (public, no auth).
   "message": "Form preview retrieved successfully",
   "data": {
     "form": { ...form object... },
-    "fields": [ { ...field object... } ]
+    "pages": [ { ...page object... } ]
   }
 }
 ```
@@ -1495,13 +1495,13 @@ Submit a form response (public, no auth, rate-limited).
 {
   "answers": [
     {
-      "fieldKey": "field_abc123",
+      "pageKey": "page_abc123",
       "label": "What is your name?",
       "type": "shortText",
       "value": "John Doe"
     },
     {
-      "fieldKey": "field_def456",
+      "pageKey": "page_def456",
       "label": "Email address",
       "type": "email",
       "value": "john@example.com"
@@ -1531,7 +1531,7 @@ Save a form submission as draft (public, no auth).
 {
   "answers": [
     {
-      "fieldKey": "field_abc123",
+      "pageKey": "page_abc123",
       "label": "What is your name?",
       "type": "shortText",
       "value": "John Doe"
@@ -1607,7 +1607,7 @@ Get analytics overview.
   "data": {
     "totalResponses": 150,
     "todayResponses": 15,
-    "totalFields": 5,
+    "totalPages": 5,
     "averageResponsesPerDay": "5.0"
   }
 }
@@ -1671,7 +1671,7 @@ Get conversion analytics.
 ```
 
 ### GET /forms/:formId/analytics/dropoff
-Get field dropoff analytics.
+Get page dropoff analytics.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -1684,8 +1684,8 @@ Get field dropoff analytics.
     "formId": "65f1a2b3c4d5e6f7a8b9c0d2",
     "dropoffData": [
       {
-        "fieldId": "65f1a2b3c4d5e6f7a8b9c0d3",
-        "fieldKey": "field_abc123",
+        "pageId": "65f1a2b3c4d5e6f7a8b9c0d3",
+        "pageKey": "page_abc123",
         "label": "What is your name?",
         "reached": 150,
         "answered": 145,
@@ -1696,8 +1696,8 @@ Get field dropoff analytics.
 }
 ```
 
-### GET /forms/:formId/analytics/field/:fieldId
-Get analytics for a specific field.
+### GET /forms/:formId/analytics/page/:pageId
+Get analytics for a specific page.
 
 **Headers:** `Authorization: Bearer <token>`
 
@@ -1707,11 +1707,11 @@ Get analytics for a specific field.
   "success": true,
   "message": "Success",
   "data": {
-    "field": { ...field object... },
+    "page": { ...page object... },
     "totalResponses": 145,
     "answers": [
       {
-        "fieldKey": "field_abc123",
+        "pageKey": "page_abc123",
         "label": "What is your name?",
         "type": "shortText",
         "value": "John Doe"
@@ -2163,12 +2163,12 @@ interface Form {
 }
 ```
 
-### FormField
+### FormPage
 ```typescript
-interface FormField {
+interface FormPage {
   id: string;
   formId: string;
-  fieldKey: string;
+  pageKey: string;
   label: string;
   helperText: string;
   placeholder: string;
@@ -2177,7 +2177,7 @@ interface FormField {
   order: number;
   options: { label?: string; value?: string }[];
   validation: { minLength?: number; maxLength?: number; min?: number; max?: number; pattern?: string; message?: string };
-  logic: { whenFieldKey?: string; operator?: string; value?: any; action?: string; targetFieldKey?: string }[];
+  logic: { whenPageKey?: string; operator?: string; value?: any; action?: string; targetPageKey?: string }[];
   appearance: { width: "full" | "half"; icon: string };
   isActive: boolean;
   createdAt: Date;
@@ -2192,7 +2192,7 @@ interface FormResponse {
   formId: string;
   respondentId?: string;
   sessionId: string;
-  answers: { fieldKey: string; label: string; type: string; value: any }[];
+  answers: { pageKey: string; label: string; type: string; value: any }[];
   metadata: { ipAddress: string; userAgent: string; referrer: string; country: string; city: string };
   submittedAt: Date;
   createdAt: Date;

@@ -7,16 +7,16 @@ import {
 } from "../../../components/ui/popover";
 import { Button } from "../../../components/ui/button";
 import {
-  FIELD_TYPE_ICONS,
-  FIELD_TYPE_LABELS,
+  PAGE_TYPE_ICONS,
+  PAGE_TYPE_LABELS,
 } from "../../../shared/constants/form-types";
-import type { FormField } from "../../../shared/types/common";
+import type { FormPage } from "../../../shared/types/common";
 import type { IItemProps } from "react-movable";
 
 interface SortablePageItemProps {
   /** Props provided by react-movable, spread over the root element. */
   itemProps: Omit<IItemProps, "key">;
-  page: FormField;
+  page: FormPage;
   index: number;
   pagesCount: number;
   isSelected: boolean;
@@ -45,8 +45,8 @@ export function SortablePageItem({
 }: SortablePageItemProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const TypeIcon = FIELD_TYPE_ICONS[page.type];
-  const typeLabel = FIELD_TYPE_LABELS[page.type];
+  const TypeIcon = PAGE_TYPE_ICONS[page.type];
+  const typeLabel = PAGE_TYPE_LABELS[page.type];
 
   const isActive = isDragged || isLifted;
   const isFirst = index === 0;

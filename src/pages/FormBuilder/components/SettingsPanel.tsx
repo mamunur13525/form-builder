@@ -19,11 +19,11 @@ import {
 import { Sheet, SheetContent } from "../../../components/ui/sheet"
 
 import { DesignDrawer } from "./settings/DesignDrawer"
-import { FIELD_TYPE_LABELS, FIELD_TYPE_ICONS, FIELD_TYPES, type FieldType } from "../../../shared/constants/form-types"
+import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, PAGE_TYPES, type PageType } from "../../../shared/constants/form-types"
 import type {
     ChoiceSettings,
-    FieldSettings,
-    FormField,
+    PageSettings,
+    FormPage,
     IFormTheme,
     Validation,
 } from "../../../shared/types/common"
@@ -32,7 +32,7 @@ import {
     defaultSettingsForType,
     CHOICE_TYPES,
     MULTI_ANSWER_TYPES,
-} from "@/features/forms/model/field-defaults"
+} from "@/features/forms/model/page-defaults"
 import {
     NumberSetting,
     RequiredToggle,
@@ -60,9 +60,9 @@ import {
 
 
 interface SettingsPanelProps {
-    page: FormField
+    page: FormPage
     pageIndex: number
-    onUpdate: (index: number, updates: Partial<FormField>) => void
+    onUpdate: (index: number, updates: Partial<FormPage>) => void
     theme?: IFormTheme | null
     designDrawerOpen: boolean
     onOpenDesignDrawer: () => void
@@ -97,7 +97,7 @@ export function SettingsPanel({
         ]
 
     /** Merge a single settings group, preserving the rest. */
-    const patchSettings = (group: Partial<FieldSettings>) => {
+    const patchSettings = (group: Partial<PageSettings>) => {
         onUpdate(pageIndex, { settings: { ...settings, ...group } })
     }
 
@@ -109,7 +109,7 @@ export function SettingsPanel({
      * Changing the type wipes settings server-side, so reset locally to the
      * new type's defaults (and reseed options for option-based types).
      */
-    const handleTypeChange = (value: FormField["type"] | null) => {
+    const handleTypeChange = (value: FormPage["type"] | null) => {
         if (!value) return
         const nextType = value
         const isOptionType = defaultOptionsForType(nextType).length > 0
@@ -160,40 +160,40 @@ export function SettingsPanel({
                         </div>
                         <TabsContent value="settings" className="h-full flex-1 overflow-y-auto">
                             <div className="space-y-8 px-6 py-6 overflow-y-auto">
-                                {/* Field type — always available */}
+                                {/* Page type — always available */}
                                 <div className="space-y-2">
                                     <Label className="text-base font-semibold text-[var(--foreground)]">
-                                        Field Type
+                                        Page Type
                                     </Label>
                                     <Combobox
-                                        items={FIELD_TYPES}
+                                        items={PAGE_TYPES}
                                         value={page.type}
                                         onValueChange={handleTypeChange}
                                     >
                                         <ComboboxTrigger className="h-[52px] w-full rounded-xl border border-[var(--input)] bg-[var(--secondary)] text-base flex items-center px-4 justify-between">
-                                            {page.type && FIELD_TYPE_ICONS[page.type] ? (
+                                            {page.type && PAGE_TYPE_ICONS[page.type] ? (
                                                 (() => {
-                                                    const Icon = FIELD_TYPE_ICONS[page.type]
+                                                    const Icon = PAGE_TYPE_ICONS[page.type]
                                                     return (
                                                         <div className="flex items-center">
                                                             <Icon className="h-4 w-4 mr-2" />
-                                                            <span>{FIELD_TYPE_LABELS[page.type]}</span>
+                                                            <span>{PAGE_TYPE_LABELS[page.type]}</span>
                                                         </div>
                                                     )
                                                 })()
                                             ) : (
-                                                <span className="text-muted-foreground">Select field type</span>
+                                                <span className="text-muted-foreground">Select page type</span>
                                             )}
                                         </ComboboxTrigger>
                                         <ComboboxContent className="editorial rounded-xl border border-[var(--border)] bg-[var(--popover)]">
                                             <ComboboxEmpty>No items found.</ComboboxEmpty>
                                             <ComboboxList>
-                                                    {(item: FieldType) => {
-                                                    const Icon = FIELD_TYPE_ICONS[item]
+                                                    {(item: PageType) => {
+                                                    const Icon = PAGE_TYPE_ICONS[item]
                                                     return (
                                                         <ComboboxItem key={item} value={item} className="rounded-[12px] py-3.5!">
                                                             <Icon className="h-5 w-5" />
-                                                            {FIELD_TYPE_LABELS[item]}
+                                                            {PAGE_TYPE_LABELS[item]}
                                                         </ComboboxItem>
                                                     )
                                                 }}
@@ -343,9 +343,9 @@ export function SettingsPanel({
 
                                 {/* ---------------- Address ---------------- */}
                                 {page.type === "address" && (
-                                    <SettingsSection title="Address fields">
+                                    <SettingsSection title="Address pages">
                                         <AddressSettingsWidget
-                                            settings={settings.address ?? { fields: [] }}
+                                            settings={settings.address ?? { pages: [] }}
                                             onChange={(address) => patchSettings({ address })}
                                         />
                                     </SettingsSection>
@@ -410,7 +410,7 @@ export function SettingsPanel({
                                     </SettingsSection>
                                 )}
 
-                                {/* Cover image — available on every field type */}
+                                {/* Cover image — available on every page type */}
                                 <SettingsSection title="Cover image">
                                     {page.coverImage?.url ? (
                                         <div className="space-y-3">
@@ -456,11 +456,11 @@ export function SettingsPanel({
                                     <Input
                                         value={page.validation?.message ?? ""}
                                         onChange={(e) => patchValidation({ message: e.target.value })}
-                                        placeholder="This field is required"
+                                        placeholder="This page is required"
                                         className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                                     />
                                     <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
-                                        Shown to respondents when this field fails validation.
+                                        Shown to respondents when this page fails validation.
                                     </p>
                                 </SettingsSection>
 

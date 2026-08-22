@@ -8,7 +8,7 @@ import type {
     StatementSettings as StatementSettingsType,
     UploadSettings as UploadSettingsType,
 } from "@/shared/types/common"
-import { STATEMENT_PROVIDERS, UPLOAD_FILE_GROUPS } from "@/features/forms/model/field-defaults"
+import { STATEMENT_PROVIDERS, UPLOAD_FILE_GROUPS } from "@/features/forms/model/page-defaults"
 import { ToggleRow, NumberSetting, TextSetting } from "./primitives"
 import { Eye, EyeOff, Plus, X } from "lucide-react"
 
@@ -197,43 +197,43 @@ export function AddressSettingsWidget({
     settings: AddressSettingsType
     onChange: (next: AddressSettingsType) => void
 }) {
-    const updateField = (
+    const updatePage = (
         key: string,
-        patch: Partial<AddressSettingsType["fields"][number]>,
+        patch: Partial<AddressSettingsType["pages"][number]>,
     ) => {
         onChange({
             ...settings,
-            fields: settings.fields.map((f) => (f.key === key ? { ...f, ...patch } : f)),
+            pages: settings.pages.map((f) => (f.key === key ? { ...f, ...patch } : f)),
         })
     }
 
-    const sorted = [...settings.fields].sort((a, b) => a.order - b.order)
+    const sorted = [...settings.pages].sort((a, b) => a.order - b.order)
 
     return (
         <div className="space-y-2">
             <p className="text-xs text-muted-foreground">
                 Rename labels, set placeholders, and choose which parts are required or hidden.
             </p>
-            {sorted.map((field) => (
+            {sorted.map((page) => (
                 <div
-                    key={field.key}
+                    key={page.key}
                     className="space-y-2 rounded-md border bg-muted/20 p-3"
-                    data-hidden={field.hidden}
+                    data-hidden={page.hidden}
                 >
                     <div className="flex items-center justify-between gap-2">
                         <Input
-                            value={field.label}
-                            onChange={(e) => updateField(field.key, { label: e.target.value })}
+                            value={page.label}
+                            onChange={(e) => updatePage(page.key, { label: e.target.value })}
                             className="h-8 flex-1 text-sm font-medium"
                             placeholder="Label"
                         />
                         <button
                             type="button"
-                            onClick={() => updateField(field.key, { hidden: !field.hidden })}
-                            title={field.hidden ? "Show field" : "Hide field"}
+                            onClick={() => updatePage(page.key, { hidden: !page.hidden })}
+                            title={page.hidden ? "Show page" : "Hide page"}
                             className="rounded-md border p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
                         >
-                            {field.hidden ? (
+                            {page.hidden ? (
                                 <EyeOff className="h-3.5 w-3.5" />
                             ) : (
                                 <Eye className="h-3.5 w-3.5" />
@@ -241,12 +241,12 @@ export function AddressSettingsWidget({
                         </button>
                     </div>
 
-                    {!field.hidden && (
+                    {!page.hidden && (
                         <>
                             <Input
-                                value={field.placeholder}
+                                value={page.placeholder}
                                 onChange={(e) =>
-                                    updateField(field.key, { placeholder: e.target.value })
+                                    updatePage(page.key, { placeholder: e.target.value })
                                 }
                                 className="h-8 text-sm"
                                 placeholder="Placeholder"
@@ -255,9 +255,9 @@ export function AddressSettingsWidget({
                                 Required
                                 <input
                                     type="checkbox"
-                                    checked={field.required}
+                                    checked={page.required}
                                     onChange={(e) =>
-                                        updateField(field.key, { required: e.target.checked })
+                                        updatePage(page.key, { required: e.target.checked })
                                     }
                                     className="h-3.5 w-3.5"
                                 />

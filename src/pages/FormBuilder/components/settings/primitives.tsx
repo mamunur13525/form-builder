@@ -55,12 +55,12 @@ export const TAB_LIST_CLASS =
 export const TAB_TRIGGER_CLASS =
     "editorial-transition flex-1 gap-2 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
 
-const FIELD_LABEL_CLASS = "text-sm font-medium text-[var(--editorial-body)]"
+const PAGE_LABEL_CLASS = "text-sm font-medium text-[var(--editorial-body)]"
 
 const HINT_CLASS = "text-xs leading-5 text-[var(--editorial-subtle)]"
 
-/** A label + control + optional hint stack, used by every field below. */
-function Field({
+/** A label + control + optional hint stack, used by every page below. */
+function Page({
     label,
     hint,
     htmlFor,
@@ -75,7 +75,7 @@ function Field({
 }) {
     return (
         <div className={cn("space-y-1.5", className)}>
-            <Label htmlFor={htmlFor} className={FIELD_LABEL_CLASS}>
+            <Label htmlFor={htmlFor} className={PAGE_LABEL_CLASS}>
                 {label}
             </Label>
             {children}
@@ -156,11 +156,11 @@ export function ToggleRow({
     )
 }
 
-/** The "required field" toggle, shared by nearly every field type. */
+/** The "required page" toggle, shared by nearly every page type. */
 export function RequiredToggle({
     checked,
     onCheckedChange,
-    description = "If checked, users will be required to complete this field.",
+    description = "If checked, users will be required to complete this page.",
 }: {
     checked: boolean
     onCheckedChange: (checked: boolean) => void
@@ -169,7 +169,7 @@ export function RequiredToggle({
     return (
         <ToggleRow
             id="required"
-            label="Required field"
+            label="Required page"
             description={description}
             checked={checked}
             onCheckedChange={onCheckedChange}
@@ -263,7 +263,7 @@ export type SelectSettingOption<T extends string> = {
 
 /**
  * A labeled select driven by an options array, so callers describe choices as
- * data instead of repeating trigger/content/item markup per field.
+ * data instead of repeating trigger/content/item markup per page.
  */
 export function SelectSetting<T extends string>({
     label,
@@ -283,7 +283,7 @@ export function SelectSetting<T extends string>({
     className?: string
 }) {
     return (
-        <Field label={label} hint={hint} className={className}>
+        <Page label={label} hint={hint} className={className}>
             <Select
                 value={value}
                 onValueChange={(next: T | null) => {
@@ -305,7 +305,7 @@ export function SelectSetting<T extends string>({
                     ))}
                 </SelectContent>
             </Select>
-        </Field>
+        </Page>
     )
 }
 
@@ -343,7 +343,7 @@ export function IconChoiceSetting<T extends string>({
     hideLabels?: boolean
 }) {
     return (
-        <Field label={label} hint={hint}>
+        <Page label={label} hint={hint}>
             <RadioGroup
                 value={value}
                 onValueChange={(next) => {
@@ -379,7 +379,7 @@ export function IconChoiceSetting<T extends string>({
                     )
                 })}
             </RadioGroup>
-        </Field>
+        </Page>
     )
 }
 
@@ -402,7 +402,7 @@ export function InputSetting({
     trailing?: ReactNode
 }) {
     return (
-        <Field label={label} hint={hint}>
+        <Page label={label} hint={hint}>
             <div className="flex items-center gap-2">
                 <Input
                     type={type}
@@ -413,7 +413,7 @@ export function InputSetting({
                 />
                 {trailing}
             </div>
-        </Field>
+        </Page>
     )
 }
 
@@ -431,7 +431,7 @@ export function ColorSetting({
 }) {
     const current = value || fallback
     return (
-        <Field label={label} className="flex items-center justify-between">
+        <Page label={label} className="flex items-center justify-between">
 
             <div className="flex items-center ml-2">
                 <Input
@@ -457,7 +457,7 @@ export function ColorSetting({
                 </span>
 
             </div>
-        </Field>
+        </Page>
     )
 }
 
@@ -482,7 +482,7 @@ export function RangeSetting({
             <div
                 className={cn(
                     "flex items-center justify-between",
-                    FIELD_LABEL_CLASS
+                    PAGE_LABEL_CLASS
                 )}
             >
                 <span>{label}</span>
@@ -574,7 +574,7 @@ export function ConfirmPopover({
 }
 
 /** Cover image upload + preview. Uploads via POST /uploads and stores {url,fileId}. */
-export function CoverImageField({
+export function CoverImagePage({
     value,
     onChange,
 }: {

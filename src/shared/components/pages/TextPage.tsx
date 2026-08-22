@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 const inputBaseClasses =
     "pl-0 text-2xl rounded-none border-0 border-b border-gray-500 focus:border-gray-200 outline-0! ring-0! focus:outline-0! focus:ring-0! focus-visible:outline-0! focus-visible:ring-0! focus-visible:ring-offset-0! focus-within:ring-0! focus-within:outline-0! bg-transparent duration-300"
 
-interface TextFieldProps {
+interface TextPageProps {
     value: string
     onChange?: (value: string) => void
     placeholder?: string
@@ -16,7 +16,7 @@ interface TextFieldProps {
     fontSizeClass?: string
 }
 
-export function TextField({
+export function TextPage({
     value,
     onChange,
     placeholder,
@@ -26,7 +26,7 @@ export function TextField({
     error,
     color,
     fontSizeClass,
-}: TextFieldProps) {
+}: TextPageProps) {
     const isError = !!error
     const errorClasses = isError ? "border-destructive" : ""
 

@@ -1,19 +1,19 @@
 import type {
-    FieldType,
-    FieldSettings,
+    PageType,
+    PageSettings,
     Option,
-    AddressFieldSetting,
+    AddressPageSetting,
     StatementEmbedProvider,
 } from "@/shared/types/common"
 
-/** Field types that use the `choice` settings group. */
-export const CHOICE_TYPES: FieldType[] = ["select", "multiSelect", "radio", "checkbox"]
+/** Page types that use the `choice` settings group. */
+export const CHOICE_TYPES: PageType[] = ["select", "multiSelect", "radio", "checkbox"]
 
-/** Field types that support multiple answers (selectionLimit applies). */
-export const MULTI_ANSWER_TYPES: FieldType[] = ["multiSelect", "checkbox"]
+/** Page types that support multiple answers (selectionLimit applies). */
+export const MULTI_ANSWER_TYPES: PageType[] = ["multiSelect", "checkbox"]
 
-/** Field types that render an editable option list. */
-export const OPTION_TYPES: FieldType[] = [
+/** Page types that render an editable option list. */
+export const OPTION_TYPES: PageType[] = [
     "select",
     "multiSelect",
     "radio",
@@ -21,7 +21,7 @@ export const OPTION_TYPES: FieldType[] = [
     "dropdown",
 ]
 
-/** Allowed-file-type groups for the upload field. */
+/** Allowed-file-type groups for the upload page. */
 export const UPLOAD_FILE_GROUPS: { value: string; label: string }[] = [
     { value: "image", label: "Images" },
     { value: "video", label: "Video" },
@@ -39,8 +39,8 @@ export const STATEMENT_PROVIDERS: { value: StatementEmbedProvider; label: string
     { value: "other", label: "Other" },
 ]
 
-/** The six fixed address sub-fields, seeded on create. */
-export function defaultAddressFields(): AddressFieldSetting[] {
+/** The six fixed address sub-pages, seeded on create. */
+export function defaultAddressPages(): AddressPageSetting[] {
     return [
         { key: "address1", label: "Address", placeholder: "", required: false, hidden: false, order: 1 },
         { key: "address2", label: "Address line 2", placeholder: "", required: false, hidden: false, order: 2 },
@@ -51,8 +51,8 @@ export function defaultAddressFields(): AddressFieldSetting[] {
     ]
 }
 
-/** Default option list for option-based field types. */
-export function defaultOptionsForType(type: FieldType): Option[] {
+/** Default option list for option-based page types. */
+export function defaultOptionsForType(type: PageType): Option[] {
     if (OPTION_TYPES.includes(type)) {
         return [
             { label: "Option 1", value: "option_1" },
@@ -63,7 +63,7 @@ export function defaultOptionsForType(type: FieldType): Option[] {
 }
 
 /** Default per-type settings group, matching the backend defaults. */
-export function defaultSettingsForType(type: FieldType): FieldSettings {
+export function defaultSettingsForType(type: PageType): PageSettings {
     switch (type) {
         case "email":
             return { email: { businessEmailsOnly: false, emailVerification: false } }
@@ -94,7 +94,7 @@ export function defaultSettingsForType(type: FieldType): FieldSettings {
                 },
             }
         case "address":
-            return { address: { fields: defaultAddressFields() } }
+            return { address: { pages: defaultAddressPages() } }
         case "rating":
             return { rating: { style: "star", max: 5 } }
         case "opinionScale":

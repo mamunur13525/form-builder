@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import type { AddressFieldSetting, MatrixSettings, OpinionScaleSettings } from "@/shared/types/common"
+import type { AddressPageSetting, MatrixSettings, OpinionScaleSettings } from "@/shared/types/common"
 
 // ---------------------------------------------------------------------------
 // Address
@@ -7,18 +7,18 @@ import type { AddressFieldSetting, MatrixSettings, OpinionScaleSettings } from "
 
 type AddressValue = Record<string, string>
 
-interface AddressFieldProps {
+interface AddressPageProps {
     value?: AddressValue
     onChange?: (value: AddressValue) => void
-    fields: AddressFieldSetting[]
+    pages: AddressPageSetting[]
     disabled?: boolean
     color?: string
     fontSizeClass?: string
 }
 
-export function AddressField({ value, onChange, fields, disabled, color, fontSizeClass }: AddressFieldProps) {
+export function AddressPage({ value, onChange, pages, disabled, color, fontSizeClass }: AddressPageProps) {
     const current = value ?? {}
-    const visible = fields
+    const visible = pages
         .filter((f) => !f.hidden)
         .slice()
         .sort((a, b) => a.order - b.order)
@@ -28,22 +28,22 @@ export function AddressField({ value, onChange, fields, disabled, color, fontSiz
 
     return (
         <div className="grid grid-cols-2 gap-3">
-            {visible.map((field) => (
+            {visible.map((page) => (
                 <div
-                    key={field.key}
-                    className={cn("space-y-1", isWide(field.key) && "col-span-2")}
+                    key={page.key}
+                    className={cn("space-y-1", isWide(page.key) && "col-span-2")}
                 >
                     <label className="text-sm text-muted-foreground">
-                        {field.label}
-                        {field.required && <span className="ml-0.5 text-destructive">*</span>}
+                        {page.label}
+                        {page.required && <span className="ml-0.5 text-destructive">*</span>}
                     </label>
                     <input
                         type="text"
-                        value={current[field.key] ?? ""}
-                        placeholder={field.placeholder}
+                        value={current[page.key] ?? ""}
+                        placeholder={page.placeholder}
                         disabled={disabled}
                         onChange={(e) =>
-                            onChange?.({ ...current, [field.key]: e.target.value })
+                            onChange?.({ ...current, [page.key]: e.target.value })
                         }
                         className={cn(
                             "h-10 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
@@ -61,19 +61,19 @@ export function AddressField({ value, onChange, fields, disabled, color, fontSiz
 // Opinion scale
 // ---------------------------------------------------------------------------
 
-interface OpinionScaleFieldProps {
+interface OpinionScalePageProps {
     value?: number
     onChange?: (value: number) => void
     settings: OpinionScaleSettings
     disabled?: boolean
 }
 
-export function OpinionScaleField({
+export function OpinionScalePage({
     value,
     onChange,
     settings,
     disabled,
-}: OpinionScaleFieldProps) {
+}: OpinionScalePageProps) {
     const { min, max, leftLabel, rightLabel } = settings
     const count = Math.max(0, max - min + 1)
     const numbers = Array.from({ length: count }, (_, i) => min + i)
@@ -115,14 +115,14 @@ export function OpinionScaleField({
 
 type MatrixValue = Record<string, string | string[]>
 
-interface MatrixFieldProps {
+interface MatrixPageProps {
     value?: MatrixValue
     onChange?: (value: MatrixValue) => void
     settings: MatrixSettings
     disabled?: boolean
 }
 
-export function MatrixField({ value, onChange, settings, disabled }: MatrixFieldProps) {
+export function MatrixPage({ value, onChange, settings, disabled }: MatrixPageProps) {
     const current = value ?? {}
     const rows = settings.rows.slice().sort((a, b) => a.order - b.order)
     const columns = settings.columns.slice().sort((a, b) => a.order - b.order)

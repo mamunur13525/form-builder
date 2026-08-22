@@ -1,10 +1,10 @@
-import type { FormField } from "@/shared/types/common";
-import { TextField } from "@/shared/components/fields";
+import type { FormPage } from "@/shared/types/common";
+import { TextPage } from "@/shared/components/pages";
 
 interface EditorProps {
-  page: FormField;
+  page: FormPage;
   pageIndex: number;
-  onUpdate: (index: number, updates: Partial<FormField>) => void;
+  onUpdate: (index: number, updates: Partial<FormPage>) => void;
   color?: string;
   fontSizeClass?: string;
 }
@@ -12,7 +12,7 @@ interface EditorProps {
 export function PhoneEditor({ page, pageIndex, onUpdate, color, fontSizeClass }: EditorProps) {
   return (
     <div className="space-y-1">
-      <TextField
+      <TextPage
         value={page.placeholder}
         onChange={(v) => onUpdate(pageIndex, { placeholder: v })}
         placeholder="+1 (555) 000-0000"

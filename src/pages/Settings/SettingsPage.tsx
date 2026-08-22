@@ -86,7 +86,7 @@ export function SettingsPage() {
 
     const handlePasswordChange = () => {
         if (!currentPassword || !newPassword) {
-            showError("Please fill in both password fields", null)
+            showError("Please fill in both password pages", null)
             return
         }
         changePassword.mutate(

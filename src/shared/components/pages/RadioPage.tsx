@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-interface RadioFieldProps {
+interface RadioPageProps {
     value: string
     onChange?: (value: string) => void
     options: Array<{ label: string; value: string }>
@@ -8,7 +8,7 @@ interface RadioFieldProps {
     disabled?: boolean
 }
 
-export function RadioField({ value, onChange, options, name, disabled }: RadioFieldProps) {
+export function RadioPage({ value, onChange, options, name, disabled }: RadioPageProps) {
     return (
         <div className="space-y-2">
             {options.map((opt) => (

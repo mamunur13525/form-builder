@@ -1,11 +1,11 @@
-import type { FormField } from "@/shared/types/common";
-import { TextareaField } from "@/shared/components/fields";
+import type { FormPage } from "@/shared/types/common";
+import { TextareaPage } from "@/shared/components/pages";
 import { cn } from "@/lib/utils";
 
 interface EditorProps {
-  page: FormField;
+  page: FormPage;
   pageIndex: number;
-  onUpdate: (index: number, updates: Partial<FormField>) => void;
+  onUpdate: (index: number, updates: Partial<FormPage>) => void;
   color?: string;
   fontSizeClass?: string;
 }
@@ -13,7 +13,7 @@ interface EditorProps {
 export function LongTextEditor({ page, pageIndex, onUpdate, color, fontSizeClass }: EditorProps) {
   return (
     <div className="space-y-1">
-      <TextareaField
+      <TextareaPage
         value={page.placeholder}
         onChange={(v) => onUpdate(pageIndex, { placeholder: v })}
         placeholder="Placeholder text..."

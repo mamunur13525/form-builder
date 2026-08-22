@@ -1,33 +1,33 @@
-import type { FormField } from "../types/common"
+import type { FormPage } from "../types/common"
 import {
-    TextField,
-    TextareaField,
-    DateField,
-    TimeField,
-    SelectField,
-    YesNoField,
-    ChoiceField,
-    SignatureField,
-    StatementField,
-    AddressField,
-    OpinionScaleField,
-    MatrixField,
-    StarRatingField,
-    UploadField,
-    PhoneAnswerField,
-} from "./fields"
-import type { UploadedFile } from "./fields/UploadField"
+    TextPage,
+    TextareaPage,
+    DatePage,
+    TimePage,
+    SelectPage,
+    YesNoPage,
+    ChoicePage,
+    SignaturePage,
+    StatementPage,
+    AddressPage,
+    OpinionScalePage,
+    MatrixPage,
+    StarRatingPage,
+    UploadPage,
+    PhoneAnswerPage,
+} from "./pages"
+import type { UploadedFile } from "./pages/UploadPage"
 
-interface FormFieldRendererProps {
-    field: FormField
+interface FormPageRendererProps {
+    page: FormPage
     value: unknown
     error: string | null
-    onAnswer: (fieldKey: string, value: unknown) => void
+    onAnswer: (pageKey: string, value: unknown) => void
     color?: string
     fontSizeClass?: string
 }
 
-/** Fall back to sane defaults so a field missing its settings group still renders. */
+/** Fall back to sane defaults so a page missing its settings group still renders. */
 const CHOICE_FALLBACK = {
     allowOther: false,
     otherLabel: "Other",
@@ -36,17 +36,17 @@ const CHOICE_FALLBACK = {
     hideLabels: false,
 }
 
-export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSizeClass }: FormFieldRendererProps) {
-    const settings = field.settings ?? {}
+export function FormPageRenderer({ page, value, error, onAnswer, color, fontSizeClass }: FormPageRendererProps) {
+    const settings = page.settings ?? {}
 
-    switch (field.type) {
+    switch (page.type) {
         case "shortText":
             return (
-                <TextField
+                <TextPage
                     type="text"
-                    placeholder={field.placeholder || "Type your answer here..."}
+                    placeholder={page.placeholder || "Type your answer here..."}
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     error={error}
                     autoFocus
                     color={color}
@@ -55,11 +55,11 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "email":
             return (
-                <TextField
+                <TextPage
                     type="email"
-                    placeholder={field.placeholder || "Type your answer here..."}
+                    placeholder={page.placeholder || "Type your answer here..."}
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     error={error}
                     autoFocus
                     color={color}
@@ -68,9 +68,9 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "phone":
             return (
-                <PhoneAnswerField
+                <PhoneAnswerPage
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     settings={
                         settings.phone ?? {
                             phoneVerification: false,
@@ -78,7 +78,7 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
                             defaultCountry: null,
                         }
                     }
-                    placeholder={field.placeholder}
+                    placeholder={page.placeholder}
                     error={error}
                     color={color}
                     fontSizeClass={fontSizeClass}
@@ -86,11 +86,11 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "url":
             return (
-                <TextField
+                <TextPage
                     type="url"
-                    placeholder={field.placeholder || "Type your answer here..."}
+                    placeholder={page.placeholder || "Type your answer here..."}
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     error={error}
                     autoFocus
                     color={color}
@@ -99,10 +99,10 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "longText":
             return (
-                <TextareaField
-                    placeholder={field.placeholder || "Type your answer here..."}
+                <TextareaPage
+                    placeholder={page.placeholder || "Type your answer here..."}
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     rows={4}
                     error={error}
                     autoFocus
@@ -112,11 +112,11 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "number":
             return (
-                <TextField
+                <TextPage
                     type="number"
-                    placeholder={field.placeholder || "Enter a number"}
+                    placeholder={page.placeholder || "Enter a number"}
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     error={error}
                     autoFocus
                     color={color}
@@ -125,9 +125,9 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "date":
             return (
-                <DateField
+                <DatePage
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     error={error}
                     color={color}
                     fontSizeClass={fontSizeClass}
@@ -135,9 +135,9 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "time":
             return (
-                <TimeField
+                <TimePage
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     error={error}
                     color={color}
                     fontSizeClass={fontSizeClass}
@@ -145,10 +145,10 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "dropdown":
             return (
-                <SelectField
+                <SelectPage
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
-                    options={field.options}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    options={page.options}
                     error={error}
                     color={color}
                     fontSizeClass={fontSizeClass}
@@ -157,13 +157,13 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
         case "select":
         case "radio":
             return (
-                <ChoiceField
+                <ChoicePage
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
-                    options={field.options}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    options={page.options}
                     settings={settings.choice ?? CHOICE_FALLBACK}
                     multiple={false}
-                    name={field.fieldKey}
+                    name={page.pageKey}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />
@@ -171,10 +171,10 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
         case "checkbox":
         case "multiSelect":
             return (
-                <ChoiceField
+                <ChoicePage
                     value={(value as string[]) || []}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
-                    options={field.options}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    options={page.options}
                     settings={
                         settings.choice ?? {
                             ...CHOICE_FALLBACK,
@@ -182,33 +182,33 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
                         }
                     }
                     multiple
-                    name={field.fieldKey}
+                    name={page.pageKey}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />
             )
         case "yesNo":
             return (
-                <YesNoField
+                <YesNoPage
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />
             )
         case "rating":
             return (
-                <StarRatingField
+                <StarRatingPage
                     value={(value as number) || 0}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     settings={settings.rating ?? { style: "star", max: 5 }}
                 />
             )
         case "opinionScale":
             return (
-                <OpinionScaleField
+                <OpinionScalePage
                     value={value as number | undefined}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     settings={
                         settings.opinionScale ?? {
                             min: 0,
@@ -221,19 +221,19 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "address":
             return (
-                <AddressField
+                <AddressPage
                     value={value as Record<string, string> | undefined}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
-                    fields={settings.address?.fields ?? []}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    pages={settings.address?.pages ?? []}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />
             )
         case "matrix":
             return (
-                <MatrixField
+                <MatrixPage
                     value={value as Record<string, string | string[]> | undefined}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     settings={
                         settings.matrix ?? {
                             rows: [],
@@ -245,14 +245,14 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "signature":
             return (
-                <SignatureField
+                <SignaturePage
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                 />
             )
         case "statement":
             return (
-                <StatementField
+                <StatementPage
                     settings={
                         settings.statement ?? {
                             embedUrl: "",
@@ -264,9 +264,9 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         case "file":
             return (
-                <UploadField
+                <UploadPage
                     value={value as UploadedFile[] | undefined}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     settings={
                         settings.upload ?? {
                             allowMultiple: false,
@@ -278,10 +278,10 @@ export function FormFieldRenderer({ field, value, error, onAnswer, color, fontSi
             )
         default:
             return (
-                <TextField
-                    placeholder={field.placeholder || "Type your answer here..."}
+                <TextPage
+                    placeholder={page.placeholder || "Type your answer here..."}
                     value={(value as string) || ""}
-                    onChange={(v) => onAnswer(field.fieldKey, v)}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
                     error={error}
                 />
             )

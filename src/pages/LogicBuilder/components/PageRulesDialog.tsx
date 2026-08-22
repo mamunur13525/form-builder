@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Workflow } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import {
-  FIELD_TYPE_ICONS,
-  FIELD_TYPE_LABELS,
+  PAGE_TYPE_ICONS,
+  PAGE_TYPE_LABELS,
 } from "../../../shared/constants/form-types";
-import type { FormField, LogicRule } from "../../../shared/types/common";
+import type { FormPage, LogicRule } from "../../../shared/types/common";
 
 interface PageRulesDialogProps {
   /** The page whose rules are being configured, or null when closed. */
-  page: FormField | null;
+  page: FormPage | null;
   /** Zero-based index of the page, used for the page-number label. */
   pageIndex: number | null;
   /**
@@ -31,7 +31,7 @@ const OPERATOR_LABELS: Record<LogicRule["operator"], string> = {
 const ACTION_LABELS: Record<LogicRule["action"], string> = {
   show: "Show this page",
   hide: "Hide this page",
-  goToField: "Jump to page",
+  goToPage: "Jump to page",
   goToEnd: "Jump to end",
 };
 
@@ -47,7 +47,7 @@ function PageRulesDialogComponent({
   onClose,
 }: PageRulesDialogProps) {
   const open = page !== null && pageIndex !== null;
-  const TypeIcon = page ? FIELD_TYPE_ICONS[page.type] : Workflow;
+  const TypeIcon = page ? PAGE_TYPE_ICONS[page.type] : Workflow;
   const rules = page?.logic ?? [];
 
   return (
@@ -90,7 +90,7 @@ function PageRulesDialogComponent({
                 </h2>
                 <span className="mt-0.5 inline-flex w-fit items-center gap-1 rounded-md border border-[var(--border)] bg-[var(--secondary)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--editorial-body)]">
                   <TypeIcon className="h-3 w-3 shrink-0" />
-                  {FIELD_TYPE_LABELS[page.type]}
+                  {PAGE_TYPE_LABELS[page.type]}
                 </span>
               </div>
               <button
@@ -131,7 +131,7 @@ function PageRulesDialogComponent({
                       <span className="text-[var(--editorial-subtle)]">
                         When
                       </span>{" "}
-                      <span className="font-medium">{rule.whenFieldKey}</span>{" "}
+                      <span className="font-medium">{rule.whenPageKey}</span>{" "}
                       <span className="text-[var(--editorial-subtle)]">
                         {OPERATOR_LABELS[rule.operator]}
                       </span>{" "}
@@ -141,7 +141,7 @@ function PageRulesDialogComponent({
                       <span className="text-[var(--editorial-subtle)]"> → </span>
                       <span className="font-medium text-[var(--primary)]">
                         {ACTION_LABELS[rule.action]}
-                        {rule.targetFieldKey ? ` (${rule.targetFieldKey})` : ""}
+                        {rule.targetPageKey ? ` (${rule.targetPageKey})` : ""}
                       </span>
                     </li>
                   ))}

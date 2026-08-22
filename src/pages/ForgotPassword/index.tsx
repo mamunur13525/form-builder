@@ -5,7 +5,7 @@ import { ROUTES } from "../../shared/constants/routes"
 import { useForgotPassword } from "../../features/auth/hooks/useAuth"
 import {
     AuthCard,
-    AuthField,
+    AuthPage,
     authSubmitClass,
 } from "../../features/auth/components/auth-primitives"
 import { showError, showSuccess } from "@/shared/hooks/useToast"
@@ -61,7 +61,7 @@ export function ForgotPasswordPage() {
             description="Enter your email and we'll send you a link to reset your password."
         >
             <form onSubmit={handleSubmit} className="space-y-5">
-                <AuthField
+                <AuthPage
                     id="email"
                     label="Email"
                     type="email"

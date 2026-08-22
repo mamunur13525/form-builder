@@ -145,10 +145,10 @@ export function AnalyticsPage() {
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                                        Total Fields
+                                        Total Pages
                                     </p>
                                     <p className="font-display text-[32px] leading-none text-[var(--foreground)]">
-                                        {form?.fields.length ?? 0}
+                                        {form?.pages.length ?? 0}
                                     </p>
                                 </div>
                             </CardContent>

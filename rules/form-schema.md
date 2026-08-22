@@ -35,13 +35,13 @@ const formSchema = new Schema(
 );
 
 /* -----------------------------
-   FORM FIELD
+   FORM PAGE
 ------------------------------ */
-const formFieldSchema = new Schema(
+const formPageSchema = new Schema(
   {
     formId: { type: Schema.Types.ObjectId, ref: "Form", required: true, index: true },
 
-    fieldKey: { type: String, required: true }, // unique key inside form
+    pageKey: { type: String, required: true }, // unique key inside form
     label: { type: String, required: true },
     helperText: { type: String, default: "" },
     placeholder: { type: String, default: "" },
@@ -89,7 +89,7 @@ const formFieldSchema = new Schema(
 
     logic: [
       {
-        whenFieldKey: { type: String }, // condition based on another field
+        whenPageKey: { type: String }, // condition based on another page
         operator: {
           type: String,
           enum: ["equals", "notEquals", "contains", "greaterThan", "lessThan"],
@@ -97,9 +97,9 @@ const formFieldSchema = new Schema(
         value: { type: Schema.Types.Mixed },
         action: {
           type: String,
-          enum: ["show", "hide", "goToField", "goToEnd"],
+          enum: ["show", "hide", "goToPage", "goToEnd"],
         },
-        targetFieldKey: { type: String },
+        targetPageKey: { type: String },
       },
     ],
 
@@ -113,8 +113,8 @@ const formFieldSchema = new Schema(
   { timestamps: true }
 );
 
-formFieldSchema.index({ formId: 1, order: 1 });
-formFieldSchema.index({ formId: 1, fieldKey: 1 }, { unique: true });
+formPageSchema.index({ formId: 1, order: 1 });
+formPageSchema.index({ formId: 1, pageKey: 1 }, { unique: true });
 
 /* -----------------------------
    FORM RESPONSE
@@ -128,7 +128,7 @@ const formResponseSchema = new Schema(
 
     answers: [
       {
-        fieldKey: { type: String, required: true },
+        pageKey: { type: String, required: true },
         label: { type: String, required: true },
         type: { type: String, required: true },
         value: { type: Schema.Types.Mixed, required: true },
@@ -197,6 +197,6 @@ const userSchema = new Schema(
 ------------------------------ */
 export const User = models.User || model("User", userSchema);
 export const Form = models.Form || model("Form", formSchema);
-export const FormField = models.FormField || model("FormField", formFieldSchema);
+export const FormPage = models.FormPage || model("FormPage", formPageSchema);
 export const FormResponse = models.FormResponse || model("FormResponse", formResponseSchema);
 export const FormShare = models.FormShare || model("FormShare", formShareSchema);

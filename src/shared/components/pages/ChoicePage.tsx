@@ -5,7 +5,7 @@ import type { ChoiceSettings, Option } from "@/shared/types/common"
 /** Sentinel stored while "Other" is selected but no text has been typed yet. */
 const OTHER_VALUE = "__other__"
 
-interface ChoiceFieldProps {
+interface ChoicePageProps {
     /** Single value for radio/select, array for checkbox/multiSelect. */
     value: string | string[]
     onChange?: (value: string | string[]) => void
@@ -45,7 +45,7 @@ const DESKTOP_COLS: Record<number, string> = {
  * picked, the answer holds either the sentinel (nothing typed yet) or the
  * respondent's free text, so the typed answer is what gets submitted.
  */
-export function ChoiceField({
+export function ChoicePage({
     value,
     onChange,
     options,
@@ -55,7 +55,7 @@ export function ChoiceField({
     disabled,
     color,
     fontSizeClass,
-}: ChoiceFieldProps) {
+}: ChoicePageProps) {
     const { allowOther, otherLabel, horizontalAlign, optionsPerRow, hideLabels } = settings
     const knownValues = options.map((o) => o.value)
 

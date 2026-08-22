@@ -2,11 +2,11 @@ import { useCallback } from "react";
 import { Plus } from "lucide-react";
 import { List } from "react-movable";
 import { SortablePageItem } from "./SortablePageItem";
-import type { FormField } from "../../../shared/types/common";
+import type { FormPage } from "../../../shared/types/common";
 import { showWarning } from "@/shared/hooks/useToast";
 
 interface FormBuilderSidebarProps {
-  pages: FormField[];
+  pages: FormPage[];
   selectedPageIndex: number;
   onSelectPage: (index: number) => void;
   /**
@@ -15,7 +15,7 @@ interface FormBuilderSidebarProps {
    */
   onPageOpened?: () => void;
   /** Applies a reordered page list and persists the new order. */
-  onReorderPages: (pages: FormField[]) => void;
+  onReorderPages: (pages: FormPage[]) => void;
   onAddPage: () => void;
   onDeletePage: (index: number) => void;
   /** Retained for API compatibility; duplicate is no longer surfaced here. */

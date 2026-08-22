@@ -10,7 +10,7 @@ import { COUNTRIES } from "@/shared/constants/countries"
 import type { PhoneSettings } from "@/shared/types/common"
 import { cn } from "@/lib/utils"
 
-interface PhoneAnswerFieldProps {
+interface PhoneAnswerPageProps {
     value?: string
     onChange?: (value: string) => void
     settings: PhoneSettings
@@ -37,7 +37,7 @@ function splitValue(value: string): { dialCode: string; local: string } {
  * Phone input with a country-code selector. The configured default is
  * pre-selected, and the respondent can still change it before submitting.
  */
-export function PhoneAnswerField({
+export function PhoneAnswerPage({
     value = "",
     onChange,
     settings,
@@ -46,7 +46,7 @@ export function PhoneAnswerField({
     disabled,
     color,
     fontSizeClass,
-}: PhoneAnswerFieldProps) {
+}: PhoneAnswerPageProps) {
     const configuredDial =
         settings.countryCodeMode === "specific" && settings.defaultCountry
             ? settings.defaultCountry.dialCode

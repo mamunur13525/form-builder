@@ -283,7 +283,7 @@ export function HiddenFieldsVariables() {
                                             )
                                         }}
                                     >
-                                        <SelectTrigger className="w-full bg-[var(--card)]">
+                                        <SelectTrigger className="w-full bg-[var(--editorial-purple-light)]">
                                             <SelectValue placeholder="Type" />
                                         </SelectTrigger>
                                         <SelectContent>

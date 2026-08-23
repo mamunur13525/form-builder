@@ -41,7 +41,7 @@ export const SETTINGS_SECTIONS: SettingsSectionMeta[] = [
     },
     {
         slug: "hidden-fields",
-        label: "Hidden fields",
+        label: "Hidden fields ",
         description: "Hidden fields & variables",
         icon: Braces,
     },

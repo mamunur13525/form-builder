@@ -117,6 +117,97 @@ export interface UpdateFormSettingsRequest {
 export type UpdateFormThemeRequest = IFormTheme
 
 // ---------------------------------------------------------------------------
+// Grouped form settings (edited on the FormSettings page)
+//
+// These live inside `FormVersion.formSchema.settings` alongside the legacy flat
+// flags above. Reads/writes always target the draft version; every write sets
+// `hasUnpublishedChanges = true` while a published version exists.
+// ---------------------------------------------------------------------------
+
+export interface GeneralSettingsValues {
+    show_progress_bar: boolean
+    initial_loader: boolean
+    navigation_arrows: boolean
+    refill_link: { isActive: boolean; link: string }
+    show_powered_by_company_name: boolean
+    anonymous_survey: boolean
+}
+
+export interface EmailSettingsValues {
+    receive_email_notification: boolean
+    multiple_recipients: { isActive: boolean; emails: string[] }
+    reply_to: {
+        automatic_first_email_field: boolean
+        custom_email: { isActive: boolean; address: string }
+    }
+    email_subject: string
+    email_body: string
+}
+
+export type DetectionMethod = "cookie" | "ip" | "cookie_ip"
+export type ResponseLimitType = "single" | "multiple"
+export type ResponseLimitPeriod = "day" | "month" | "year" | "lifetime"
+
+export interface AccessSettingsValues {
+    close_form: boolean
+    close_form_by_date: { isActive: boolean; date: string | null }
+    close_form_by_submissions: { isActive: boolean; submissions: number }
+    auto_refresh_inactivity: { isActive: boolean; minutes: number }
+    preventDuplicateSubmissions: boolean
+    detectionMethod: DetectionMethod
+    responseLimit: {
+        type: ResponseLimitType
+        count: number
+        period: ResponseLimitPeriod
+    }
+}
+
+export interface HiddenField {
+    key: string
+    value: string
+}
+
+export interface HiddenFieldsSettings {
+    enabled: boolean
+    fields: HiddenField[]
+}
+
+export type VariableType = "text" | "number"
+
+export interface FormVariable {
+    name: string
+    type: VariableType
+    value: string | number | boolean
+}
+
+/** The full normalized settings object returned by GET /forms/:id/settings. */
+export interface GroupedFormSettings extends FormSettings {
+    general?: GeneralSettingsValues
+    emailSettings?: EmailSettingsValues
+    access?: AccessSettingsValues
+    hiddenFields?: HiddenFieldsSettings
+    variables?: FormVariable[]
+}
+
+/** Envelope `data` for GET /forms/:id/settings. */
+export interface FormSettingsResponse {
+    formId: string
+    settings: GroupedFormSettings
+    hasUnpublishedChanges: boolean
+}
+
+// Per-section PATCH bodies. Missing fields are kept from the current draft.
+export type UpdateGeneralSettingsRequest = Partial<GeneralSettingsValues>
+export type UpdateEmailSettingsRequest = Partial<EmailSettingsValues>
+export type UpdateAccessSettingsRequest = Partial<AccessSettingsValues>
+/** `fields` is replaced wholesale. */
+export type UpdateHiddenFieldsRequest = HiddenFieldsSettings
+/** `variables` is replaced wholesale. */
+export interface UpdateVariablesRequest {
+    variables: FormVariable[]
+}
+
+// ---------------------------------------------------------------------------
 // Pages
 // ---------------------------------------------------------------------------
 

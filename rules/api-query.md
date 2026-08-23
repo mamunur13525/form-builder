@@ -85,3 +85,40 @@ src/features/<feature>/
 - All API functions must be fully typed with explicit request and response types.
 - Entity model types must match the backend API documentation exactly.
 - Use `zod` or manual validation is **not** required — trust the backend types.
+
+## Worked Example: Form Settings
+
+The Form Settings feature is the reference implementation of these conventions.
+
+**Endpoints** (all target the form's draft version):
+
+- `GET   /forms/:formId/settings`               — load the grouped settings
+- `PATCH /forms/:formId/settings/general`       — general behaviour
+- `PATCH /forms/:formId/settings/email`         — notification email
+- `PATCH /forms/:formId/settings/access`        — access & scheduling / limits
+- `PATCH /forms/:formId/settings/hidden-fields` — hidden fields (replaced wholesale)
+- `PATCH /forms/:formId/settings/variables`     — variables (replaced wholesale)
+
+Every PATCH returns the full normalized settings and sets
+`hasUnpublishedChanges = true` when a published version exists.
+
+**Files** (following the layering above):
+
+- `src/entities/form/model/types.ts` — request/response types
+  (`GeneralSettingsValues`, `EmailSettingsValues`, `AccessSettingsValues`,
+  `HiddenFieldsSettings`, `FormVariable`, `FormSettingsResponse`, and the
+  `Update*Request` bodies).
+- `src/entities/form/api/settings.api.ts` — thin `apiRequest` wrappers, one per
+  endpoint. No `fetch`, no parsing — the base client handles both.
+- `src/features/forms/hooks/useFormSettings.ts` — one `useFormSettings(formId)`
+  query plus one `useUpdate*` mutation per section.
+
+**Query key:** every section shares `["forms", formId, "settings"]`, so the GET
+is fetched once and each section reads the same cache entry.
+
+**Save flow:** a section builds its section payload from local edits, calls its
+mutation, and on success writes the returned settings into the cache with
+`setQueryData` (falling back to `invalidateQueries` if the body is empty) and
+flips `hasUnpublishedChanges` through the form context. Local editing state and
+dirty-tracking live in the page-local `useSectionState` helper, keeping this
+data layer free of form state.

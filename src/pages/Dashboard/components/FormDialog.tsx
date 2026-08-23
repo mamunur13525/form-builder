@@ -108,7 +108,7 @@ export function FormDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="editorial editorial-shadow rounded-[30px] border-[var(--border)] bg-[var(--popover)] p-10"
+            className="editorial editorial-shadow rounded-2xl border-[var(--border)] bg-[var(--popover)] p-10"
         >
             <DialogContent>
                 <DialogHeader className="mb-6">

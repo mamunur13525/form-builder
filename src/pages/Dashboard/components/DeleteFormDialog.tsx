@@ -38,7 +38,7 @@ export function DeleteFormDialog({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="editorial editorial-shadow rounded-[30px] bg-[var(--popover)] p-10 ring-0">
+            <AlertDialogContent className="editorial editorial-shadow rounded-2xl bg-[var(--popover)] p-10 ring-0">
                 <AlertDialogHeader>
                     <AlertDialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
                         Delete Form

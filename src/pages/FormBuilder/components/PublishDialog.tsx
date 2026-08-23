@@ -203,7 +203,7 @@ export function PublishDialog({
         if (!next) setConfirming(null);
         onOpenChange(next);
       }}
-      className="editorial editorial-shadow max-w-xl overflow-hidden rounded-[30px] border-[var(--border)] bg-[var(--popover)] p-0"
+      className="editorial editorial-shadow max-w-xl overflow-hidden rounded-2xl border-[var(--border)] bg-[var(--popover)] p-0"
     >
       <DialogContent>
         <div className="px-10 pt-10">

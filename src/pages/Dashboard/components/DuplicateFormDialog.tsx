@@ -53,7 +53,7 @@ export function DuplicateFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="editorial editorial-shadow rounded-[30px] bg-[var(--popover)] px-7 py-7 ring-0 w-full">
+      <DialogContent className="editorial editorial-shadow rounded-2xl bg-[var(--popover)] px-7 py-7 ring-0 w-full">
         <DialogHeader>
           <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
             Duplicate Form

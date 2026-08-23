@@ -118,6 +118,18 @@ export function SettingsPage() {
                 title="Profile"
                 description="How your name and picture appear across the workspace."
             >
+                 <div className="space-y-2">
+                    <Label htmlFor="settings-avatar" className="editorial-eyebrow text-[var(--editorial-subtle)]">
+                        Avatar URL
+                    </Label>
+                    <Input
+                        id="settings-avatar"
+                        value={avatarUrl}
+                        onChange={(event) => setAvatarEdit(event.target.value)}
+                        placeholder="https://..."
+                        className={inputClass}
+                    />
+                </div>
                 <div className="space-y-2">
                     <Label htmlFor="settings-name" className="editorial-eyebrow text-[var(--editorial-subtle)]">
                         Full name
@@ -144,18 +156,7 @@ export function SettingsPage() {
                         Your sign-in email cannot be changed here.
                     </p>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="settings-avatar" className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                        Avatar URL
-                    </Label>
-                    <Input
-                        id="settings-avatar"
-                        value={avatarUrl}
-                        onChange={(event) => setAvatarEdit(event.target.value)}
-                        placeholder="https://..."
-                        className={inputClass}
-                    />
-                </div>
+               
                 <div className="flex justify-stretch sm:justify-end">
                     <Button
                         onClick={handleProfileSave}

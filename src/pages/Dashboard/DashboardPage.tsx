@@ -125,7 +125,7 @@ export function DashboardPage() {
         </h2>
         {forms.length === 0 ? (
           <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
-            <CardContent className="py-16 text-center">
+            <CardContent className="py-16 text-center space-y-5">
               <p className="text-base text-[var(--editorial-subtle)]">
                 No forms yet
               </p>

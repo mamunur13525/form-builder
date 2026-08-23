@@ -82,6 +82,7 @@ export function GeneralSettings() {
             >
                 <ToggleRow
                     label="Show progress bar"
+                    htmlFor="toggle-progress-bar"
                     description="Display a progress indicator as respondents move through the form."
                     checked={values.show_progress_bar}
                     onCheckedChange={(v) => set("show_progress_bar", v)}
@@ -89,6 +90,7 @@ export function GeneralSettings() {
 
                 <ToggleRow
                     label="Initial loader"
+                    htmlFor="toggle-initial-loader"
                     description="Show a brief loading animation before the form appears."
                     checked={values.initial_loader}
                     onCheckedChange={(v) => set("initial_loader", v)}
@@ -96,6 +98,7 @@ export function GeneralSettings() {
 
                 <ToggleRow
                     label="Navigation arrows"
+                    htmlFor="toggle-nav-arrows"
                     description="Let respondents move between questions using on-screen arrows."
                     checked={values.navigation_arrows}
                     onCheckedChange={(v) => set("navigation_arrows", v)}
@@ -103,6 +106,7 @@ export function GeneralSettings() {
 
                 <ToggleRow
                     label="Refill link"
+                    htmlFor="toggle-refill-link"
                     description="Offer a link that lets respondents start a fresh submission."
                     checked={values.refill_link.isActive}
                     onCheckedChange={(v) =>
@@ -128,6 +132,7 @@ export function GeneralSettings() {
 
                 <ToggleRow
                     label="Show “Powered by” branding"
+                    htmlFor="toggle-powered-by"
                     description="Display the company name in the form footer."
                     checked={values.show_powered_by_company_name}
                     onCheckedChange={(v) =>
@@ -137,6 +142,7 @@ export function GeneralSettings() {
 
                 <ToggleRow
                     label="Anonymous survey"
+                    htmlFor="toggle-anonymous"
                     description="Don’t associate responses with any identifying metadata."
                     checked={values.anonymous_survey}
                     onCheckedChange={(v) => set("anonymous_survey", v)}

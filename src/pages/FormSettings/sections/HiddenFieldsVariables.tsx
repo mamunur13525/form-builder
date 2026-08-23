@@ -131,6 +131,7 @@ export function HiddenFieldsVariables() {
                 >
                     <ToggleRow
                         label="Enable hidden fields"
+                        htmlFor="toggle-hidden-fields"
                         description="Store the key/value pairs below with every response."
                         checked={hidden.enabled}
                         onCheckedChange={(v) =>

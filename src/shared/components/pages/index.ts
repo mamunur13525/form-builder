@@ -1,5 +1,15 @@
 export { PageLabel } from "./PageLabel"
 export { PageHelperText } from "./PageHelperText"
+export { VariableEditable } from "./VariableEditable"
+export {
+    buildVariableItems,
+    renderVariableText,
+    createVariablePattern,
+    extractFormVariables,
+    variableValueToString,
+    FORM_NAME_VARIABLE,
+    type VariableItem,
+} from "./formVariables"
 export { PageSubmitButton } from "./PageSubmitButton"
 export { TextPage } from "./TextPage"
 export { TextareaPage } from "./TextareaPage"

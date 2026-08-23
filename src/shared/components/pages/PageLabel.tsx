@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils"
+import { VariableEditable } from "./VariableEditable"
+import { renderVariableText, type VariableItem } from "./formVariables"
 
 interface PageLabelProps {
     label: string
@@ -7,9 +9,19 @@ interface PageLabelProps {
     onUpdate?: (label: string) => void
     color?: string
     fontSizeClass?: string
+    /** Variables offered in the `@` menu (editable) and resolved (render). */
+    variables?: VariableItem[]
 }
 
-export function PageLabel({ label, pageNumber, editable, onUpdate, color, fontSizeClass }: PageLabelProps) {
+export function PageLabel({
+    label,
+    pageNumber,
+    editable,
+    onUpdate,
+    color,
+    fontSizeClass,
+    variables = [],
+}: PageLabelProps) {
     const sizeClass = fontSizeClass || "text-[26px]"
 
     if (editable) {
@@ -20,16 +32,17 @@ export function PageLabel({ label, pageNumber, editable, onUpdate, color, fontSi
                         {pageNumber}
                     </span>
                 )}
-                <div
-                    contentEditable
-                    suppressContentEditableWarning
-                    data-placeholder="Type your question... Use @ to recall information."
-                    className={cn(sizeClass, "outline-none border-0 border-transparent pb-1 transition-colors cursor-text")}
+                <VariableEditable
+                    value={label}
+                    onCommit={(next) => onUpdate?.(next)}
+                    variables={variables}
+                    ariaLabel="Question"
+                    placeholder="Type your question... Use @ to recall information."
+                    className={cn(
+                        sizeClass,
+                        "outline-none border-0 border-transparent pb-1 transition-colors cursor-text",
+                    )}
                     style={color ? { color } : undefined}
-                    onBlur={(e) =>
-                        onUpdate?.(e.currentTarget.textContent || "")
-                    }
-                    dangerouslySetInnerHTML={{ __html: label }}
                 />
             </div>
         )
@@ -46,7 +59,7 @@ export function PageLabel({ label, pageNumber, editable, onUpdate, color, fontSi
                 className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-semibold")}
                 style={color ? { color } : undefined}
             >
-                {label}
+                {renderVariableText(label, variables)}
             </h2>
         </div>
     )

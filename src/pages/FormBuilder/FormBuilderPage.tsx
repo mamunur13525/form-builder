@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ResizablePanelGroup,
@@ -22,6 +22,8 @@ import {
 import { updateFormTheme } from "@/entities/form/api/form.api";
 import { useDebounce } from "../../shared/hooks/useDebounce";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
+import { useFormSettings } from "@/features/forms/hooks/useFormSettings";
+import { buildVariableItems } from "@/shared/components/pages";
 import { FormBuilderSidebar } from "./components/FormBuilderSidebar";
 import { PageContentEditor } from "./components/PageContentEditor/PageContentEditor";
 import { EndPageContentEditor } from "./components/EndPage/EndPageContentEditor";
@@ -48,6 +50,14 @@ export function FormBuilderPage() {
     openPreview,
     updateFormData,
   } = useFormContext();
+
+  // Variables (from the FormSettings page) offered in the @ menu inside the
+  // editable label/helper-text, and resolved to values in the preview.
+  const { data: settingsData } = useFormSettings(formId ?? "");
+  const variableItems = useMemo(
+    () => buildVariableItems(settingsData?.settings.variables, form?.title),
+    [settingsData?.settings.variables, form?.title],
+  );
 
   const [pages, setPages] = useState<FormPage[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
@@ -694,7 +704,23 @@ export function FormBuilderPage() {
         onPreview={async () => {
           // Flush any pending debounced updates before showing preview
           await flushPendingUpdate();
-          openPreview(form ? { ...form, pages, endPages } : null);
+          openPreview(
+            form
+              ? {
+                  ...form,
+                  pages,
+                  endPages,
+                  // Carry the live variables so @tokens resolve in the preview.
+                  settings: {
+                    ...form.settings,
+                    variables:
+                      settingsData?.settings.variables ??
+                      form.settings?.variables ??
+                      [],
+                  },
+                }
+              : null,
+          );
         }}
         isMobileView={isMobileView}
         onToggleView={() => setIsMobileView((prev) => !prev)}
@@ -722,6 +748,7 @@ export function FormBuilderPage() {
               onUpdate={updateEndPage}
               isMobileView={isMobileView}
               theme={form?.theme}
+              variables={variableItems}
             />
           ) : selectedPage ? (
             <PageContentEditor
@@ -730,6 +757,7 @@ export function FormBuilderPage() {
               onUpdate={updatePage}
               isMobileView={isMobileView}
               theme={form?.theme}
+              variables={variableItems}
             />
           ) : (
             <div className="flex h-full flex-col items-center justify-center px-4 text-center">

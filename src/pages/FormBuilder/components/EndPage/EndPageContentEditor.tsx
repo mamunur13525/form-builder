@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react"
 import { Share2 } from "lucide-react"
 import type { EndPage, IFormTheme } from "@/shared/types/common"
-import { PageLabel, PageHelperText, PageSubmitButton } from "@/shared/components/pages"
+import { PageLabel, PageHelperText, PageSubmitButton, type VariableItem } from "@/shared/components/pages"
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme"
 import { ConfettiBurst } from "@/shared/components/ConfettiBurst"
 import { SHARE_LABELS, buildShareLinks, type ShareKey } from "@/shared/components/EndPageView"
@@ -13,6 +13,7 @@ interface EndPageContentEditorProps {
     onUpdate: (index: number, updates: Partial<EndPage>) => void
     isMobileView: boolean
     theme?: IFormTheme | null
+    variables?: VariableItem[]
 }
 
 /**
@@ -26,6 +27,7 @@ export function EndPageContentEditor({
     onUpdate,
     isMobileView,
     theme,
+    variables = [],
 }: EndPageContentEditorProps) {
     const themeResolved = resolveFormTheme(theme)
 
@@ -103,6 +105,7 @@ export function EndPageContentEditor({
                         onUpdate={(title) => onUpdate(endPageIndex, { title })}
                         color={themeResolved.questionColor}
                         fontSizeClass={fontSizes.question}
+                        variables={variables}
                     />
 
                     <PageHelperText
@@ -111,6 +114,7 @@ export function EndPageContentEditor({
                         onUpdate={(helperText) => onUpdate(endPageIndex, { helperText })}
                         color={themeResolved.textColor}
                         fontSizeClass={fontSizes.helper}
+                        variables={variables}
                     />
 
                     {endPage.embed?.url && (

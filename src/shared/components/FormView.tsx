@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import type { Form, FormPage } from "../../shared/types/common";
@@ -9,7 +9,7 @@ import { FormProgressBar } from "./FormProgressBar";
 import { FormSubmittedView } from "./FormSubmittedView";
 import { EndPageView } from "./EndPageView";
 import { FormNavigationFooter } from "./FormNavigationFooter";
-import { PageLabel, PageHelperText, PageSubmitButton } from "./pages";
+import { PageLabel, PageHelperText, PageSubmitButton, buildVariableItems, extractFormVariables } from "./pages";
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "../utils/theme";
 
 const slideVariants = {
@@ -52,6 +52,14 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
   } = useFormNavigation({ form, mode, onSubmit });
 
   const themeResolved = resolveFormTheme(form.theme);
+
+  // Variables (plus the built-in form_name) resolved into @token replacements.
+  // `extractFormVariables` tolerates the public payload putting them either
+  // under `settings` or at the top level.
+  const variableItems = useMemo(
+    () => buildVariableItems(extractFormVariables(form), form.title),
+    [form],
+  );
 
   useEffect(() => {
     if (themeResolved.font) {
@@ -101,12 +109,14 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
         pageNumber={currentStep + 1}
         color={themeResolved.questionColor}
         fontSizeClass={fontSizes.question}
+        variables={variableItems}
       />
 
       <PageHelperText
         helperText={page.helperText}
         color={themeResolved.textColor}
         fontSizeClass={fontSizes.helper}
+        variables={variableItems}
       />
 
       {/* Page-specific input */}

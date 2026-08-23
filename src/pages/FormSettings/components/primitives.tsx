@@ -88,19 +88,27 @@ export function ToggleRow({
     checked,
     onCheckedChange,
     children,
+    htmlFor,
 }: {
     label: string
     description?: string
     checked: boolean
     onCheckedChange: (checked: boolean) => void
     children?: ReactNode
+    /** Associates the label with the Switch control so click-to-toggle works. */
+    htmlFor?: string
 }) {
     return (
         <SettingRow
             label={label}
             description={description}
+            htmlFor={htmlFor}
             control={
-                <Switch checked={checked} onCheckedChange={onCheckedChange} />
+                <Switch
+                    id={htmlFor || undefined}
+                    checked={checked}
+                    onCheckedChange={onCheckedChange}
+                />
             }
         >
             {checked && children ? <NestedPanel>{children}</NestedPanel> : null}

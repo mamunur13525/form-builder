@@ -118,6 +118,7 @@ export function AccessScheduling() {
                 >
                     <ToggleRow
                         label="Close form"
+                        htmlFor="toggle-close-form"
                         description="Stop accepting new responses immediately."
                         checked={values.close_form}
                         onCheckedChange={(v) => set("close_form", v)}
@@ -125,6 +126,7 @@ export function AccessScheduling() {
 
                     <ToggleRow
                         label="Close on a specific date"
+                        htmlFor="toggle-close-date"
                         description="Automatically stop accepting responses after this date."
                         checked={values.close_form_by_date.isActive}
                         onCheckedChange={(v) =>
@@ -159,6 +161,7 @@ export function AccessScheduling() {
                                 isActive: v,
                             })
                         }
+                        htmlFor="toggle-max-submissions"
                     >
                         <FieldLabel htmlFor="max-submissions">
                             Maximum submissions
@@ -190,6 +193,7 @@ export function AccessScheduling() {
                                 isActive: v,
                             })
                         }
+                        htmlFor="toggle-refresh-minutes"
                     >
                         <FieldLabel htmlFor="refresh-minutes">
                             Inactivity timeout (minutes)
@@ -223,6 +227,7 @@ export function AccessScheduling() {
                         onCheckedChange={(v) =>
                             set("preventDuplicateSubmissions", v)
                         }
+                        htmlFor="toggle-detection-method"
                     >
                         <FieldLabel>Detection method</FieldLabel>
                         <Select

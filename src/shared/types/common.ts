@@ -63,6 +63,14 @@ export interface IFormTheme {
 
 export type Theme = IFormTheme
 
+/** A named value defined in the form's settings, referenced in text as `@name`. */
+export type VariableType = "text" | "number"
+
+export interface FormVariable {
+    name: string
+    type: VariableType
+    value: string | number | boolean
+}
 
 export interface FormSettings {
     oneQuestionAtATime: boolean
@@ -70,6 +78,12 @@ export interface FormSettings {
     allowMultipleSubmissions: boolean
     requireLogin: boolean
     collectIP: boolean
+    /**
+     * Variables defined on the FormSettings page. Referenced inside page labels
+     * and helper text as `@variable_name` and resolved to their value when the
+     * form is rendered (preview and published views).
+     */
+    variables?: FormVariable[]
 }
 
 export type PageType =

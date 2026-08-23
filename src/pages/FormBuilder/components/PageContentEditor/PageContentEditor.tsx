@@ -1,5 +1,5 @@
 import type { FormPage, IFormTheme } from "@/shared/types/common";
-import { PageLabel, PageHelperText, PageSubmitButton } from "@/shared/components/pages";
+import { PageLabel, PageHelperText, PageSubmitButton, type VariableItem } from "@/shared/components/pages";
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme";
 import { useEffect } from "react";
 
@@ -34,6 +34,7 @@ interface PageContentEditorProps {
   onUpdate: (index: number, updates: Partial<FormPage>) => void;
   isMobileView: boolean;
   theme?: IFormTheme | null;
+  variables?: VariableItem[];
 }
 
 const editorMap: Record<
@@ -76,6 +77,7 @@ export function PageContentEditor({
   onUpdate,
   isMobileView,
   theme,
+  variables = [],
 }: PageContentEditorProps) {
   const PageEditor = editorMap[page.type];
   const isStatement = page.type === "statement";
@@ -151,6 +153,7 @@ export function PageContentEditor({
             onUpdate={(label) => onUpdate(pageIndex, { label })}
             color={themeResolved.questionColor}
             fontSizeClass={fontSizes.question}
+            variables={variables}
           />
 
           <PageHelperText
@@ -159,6 +162,7 @@ export function PageContentEditor({
             onUpdate={(helperText) => onUpdate(pageIndex, { helperText })}
             color={themeResolved.textColor}
             fontSizeClass={fontSizes.helper}
+            variables={variables}
           />
 
           <div className="mt-8 w-full" style={{ color: themeResolved.answerColor }}>

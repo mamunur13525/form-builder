@@ -141,6 +141,7 @@ export function EmailSettings() {
             >
                 <ToggleRow
                     label="Receive email notifications"
+                    htmlFor="toggle-email-notifications"
                     description="Receive email notifications when someone submits your form."
                     checked={values.receive_email_notification}
                     onCheckedChange={(v) => set("receive_email_notification", v)}
@@ -148,6 +149,7 @@ export function EmailSettings() {
 
                 <ToggleRow
                     label="Multiple recipients"
+                    htmlFor="toggle-multiple-recipients"
                     description="Send the notification to more than one email address."
                     checked={values.multiple_recipients.isActive}
                     onCheckedChange={toggleMultiple}

@@ -44,6 +44,8 @@ interface FormBuilderSidebarProps {
   onDeleteEndPage: (index: number) => void;
   /** Moves an end page to the top so it becomes the one shown on submit. */
   onReorderEndPageToFirst: (index: number) => void;
+  /** True while a new end page is being created on the backend. */
+  isAddingEndPage?: boolean;
 }
 
 export function FormBuilderSidebar({
@@ -62,6 +64,7 @@ export function FormBuilderSidebar({
   onAddEndPage,
   onDeleteEndPage,
   onReorderEndPageToFirst,
+  isAddingEndPage,
 }: FormBuilderSidebarProps) {
   const selectPage = useCallback(
     (index: number) => {
@@ -196,6 +199,7 @@ export function FormBuilderSidebar({
             onAdd={onAddEndPage}
             onDelete={onDeleteEndPage}
             onReorderToFirst={onReorderEndPageToFirst}
+            isAdding={isAddingEndPage}
           />
         </ResizablePanel>
       </ResizablePanelGroup>

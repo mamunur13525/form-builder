@@ -31,7 +31,6 @@ export function GoogleSignInButton({
 
   const handleSuccess = useCallback(
     (credentialResponse: CredentialResponse) => {
-      console.log({ credentialResponse });
       setIsPending(true);
       const idToken = credentialResponse.credential;
       if (!idToken) {
@@ -46,11 +45,9 @@ export function GoogleSignInButton({
         { idToken },
         {
           onSuccess: () => {
-            console.log("success");
             navigate(redirectTo);
           },
           onError: (err) => {
-            console.log({ err });
             setIsPending(false);
           },
           onSettled: () => {

@@ -17,9 +17,20 @@ import {
 import "@xyflow/react/dist/style.css";
 import { RotateCcw } from "lucide-react";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
-import type { FormPage } from "../../shared/types/common";
+import type { EndPage, FormPage } from "../../shared/types/common";
 import { PageNode, type PageNodeData, type PageNodeType } from "./components/PageNode";
+import {
+  EndPageNode,
+  type EndPageNodeData,
+  type EndPageNodeType,
+} from "./components/EndPageNode";
 import { PageRulesDialog } from "./components/PageRulesDialog";
+
+/** Union of every node kind that can appear on the canvas. */
+type FlowNode = PageNodeType | EndPageNodeType;
+
+/** Stable id for the (single) shown-on-submit end-page node. */
+const END_PAGE_NODE_ID = "end-page-0";
 
 /**
  * Horizontal distance between the left edges of consecutive page nodes.
@@ -34,10 +45,14 @@ function pageId(page: FormPage, index: number): string {
 
 /**
  * Lay the pages out left-to-right using React Flow's own coordinate system
- * (deterministic x positions), rather than CSS flow. Page 1 → Page 2 → …
+ * (deterministic x positions), rather than CSS flow. Page 1 → Page 2 → … and,
+ * when the form has one, the shown-on-submit end page as the final node.
+ *
+ * The first node never renders an incoming handle and the last node never
+ * renders an outgoing handle, so the flow reads as a bounded start → end chain.
  */
-function buildNodes(pages: FormPage[]): PageNodeType[] {
-  return pages.map((page, index) => ({
+function buildNodes(pages: FormPage[], endPage: EndPage | null): FlowNode[] {
+  const nodes: FlowNode[] = pages.map((page, index) => ({
     id: pageId(page, index),
     type: "pageNode",
     position: { x: index * NODE_STEP_X, y: 0 },
@@ -47,24 +62,56 @@ function buildNodes(pages: FormPage[]): PageNodeType[] {
       type: page.type,
       required: page.required,
       ruleCount: page.logic?.length ?? 0,
+      hasTarget: index !== 0,
+      hasSource: true,
     } satisfies PageNodeData,
   }));
+
+  if (endPage) {
+    nodes.push({
+      id: END_PAGE_NODE_ID,
+      type: "endPageNode",
+      position: { x: pages.length * NODE_STEP_X, y: 0 },
+      data: {
+        title: endPage.title,
+        hasTarget: true,
+        hasSource: false,
+      } satisfies EndPageNodeData,
+    });
+  }
+
+  // The first node in the flow has no incoming handle, and the last node has no
+  // outgoing handle — so the chain reads as a bounded start → end.
+  const first = nodes[0];
+  if (first) first.data.hasTarget = false;
+  const last = nodes[nodes.length - 1];
+  if (last) last.data.hasSource = false;
+
+  return nodes;
 }
 
 /** Connect each page to the next so the canvas reads as a linear flow. */
-function buildEdges(pages: FormPage[]): Edge[] {
+function buildEdges(pages: FormPage[], hasEndPage: boolean): Edge[] {
   const edges: Edge[] = [];
   for (let i = 1; i < pages.length; i++) {
     const source = pageId(pages[i - 1], i - 1);
     const target = pageId(pages[i], i);
     edges.push({ id: `e-${source}-${target}`, source, target });
   }
+  if (hasEndPage && pages.length > 0) {
+    const source = pageId(pages[pages.length - 1], pages.length - 1);
+    edges.push({
+      id: `e-${source}-${END_PAGE_NODE_ID}`,
+      source,
+      target: END_PAGE_NODE_ID,
+    });
+  }
   return edges;
 }
 
 // Defined at module scope so their identities stay stable across renders
 // (React Flow warns when nodeTypes / edge options are recreated each render).
-const nodeTypes: NodeTypes = { pageNode: PageNode };
+const nodeTypes: NodeTypes = { pageNode: PageNode, endPageNode: EndPageNode };
 
 const defaultEdgeOptions = {
   type: "smoothstep",
@@ -84,8 +131,12 @@ const defaultEdgeOptions = {
 function LogicFlow() {
   const { form, isLoading, error } = useFormContext();
   const pages = useMemo(() => form?.pages ?? [], [form]);
+  const endPage = useMemo<EndPage | null>(
+    () => form?.endPages?.[0] ?? null,
+    [form],
+  );
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<PageNodeType>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selected, setSelected] = useState<{
     page: FormPage;
@@ -99,10 +150,10 @@ function LogicFlow() {
   // Build (or rebuild) the graph whenever the form's pages change. Positions
   // are deterministic, so this also serves as the "initial layout".
   useEffect(() => {
-    setNodes(buildNodes(pages));
-    setEdges(buildEdges(pages));
+    setNodes(buildNodes(pages, endPage));
+    setEdges(buildEdges(pages, endPage !== null));
     didInitialFit.current = false;
-  }, [pages, setNodes, setEdges]);
+  }, [pages, endPage, setNodes, setEdges]);
 
   // Fit the flow into view once the freshly-built nodes have been measured.
   // This is the reliable moment to fit, since node dimensions are known.
@@ -114,8 +165,13 @@ function LogicFlow() {
   }, [nodesInitialized, nodes.length, fitView]);
 
   const handleNodeClick = useCallback(
-    (_event: React.MouseEvent, node: { data: PageNodeData }) => {
-      const index = node.data.index;
+    (
+      _event: React.MouseEvent,
+      node: { type?: string; data: PageNodeData | EndPageNodeData },
+    ) => {
+      // Only page nodes open the rules dialog; the end-page node has no rules.
+      if (node.type !== "pageNode") return;
+      const index = (node.data as PageNodeData).index;
       const page = pages[index];
       if (page) setSelected({ page, index });
     },
@@ -124,12 +180,12 @@ function LogicFlow() {
 
   // Reload / Reset — restore the initial horizontal layout and re-fit the view.
   const handleReset = useCallback(() => {
-    setNodes(buildNodes(pages));
-    setEdges(buildEdges(pages));
+    setNodes(buildNodes(pages, endPage));
+    setEdges(buildEdges(pages, endPage !== null));
     setSelected(null);
     // Let React Flow apply the restored positions before fitting.
     window.setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 60);
-  }, [pages, setNodes, setEdges, fitView]);
+  }, [pages, endPage, setNodes, setEdges, fitView]);
 
   if (isLoading) {
     return (

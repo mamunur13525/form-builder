@@ -138,9 +138,9 @@ export function SettingsPanel({
 
     return (
         <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden bg-[var(--card)] border-l border-[var(--border)]">
-            <div className="flex flex-col border-b border-[var(--editorial-border-light)]">
-                <div className="flex-1 overflow-y-auto">
-                    <Tabs defaultValue="settings" className="flex h-full flex-col">
+            <div className="flex flex-1 min-h-0 flex-col border-b border-[var(--editorial-border-light)]">
+                <div className="flex flex-1 min-h-0 flex-col">
+                    <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
                         {/* Pill tabs on the editorial palette: the list is the track,
                             the active tab is a raised card. */}
                         <div className="px-6 pt-5">
@@ -158,8 +158,8 @@ export function SettingsPanel({
                                 ))}
                             </TabsList>
                         </div>
-                        <TabsContent value="settings" className="h-full flex-1 overflow-y-auto">
-                            <div className="space-y-8 px-6 py-6 overflow-y-auto">
+                        <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
+                            <div className="space-y-8 px-6 py-6">
                                 {/* Page type — always available */}
                                 <div className="space-y-2">
                                     <Label className="text-base font-semibold text-[var(--foreground)]">

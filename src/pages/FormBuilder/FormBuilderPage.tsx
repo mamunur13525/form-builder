@@ -53,6 +53,9 @@ export function FormBuilderPage() {
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
   const [endPages, setEndPages] = useState<EndPage[]>([]);
   const [selectedEndPageIndex, setSelectedEndPageIndex] = useState(0);
+  // True while a new end page is being created on the backend, so the list can
+  // show a loading placeholder until the created record comes back.
+  const [isAddingEndPage, setIsAddingEndPage] = useState(false);
   // Which list the middle editor and settings panel follow.
   const [selectedKind, setSelectedKind] = useState<"page" | "endPage">("page");
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
@@ -362,6 +365,7 @@ export function FormBuilderPage() {
     if (!formId || formId === "new") return;
 
     try {
+      setIsAddingEndPage(true);
       showSaveStatus("saving");
       const created = await createEndPageApi(formId, {});
       setEndPages((prev) => {
@@ -376,6 +380,8 @@ export function FormBuilderPage() {
     } catch (error) {
       console.error("Failed to create end page:", error);
       showSaveStatus("error");
+    } finally {
+      setIsAddingEndPage(false);
     }
   }, [formId, showSaveStatus, setHasUnpublishedChanges]);
 
@@ -643,6 +649,7 @@ export function FormBuilderPage() {
       onAddEndPage={addEndPage}
       onDeleteEndPage={deleteEndPage}
       onReorderEndPageToFirst={moveEndPageToFirst}
+      isAddingEndPage={isAddingEndPage}
     />
   );
 

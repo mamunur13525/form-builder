@@ -17,6 +17,10 @@ export interface PageNodeData {
   type: PageType;
   required: boolean;
   ruleCount: number;
+  /** Render the incoming (target) handle. Defaults to true. */
+  hasTarget?: boolean;
+  /** Render the outgoing (source) handle. Defaults to true. */
+  hasSource?: boolean;
   [key: string]: unknown;
 }
 
@@ -40,6 +44,9 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
   const handleClass =
     "!h-2.5 !w-2.5 !border-[var(--border)] !bg-[var(--card)]";
 
+  const hasTarget = data.hasTarget !== false;
+  const hasSource = data.hasSource !== false;
+
   return (
     <div
       aria-current={selected ? "true" : undefined}
@@ -54,12 +61,14 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
       `}
     >
       {/* Incoming connection point (from the previous page). */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        className={handleClass}
-        isConnectable={false}
-      />
+      {hasTarget && (
+        <Handle
+          type="target"
+          position={Position.Left}
+          className={handleClass}
+          isConnectable={false}
+        />
+      )}
 
       {/* Page number + title. */}
       <p className="line-clamp-2 text-sm leading-snug text-[var(--foreground)]">
@@ -96,12 +105,14 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
       </div>
 
       {/* Outgoing connection point (to the next page). */}
-      <Handle
-        type="source"
-        position={Position.Right}
-        className={handleClass}
-        isConnectable={false}
-      />
+      {hasSource && (
+        <Handle
+          type="source"
+          position={Position.Right}
+          className={handleClass}
+          isConnectable={false}
+        />
+      )}
     </div>
   );
 }

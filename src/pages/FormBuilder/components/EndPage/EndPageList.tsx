@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Plus, Trash2, Flag, CheckCircle2, ArrowUpToLine } from "lucide-react"
+import { Plus, Trash2, Flag, CheckCircle2, ArrowUpToLine, Loader2 } from "lucide-react"
 import {
     Popover,
     PopoverContent,
@@ -24,6 +24,8 @@ interface EndPageListProps {
     onDelete: (index: number) => void
     /** Moves an end page to the top so it becomes the one shown on submit. */
     onReorderToFirst: (index: number) => void
+    /** True while a new end page is being created on the backend. */
+    isAdding?: boolean
 }
 
 /**
@@ -39,6 +41,7 @@ export function EndPageList({
     onAdd,
     onDelete,
     onReorderToFirst,
+    isAdding = false,
 }: EndPageListProps) {
     return (
         <div className="flex h-full w-full flex-col overflow-hidden bg-[var(--card)]">
@@ -55,10 +58,16 @@ export function EndPageList({
                             <button
                                 type="button"
                                 onClick={onAdd}
+                                disabled={isAdding}
                                 aria-label="Add end page"
-                                className="editorial-transition flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                                aria-busy={isAdding}
+                                className="editorial-transition flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] disabled:pointer-events-none disabled:opacity-60"
                             >
-                                <Plus className="h-5 w-5" />
+                                {isAdding ? (
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                    <Plus className="h-5 w-5" />
+                                )}
                             </button>
                         }
                     />
@@ -67,7 +76,7 @@ export function EndPageList({
             </div>
 
             <div className="flex-1 space-y-2.5 overflow-y-auto overflow-x-hidden px-3 pb-4">
-                {endPages.length === 0 ? (
+                {endPages.length === 0 && !isAdding ? (
                     <div className="px-2 py-6 text-center text-sm text-[var(--editorial-subtle)]">
                         No end pages yet.
                     </div>
@@ -85,6 +94,22 @@ export function EndPageList({
                             onReorderToFirst={onReorderToFirst}
                         />
                     ))
+                )}
+
+                {/* Loading placeholder — shown while the new end page is being
+                    created on the backend, replaced by the real card once the
+                    POST response arrives. */}
+                {isAdding && (
+                    <div
+                        aria-busy="true"
+                        className="flex flex-col gap-3 rounded-xl border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-3.5"
+                    >
+                        <div className="flex items-center gap-2 text-sm text-[var(--editorial-body)]">
+                            <Loader2 className="h-4 w-4 animate-spin text-[var(--primary)]" />
+                            <span>Creating end page…</span>
+                        </div>
+                        <div className="h-5 w-28 animate-pulse rounded-md bg-[var(--border)]" />
+                    </div>
                 )}
             </div>
         </div>
@@ -153,7 +178,7 @@ function EndPageItem({
                                 render={
                                     <button
                                         type="button"
-                                        aria-label="Show this end page on submit"
+                                        aria-label="Set this end page to show on submit"
                                         onClick={(e) => {
                                             e.stopPropagation()
                                             onReorderToFirst(index)
@@ -164,7 +189,7 @@ function EndPageItem({
                                     </button>
                                 }
                             />
-                            <TooltipContent>Show on submit</TooltipContent>
+                            <TooltipContent>Set this end page to Show on submit</TooltipContent>
                         </Tooltip>
                     )}
                     {canDelete && (

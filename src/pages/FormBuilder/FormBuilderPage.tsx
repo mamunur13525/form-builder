@@ -696,7 +696,7 @@ export function FormBuilderPage() {
   );
 
   const editorColumn = (
-    <div className="flex h-full min-h-0 w-full flex-col gap-3 sm:gap-4 py-4 bg-transparent">
+    <div className="flex h-full min-h-0 w-full flex-col gap-3 py-3 bg-transparent">
       <PageContentTopbar
         onAddPage={() => {
           setShowAddPageDialog(true);
@@ -801,7 +801,7 @@ export function FormBuilderPage() {
         </ResizablePanelGroup>
       ) : (
         <>
-          <div className="flex min-h-0 w-full flex-1 flex-col px-3 py-3 sm:px-5 sm:py-4">
+          <div className="flex min-h-0 w-full flex-1 flex-col">
             {editorColumn}
           </div>
 

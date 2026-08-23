@@ -44,7 +44,7 @@ export function BrowseView({
                 onBack={onBack}
             />
 
-            <div className="mt-6 min-w-0 flex-1 space-y-6 lg:mt-0 bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 lg:p-8">
+            <div className="editorial-shadow-sm sm:mt-6 min-w-0 flex-1 space-y-6 lg:mt-0 bg-[var(--card)] rounded-xl border border-[var(--border)] p-6 lg:p-8">
                 <div className="relative">
                     <Search className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[var(--editorial-subtle)]" />
                     <Input
@@ -52,7 +52,7 @@ export function BrowseView({
                         onChange={(event) => onSearchChange(event.target.value)}
                         placeholder="Search integrations..."
                         aria-label="Search integrations"
-                        className="h-12 rounded-2xl border-[var(--input)] bg-[var(--card)] pr-4 pl-10 text-base placeholder:text-[var(--editorial-subtle)]"
+                        className="h-12 rounded-lg border-[var(--input)] bg-[var(--card)] pr-4 pl-10 text-base placeholder:text-[var(--editorial-subtle)]"
                     />
                 </div>
 
@@ -97,8 +97,8 @@ export function BrowseView({
 /** Shown when no integration matches the current filters. */
 function EmptyState({ onClear }: { onClear: () => void }) {
     return (
-        <div className="flex flex-col items-center rounded-2xl border border-[var(--border)] bg-[var(--card)] py-16 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
+        <div className="editorial-shadow-sm flex flex-col items-center rounded-xl border border-[var(--border)] bg-[var(--card)] py-16 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
                 <Search className="h-6 w-6" />
             </div>
             <h2 className="font-display mt-5 text-2xl text-[var(--foreground)]">

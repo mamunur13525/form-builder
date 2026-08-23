@@ -39,7 +39,7 @@ function ConnectedRow({
         )
 
     return (
-        <div className="flex flex-col gap-3 rounded-2xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex flex-col gap-3 rounded-xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)]">
                     <Icon className="h-4 w-4" />
@@ -87,10 +87,10 @@ export function ConnectedView({
                         <CheckCircle className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                        <h2 className="font-display text-xl leading-tight text-[var(--foreground)] sm:text-2xl">
+                        <h2 className="font-display text-2xl text-[var(--foreground)]">
                             Connected
                         </h2>
-                        <p className="mt-1 text-sm leading-6 text-[var(--editorial-body)]">
+                        <p className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
                             {connected.length > 0
                                 ? "These integrations are active for this form."
                                 : "Nothing is connected yet — pick a tool below to get started."}
@@ -116,10 +116,10 @@ export function ConnectedView({
             <PanelCard>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 className="font-display text-xl leading-tight text-[var(--foreground)] sm:text-2xl">
+                        <h2 className="font-display text-2xl text-[var(--foreground)]">
                             Connect more tools
                         </h2>
-                        <p className="mt-1 text-sm leading-6 text-[var(--editorial-body)]">
+                        <p className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
                             A few favourites to get you going, or browse the full
                             set of {total}.
                         </p>
@@ -154,7 +154,7 @@ function PanelCard({
     return (
         <section
             className={cn(
-                "rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:p-7",
+                "editorial-shadow-sm rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 sm:p-7",
                 className,
             )}
         >

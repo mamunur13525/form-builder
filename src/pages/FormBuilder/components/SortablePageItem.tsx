@@ -14,6 +14,7 @@ import {
 import {
   PAGE_TYPE_ICONS,
   PAGE_TYPE_LABELS,
+  PAGE_TYPE_COLORS,
 } from "../../../shared/constants/form-types";
 import type { FormPage } from "../../../shared/types/common";
 import type { IItemProps } from "react-movable";
@@ -114,7 +115,7 @@ export function SortablePageItem({
       <div className="flex items-center justify-between gap-2">
         {/* Left: page-type badge + drag handle */}
         <div className="flex min-w-0 items-center gap-1.5">
-          <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-[var(--border)] bg-[var(--card)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--editorial-body)]">
+          <span className={`inline-flex min-w-0 items-center gap-1 rounded-md border border-[var(--editorial-border-light)] bg-gradient-to-br ${PAGE_TYPE_COLORS[page.type]} px-1.5 py-0.5 text-[11px] font-medium`}>
             <TypeIcon className="h-3 w-3 shrink-0" />
             <span className="truncate">{typeLabel}</span>
           </span>

@@ -34,7 +34,7 @@ export function FormIntegrationsPage() {
     const handleAction = (_integration: Integration) => { }
 
     return (
-        <div className="editorial mx-auto w-full max-w-[1160px] space-y-8 px-4 pt-6 pb-16 sm:px-6 sm:pt-10 lg:px-8">
+        <div className="editorial mx-auto w-full max-w-[1160px] space-y-8 px-0 py-0 sm:px-6 sm:pt-10 lg:px-8">
             {view === "connected" ? (
                 <>
                     <ConnectedView

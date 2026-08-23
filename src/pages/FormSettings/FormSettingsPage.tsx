@@ -81,7 +81,7 @@ export function FormSettingsPage() {
                 </div>
             </nav>
 
-            <div className="mx-auto flex max-w-5xl gap-8 px-4 py-6 md:px-8 md:py-10  bg-[var(--background)] rounded-xl md:mt-10">
+            <div className="mx-auto flex max-w-[1160px] gap-8 px-4 py-6 md:px-8 md:py-10  bg-[var(--background)] rounded-xl md:mt-10">
                 {/* Desktop: sticky vertical section nav. */}
                 <aside className="hidden md:block md:w-64 md:shrink-0">
                     <div className="sticky top-10 flex flex-col gap-1">

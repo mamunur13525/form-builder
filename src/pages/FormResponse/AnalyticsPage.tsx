@@ -51,8 +51,8 @@ export function AnalyticsPage() {
     // Only claim the form is missing once loading has finished.
     if (!formId || (!isLoading && !form)) {
         return (
-            <div className="editorial py-32 text-center">
-                <h2 className="font-display text-[40px] leading-tight text-[var(--foreground)]">
+            <div className="editorial px-4 py-20 text-center sm:py-32">
+                <h2 className="font-display text-3xl leading-tight text-[var(--foreground)] sm:text-[40px]">
                     Form not found
                 </h2>
             </div>
@@ -73,53 +73,53 @@ export function AnalyticsPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="space-y-6"
+                    className="space-y-4 sm:space-y-6"
                 >
-                    {/* Overview Stats */}
-                    <div className="grid gap-6 md:grid-cols-4">
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
+                    {/* Overview Stats — 2-up on phones so the four numbers stay scannable. */}
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-4 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Total Responses
                                     </p>
-                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                    <p className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
                                         {totalResponses}
                                     </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-4 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Unique Respondents
                                     </p>
-                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                    <p className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
                                         {uniqueRespondents}
                                     </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-4 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Today's Responses
                                     </p>
-                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                    <p className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
                                         {todayResponses}
                                     </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-4 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Completion Rate
                                     </p>
-                                    <p className="font-display text-[40px] leading-none text-[var(--foreground)]">
+                                    <p className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
                                         {formatPercent(completionRate)}%
                                     </p>
                                 </div>
@@ -128,26 +128,26 @@ export function AnalyticsPage() {
                     </div>
 
                     {/* Additional Stats */}
-                    <div className="grid gap-6 md:grid-cols-2">
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-4 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Avg. Completion Time
                                     </p>
-                                    <p className="font-display text-[32px] leading-none text-[var(--foreground)]">
+                                    <p className="font-display text-[24px] leading-none text-[var(--foreground)] sm:text-[32px]">
                                         {formatDuration(avgCompletionTime)}
                                     </p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-6">
+                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-4 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                         Total Pages
                                     </p>
-                                    <p className="font-display text-[32px] leading-none text-[var(--foreground)]">
+                                    <p className="font-display text-[24px] leading-none text-[var(--foreground)] sm:text-[32px]">
                                         {form?.pages.length ?? 0}
                                     </p>
                                 </div>

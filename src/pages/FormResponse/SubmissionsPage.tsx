@@ -104,12 +104,13 @@ export function SubmissionsPage() {
     // flashes "Form not found" on every visit.
     if (!formId || (!isLoading && !form)) {
         return (
-            <div className="editorial flex flex-col items-center py-32 text-center">
-                <h2 className="font-display text-[40px] leading-tight text-[var(--foreground)]">
+            <div className="editorial flex flex-col items-center px-4 py-20 text-center sm:py-32">
+                <h2 className="font-display text-3xl leading-tight text-[var(--foreground)] sm:text-[40px]">
                     Form not found
                 </h2>
                 <Button
-                    className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                    size="lg"
+                    className="mt-6 text-sm sm:mt-8"
                     onClick={() => navigate(ROUTES.DASHBOARD)}
                 >
                     Back to Dashboard
@@ -124,16 +125,16 @@ export function SubmissionsPage() {
     return (
         <ResponsePageShell activeTab="submissions" fill>
             {isLoading ? (
-                <div className="p-8">
+                <div className="p-4 sm:p-8">
                     <ResponseStateCard loading message="Loading submissions..." />
                 </div>
             ) : formError || responsesError ? (
-                <div className="p-8">
+                <div className="p-4 sm:p-8">
                     <ResponseStateCard message="Could not load submissions. Please try again." />
                 </div>
             ) : !hasResponses ? (
                 <motion.div
-                    className="p-8"
+                    className="p-4 sm:p-8"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                 >
@@ -142,7 +143,8 @@ export function SubmissionsPage() {
                         action={
                             <Button
                                 variant="outline"
-                                className="editorial-transition h-[52px] rounded-[16px] border-[var(--border)] bg-[var(--secondary)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                                size="lg"
+                                className="text-sm"
                                 onClick={() =>
                                     navigate(ROUTES.FORM_SHARE.replace(":formId", formId))
                                 }

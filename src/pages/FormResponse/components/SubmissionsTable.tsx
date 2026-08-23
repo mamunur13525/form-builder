@@ -50,10 +50,10 @@ export function SubmissionsTable({
                     <TableHead
                         className={cn(
                             PINNED_HEAD_CELL,
-                            "sticky top-0 left-0 z-30 w-[180px] border-b border-r px-6",
+                            "sticky top-0 left-0 z-30 w-[132px] border-b border-r px-3 sm:w-[180px] sm:px-6",
                         )}
                     >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             <Checkbox
                                 checked={allSelected}
                                 indeterminate={someSelected}
@@ -66,9 +66,12 @@ export function SubmissionsTable({
                     {columns.map((column) => (
                         <TableHead
                             key={column.id}
-                            className={cn(PINNED_HEAD_CELL, "sticky top-0 z-20 border-b px-6")}
+                            className={cn(PINNED_HEAD_CELL, "sticky top-0 z-20 border-b px-3 sm:px-6")}
                         >
-                            <span className="block max-w-[240px] truncate" title={column.label}>
+                            <span
+                                className="block max-w-[160px] truncate sm:max-w-[240px]"
+                                title={column.label}
+                            >
                                 {column.label}
                             </span>
                         </TableHead>
@@ -76,7 +79,9 @@ export function SubmissionsTable({
                     <TableHead
                         className={cn(
                             PINNED_HEAD_CELL,
-                            "sticky top-0 right-0 z-30 border-b border-l px-6 text-right",
+                            // Pinning both edges would leave nothing scrollable between
+                            // them on a phone, so this column only pins from `sm` up.
+                            "sticky top-0 z-30 border-b border-l px-3 text-right sm:right-0 sm:px-6",
                         )}
                     >
                         Submitted At
@@ -106,10 +111,10 @@ export function SubmissionsTable({
                             <TableCell
                                 className={cn(
                                     PINNED_BODY_CELL,
-                                    "sticky left-0 z-10 border-b border-r font-medium",
+                                    "sticky left-0 z-10 border-b border-r font-medium sm:px-6",
                                 )}
                             >
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2 sm:gap-3">
                                     <span data-select-control className="flex items-center">
                                         <Checkbox
                                             checked={isSelected}
@@ -123,10 +128,10 @@ export function SubmissionsTable({
                             {columns.map((column) => {
                                 const text = column.getValue(response)
                                 return (
-                                    <TableCell key={column.id} className="border-b">
+                                    <TableCell key={column.id} className="border-b sm:px-6">
                                         {text ? (
                                             <span
-                                                className="block max-w-[240px] truncate"
+                                                className="block max-w-[160px] truncate sm:max-w-[240px]"
                                                 title={text}
                                             >
                                                 {text}
@@ -140,7 +145,7 @@ export function SubmissionsTable({
                             <TableCell
                                 className={cn(
                                     PINNED_BODY_CELL,
-                                    "sticky right-0 z-10 border-b border-l text-right text-muted-foreground",
+                                    "sticky z-10 border-b border-l text-right text-muted-foreground sm:right-0 sm:px-6",
                                 )}
                             >
                                 {formatSubmittedAt(response.submittedAt)}

@@ -112,7 +112,7 @@ function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                 onDrop={handleDrop}
                 onClick={() => inputRef.current?.click()}
                 className={cn(
-                    "editorial-transition flex cursor-pointer flex-col items-center justify-center gap-3 rounded-[22px] border border-dashed py-12 text-center transition-colors",
+                    "editorial-transition flex cursor-pointer flex-col items-center justify-center gap-3 rounded-[22px] border border-dashed py-8 sm:py-12 text-center transition-colors",
                     dragOver
                         ? "border-[var(--primary)] bg-[var(--editorial-primary-light)]"
                         : "border-[var(--input)] bg-[var(--secondary)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
@@ -180,7 +180,7 @@ function LinkTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                             onChange={(e) => { setUrl(e.target.value); setError(null) }}
                             placeholder="https://example.com/photo.jpg"
                             onKeyDown={(e) => e.key === "Enter" && handlePaste()}
-                            className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] pl-10 pr-4 text-base"
+                            className="h-12 rounded-2xl border-[var(--input)] bg-[var(--secondary)] pl-10 pr-4 text-sm sm:h-[52px] sm:text-base"
                         />
                     </div>
                     <Button onClick={handlePaste} disabled={validating} className={cn("rounded-2xl", PRIMARY_BUTTON_CLASS)}>
@@ -230,7 +230,7 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                         onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={handleKey}
                         placeholder="Search Unsplash..."
-                        className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] pl-10 pr-4 text-base"
+                        className="h-12 rounded-2xl border-[var(--input)] bg-[var(--secondary)] pl-10 pr-4 text-sm sm:h-[52px] sm:text-base"
                     />
                 </div>
                 <Button onClick={doSearch} disabled={searching} className={cn("rounded-2xl", PRIMARY_BUTTON_CLASS)}>
@@ -238,7 +238,7 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <AnimatePresence>
                     {results.map((img) => (
                         <motion.button
@@ -302,14 +302,14 @@ export function ImagePickerDialog({
         <Dialog
             open={open}
             onOpenChange={(next) => { if (!next) reset(); onOpenChange(next); }}
-            className="editorial editorial-shadow w-full max-w-3xl rounded-2xl border-[var(--border)] bg-[var(--popover)] p-10"
+            className="editorial editorial-shadow w-full max-w-3xl rounded-2xl border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
         >
             <DialogContent>
                 <DialogHeader className="mb-6">
-                    <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+                    <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
                         {title}
                     </DialogTitle>
-                    <DialogDescription className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
+                    <DialogDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
                         {description}
                     </DialogDescription>
                 </DialogHeader>
@@ -358,11 +358,11 @@ export function ImagePickerDialog({
                     </div>
                 )}
 
-                <DialogFooter className="mt-8">
+                <DialogFooter className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <Button
                         variant="outline"
                         onClick={() => onOpenChange(false)}
-                        className="editorial-transition h-[52px] rounded-[16px] border-[var(--border)] bg-[var(--card)] px-8 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                        className="editorial-transition h-12 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-8 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] w-full sm:w-auto sm:h-[52px]"
                     >
                         Cancel
                     </Button>

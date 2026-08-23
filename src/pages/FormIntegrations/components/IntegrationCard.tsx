@@ -24,8 +24,8 @@ export function IntegrationCard({ integration, onAction }: IntegrationCardProps)
     return (
         <div
             className={cn(
-                "group editorial-transition flex h-full flex-col rounded-2xl border bg-[var(--card)] p-5",
-                "shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(24,35,52,0.08)]",
+                "group editorial-transition flex h-full flex-col rounded-xl border bg-[var(--card)] p-5",
+                "editorial-shadow-sm hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(24,35,52,0.08)]",
                 connected
                     ? "border-[var(--editorial-primary-ring)]"
                     : "border-[var(--border)] hover:border-[var(--editorial-primary-ring)]",

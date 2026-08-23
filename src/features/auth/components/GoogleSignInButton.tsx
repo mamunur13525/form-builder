@@ -47,7 +47,7 @@ export function GoogleSignInButton({
           onSuccess: () => {
             navigate(redirectTo);
           },
-          onError: (err) => {
+          onError: () => {
             setIsPending(false);
           },
           onSettled: () => {

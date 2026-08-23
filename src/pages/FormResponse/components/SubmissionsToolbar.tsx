@@ -42,20 +42,21 @@ export function SubmissionsToolbar({
     const hasSelection = selectedCount > 0
 
     return (
-        <div className="flex flex-wrap items-center justify-between gap-3 px-8 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-8 sm:py-4">
             <TooltipProvider delay={200}>
                 <Tabs
                     value={layer}
                     onValueChange={(value) => onLayerChange(value as SubmissionLayer)}
+                    className="min-w-0 max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
-                    <TabsList className="h-auto gap-1 bg-transparent p-0">
+                    <TabsList className="h-auto w-max gap-1 bg-transparent p-0">
                         {SUBMISSION_LAYERS.map(({ value, label, hint }) => (
                             <Tooltip key={value}>
                                 <TooltipTrigger
                                     render={
                                         <TabsTrigger
                                             value={value}
-                                            className="editorial-transition h-9 gap-2 rounded-[16px] px-4 text-sm text-[var(--editorial-body)] data-[selected]:border data-[selected]:border-[var(--editorial-primary-ring)] data-[selected]:bg-[var(--editorial-primary-selected)] data-[selected]:text-[var(--primary)]"
+                                            className="editorial-transition h-9 gap-1.5 rounded-xl px-2.5 text-xs whitespace-nowrap text-[var(--editorial-body)] data-[selected]:border data-[selected]:border-[var(--editorial-primary-ring)] data-[selected]:bg-[var(--editorial-primary-selected)] data-[selected]:text-[var(--primary)] sm:gap-2 sm:px-4 sm:text-sm"
                                         >
                                             {label}
                                             <span className="text-xs tabular-nums text-[var(--editorial-subtle)]">
@@ -76,15 +77,16 @@ export function SubmissionsToolbar({
                 </Tabs>
             </TooltipProvider>
 
-            <div className="flex items-center gap-3">
+            <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:gap-3">
                 {hasSelection ? (
                     <>
-                        <span className="text-sm tabular-nums text-[var(--editorial-body)]">
+                        <span className="text-xs tabular-nums text-[var(--editorial-body)] sm:text-sm">
                             {selectedCount} of {totalCount} selected
                         </span>
                         <Button
                             variant="ghost"
-                            className="editorial-transition h-10 gap-1.5 rounded-[16px] px-4 text-sm text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] active:scale-[.98]"
+                            size="lg"
+                            className="text-sm"
                             onClick={onClearSelection}
                         >
                             <X className="h-4 w-4" />
@@ -92,7 +94,7 @@ export function SubmissionsToolbar({
                         </Button>
                     </>
                 ) : (
-                    <span className="text-sm tabular-nums text-[var(--editorial-body)]">
+                    <span className="text-xs tabular-nums text-[var(--editorial-body)] sm:text-sm">
                         {totalCount} {totalCount === 1 ? "response" : "responses"}
                     </span>
                 )}
@@ -102,7 +104,8 @@ export function SubmissionsToolbar({
                         render={
                             <Button
                                 variant="outline"
-                                className="editorial-transition h-10 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--secondary)] px-4 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                                size="lg"
+                                className="text-sm"
                                 disabled={totalCount === 0}
                             >
                                 <Download className="h-4 w-4" />

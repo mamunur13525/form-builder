@@ -53,12 +53,12 @@ export function DuplicateFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="editorial editorial-shadow rounded-2xl bg-[var(--popover)] px-7 py-7 ring-0 w-full">
+      <DialogContent className="editorial editorial-shadow rounded-2xl bg-[var(--popover)] p-6 ring-0 sm:px-7 sm:py-7 w-full">
         <DialogHeader>
-          <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+          <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
             Duplicate Form
           </DialogTitle>
-          <DialogDescription className="text-base leading-6 text-[var(--editorial-body)]">
+          <DialogDescription className="text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
             Enter a name for the duplicated form. The new form will be created
             as a draft.
           </DialogDescription>
@@ -84,19 +84,21 @@ export function DuplicateFormDialog({
           />
         </div>
 
-        <DialogFooter className="gap-3">
+        <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:justify-end">
           <Button
-            variant="ghost"
-            onClick={() => handleOpenChange(false)}
-            disabled={duplicateFormMutation.isPending}
-          >
-            Cancel
+                variant="ghost"
+                onClick={() => handleOpenChange(false)}
+                disabled={duplicateFormMutation.isPending}
+                className="w-full sm:w-auto"
+            >
+                Cancel
           </Button>
           <Button
-            onClick={handleDuplicate}
-            disabled={duplicateFormMutation.isPending || !title.trim()}
-          >
-            {duplicateFormMutation.isPending ? "Duplicating..." : "Duplicate"}
+                onClick={handleDuplicate}
+                disabled={duplicateFormMutation.isPending || !title.trim()}
+                className="w-full sm:w-auto"
+            >
+                {duplicateFormMutation.isPending ? "Duplicating..." : "Duplicate"}
           </Button>
         </DialogFooter>
       </DialogContent>

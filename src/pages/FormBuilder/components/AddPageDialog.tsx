@@ -3,7 +3,7 @@ import { FileText } from "lucide-react"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "../../../components/ui/input"
-import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, type PageType } from "../../../shared/constants/form-types"
+import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, PAGE_TYPE_COLORS, type PageType } from "../../../shared/constants/form-types"
 import type { FormPage } from "../../../shared/types/common"
 import { defaultOptionsForType, defaultSettingsForType } from "@/features/forms/model/page-defaults"
 import type { LucideIcon } from "lucide-react"
@@ -80,14 +80,14 @@ export function AddPageDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="editorial editorial-shadow w-full max-w-3xl rounded-2xl border-[var(--border)] bg-[var(--popover)] p-10"
+            className="editorial editorial-shadow w-full max-w-3xl rounded-2xl border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
         >
             <DialogContent>
                 <DialogHeader className="mb-6">
-                    <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+                    <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
                         Add a Page
                     </DialogTitle>
-                    <DialogDescription className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
+                    <DialogDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
                         Choose the type of page you want to add to your form.
                     </DialogDescription>
                 </DialogHeader>
@@ -99,7 +99,7 @@ export function AddPageDialog({
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-[52px] rounded-lg border-[var(--input)] bg-[var(--card)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
+                        className="h-12 rounded-lg border-[var(--input)] bg-[var(--card)] px-6 text-sm placeholder:text-[var(--editorial-subtle)] sm:h-[52px] sm:text-base"
                         autoFocus={true}
                     />
                 </div>
@@ -117,7 +117,7 @@ export function AddPageDialog({
                                     onClick={() => addPage(pt.type)}
                                     className="editorial-transition group flex items-center gap-3 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--card)] p-3 text-left hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-selected)] hover:shadow-[0_4px_10px_rgba(0,0,0,.04)] active:translate-y-0 active:scale-[.98]"
                                 >
-                                    <div className="editorial-transition flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)] group-hover:border-[var(--editorial-primary-ring)] group-hover:bg-[var(--card)] group-hover:text-[var(--primary)]">
+                                    <div className={`editorial-transition flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] border border-[var(--editorial-border-light)] bg-gradient-to-br ${PAGE_TYPE_COLORS[pt.type]} group-hover:brightness-110`}>
                                         <Icon className="h-5 w-5" />
                                     </div>
                                     <span className="text-base leading-tight text-[var(--foreground)]">
@@ -138,11 +138,11 @@ export function AddPageDialog({
                         </div>
                     )}
                 </div>
-                <DialogFooter className="mt-8">
+                <DialogFooter className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <Button
                         variant="outline"
                         onClick={() => onOpenChange(false)}
-                        className=" border-[var(--border)] bg-[var(--card)]"
+                        className="border-[var(--border)] bg-[var(--card)] w-full sm:w-auto"
                     >
                         Cancel
                     </Button>

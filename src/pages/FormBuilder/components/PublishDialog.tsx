@@ -85,9 +85,6 @@ const CONFIRM_COPY: Record<
   },
 };
 
-/** Green publish CTA accent — matches the Publish button in FormBuilderTopBar. */
-const PUBLISH_BUTTON_CLASS = "border-0 from-[#4a7f11] to-[#355b0c]";
-
 export function PublishDialog({
   open,
   onOpenChange,
@@ -133,7 +130,6 @@ export function PublishDialog({
     publishForm,
     onIsPublishedChange,
     onHasUnpublishedChangesChange,
-    closeDialog,
   ]);
 
   // Takes the form offline. The draft content is untouched, so the pending
@@ -156,7 +152,6 @@ export function PublishDialog({
     unpublishForm,
     onIsPublishedChange,
     onHasUnpublishedChangesChange,
-    closeDialog,
   ]);
 
   // Throws away draft edits and reverts to the live version. The server
@@ -206,7 +201,7 @@ export function PublishDialog({
       className="editorial editorial-shadow max-w-xl overflow-hidden rounded-2xl border-[var(--border)] bg-[var(--popover)] p-0"
     >
       <DialogContent>
-        <div className="px-10 pt-10">
+        <div className="px-6 pt-6 sm:px-10 sm:pt-10">
           {/* Status pill. Muted, warm tints keep the palette calm — the coral
               accent stays reserved for the primary action. */}
           <span
@@ -239,10 +234,10 @@ export function PublishDialog({
           </span>
 
           <DialogHeader className="mt-6 mb-0 space-y-2">
-            <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+            <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
               {confirmCopy?.title ?? title ?? copy.title}
             </DialogTitle>
-            <DialogDescription className="text-base leading-6 text-[var(--editorial-body)]">
+            <DialogDescription className="text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
               {confirmCopy?.body ?? description ?? copy.body}
             </DialogDescription>
           </DialogHeader>
@@ -251,7 +246,7 @@ export function PublishDialog({
         {/* The confirmation step replaces the body entirely to keep focus on
             the decision being made. */}
         {!confirming && (
-          <div className="space-y-6 px-10 pt-8">
+          <div className="space-y-6 px-6 pt-6 sm:px-10 sm:pt-8">
             {state === "pending" && (
               <Alert className="rounded-[18px] border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)]">
                 <AlertCircle className="text-[var(--editorial-purple)]" />
@@ -305,8 +300,8 @@ export function PublishDialog({
 
         <DialogFooter
           className={cn(
-            "mt-10 items-center gap-3 border-t border-[var(--editorial-border-light)] bg-[var(--secondary)] px-10 py-6",
-            !confirming && state !== "draft" && "justify-between",
+            "mt-10 flex flex-col gap-3 border-t border-[var(--editorial-border-light)] bg-[var(--secondary)] px-4 py-5 sm:flex-row sm:items-center sm:gap-3 sm:px-10 sm:py-6",
+            !confirming && state !== "draft" && "sm:justify-between",
           )}
         >
           {confirming ? (
@@ -315,6 +310,7 @@ export function PublishDialog({
                 variant="ghost"
                 onClick={() => setConfirming(null)}
                 disabled={isBusy}
+                className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)]"
               >
                 Keep it
               </Button>
@@ -324,7 +320,7 @@ export function PublishDialog({
                   confirming === "unpublish" ? handleUnpublish : handleDiscard
                 }
                 disabled={isBusy}
-                className="border border-[var(--destructive)]/25 bg-[var(--destructive)]/10"
+                className="w-full sm:w-auto border border-[var(--destructive)]/25 bg-[var(--destructive)]/10"
               >
                 {isBusy && <Loader2 className="animate-spin" />}
                 {isBusy ? "Working…" : confirmCopy?.action}
@@ -336,14 +332,14 @@ export function PublishDialog({
                 variant="ghost"
                 onClick={closeDialog}
                 disabled={isBusy}
-                className="border border-[var(--border)] bg-[var(--card)]"
+                className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)]"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handlePublish}
                 disabled={isBusy}
-                className={PUBLISH_BUTTON_CLASS}
+                className="w-full sm:w-auto bg-gradient-to-b from-[#4a7f11] to-[#355b0c] text-white"
               >
                 {busy === "publish" && <Loader2 className="animate-spin" />}
                 {busy === "publish" ? "Publishing…" : "Publish form"}
@@ -353,19 +349,19 @@ export function PublishDialog({
             <>
               <Button
                 variant="ghost"
-                className="border border-[var(--border)] bg-[var(--card)] hover:text-[var(--destructive)]"
+                className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)] hover:text-[var(--destructive)]"
                 onClick={() => setConfirming("discard")}
                 disabled={isBusy}
               >
                 <Undo2 />
                 Discard changes
               </Button>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
                 <Button
                   variant="outline"
                   onClick={onOpenForm}
                   disabled={isBusy}
-                  className="border border-[var(--border)] bg-[var(--card)]"
+                  className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)]"
                 >
                   <ExternalLink />
                   Open form
@@ -373,7 +369,7 @@ export function PublishDialog({
                 <Button
                   onClick={handlePublish}
                   disabled={isBusy}
-                  className={PUBLISH_BUTTON_CLASS}
+                  className="w-full sm:w-auto bg-gradient-to-b from-[#4a7f11] to-[#355b0c] text-white"
                 >
                   {busy === "publish" && <Loader2 className="animate-spin" />}
                   {busy === "publish" ? "Publishing…" : "Publish changes"}
@@ -384,24 +380,25 @@ export function PublishDialog({
             <>
               <Button
                 variant="ghost"
-                className="border border-[var(--border)] bg-[var(--card)] hover:text-[var(--destructive)]"
+                className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)] hover:text-[var(--destructive)]"
                 onClick={() => setConfirming("unpublish")}
                 disabled={isBusy}
               >
                 Unpublish
               </Button>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
                 <Button
                   variant="ghost"
                   onClick={closeDialog}
                   disabled={isBusy}
+                  className="w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={onOpenForm}
                   disabled={isBusy}
-                  className="bg-[var(--primary)] text-white"
+                  className="w-full sm:w-auto bg-[var(--primary)] text-white"
                 >
                   <ExternalLink />
                   Open form

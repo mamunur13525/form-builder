@@ -1,5 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Eye, BarChart3, EllipsisVertical } from "lucide-react";
+import {
+    BarChart3,
+    Copy,
+    EllipsisVertical,
+    List,
+    Puzzle,
+    Settings,
+    Share2,
+    Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,39 +45,39 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
   const menuItems: MenuItemData[] = [
     {
       label: "View Responses",
-      icon: BarChart3,
+      icon: List,
       onClick: () =>
-        navigate(`/form-response/6a74af911e8b59bb1c8c4152/submissions`),
+        navigate(`/form-response/${form.id}/submissions`),
     },
     {
-      label: "Form Analytics",
+      label: "Analytics",
       icon: BarChart3,
       onClick: () => navigate(`/form-response/${form.id}/analytics`),
     },
     {
-      label: "Form Settings",
-      icon: FileText,
+      label: "Settings",
+      icon: Settings,
       onClick: () => navigate(`/form-settings/${form.id}`),
     },
     {
-      label: "Form Share",
-      icon: Eye,
+      label: "Share Form",
+      icon: Share2,
       onClick: () => navigate(`/form-share/${form.id}`),
     },
     {
-      label: "Form Integrations",
-      icon: FileText,
+      label: "Integrations",
+      icon: Puzzle,
       onClick: () => navigate(`/form-integrate/${form.id}`),
     },
     { isSeparator: true },
     {
-      label: "Duplicate Form",
-      icon: FileText,
+      label: "Duplicate",
+      icon: Copy,
       onClick: () => onDuplicateClick(form.id),
     },
     {
-      label: "Delete Form",
-      icon: FileText,
+      label: "Delete",
+      icon: Trash2,
       variant: "destructive" as const,
       onClick: () => onDeleteClick(form.id),
     },

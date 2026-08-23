@@ -68,51 +68,51 @@ export function DashboardPage() {
         onOpenChange={setCreateDialogOpen}
       />
 
-      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
             <CardTitle className="editorial-eyebrow text-[var(--editorial-subtle)]">
               Total Forms
             </CardTitle>
-            <FileText className="h-5 w-5 text-[var(--editorial-subtle)]" />
+            <FileText className="h-4 w-4 text-[var(--editorial-subtle)] sm:h-5 sm:w-5" />
           </CardHeader>
-          <CardContent >
-            <div className="font-display text-[32px] leading-none sm:text-[40px] text-[var(--foreground)]">
+          <CardContent className="p-4 sm:p-6">
+            <div className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
               {forms.length}
             </div>
-            <p className="mt-3 text-sm text-[var(--editorial-body)]">
+            <p className="mt-2 text-[13px] text-[var(--editorial-body)] sm:mt-3 sm:text-sm">
               {publishedForms} published, {draftForms} drafts
             </p>
           </CardContent>
         </Card>
         <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
             <CardTitle className="editorial-eyebrow text-[var(--editorial-subtle)]">
               Total Responses
             </CardTitle>
-            <BarChart3 className="h-5 w-5 text-[var(--editorial-subtle)]" />
+            <BarChart3 className="h-4 w-4 text-[var(--editorial-subtle)] sm:h-5 sm:w-5" />
           </CardHeader>
-          <CardContent>
-            <div className="font-display text-[32px] leading-none sm:text-[40px] text-[var(--foreground)]">
+          <CardContent className="p-4 sm:p-6">
+            <div className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
               {totalResponses}
             </div>
-            <p className="mt-3 text-sm text-[var(--editorial-body)]">
+            <p className="mt-2 text-[13px] text-[var(--editorial-body)] sm:mt-3 sm:text-sm">
               Across all forms
             </p>
           </CardContent>
         </Card>
         <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
             <CardTitle className="editorial-eyebrow text-[var(--editorial-subtle)]">
               Published
             </CardTitle>
-            <Eye className="h-5 w-5 text-[var(--editorial-subtle)]" />
+            <Eye className="h-4 w-4 text-[var(--editorial-subtle)] sm:h-5 sm:w-5" />
           </CardHeader>
-          <CardContent>
-            <div className="font-display text-[32px] leading-none sm:text-[40px] text-[var(--foreground)]">
+          <CardContent className="p-4 sm:p-6">
+            <div className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
               {publishedForms}
             </div>
-            <p className="mt-3 text-sm text-[var(--editorial-body)]">
+            <p className="mt-2 text-[13px] text-[var(--editorial-body)] sm:mt-3 sm:text-sm">
               Forms live and accepting responses
             </p>
           </CardContent>

@@ -22,7 +22,7 @@ export function SettingsSection({
     children: ReactNode
 }) {
     return (
-        <section className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <section className="editorial-shadow-sm overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
             <header className="border-b border-[var(--editorial-border-light)] px-5 py-4">
                 <h2 className="text-[15px] font-semibold text-[var(--foreground)]">
                     {title}

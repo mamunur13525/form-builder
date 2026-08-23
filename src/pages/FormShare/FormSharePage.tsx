@@ -22,6 +22,7 @@ import { TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "../FormBuilder/components/set
 import { PublishDialog } from "../FormBuilder/components/PublishDialog"
 import { useFormContext } from "@/features/forms/hooks/useFormContext"
 import { cn } from "@/lib/utils"
+import { Alert } from "@/components/ui/alert"
 
 /* -------------------------------------------------------------------------- */
 /*  Brand marks — this lucide build ships no social icons, so we inline crisp  */
@@ -178,65 +179,87 @@ export function FormSharePage() {
     }
 
     return (
-        <div className="editorial mx-auto max-w-4xl space-y-6 px-8 pt-12 pb-16">
+        <div className="editorial mx-auto max-w-[1160px] space-y-5 px-4 pt-6 pb-12 sm:space-y-6 sm:px-6 sm:pt-10 lg:px-8 lg:pb-16">
             {hasUnpublishedChanges && (
-                <div className="flex items-center justify-between gap-4 rounded-[18px] border border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                        <Info className="h-5 w-5 text-[var(--editorial-purple)]" />
-                        <p className="text-base text-[var(--foreground)]">
+                <Alert
+                    variant={"destructive"}
+                    className="flex flex-col items-start gap-2 rounded-xl sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                >
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                        <Info className="h-5 w-5 shrink-0 text-[var(--editorial-purple)]" />
+                        <p className="text-sm text-[var(--foreground)] sm:text-base">
                             You have some unpublished changes.
                         </p>
                     </div>
                     <Button
                         variant="link"
                         onClick={() => setShowPublishDialog(true)}
-                        className="h-auto p-0 text-base font-medium text-[var(--editorial-purple)]"
+                        className="h-auto shrink-0 p-0 text-sm font-medium text-[var(--editorial-purple)] sm:text-base"
                     >
                         Publish Now →
                     </Button>
-                </div>
+                </Alert>
             )}
 
             <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
-                <CardContent className="p-8">
+                <CardContent className="p-5 sm:p-8">
                     <Tabs defaultValue="share" className="w-full">
-                        <TabsList className={cn(TAB_LIST_CLASS, "mb-8")}>
-                            <TabsTrigger value="share" className={TAB_TRIGGER_CLASS}>
-                                <Share2 className="h-5 w-5" /> Share link
+                        <TabsList className={cn(TAB_LIST_CLASS, "mb-6 sm:mb-8")}>
+                            <TabsTrigger
+                                value="share"
+                                className={cn(TAB_TRIGGER_CLASS, "gap-1.5 px-1.5 text-xs sm:gap-2 sm:px-3 sm:text-sm")}
+                            >
+                                <Share2 className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+                                <span className="sm:hidden">Link</span>
+                                <span className="hidden sm:inline">Share link</span>
                             </TabsTrigger>
-                            <TabsTrigger value="website" className={TAB_TRIGGER_CLASS}>
-                                <Code className="h-5 w-5" /> Embed in website
+                            <TabsTrigger
+                                value="website"
+                                className={cn(TAB_TRIGGER_CLASS, "gap-1.5 px-1.5 text-xs sm:gap-2 sm:px-3 sm:text-sm")}
+                            >
+                                <Code className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+                                <span className="sm:hidden">Website</span>
+                                <span className="hidden sm:inline">Embed in website</span>
                             </TabsTrigger>
-                            <TabsTrigger value="email" className={TAB_TRIGGER_CLASS}>
-                                <Mail className="h-5 w-5" /> Embed in email
+                            <TabsTrigger
+                                value="email"
+                                className={cn(TAB_TRIGGER_CLASS, "gap-1.5 px-1.5 text-xs sm:gap-2 sm:px-3 sm:text-sm")}
+                            >
+                                <Mail className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+                                <span className="sm:hidden">Email</span>
+                                <span className="hidden sm:inline">Embed in email</span>
                             </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="share">
                             <div className="mx-auto flex max-w-xl flex-col items-center text-center">
-                                <div className="flex w-full items-center gap-3">
+                                <div className="flex w-full flex-col items-stretch gap-2.5 sm:flex-row sm:items-center sm:gap-3">
                                     <Input
                                         value={formUrl}
                                         readOnly
                                         onFocus={(e) => e.currentTarget.select()}
-                                        className="h-[52px] flex-1 rounded-lg border-[var(--input)] bg-[var(--secondary)] px-6 text-center text-base"
+                                        className=" flex-1 rounded-lg border-[var(--input)] bg-[var(--secondary)] px-4 text-center text-sm sm:px-6 sm:text-base"
                                     />
-                                    <Button onClick={() => copy("link", formUrl)}>
-                                        {copiedKey === "link" ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                                    <Button
+                                        size="lg"
+                                        onClick={() => copy("link", formUrl)}
+                                        className="rounded-lg shrink-0 justify-center"
+                                    >
+                                        {copiedKey === "link" ? <Check className="h-4! w-4!" /> : <Copy className="h-4! w-4!" />}
                                         {copiedKey === "link" ? "Copied" : "Copy Link"}
                                     </Button>
                                 </div>
-                                <p className="mt-3 text-sm leading-5 text-[var(--editorial-subtle)]">
+                                <p className="mt-3 text-xs leading-5 text-[var(--editorial-subtle)] sm:text-sm">
                                     Make sure your form is published before you share it to the world.
                                 </p>
 
-                                <div className="mt-8 flex w-full items-center gap-4">
+                                <div className="mt-6 flex w-full items-center gap-4 sm:mt-8">
                                     <span className="h-px flex-1 bg-[var(--editorial-border-light)]" />
-                                    <p className="text-sm font-medium text-[var(--editorial-subtle)]">Share on</p>
+                                    <p className="text-xs font-medium text-[var(--editorial-subtle)] sm:text-sm">Share on</p>
                                     <span className="h-px flex-1 bg-[var(--editorial-border-light)]" />
                                 </div>
 
-                                <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
+                                <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 sm:mt-6">
                                     {shareTargets.map(({ key, label, icon: Icon, hover, action }) => (
                                         <Button
                                             key={key}
@@ -260,16 +283,16 @@ export function FormSharePage() {
 
                         <TabsContent value="website">
                             <div className="mx-auto flex max-w-xl flex-col items-center text-center">
-                                <p className="text-base text-[var(--editorial-body)]">
+                                <p className="text-sm text-[var(--editorial-body)] sm:text-base">
                                     Paste this snippet into your site's HTML to embed the form inline.
                                 </p>
-                                <pre className="mt-5 w-full overflow-x-auto rounded-lg border border-[var(--input)] bg-[var(--secondary)] px-5 py-4 text-left text-sm text-[var(--foreground)]">
+                                <pre className="mt-4 w-full overflow-x-auto rounded-lg border border-[var(--input)] bg-[var(--secondary)] px-4 py-3.5 text-left text-xs text-[var(--foreground)] sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
                                     <code>{iframeCode}</code>
                                 </pre>
                                 <Button
-                                    variant="outline"
+                                    size="lg"
                                     onClick={() => copy("iframe", iframeCode)}
-                                    className="mt-4"
+                                    className="mt-4 w-full justify-center sm:w-auto"
                                 >
                                     {copiedKey === "iframe" ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                                     {copiedKey === "iframe" ? "Copied" : "Copy embed code"}
@@ -279,16 +302,16 @@ export function FormSharePage() {
 
                         <TabsContent value="email">
                             <div className="mx-auto flex max-w-xl flex-col items-center text-center">
-                                <p className="text-base text-[var(--editorial-body)]">
+                                <p className="text-sm text-[var(--editorial-body)] sm:text-base">
                                     Add this button link to an email so recipients can open the form.
                                 </p>
-                                <pre className="mt-5 w-full overflow-x-auto rounded-lg border border-[var(--input)] bg-[var(--secondary)] px-5 py-4 text-left text-sm text-[var(--foreground)]">
+                                <pre className="mt-4 w-full overflow-x-auto rounded-lg border border-[var(--input)] bg-[var(--secondary)] px-4 py-3.5 text-left text-xs text-[var(--foreground)] sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
                                     <code>{emailCode}</code>
                                 </pre>
                                 <Button
-                                    variant="outline"
+                                size="lg"
                                     onClick={() => copy("email-code", emailCode)}
-                                    className="mt-4"
+                                    className="mt-4 w-full justify-center sm:w-auto"
                                 >
                                     {copiedKey === "email-code" ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                                     {copiedKey === "email-code" ? "Copied" : "Copy email link"}
@@ -300,29 +323,31 @@ export function FormSharePage() {
             </Card>
 
             <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
-                <CardHeader className="flex flex-row items-center justify-between gap-8 p-8">
+                <CardHeader className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-8">
                     <div>
-                        <CardTitle className="font-display text-2xl text-[var(--foreground)]">
+                        <CardTitle className="font-display text-xl text-[var(--foreground)] sm:text-2xl">
                             Link Settings
                         </CardTitle>
-                        <CardDescription className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
+                        <CardDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
                             Update the form title, share image, and favicon that appear when this link is opened or shared.
                         </CardDescription>
                     </div>
-                    <Button>Open Link Settings</Button>
+                    <Button size="lg" className="w-full shrink-0 justify-center sm:w-auto">
+                        Open Link Settings
+                    </Button>
                 </CardHeader>
             </Card>
 
             <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
-                <CardHeader className="flex flex-row items-center justify-between p-8">
+                <CardHeader className="flex flex-col items-start justify-between p-5 sm:flex-row sm:items-center sm:p-8">
                     <div>
-                        <CardTitle className="flex items-center gap-3 font-display text-2xl text-[var(--foreground)]">
+                        <CardTitle className="flex flex-wrap items-center gap-2 font-display text-xl text-[var(--foreground)] sm:gap-3 sm:text-2xl">
                             Custom Domain
-                            <Badge className="rounded-full border border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--editorial-purple)]">
+                            <Badge className="rounded-full border border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--editorial-purple)] sm:px-3 sm:py-1 sm:text-[12px]">
                                 PRO
                             </Badge>
                         </CardTitle>
-                        <CardDescription className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
+                        <CardDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
                             Please buy a PRO plan to add your own custom domain.
                         </CardDescription>
                     </div>
@@ -332,7 +357,7 @@ export function FormSharePage() {
             <Dialog
                 open={qrOpen}
                 onOpenChange={setQrOpen}
-                className="editorial editorial-shadow-md max-w-md rounded-2xl border-[var(--border)] bg-[var(--popover)] p-8"
+                className="editorial editorial-shadow-md w-[calc(100%-2rem)] max-w-md rounded-2xl border-[var(--border)] bg-[var(--popover)] p-5 sm:p-8"
             >
                 <button
                     type="button"
@@ -343,17 +368,17 @@ export function FormSharePage() {
                     <X className="h-5 w-5" />
                 </button>
 
-                <DialogHeader className="mb-6 text-center">
-                    <DialogTitle className="font-display text-2xl text-[var(--foreground)]">
+                <DialogHeader className="mb-5 text-center sm:mb-6">
+                    <DialogTitle className="font-display text-xl text-[var(--foreground)] sm:text-2xl">
                         Scan to open
                     </DialogTitle>
-                    <DialogDescription className="opacity-0 mt-2 text-base leading-6 text-[var(--editorial-body)]">
+                    <DialogDescription className="opacity-0 mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
                         .
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="mx-auto flex w-fit items-center justify-center rounded-2xl border border-[var(--editorial-border-light)] bg-white p-4">
-                    <div className="relative h-56 w-56">
+                <div className="mx-auto flex w-fit items-center justify-center rounded-2xl border border-[var(--editorial-border-light)] bg-white p-3 sm:p-4">
+                    <div className="relative h-44 w-44 sm:h-56 sm:w-56">
                         {!qrLoaded && (
                             <div className="absolute inset-0 animate-pulse rounded-lg bg-[var(--secondary)]" />
                         )}
@@ -364,21 +389,29 @@ export function FormSharePage() {
                             height={224}
                             onLoad={() => setQrLoaded(true)}
                             className={cn(
-                                "h-56 w-56 transition-opacity duration-200",
+                                "h-44 w-44 transition-opacity duration-200 sm:h-56 sm:w-56",
                                 qrLoaded ? "opacity-100" : "opacity-0",
                             )}
                         />
                     </div>
                 </div>
 
-                <p className="mt-5 truncate text-center text-sm text-[var(--editorial-subtle)]">{formUrl}</p>
+                <p className="mt-4 truncate text-center text-xs text-[var(--editorial-subtle)] sm:mt-5 sm:text-sm">{formUrl}</p>
 
-                <div className="mt-6 flex items-center justify-center gap-3">
-                    <Button variant="outline" onClick={() => copy("qr-link", formUrl)}>
+                <div className="mt-5 flex flex-col items-stretch justify-center gap-2.5 sm:mt-6 sm:flex-row sm:items-center sm:gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={() => copy("qr-link", formUrl)}
+                        className="justify-center"
+                    >
                         {copiedKey === "qr-link" ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                         {copiedKey === "qr-link" ? "Copied" : "Copy link"}
                     </Button>
-                    <Button onClick={handleDownloadQr} disabled={downloading}>
+                    <Button
+                        onClick={handleDownloadQr}
+                        disabled={downloading}
+                        className="justify-center"
+                    >
                         <Download className="h-5 w-5" />
                         {downloading ? "Preparing…" : "Download PNG"}
                     </Button>

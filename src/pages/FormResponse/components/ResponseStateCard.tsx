@@ -14,14 +14,14 @@ interface ResponseStateCardProps {
 export function ResponseStateCard({ loading = false, message, action }: ResponseStateCardProps) {
     return (
         <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
-            <CardContent className="py-16 text-center">
+            <CardContent className="px-5 py-12 text-center sm:py-16">
                 <div className="flex items-center justify-center gap-2">
                     {loading && (
-                        <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />
+                        <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[var(--primary)]" />
                     )}
-                    <p className="text-base text-[var(--editorial-subtle)]">{message}</p>
+                    <p className="text-sm text-[var(--editorial-subtle)] sm:text-base">{message}</p>
                 </div>
-                {action && <div className="mt-8">{action}</div>}
+                {action && <div className="mt-6 sm:mt-8">{action}</div>}
             </CardContent>
         </Card>
     )

@@ -29,7 +29,7 @@ export function CategoryTabs({
     return (
         <>
             {/* Mobile: horizontally scrollable pill strip pinned to the top. */}
-            <nav className="sticky top-0 z-20 border-b border border-[var(--border)] bg-[var(--card)]/95 backdrop-blur supports-backdrop-filter:bg-[var(--card)]/80 lg:hidden rounded-2xl">
+            <nav className="sticky top-0 z-20 border border-[var(--border)] bg-[var(--card)]/95 backdrop-blur supports-backdrop-filter:bg-[var(--card)]/80 lg:hidden rounded-xl">
                 <div className="flex items-center gap-3 overflow-x-auto py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <Button
                         size="sm"

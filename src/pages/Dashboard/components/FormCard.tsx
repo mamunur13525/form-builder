@@ -1,5 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Eye, BarChart3, EllipsisVertical } from "lucide-react";
+import {
+    BarChart3,
+    Copy,
+    EllipsisVertical,
+    List,
+    Puzzle,
+    Settings,
+    Share2,
+    Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,13 +30,13 @@ interface FormCardProps {
 
 type MenuItemData =
   | {
-      label: string;
-      icon: React.ForwardRefExoticComponent<
-        React.PropsWithRef<React.SVGProps<SVGSVGElement>>
-      >;
-      onClick: () => void;
-      variant?: ComponentProps<typeof DropdownMenuItem>["variant"];
-    }
+    label: string;
+    icon: React.ForwardRefExoticComponent<
+      React.PropsWithRef<React.SVGProps<SVGSVGElement>>
+    >;
+    onClick: () => void;
+    variant?: ComponentProps<typeof DropdownMenuItem>["variant"];
+  }
   | { isSeparator: true };
 
 export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProps) {
@@ -36,39 +45,39 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
   const menuItems: MenuItemData[] = [
     {
       label: "View Responses",
-      icon: BarChart3,
+      icon: List,
       onClick: () =>
-        navigate(`/form-response/6a74af911e8b59bb1c8c4152/submissions`),
+        navigate(`/form-response/${form.id}/submissions`),
     },
     {
-      label: "Form Analytics",
+      label: "Analytics",
       icon: BarChart3,
       onClick: () => navigate(`/form-response/${form.id}/analytics`),
     },
     {
-      label: "Form Settings",
-      icon: FileText,
+      label: "Settings",
+      icon: Settings,
       onClick: () => navigate(`/form-settings/${form.id}`),
     },
     {
-      label: "Form Share",
-      icon: Eye,
+      label: "Share Form",
+      icon: Share2,
       onClick: () => navigate(`/form-share/${form.id}`),
     },
     {
-      label: "Form Integrations",
-      icon: FileText,
+      label: "Integrations",
+      icon: Puzzle,
       onClick: () => navigate(`/form-integrate/${form.id}`),
     },
     { isSeparator: true },
     {
-      label: "Duplicate Form",
-      icon: FileText,
+      label: "Duplicate",
+      icon: Copy,
       onClick: () => onDuplicateClick(form.id),
     },
     {
-      label: "Delete Form",
-      icon: FileText,
+      label: "Delete",
+      icon: Trash2,
       variant: "destructive" as const,
       onClick: () => onDeleteClick(form.id),
     },
@@ -76,7 +85,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
 
   return (
     <Card
-      className="editorial editorial-transition editorial-shadow-sm cursor-pointer rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)] flex flex-col justify-between"
+      className="editorial editorial-transition editorial-shadow-sm cursor-pointer border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)] flex flex-col justify-between"
       onClick={() => navigate(`/form-builder/${form.id}`)}
     >
       <CardHeader className="p-0">
@@ -97,7 +106,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
       </CardHeader>
       <CardContent className="flex items-end justify-between p-0 pt-6">
         <div className="flex gap-2 text-sm text-[var(--editorial-body)]">
-          <span>{form.fields?.length || 0} pages</span>
+          <span>{form.pages?.length || 0} pages</span>
           <span className="text-[var(--editorial-disabled)]">•</span>
           <span>{form.responses_count || 0} responses</span>
         </div>
@@ -108,7 +117,6 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
                 variant="ghost"
                 size="icon"
                 aria-label="Form actions"
-                className="editorial-transition h-9 w-9 rounded-xl border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:scale-[.98]"
               />
             }
             onClick={(e) => e.stopPropagation()}

@@ -9,6 +9,7 @@ export const ROUTES = {
     SETTINGS: "/settings",
     PRICING: "/pricing",
     FORM_BUILDER: "/form-builder/:formId",
+    FORM_LOGIC: "/form-logic/:formId",
     FORM_SETTINGS: "/form-settings/:formId",
     FORM_INTEGRATIONS: "/form-integrate/:formId",
     FORM_SHARE: "/form-share/:formId",

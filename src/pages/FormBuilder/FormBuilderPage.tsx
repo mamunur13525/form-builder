@@ -1,24 +1,34 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
 } from "../../components/ui/resizable";
-import type { FormField, IFormTheme } from "../../shared/types/common";
+import type { FormPage, EndPage, IFormTheme } from "../../shared/types/common";
 import {
-  createField,
-  updateField,
-  deleteField,
-  duplicateField,
-  reorderFields,
-} from "../../entities/form/api/field.api";
+  createPage,
+  updatePage as updatePageApi,
+  deletePage as deletePageApi,
+  duplicatePage as duplicatePageApi,
+  reorderPages as reorderPagesApi,
+} from "../../entities/form/api/page.api";
+import {
+  createEndPage as createEndPageApi,
+  updateEndPage as updateEndPageApi,
+  deleteEndPage as deleteEndPageApi,
+  reorderEndPages as reorderEndPagesApi,
+} from "../../entities/form/api/end-page.api";
 import { updateFormTheme } from "@/entities/form/api/form.api";
 import { useDebounce } from "../../shared/hooks/useDebounce";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
+import { useFormSettings } from "@/features/forms/hooks/useFormSettings";
+import { buildVariableItems } from "@/shared/components/pages";
 import { FormBuilderSidebar } from "./components/FormBuilderSidebar";
 import { PageContentEditor } from "./components/PageContentEditor/PageContentEditor";
+import { EndPageContentEditor } from "./components/EndPage/EndPageContentEditor";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { EndPageSettingsPanel } from "./components/EndPage/EndPageSettingsPanel";
 import { AddPageDialog } from "./components/AddPageDialog";
 import PageContentTopbar from "./components/PageContentEditor/PageContentTopbar";
 import { Drawer } from "@/components/ui/drawer";
@@ -41,18 +51,36 @@ export function FormBuilderPage() {
     updateFormData,
   } = useFormContext();
 
-  const [pages, setPages] = useState<FormField[]>([]);
+  // Variables (from the FormSettings page) offered in the @ menu inside the
+  // editable label/helper-text, and resolved to values in the preview.
+  const { data: settingsData } = useFormSettings(formId ?? "");
+  const variableItems = useMemo(
+    () => buildVariableItems(settingsData?.settings.variables, form?.title),
+    [settingsData?.settings.variables, form?.title],
+  );
+
+  const [pages, setPages] = useState<FormPage[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
+  const [endPages, setEndPages] = useState<EndPage[]>([]);
+  const [selectedEndPageIndex, setSelectedEndPageIndex] = useState(0);
+  // True while a new end page is being created on the backend, so the list can
+  // show a loading placeholder until the created record comes back.
+  const [isAddingEndPage, setIsAddingEndPage] = useState(false);
+  // Which list the middle editor and settings panel follow.
+  const [selectedKind, setSelectedKind] = useState<"page" | "endPage">("page");
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
-  const pendingFieldUpdateRef = useRef<
-    { fieldId: string; data: Record<string, unknown> } | null
+  const pendingPageUpdateRef = useRef<
+    { pageId: string; data: Record<string, unknown> } | null
+  >(null);
+  const pendingEndPageUpdateRef = useRef<
+    { endPageId: string; data: Record<string, unknown> } | null
   >(null);
   const pendingReorderRef = useRef<string[] | null>(null);
+  const pendingEndPageReorderRef = useRef<string[] | null>(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const [showPagesDrawer, setShowPagesDrawer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   const [designDrawerOpen, setDesignDrawerOpen] = useState(false);
-  const [logicDialogOpen, setLogicDialogOpen] = useState(false);
   const syncedKeyRef = useRef<string | undefined>(undefined);
   const isDesktop = useIsDesktop();
 
@@ -70,39 +98,46 @@ export function FormBuilderPage() {
 
   // Sync pages from context form data when a different form loads, or when the
   // form is re-fetched (formRevision changes) because the server rewrote the
-  // fields underneath us — e.g. after discarding a draft.
+  // pages underneath us — e.g. after discarding a draft.
   useEffect(() => {
     const currentFormId = form?.id;
     const syncKey = `${currentFormId}:${formRevision}`;
-    if (form?.fields && syncKey !== syncedKeyRef.current) {
+    if (form?.pages && syncKey !== syncedKeyRef.current) {
       syncedKeyRef.current = syncKey;
-      setPages(form.fields);
+      setPages(form.pages);
       setSelectedPageIndex((prev) =>
-        prev < form.fields.length ? prev : 0,
+        prev < form.pages.length ? prev : 0,
+      );
+      const nextEndPages = form.endPages ?? [];
+      setEndPages(nextEndPages);
+      setSelectedEndPageIndex((prev) =>
+        prev < nextEndPages.length ? prev : 0,
       );
     }
   }, [form, formRevision]);
 
   const selectedPage = pages[selectedPageIndex];
+  const selectedEndPage = endPages[selectedEndPageIndex];
+  const isEndPageSelected = selectedKind === "endPage" && !!selectedEndPage;
 
   // Keep the preview form in sync with the latest builder edits, so the
   // preview dialog shows unsaved changes.
   useEffect(() => {
     if (!form) return;
-    setPreviewForm({ ...form, fields: pages });
-  }, [form, pages, setPreviewForm]);
+    setPreviewForm({ ...form, pages, endPages });
+  }, [form, pages, endPages, setPreviewForm]);
 
-  const executeFieldUpdate = useCallback(async () => {
-    const pending = pendingFieldUpdateRef.current;
+  const executePageUpdate = useCallback(async () => {
+    const pending = pendingPageUpdateRef.current;
     if (!pending || !formId || formId === "new") return;
 
     try {
       showSaveStatus("saving");
-      const updated = await updateField(formId, pending.fieldId, pending.data);
+      const updated = await updatePageApi(formId, pending.pageId, pending.data);
       // Drop the payload once it lands so a later flush cannot re-send it.
       // Only if a newer edit has not replaced it in the meantime.
-      if (pendingFieldUpdateRef.current === pending) {
-        pendingFieldUpdateRef.current = null;
+      if (pendingPageUpdateRef.current === pending) {
+        pendingPageUpdateRef.current = null;
       }
       showSaveStatus("saved");
       // The backend reports whether the published form is now out of date.
@@ -110,26 +145,52 @@ export function FormBuilderPage() {
         setHasUnpublishedChanges(updated.hasUnpublishedChanges);
       }
     } catch (error) {
-      console.error("Failed to update field:", error);
+      console.error("Failed to update page:", error);
       showSaveStatus("error");
     }
   }, [formId, showSaveStatus, setHasUnpublishedChanges]);
 
-  const debouncedFieldUpdate = useDebounce(executeFieldUpdate, 1000);
+  const debouncedPageUpdate = useDebounce(executePageUpdate, 1000);
 
-  const executeReorder = useCallback(async () => {
-    const fieldIds = pendingReorderRef.current;
-    pendingReorderRef.current = null;
-    if (!fieldIds || !formId || formId === "new") return;
+  const executeEndPageUpdate = useCallback(async () => {
+    const pending = pendingEndPageUpdateRef.current;
+    if (!pending || !formId || formId === "new") return;
 
     try {
       showSaveStatus("saving");
-      await reorderFields(formId, { fieldIds });
+      const updated = await updateEndPageApi(
+        formId,
+        pending.endPageId,
+        pending.data,
+      );
+      if (pendingEndPageUpdateRef.current === pending) {
+        pendingEndPageUpdateRef.current = null;
+      }
+      showSaveStatus("saved");
+      if (updated.hasUnpublishedChanges !== undefined) {
+        setHasUnpublishedChanges(updated.hasUnpublishedChanges);
+      }
+    } catch (error) {
+      console.error("Failed to update end page:", error);
+      showSaveStatus("error");
+    }
+  }, [formId, showSaveStatus, setHasUnpublishedChanges]);
+
+  const debouncedEndPageUpdate = useDebounce(executeEndPageUpdate, 1000);
+
+  const executeReorder = useCallback(async () => {
+    const pageIds = pendingReorderRef.current;
+    pendingReorderRef.current = null;
+    if (!pageIds || !formId || formId === "new") return;
+
+    try {
+      showSaveStatus("saving");
+      await reorderPagesApi(formId, { pageIds });
       showSaveStatus("saved");
       // Reordering a published form makes it out of date.
       setHasUnpublishedChanges(true);
     } catch (error) {
-      console.error("Failed to reorder fields:", error);
+      console.error("Failed to reorder pages:", error);
       showSaveStatus("error");
     }
   }, [formId, showSaveStatus, setHasUnpublishedChanges]);
@@ -138,25 +199,44 @@ export function FormBuilderPage() {
   // click. The payload is the whole ordering, so only the last one matters.
   const debouncedReorder = useDebounce(executeReorder, 500);
 
+  const executeEndPageReorder = useCallback(async () => {
+    const endPageIds = pendingEndPageReorderRef.current;
+    pendingEndPageReorderRef.current = null;
+    if (!endPageIds || !formId || formId === "new") return;
+
+    try {
+      showSaveStatus("saving");
+      await reorderEndPagesApi(formId, { endPageIds });
+      showSaveStatus("saved");
+      // Reordering a published form makes it out of date.
+      setHasUnpublishedChanges(true);
+    } catch (error) {
+      console.error("Failed to reorder end pages:", error);
+      showSaveStatus("error");
+    }
+  }, [formId, showSaveStatus, setHasUnpublishedChanges]);
+
+  const debouncedEndPageReorder = useDebounce(executeEndPageReorder, 500);
+
   /**
    * Apply a reordered page list and persist the new order.
    *
-   * The reorder endpoint identifies fields by `_id`, so a page that has not
+   * The reorder endpoint identifies pages by `_id`, so a page that has not
    * been created server-side yet (the window between adding/duplicating and
    * the POST resolving) cannot be described in the payload. Sending a partial
-   * list would drop that field's ordering, so the persist is skipped and the
+   * list would drop that page's ordering, so the persist is skipped and the
    * next re-fetch reconciles.
    */
   const reorderPages = useCallback(
-    (reordered: FormField[]) => {
+    (reordered: FormPage[]) => {
       setPages(reordered);
 
       if (!formId || formId === "new") return;
 
-      const fieldIds = reordered.map((page) => page._id).filter(Boolean) as string[];
-      if (fieldIds.length !== reordered.length) return;
+      const pageIds = reordered.map((page) => page._id).filter(Boolean) as string[];
+      if (pageIds.length !== reordered.length) return;
 
-      pendingReorderRef.current = fieldIds;
+      pendingReorderRef.current = pageIds;
       debouncedReorder();
     },
     [formId, debouncedReorder],
@@ -166,20 +246,38 @@ export function FormBuilderPage() {
   const flushPendingUpdate = useCallback(async () => {
     const pendingOrder = pendingReorderRef.current;
     pendingReorderRef.current = null;
-    const pending = pendingFieldUpdateRef.current;
-    pendingFieldUpdateRef.current = null;
+    const pendingEndPageOrder = pendingEndPageReorderRef.current;
+    pendingEndPageReorderRef.current = null;
+    const pending = pendingPageUpdateRef.current;
+    pendingPageUpdateRef.current = null;
+    const pendingEndPage = pendingEndPageUpdateRef.current;
+    pendingEndPageUpdateRef.current = null;
 
     if (!formId || formId === "new") return;
 
     try {
       if (pending) {
-        const updated = await updateField(formId, pending.fieldId, pending.data);
+        const updated = await updatePageApi(formId, pending.pageId, pending.data);
+        if (updated.hasUnpublishedChanges !== undefined) {
+          setHasUnpublishedChanges(updated.hasUnpublishedChanges);
+        }
+      }
+      if (pendingEndPage) {
+        const updated = await updateEndPageApi(
+          formId,
+          pendingEndPage.endPageId,
+          pendingEndPage.data,
+        );
         if (updated.hasUnpublishedChanges !== undefined) {
           setHasUnpublishedChanges(updated.hasUnpublishedChanges);
         }
       }
       if (pendingOrder) {
-        await reorderFields(formId, { fieldIds: pendingOrder });
+        await reorderPagesApi(formId, { pageIds: pendingOrder });
+        setHasUnpublishedChanges(true);
+      }
+      if (pendingEndPageOrder) {
+        await reorderEndPagesApi(formId, { endPageIds: pendingEndPageOrder });
         setHasUnpublishedChanges(true);
       }
     } catch (error) {
@@ -188,12 +286,12 @@ export function FormBuilderPage() {
   }, [formId, setHasUnpublishedChanges]);
 
   const updatePage = useCallback(
-    async (index: number, updates: Partial<FormField>) => {
-      const field = pages[index];
-      if (!field) return;
+    async (index: number, updates: Partial<FormPage>) => {
+      const page = pages[index];
+      if (!page) return;
 
-      const fieldId = field._id as string | undefined;
-      if (!fieldId) return;
+      const pageId = page._id as string | undefined;
+      if (!pageId) return;
 
       // Optimistically update local state
       const updated = [...pages];
@@ -210,11 +308,127 @@ export function FormBuilderPage() {
         if (appearance && !appearance.icon) {
           updateData.appearance = { ...appearance, icon: "" };
         }
-        pendingFieldUpdateRef.current = { fieldId, data: updateData };
-        debouncedFieldUpdate();
+        pendingPageUpdateRef.current = { pageId, data: updateData };
+        debouncedPageUpdate();
       }
     },
-    [formId, pages, debouncedFieldUpdate],
+    [formId, pages, debouncedPageUpdate],
+  );
+
+  const updateEndPage = useCallback(
+    async (index: number, updates: Partial<EndPage>) => {
+      const endPage = endPages[index];
+      if (!endPage) return;
+
+      // Optimistically update local state.
+      const updated = [...endPages];
+      updated[index] = { ...updated[index], ...updates };
+      setEndPages(updated);
+
+      const endPageId = endPage._id;
+      // Debounce the API write once the form (and this end page) is persisted.
+      if (formId && formId !== "new" && endPageId) {
+        pendingEndPageUpdateRef.current = {
+          endPageId,
+          data: { ...updates } as Record<string, unknown>,
+        };
+        debouncedEndPageUpdate();
+      }
+    },
+    [formId, endPages, debouncedEndPageUpdate],
+  );
+
+  /**
+   * Move an end page to the top of the list so it becomes the one shown on
+   * submit — respondents only ever see `endPages[0]`. The end page that was
+   * first shifts down. Mirrors reorderPages: the reorder endpoint identifies
+   * end pages by `_id`, so if any end page is still mid-creation the persist
+   * is skipped and the next re-fetch reconciles.
+   */
+  const moveEndPageToFirst = useCallback(
+    (index: number) => {
+      if (index <= 0 || index >= endPages.length) return;
+
+      const reordered = [...endPages];
+      const [moved] = reordered.splice(index, 1);
+      reordered.unshift(moved);
+      setEndPages(reordered);
+
+      // The moved page is now first — keep it selected.
+      setSelectedKind("endPage");
+      setSelectedEndPageIndex(0);
+
+      if (!formId || formId === "new") return;
+
+      const endPageIds = reordered
+        .map((endPage) => endPage._id)
+        .filter(Boolean) as string[];
+      if (endPageIds.length !== reordered.length) return;
+
+      pendingEndPageReorderRef.current = endPageIds;
+      debouncedEndPageReorder();
+    },
+    [formId, endPages, debouncedEndPageReorder],
+  );
+
+  const addEndPage = useCallback(async () => {
+    if (!formId || formId === "new") return;
+
+    try {
+      setIsAddingEndPage(true);
+      showSaveStatus("saving");
+      const created = await createEndPageApi(formId, {});
+      setEndPages((prev) => {
+        const next = [...prev, created];
+        setSelectedEndPageIndex(next.length - 1);
+        return next;
+      });
+      setSelectedKind("endPage");
+      showSaveStatus("saved");
+      // Adding an end page to a published form makes it out of date.
+      setHasUnpublishedChanges(true);
+    } catch (error) {
+      console.error("Failed to create end page:", error);
+      showSaveStatus("error");
+    } finally {
+      setIsAddingEndPage(false);
+    }
+  }, [formId, showSaveStatus, setHasUnpublishedChanges]);
+
+  const deleteEndPage = useCallback(
+    async (index: number) => {
+      if (endPages.length <= 1) return;
+
+      const endPageToDelete = endPages[index];
+      const endPageId = endPageToDelete?._id;
+
+      // Optimistically update local state.
+      const updatedEndPages = endPages.filter((_, i) => i !== index);
+      setEndPages(updatedEndPages);
+      setSelectedEndPageIndex((prev) =>
+        prev >= updatedEndPages.length
+          ? Math.max(0, updatedEndPages.length - 1)
+          : prev > index
+            ? prev - 1
+            : prev,
+      );
+
+      if (formId && formId !== "new" && endPageId) {
+        try {
+          showSaveStatus("saving");
+          await deleteEndPageApi(formId, endPageId);
+          showSaveStatus("saved");
+          // Removing an end page from a published form makes it out of date.
+          setHasUnpublishedChanges(true);
+        } catch (error) {
+          console.error("Failed to delete end page:", error);
+          showSaveStatus("error");
+          // Revert on error.
+          setEndPages(endPages);
+        }
+      }
+    },
+    [formId, endPages, showSaveStatus, setHasUnpublishedChanges],
   );
 
   /**
@@ -248,7 +462,7 @@ export function FormBuilderPage() {
   );
 
   const addPage = useCallback(
-    async (page: FormField) => {
+    async (page: FormPage) => {
       if (!formId || formId === "new") {
         // For new forms, just add to local state
         setPages((prev) => [...prev, page]);
@@ -258,8 +472,8 @@ export function FormBuilderPage() {
 
       try {
         showSaveStatus("saving");
-        // Create field via API
-        const createdField = await createField(formId, {
+        // Create page via API
+        const createdPage = await createPage(formId, {
           type: page.type,
           label: page.label,
           helperText: page.helperText,
@@ -275,17 +489,17 @@ export function FormBuilderPage() {
           settings: page.settings,
         });
 
-        // Update local state with the created field (which has id from server)
+        // Update local state with the created page (which has id from server)
         setPages((prev) => [
           ...prev,
-          { ...page, _id: createdField._id, fieldKey: createdField.fieldKey },
+          { ...page, _id: createdPage._id, pageKey: createdPage.pageKey },
         ]);
         setSelectedPageIndex(pages.length);
         showSaveStatus("saved");
-        // Adding a field to a published form makes it out of date.
+        // Adding a page to a published form makes it out of date.
         setHasUnpublishedChanges(true);
       } catch (error) {
-        console.error("Failed to create field:", error);
+        console.error("Failed to create page:", error);
         showSaveStatus("error");
       }
     },
@@ -297,7 +511,7 @@ export function FormBuilderPage() {
       if (pages.length <= 1) return;
 
       const pageToDelete = pages[index];
-      const fieldId = "_id" in pageToDelete ? pageToDelete._id : undefined;
+      const pageId = "_id" in pageToDelete ? pageToDelete._id : undefined;
 
       // Optimistically update local state
       const updatedPages = pages.filter((_, i) => i !== index);
@@ -308,15 +522,15 @@ export function FormBuilderPage() {
       }
 
       // If form is persisted, delete via API
-      if (formId && formId !== "new" && fieldId !== undefined) {
+      if (formId && formId !== "new" && pageId !== undefined) {
         try {
           showSaveStatus("saving");
-          await deleteField(formId, fieldId);
+          await deletePageApi(formId, pageId);
           showSaveStatus("saved");
-          // Removing a field from a published form makes it out of date.
+          // Removing a page from a published form makes it out of date.
           setHasUnpublishedChanges(true);
         } catch (error) {
-          console.error("Failed to delete field:", error);
+          console.error("Failed to delete page:", error);
           showSaveStatus("error");
           // Revert on error
           setPages(pages);
@@ -329,13 +543,13 @@ export function FormBuilderPage() {
   const duplicatePage = useCallback(
     async (index: number) => {
       const page = pages[index];
-      const fieldId = page._id as string | undefined;
-      if (!fieldId) return;
+      const pageId = page._id as string | undefined;
+      if (!pageId) return;
 
       // Optimistically update local state
-      const newPage: FormField = {
+      const newPage: FormPage = {
         ...page,
-        fieldKey: `field_${Date.now()}`,
+        pageKey: `page_${Date.now()}`,
         label: page.label + " (copy)",
         order: pages.length + 1,
         appearance: {
@@ -353,23 +567,23 @@ export function FormBuilderPage() {
       if (formId && formId !== "new") {
         try {
           showSaveStatus("saving");
-          const duplicatedField = await duplicateField(formId, fieldId);
+          const duplicatedPage = await duplicatePageApi(formId, pageId);
 
-          // Update the temporary field with the real one from server
+          // Update the temporary page with the real one from server
           setPages((prev) => {
             const updated = [...prev];
             updated[index + 1] = {
               ...newPage,
-              _id: duplicatedField._id,
-              fieldKey: duplicatedField.fieldKey,
-            } as FormField;
+              _id: duplicatedPage._id,
+              pageKey: duplicatedPage.pageKey,
+            } as FormPage;
             return updated;
           });
           showSaveStatus("saved");
-          // Duplicating a field on a published form makes it out of date.
+          // Duplicating a page on a published form makes it out of date.
           setHasUnpublishedChanges(true);
         } catch (error) {
-          console.error("Failed to duplicate field:", error);
+          console.error("Failed to duplicate page:", error);
           showSaveStatus("error");
           // Revert on error
           setPages(pages);
@@ -400,7 +614,7 @@ export function FormBuilderPage() {
   if (formError) {
     return (
       <div className="editorial h-screen flex items-center justify-center bg-[var(--editorial-canvas)] px-8">
-        <div className="editorial-shadow-md flex max-w-md flex-col items-center rounded-[24px] border border-[var(--border)] bg-[var(--card)] px-10 py-12 text-center">
+        <div className="editorial-shadow-md flex max-w-md flex-col items-center rounded-xl border border-[var(--border)] bg-[var(--card)] px-10 py-12 text-center">
           <h2 className="font-display text-[32px] leading-tight text-[var(--foreground)]">
             Something went wrong
           </h2>
@@ -409,7 +623,7 @@ export function FormBuilderPage() {
           </p>
           <button
             onClick={() => navigate("/dashboard")}
-            className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-8 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-8 text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           >
             Back to Dashboard
           </button>
@@ -422,7 +636,11 @@ export function FormBuilderPage() {
     <FormBuilderSidebar
       pages={pages}
       selectedPageIndex={selectedPageIndex}
-      onSelectPage={setSelectedPageIndex}
+      isPageSelected={selectedKind === "page"}
+      onSelectPage={(index) => {
+        setSelectedKind("page");
+        setSelectedPageIndex(index);
+      }}
       onPageOpened={() => setShowPagesDrawer(false)}
       onReorderPages={reorderPages}
       onAddPage={() => {
@@ -431,26 +649,39 @@ export function FormBuilderPage() {
       }}
       onDeletePage={deletePage}
       onDuplicatePage={duplicatePage}
+      endPages={endPages}
+      selectedEndPageIndex={selectedEndPageIndex}
+      isEndPageSelected={isEndPageSelected}
+      onSelectEndPage={(index) => {
+        setSelectedKind("endPage");
+        setSelectedEndPageIndex(index);
+      }}
+      onAddEndPage={addEndPage}
+      onDeleteEndPage={deleteEndPage}
+      onReorderEndPageToFirst={moveEndPageToFirst}
+      isAddingEndPage={isAddingEndPage}
     />
   );
 
-  const settingsPanel = selectedPage ? (
+  const settingsPanel = isEndPageSelected ? (
+    <EndPageSettingsPanel
+      endPage={selectedEndPage}
+      endPageIndex={selectedEndPageIndex}
+      onUpdate={updateEndPage}
+    />
+  ) : selectedPage ? (
     <SettingsPanel
       page={selectedPage}
       pageIndex={selectedPageIndex}
       onUpdate={updatePage}
       theme={form?.theme}
       designDrawerOpen={designDrawerOpen}
-      logicDialogOpen={logicDialogOpen}
       onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
-      onOpenLogicDialog={() => setLogicDialogOpen(true)}
       onCloseDesignDrawer={() => setDesignDrawerOpen(false)}
-      onCloseLogicDialog={() => setLogicDialogOpen(false)}
       onSaveTheme={handleSaveTheme}
-
     />
   ) : (
-    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden border border-[var(--border)] bg-[var(--card)]">
       <div className="border-b border-[var(--editorial-border-light)] px-6 py-5">
         <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
           Settings
@@ -465,7 +696,7 @@ export function FormBuilderPage() {
   );
 
   const editorColumn = (
-    <div className="flex h-full min-h-0 w-full flex-col gap-3 sm:gap-4">
+    <div className="flex h-full min-h-0 w-full flex-col gap-3 py-3 bg-transparent">
       <PageContentTopbar
         onAddPage={() => {
           setShowAddPageDialog(true);
@@ -473,7 +704,23 @@ export function FormBuilderPage() {
         onPreview={async () => {
           // Flush any pending debounced updates before showing preview
           await flushPendingUpdate();
-          openPreview(form ? { ...form, fields: pages } : null);
+          openPreview(
+            form
+              ? {
+                  ...form,
+                  pages,
+                  endPages,
+                  // Carry the live variables so @tokens resolve in the preview.
+                  settings: {
+                    ...form.settings,
+                    variables:
+                      settingsData?.settings.variables ??
+                      form.settings?.variables ??
+                      [],
+                  },
+                }
+              : null,
+          );
         }}
         isMobileView={isMobileView}
         onToggleView={() => setIsMobileView((prev) => !prev)}
@@ -482,25 +729,35 @@ export function FormBuilderPage() {
           isDesktop ? undefined : () => setShowSettingsDrawer(true)
         }
         onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
-        onOpenLogicDialog={() => setLogicDialogOpen(true)}
+
       />
 
       <div className="flex min-h-0 w-full flex-1 items-center justify-center">
         <div
           className={cn(
-            "editorial-shadow h-full w-full overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--card)] sm:rounded-[24px]",
+            "editorial-shadow h-full w-full overflow-hidden  border border-[var(--border)] bg-[var(--card)] sm:rounded-xl",
             "transition-all duration-500 ease-out",
           )}
           // The phone-frame preview must never exceed the available width.
           style={{ width: isMobileView ? "min(420px, 100%)" : "100%" }}
         >
-          {selectedPage ? (
+          {isEndPageSelected ? (
+            <EndPageContentEditor
+              endPage={selectedEndPage}
+              endPageIndex={selectedEndPageIndex}
+              onUpdate={updateEndPage}
+              isMobileView={isMobileView}
+              theme={form?.theme}
+              variables={variableItems}
+            />
+          ) : selectedPage ? (
             <PageContentEditor
               page={selectedPage}
               pageIndex={selectedPageIndex}
               onUpdate={updatePage}
               isMobileView={isMobileView}
               theme={form?.theme}
+              variables={variableItems}
             />
           ) : (
             <div className="flex h-full flex-col items-center justify-center px-4 text-center">
@@ -524,7 +781,7 @@ export function FormBuilderPage() {
       {isDesktop ? (
         <ResizablePanelGroup
           orientation="horizontal"
-          className="mx-auto w-full flex-1 min-h-0 px-8 py-4"
+          className="mx-auto w-full flex-1 min-h-0"
         >
           <ResizablePanel defaultSize={300} minSize={260} maxSize={400}>
             {sidebarPanel}
@@ -532,7 +789,7 @@ export function FormBuilderPage() {
 
           <ResizableHandle className="w-4 bg-transparent after:hidden" />
 
-          <ResizablePanel defaultSize={600} minSize={300}>
+          <ResizablePanel defaultSize={600} minSize={300} className="bg-transparent">
             {editorColumn}
           </ResizablePanel>
 
@@ -544,7 +801,7 @@ export function FormBuilderPage() {
         </ResizablePanelGroup>
       ) : (
         <>
-          <div className="flex min-h-0 w-full flex-1 flex-col px-3 py-3 sm:px-5 sm:py-4">
+          <div className="flex min-h-0 w-full flex-1 flex-col">
             {editorColumn}
           </div>
 

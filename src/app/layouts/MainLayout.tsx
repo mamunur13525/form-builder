@@ -41,7 +41,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
             {/* The sidebar is pinned from `lg` up, so only reserve space there. */}
             <div className="lg:ml-[20rem]">
                 {/* Mobile chrome — the only way to reach the nav below `lg`. */}
-                <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-[#EEE7E0] bg-[var(--editorial-canvas)]/95 px-4 backdrop-blur-sm sm:px-6 lg:hidden">
+                <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-[var(--border)] bg-[var(--editorial-canvas)]/95 px-4 backdrop-blur-sm sm:px-6 lg:hidden">
                     <button
                         type="button"
                         onClick={() => setDrawerOpen(true)}

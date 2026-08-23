@@ -11,9 +11,17 @@ import {
   AlertCircle,
   Home,
   Pencil,
+  CheckCheck,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
@@ -26,6 +34,14 @@ const navLinks = [
   { to: ROUTES.FORM_SHARE, icon: Share2, label: "Share" },
   { to: ROUTES.FORM_RESPONSE_SUBMISSIONS, icon: BarChart3, label: "Results" },
 ];
+
+/**
+ * The static head of a tab's route, e.g. "/form-response". Every section lives
+ * under its own top-level prefix, so this is enough to resolve the active tab —
+ * and unlike `NavLink`'s own matching it keeps Results active on the summary and
+ * analytics sub-routes too.
+ */
+const tabPrefix = (to: string) => to.split("/:formId")[0];
 
 interface FormBuilderTopBarProps {
   isPublished: boolean;
@@ -42,12 +58,20 @@ export function FormBuilderTopBar({
 }: FormBuilderTopBarProps) {
   const { formId } = useParams<{ formId: string }>();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { saveStatus, showSaveStatus, openPreview, hasUnpublishedChanges } =
     useFormContext();
+  const activeTab =
+    navLinks.find(({ to }) => pathname.startsWith(tabPrefix(to))) ?? navLinks[0];
+  const ActiveTabIcon = activeTab.icon;
   const baseNavLinkClass =
-    "editorial-transition flex items-center gap-1.5 rounded-[16px] px-3.5 py-2 text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]";
+    "editorial-transition flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]";
   const activeNavLinkClass =
     "border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)] hover:text-[var(--primary)]";
+  const navLabelClass = "text-[10px] font-semibold uppercase tracking-[0.08em]";
+  // Publish CTA accent — green gradient (#4a7f11); overrides the monochrome default button
+  const publishButtonClass =
+    "border-0 from-[#4a7f11] to-[#355b0c]";
 
   const [title, setTitle] = useState(initialTitle);
   const prevInitialTitleRef = useRef(initialTitle);
@@ -65,107 +89,150 @@ export function FormBuilderTopBar({
 
 
   return (
-    <div className="bg-white editorial flex shrink-0 items-center justify-between border-b border-[#EEE7E0] bg-[var(--editorial-canvas)] px-3 py-2 lg:h-[72px] lg:flex-nowrap lg:gap-0 lg:px-8 lg:py-0">
+    <div className="bg-white editorial flex h-14 shrink-0 items-center justify-between gap-2 border-b border-[var(--border)] px-3 lg:h-[72px] lg:gap-4 lg:px-8">
       <div className="flex min-w-0 items-center gap-2">
         <nav className="flex min-w-0 items-center gap-2 text-sm">
           <button
             onClick={() => navigate("/dashboard")}
-            className="editorial-transition cursor-pointer items-center gap-1.5 text-[var(--editorial-body)] hover:text-[var(--primary)] flex"
+            className="editorial-transition flex shrink-0 cursor-pointer items-center gap-1.5 text-[var(--editorial-body)] hover:text-[var(--primary)]"
           >
             <Home className="h-4 w-4" />
-            Forms
+            <span className="hidden sm:inline">Forms</span>
           </button>
-          <span className="text-[var(--editorial-disabled)] inline">
+          <span className="hidden shrink-0 text-[var(--editorial-disabled)] sm:inline">
             /
           </span>
           <button
             onClick={() => setDialogOpen(true)}
-            className="editorial-transition group flex min-w-0 cursor-pointer items-center gap-1.5 font-display text-lg text-[var(--foreground)] hover:text-[var(--primary)] lg:text-xl"
+            className="editorial-transition group flex min-w-0 cursor-pointer items-center gap-1.5 font-display text-base text-[var(--foreground)] hover:text-[var(--primary)] sm:text-lg lg:text-xl"
           >
             <span className="truncate">{title}</span>
-            <Pencil className="h-4 w-4 shrink-0 opacity-0 transition-opacity duration-250 group-hover:opacity-100" />
+            {/* Hover affordance only — hidden on touch widths, where it would
+                just eat room the title needs. */}
+            <Pencil className="hidden h-4 w-4 shrink-0 opacity-0 transition-opacity duration-250 group-hover:opacity-100 lg:block" />
           </button>
         </nav>
       </div>
 
-      <nav className="order-last flex w-full items-center gap-1 overflow-x-auto lg:order-none lg:w-auto lg:overflow-visible py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Section nav. Five tabs need ~500px, so below `lg` they collapse into a
+          menu that shows the active section and opens the full list. */}
+      <nav className="hidden shrink-0 items-center gap-1 md:flex">
         {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={label}
             to={to.replace(":formId", formId || "new")}
-            className={({ isActive }) =>
-              cn(baseNavLinkClass, "shrink-0", isActive && activeNavLinkClass)
-            }
-            end={to === ROUTES.FORM_BUILDER}
+            className={cn(
+              baseNavLinkClass,
+              "shrink-0",
+              activeTab.label === label && activeNavLinkClass,
+            )}
           >
             <Icon className="h-4 w-4" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.08em]">
-              {label}
-            </span>
+            <span className={navLabelClass}>{label}</span>
           </NavLink>
         ))}
       </nav>
 
-      <div className="flex items-center gap-2 lg:gap-3">
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <button
+              type="button"
+              aria-label={`Section: ${activeTab.label}`}
+              className={cn(
+                baseNavLinkClass,
+                activeNavLinkClass,
+                "shrink-0 cursor-pointer px-2.5 md:hidden",
+              )}
+            >
+              <ActiveTabIcon className="h-4 w-4 shrink-0" />
+              <span className={navLabelClass}>{activeTab.label}</span>
+              <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-60" />
+            </button>
+          }
+        />
+        <DropdownMenuContent
+          align="center"
+          className="editorial w-52 rounded-[18px] border border-[var(--border)] bg-[var(--popover)] p-2"
+        >
+          {navLinks.map(({ to, icon: Icon, label }) => (
+            <DropdownMenuItem
+              key={label}
+              className={cn(
+                "cursor-pointer rounded-[12px] px-3 py-2",
+                activeTab.label === label &&
+                  "bg-[var(--editorial-primary-selected)] text-[var(--primary)]",
+              )}
+              onClick={() => navigate(to.replace(":formId", formId || "new"))}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <div className="flex shrink-0 items-center gap-2 lg:gap-3">
         <span
           className={cn(
-            "w-16 items-center gap-1.5 text-xs text-[var(--editorial-subtle)] transition-opacity duration-250 ease-out flex",
+            "flex w-4 shrink-0 items-center gap-1.5 overflow-hidden text-xs text-[var(--editorial-subtle)] transition-opacity duration-250 ease-out lg:w-16",
             saveStatus !== "idle" ? "opacity-100" : "opacity-0",
           )}
         >
           {saveStatus === "saving" && (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
           )}
           {saveStatus === "saved" && (
-            <CheckCircle className="h-4 w-4 text-[var(--editorial-success)]" />
+            <CheckCheck className="h-4 w-4 shrink-0 text-[var(--editorial-success)]" />
           )}
           {saveStatus === "error" && (
-            <AlertCircle className="h-4 w-4 text-[var(--destructive)]" />
+            <AlertCircle className="h-4 w-4 shrink-0 text-[var(--destructive)]" />
           )}
-          {saveStatus === "saving"
-            ? "Saving..."
-            : saveStatus === "saved"
-              ? "Saved"
-              : "Error"}
+          <span className="hidden lg:inline">
+            {saveStatus === "saving"
+              ? "Saving..."
+              : saveStatus === "saved"
+                ? "Saved"
+                : "Error"}
+          </span>
         </span>
 
         <Button
           variant="outline"
           aria-label="Preview"
-          className="editorial-transition h-10 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-3 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
           onClick={() => openPreview()}
         >
           <Play className="h-5 w-5" />
-          <span className="hidden sm:inline">Preview</span>
+          <span className="hidden xl:inline">Preview</span>
         </Button>
         {!isPublished ? (
           <Button
             aria-label="Publish"
-            className="editorial-transition h-10 gap-2 rounded-[16px] bg-[var(--primary)] px-3 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] lg:h-11 lg:px-5"
+            className={publishButtonClass}
             onClick={onPublish}
           >
             <Share2 className="h-5 w-5" />
-            <span className="hidden sm:inline">Publish</span>
+            <span className="hidden xl:inline">Publish</span>
           </Button>
         ) : hasUnpublishedChanges ? (
           <Button
             variant="default"
             aria-label="Publish changes"
-            className="editorial-transition h-10 gap-2 rounded-[16px] border border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] px-3 text-sm font-medium text-[var(--editorial-purple)] hover:-translate-y-0.5 hover:bg-[var(--editorial-purple-light)] active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
+            className={publishButtonClass}
             onClick={onPublishedClick}
           >
             <AlertCircle className="h-5 w-5" />
-            <span className="hidden sm:inline">Publish changes</span>
+            <span className="hidden xl:inline">Publish changes</span>
           </Button>
         ) : (
           <Button
             variant="default"
             aria-label="Published"
-            className="editorial-transition h-10 gap-2 rounded-[16px] border border-[var(--editorial-success)]/30 bg-[var(--editorial-success)]/12 px-3 text-sm font-medium text-[#4E7F62] hover:-translate-y-0.5 hover:bg-[var(--editorial-success)]/20 active:translate-y-0 active:scale-[.98] lg:h-11 lg:px-5"
+            className={publishButtonClass}
             onClick={onPublishedClick}
           >
             <CheckCircle className="h-5 w-5" />
-            <span className="hidden sm:inline">Published</span>
+            <span className="hidden xl:inline">Published</span>
           </Button>
         )}
       </div>

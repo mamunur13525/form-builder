@@ -20,6 +20,7 @@ import {
     DropdownMenuSeparator,
 } from "../../components/ui/dropdown-menu"
 import { useLogout, useCurrentUser } from "../../features/auth/hooks/useAuth"
+import { Button } from "@/components/ui/button"
 
 interface SidebarProps {
     /** Drawer visibility on small screens. The sidebar is always shown from `lg` up. */
@@ -80,12 +81,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
             <aside
                 className={cn(
-                    "editorial fixed left-0 top-0 z-40 flex h-dvh w-[20rem] max-w-[85vw] flex-col bg-transparent p-2",
+                    "editorial fixed left-0 top-0 z-40 flex h-dvh w-[20rem] max-w-[85vw] flex-col bg-transparent border-r border-[var(--border)] ",
                     "transition-transform duration-250 ease-out lg:translate-x-0",
                     open ? "translate-x-0" : "-translate-x-full",
                 )}
             >
-                <div className="editorial-shadow-md flex min-h-0 flex-1 flex-col rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+                <div className="editorial-shadow-md flex min-h-0 flex-1 flex-col bg-[var(--card)]">
                     {/* Logo */}
                     <div className="flex items-center justify-between border-b border-[var(--editorial-border-light)] px-6 py-6">
                         <h1 className="font-display text-2xl text-[var(--foreground)]">FormFlow</h1>
@@ -108,7 +109,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                                     key={item.label}
                                     onClick={() => go(item.path)}
                                     className={cn(
-                                        "editorial-transition flex items-center gap-3 rounded-[16px] border px-4 py-3 text-sm",
+                                        "editorial-transition flex items-center gap-3 rounded-lg border px-4 py-3 text-sm",
                                         isActive
                                             ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)]"
                                             : "border-transparent text-[var(--editorial-body)] hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]",
@@ -133,13 +134,13 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                             <p className="mt-2 text-xs leading-5 text-[var(--editorial-body)]">
                                 Unlimited forms, custom domains and advanced analytics.
                             </p>
-                            <button
+                            <Button
                                 type="button"
                                 onClick={() => go(ROUTES.PRICING)}
-                                className="editorial-transition mt-4 h-11 w-full rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                                className="editorial-transition mt-4 h-11 w-full rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
                             >
                                 Upgrade now
-                            </button>
+                            </Button>
                         </div>
                     </div>
 

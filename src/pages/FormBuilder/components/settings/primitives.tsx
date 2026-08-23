@@ -37,20 +37,12 @@ const CONTROL_CLASS =
 
 /** Portalled surfaces escape the `.editorial` subtree, so they opt back in. */
 const OVERLAY_CLASS =
-    "editorial rounded-[18px] border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
+    "editorial rounded-xl border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
 
 /**
  * Editorial button treatments, matching PublishDialog so confirmation prompts
  * and drawer footers read as the same product surface.
  */
-export const PRIMARY_BUTTON_CLASS =
-    "editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-[var(--primary-foreground)] shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"
-
-export const SECONDARY_BUTTON_CLASS =
-    "editorial-transition h-11 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
-
-export const DESTRUCTIVE_BUTTON_CLASS =
-    "editorial-transition h-11 gap-2 rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
 
 /**
  * Segmented pill tabs: the list is an inset track, the active tab a raised
@@ -58,17 +50,17 @@ export const DESTRUCTIVE_BUTTON_CLASS =
  * `data-active:bg-transparent` and would cancel the raised fill.
  */
 export const TAB_LIST_CLASS =
-    "h-auto w-full gap-1 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)] group-data-horizontal/tabs:h-auto"
+    "h-auto w-full gap-1 rounded-xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)] group-data-horizontal/tabs:h-auto"
 
 export const TAB_TRIGGER_CLASS =
-    "editorial-transition flex-1 gap-2 rounded-[13px] border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
+    "editorial-transition flex-1 gap-2 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
 
-const FIELD_LABEL_CLASS = "text-sm font-medium text-[var(--editorial-body)]"
+const PAGE_LABEL_CLASS = "text-sm font-medium text-[var(--editorial-body)]"
 
 const HINT_CLASS = "text-xs leading-5 text-[var(--editorial-subtle)]"
 
-/** A label + control + optional hint stack, used by every field below. */
-function Field({
+/** A label + control + optional hint stack, used by every page below. */
+function Page({
     label,
     hint,
     htmlFor,
@@ -83,7 +75,7 @@ function Field({
 }) {
     return (
         <div className={cn("space-y-1.5", className)}>
-            <Label htmlFor={htmlFor} className={FIELD_LABEL_CLASS}>
+            <Label htmlFor={htmlFor} className={PAGE_LABEL_CLASS}>
                 {label}
             </Label>
             {children}
@@ -153,7 +145,6 @@ export function ToggleRow({
                     id={id}
                     checked={checked}
                     onCheckedChange={onCheckedChange}
-                    size="sm"
                 />
             </div>
             {description && (
@@ -165,11 +156,11 @@ export function ToggleRow({
     )
 }
 
-/** The "required field" toggle, shared by nearly every field type. */
+/** The "required page" toggle, shared by nearly every page type. */
 export function RequiredToggle({
     checked,
     onCheckedChange,
-    description = "If checked, users will be required to complete this field.",
+    description = "If checked, users will be required to complete this page.",
 }: {
     checked: boolean
     onCheckedChange: (checked: boolean) => void
@@ -178,7 +169,7 @@ export function RequiredToggle({
     return (
         <ToggleRow
             id="required"
-            label="Required field"
+            label="Required page"
             description={description}
             checked={checked}
             onCheckedChange={onCheckedChange}
@@ -222,7 +213,7 @@ export function NumberSetting({
                     onChange(Number(raw))
                 }}
                 placeholder={placeholder}
-                className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
             />
             {description && (
                 <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
@@ -254,7 +245,7 @@ export function TextSetting({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="h-[52px] rounded-full border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
             />
             {description && (
                 <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
@@ -272,7 +263,7 @@ export type SelectSettingOption<T extends string> = {
 
 /**
  * A labeled select driven by an options array, so callers describe choices as
- * data instead of repeating trigger/content/item markup per field.
+ * data instead of repeating trigger/content/item markup per page.
  */
 export function SelectSetting<T extends string>({
     label,
@@ -292,7 +283,7 @@ export function SelectSetting<T extends string>({
     className?: string
 }) {
     return (
-        <Field label={label} hint={hint} className={className}>
+        <Page label={label} hint={hint} className={className}>
             <Select
                 value={value}
                 onValueChange={(next: T | null) => {
@@ -308,14 +299,13 @@ export function SelectSetting<T extends string>({
                         <SelectItem
                             key={option.value}
                             value={option.value}
-                            className="rounded-[12px]"
                         >
                             {option.label}
                         </SelectItem>
                     ))}
                 </SelectContent>
             </Select>
-        </Field>
+        </Page>
     )
 }
 
@@ -353,7 +343,7 @@ export function IconChoiceSetting<T extends string>({
     hideLabels?: boolean
 }) {
     return (
-        <Field label={label} hint={hint}>
+        <Page label={label} hint={hint}>
             <RadioGroup
                 value={value}
                 onValueChange={(next) => {
@@ -389,7 +379,7 @@ export function IconChoiceSetting<T extends string>({
                     )
                 })}
             </RadioGroup>
-        </Field>
+        </Page>
     )
 }
 
@@ -412,7 +402,7 @@ export function InputSetting({
     trailing?: ReactNode
 }) {
     return (
-        <Field label={label} hint={hint}>
+        <Page label={label} hint={hint}>
             <div className="flex items-center gap-2">
                 <Input
                     type={type}
@@ -423,7 +413,7 @@ export function InputSetting({
                 />
                 {trailing}
             </div>
-        </Field>
+        </Page>
     )
 }
 
@@ -441,7 +431,7 @@ export function ColorSetting({
 }) {
     const current = value || fallback
     return (
-        <Field label={label} className="flex items-center justify-between">
+        <Page label={label} className="flex items-center justify-between">
 
             <div className="flex items-center ml-2">
                 <Input
@@ -467,7 +457,7 @@ export function ColorSetting({
                 </span>
 
             </div>
-        </Field>
+        </Page>
     )
 }
 
@@ -492,7 +482,7 @@ export function RangeSetting({
             <div
                 className={cn(
                     "flex items-center justify-between",
-                    FIELD_LABEL_CLASS
+                    PAGE_LABEL_CLASS
                 )}
             >
                 <span>{label}</span>
@@ -562,7 +552,7 @@ export function ConfirmPopover({
                     <Button
                         variant="outline"
                         size="lg"
-                        className={SECONDARY_BUTTON_CLASS}
+                        className="editorial-transition h-11 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
                         onClick={() => onOpenChange(false)}
                     >
                         {cancelLabel}
@@ -571,7 +561,9 @@ export function ConfirmPopover({
                         size="lg"
                         onClick={onConfirm}
                         disabled={confirmDisabled}
-                        className={destructive ? DESTRUCTIVE_BUTTON_CLASS : PRIMARY_BUTTON_CLASS}
+                        className={destructive ?
+                            "editorial-transition h-11 gap-2 rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
+                            : "editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-[var(--primary-foreground)] hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"}
                     >
                         {confirmLabel}
                     </Button>
@@ -582,7 +574,7 @@ export function ConfirmPopover({
 }
 
 /** Cover image upload + preview. Uploads via POST /uploads and stores {url,fileId}. */
-export function CoverImageField({
+export function CoverImagePage({
     value,
     onChange,
 }: {
@@ -620,7 +612,7 @@ export function CoverImageField({
             />
             {value?.url ? (
                 <div className="space-y-3">
-                    <div className="relative overflow-hidden rounded-[22px] border border-[var(--editorial-border-light)]">
+                    <div className="relative overflow-hidden rounded-xl border border-[var(--editorial-border-light)]">
                         <img
                             src={value.url}
                             alt={value.alt || "Cover"}
@@ -657,7 +649,7 @@ export function CoverImageField({
                     type="button"
                     onClick={() => inputRef.current?.click()}
                     disabled={uploading}
-                    className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-[22px] border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-50"
+                    className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-50"
                 >
                     {uploading ? (
                         <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />

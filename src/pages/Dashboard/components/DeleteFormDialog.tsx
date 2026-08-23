@@ -38,12 +38,12 @@ export function DeleteFormDialog({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="editorial editorial-shadow rounded-[30px] bg-[var(--popover)] p-10 ring-0">
+            <AlertDialogContent className="editorial editorial-shadow rounded-2xl bg-[var(--popover)] p-6 sm:p-10 ring-0">
                 <AlertDialogHeader>
-                    <AlertDialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+                    <AlertDialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
                         Delete Form
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="text-base leading-6 text-[var(--editorial-body)]">
+                    <AlertDialogDescription className="text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
                         Are you sure you want to delete "{formTitle}"? This action cannot be undone.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -51,14 +51,16 @@ export function DeleteFormDialog({
                     <AlertDialogCancel
                         onClick={() => onOpenChange(false)}
                         disabled={deleteFormMutation.isPending}
-                        className="editorial-transition h-[52px] rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                        variant="ghost"
+                        className="w-full sm:w-auto"
                     >
                         Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleDelete}
                         disabled={deleteFormMutation.isPending}
-                        className="editorial-transition h-[52px] rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98]"
+                        variant="destructive"
+                        className="w-full sm:w-auto"
                     >
                         {deleteFormMutation.isPending ? "Deleting..." : "Delete"}
                     </AlertDialogAction>

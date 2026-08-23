@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -125,11 +125,28 @@
 
     body {
         @apply bg-background text-foreground;
+        /* Ambient monochrome wash — a soft light-from-above gradient,
+           fixed to the viewport so it stays put while content scrolls. */
+        background-image:
+            radial-gradient(1200px 760px at 50% -12%,
+                color-mix(in oklch, var(--foreground) 5%, transparent),
+                transparent 60%);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
     }
 
-    html {
-        @apply font-sans;
+    /* Whisper of a top-down gradient on card surfaces for gentle depth.
+       Layers over the card's solid `background-color`, so it also reads
+       as a subtle sheen on dark cards (foreground flips to near-white). */
+    .bg-card {
+        background-image: linear-gradient(180deg,
+                color-mix(in oklch, var(--foreground) 3%, transparent),
+                transparent 60%);
     }
+  html {
+    @apply font-sans;
+    }
+
 }
 
 /* Editable placeholder styling for contentEditable elements */
@@ -146,69 +163,123 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Premium editorial theme                                             */
+/* Monochrome editorial theme — Mono (black · white · gray)            */
 /*                                                                     */
 /* Scoped to `.editorial` so it can be adopted screen by screen. It    */
-/* re-points the shadcn design tokens at the editorial palette, so any */
-/* component rendered inside the scope inherits the new look without   */
-/* being rewritten. Portalled surfaces (dialogs, dropdowns, popovers)  */
-/* escape the DOM subtree, so they opt in with the same class.         */
+/* re-points the shadcn design tokens at a pure neutral palette, so    */
+/* any component rendered inside the scope inherits the new look       */
+/* without being rewritten. Portalled surfaces (dialogs, dropdowns,    */
+/* popovers) escape the DOM subtree, so they opt in with the same      */
+/* class.                                                              */
+/*                                                                     */
+/* Everything below is driven by the nine `--palette-*` values, all of */
+/* which are pure grays (R=G=B, zero hue). The brand accent is simply  */
+/* near-black. Semantic (success/warning/error) and status colors are  */
+/* also mapped onto the grayscale — strength reads as darkness rather  */
+/* than hue. A subtle ambient gradient wash is layered over the canvas */
+/* and card surfaces further down.                                     */
 /* ------------------------------------------------------------------ */
 .editorial {
+    /* Palette — Mono */
+    --palette-background: #ffffff;
+    --palette-surface: #f5f5f5;
+    --palette-text-dark: #0a0a0a;
+    --palette-text: #5c5c5c;
+    --palette-muted: #757575;
+    --palette-brand: #191919;
+    --palette-brand-hover: #2e2e2e;
+    --palette-brand-dark: #000000;
+    --palette-soft: #e6e6e6;
+
     /* Surfaces */
-    --editorial-canvas: #f8f3ec;
-    --editorial-surface: #fdfbf8;
-    --background: #fffdfb;
-    --card: #fffdfb;
-    --card-foreground: #2e2825;
-    --popover: #fff9f2;
-    --popover-foreground: #2e2825;
+    --editorial-canvas: #f6f6f6;
+    --editorial-surface: var(--palette-surface);
+    --background: var(--palette-background);
+    --card: var(--palette-background);
+    --card-foreground: var(--palette-text-dark);
+    --popover: var(--palette-background);
+    --popover-foreground: var(--palette-text-dark);
 
-    /* Text — never pure black */
-    --foreground: #2e2825;
-    --editorial-body: #665f5b;
-    --muted-foreground: #665f5b;
-    --editorial-subtle: #a49a95;
-    --editorial-disabled: #ccc5be;
+    /* Text — near-black, never pure black for body */
+    --foreground: var(--palette-text-dark);
+    --editorial-body: var(--palette-text);
+    --muted-foreground: var(--palette-muted);
+    --editorial-subtle: #a1a1a1;
+    --editorial-disabled: #d4d4d4;
 
-    /* Coral is the single accent */
-    --primary: #ee7d69;
+    /* Brand is the single accent — black */
+    --primary: var(--palette-brand);
     --primary-foreground: #ffffff;
-    --editorial-primary-hover: #e56b56;
-    --editorial-primary-pressed: #d95e49;
-    --editorial-primary-light: #ffe5de;
-    --editorial-primary-selected: #ffe9e5;
-    --editorial-primary-ring: #f4b3a8;
+    --editorial-primary-hover: var(--palette-brand-hover);
+    --editorial-primary-pressed: var(--palette-brand-dark);
+    --editorial-primary-light: var(--palette-soft);
+    --editorial-primary-selected: #f0f0f0;
+    --editorial-primary-ring: #a1a1a1;
 
-    --secondary: #fff9f2;
-    --secondary-foreground: #2e2825;
-    --muted: #f6f0e9;
-    --accent: #ffe9e5;
-    --accent-foreground: #2e2825;
+    --secondary: var(--palette-surface);
+    --secondary-foreground: var(--palette-text-dark);
+    --muted: var(--palette-surface);
+    --accent: var(--palette-soft);
+    --accent-foreground: var(--palette-text-dark);
 
     /* Borders */
-    --border: #e8ddd4;
-    --editorial-border-light: #f2ece6;
-    --input: #ddd3cb;
-    --ring: #ee7d69;
+    --border: #e5e5e5;
+    --editorial-border-light: #ececec;
+    --input: #d4d4d4;
+    --ring: var(--palette-brand);
 
-    --destructive: #c05b45;
+    --destructive: #2b2b2b;
+
+    /* Semantic — fully monochrome; strength maps to darkness */
+    --editorial-success: #3f3f3f;
+    --editorial-success-soft: #ededed;
+    --editorial-warning: #6b6b6b;
+    --editorial-warning-soft: #ebebeb;
+    --editorial-error: #2b2b2b;
+    --editorial-error-soft: #e9e9e9;
 
     /* Status */
-    --editorial-purple: #8971c5;
-    --editorial-purple-light: #eee7fa;
-    --editorial-note: #fff2bc;
-    --editorial-success: #7cbf95;
-    --editorial-blue: #74a7ff;
+    --editorial-note: #ededed;
+    --editorial-purple: #525252;
+    --editorial-purple-light: #e8e8e8;
+    --editorial-blue: #4d4d4d;
+
+    /* Theme accents — distinct grays so any coding stays legible */
+    --editorial-matcha: #8a8a8a;
+    --editorial-slate: #4a4a4a;
+    --editorial-indigo: #5f5f5f;
+    --editorial-sandstone: #9c9c9c;
+    --editorial-mauve: #6e6e6e;
+    --editorial-mint: #3f3f3f;
 
     color: var(--foreground);
+
+    /* Ambient monochrome wash — soft, fixed to the viewport so it reads
+       as one continuous gradient even across nested editorial regions. */
+    background-image:
+        radial-gradient(900px 620px at 12% -6%,
+            color-mix(in oklch, var(--foreground) 4.5%, transparent),
+            transparent 55%),
+        radial-gradient(1000px 720px at 104% 2%,
+            color-mix(in oklch, var(--foreground) 3.5%, transparent),
+            transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 /* Serif reserved for major headings only. */
 .font-display {
-    font-family: "Cormorant Garamond", ui-serif, Georgia, "Times New Roman", serif;
+    font-family: "Playfair Display", ui-serif, Georgia, "Times New Roman", serif;
     font-weight: 600;
-    letter-spacing: 0.01em;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    font-optical-sizing: auto;
+    font-feature-settings: "liga" 1, "kern" 1, "ss01" 1;
+    font-variant-ligatures: contextual;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-wrap: balance;
 }
 
 /* Small uppercase labels. */
@@ -220,17 +291,17 @@
     text-transform: uppercase;
 }
 
-/* Soft, warm elevation — never dark or heavy. */
+/* Soft, neutral elevation — never dark or heavy. */
 .editorial-shadow {
-    box-shadow: 0 20px 60px rgba(110, 80, 60, 0.08);
+    box-shadow: 0 20px 60px rgba(24, 35, 52, 0.10);
 }
 
 .editorial-shadow-md {
-    box-shadow: 0 12px 40px rgba(90, 70, 50, 0.06);
+    box-shadow: 0 12px 40px rgba(24, 35, 52, 0.08);
 }
 
 .editorial-shadow-sm {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 10px rgba(24, 35, 52, 0.05);
 }
 
 /* Calm, consistent motion. */
@@ -243,13 +314,16 @@
 
 /* Nudge to draw attention to an action that still needs a decision. */
 @keyframes editorial-vibrate {
+
     0%,
     100% {
         transform: translateX(0);
     }
+
     25% {
         transform: translateX(-3px);
     }
+
     75% {
         transform: translateX(3px);
     }
@@ -273,4 +347,3 @@
         animation: none;
     }
 }
-

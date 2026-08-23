@@ -12,10 +12,15 @@ import { TemplatesPage } from "../../pages/Templates"
 import { SettingsPage } from "../../pages/Settings"
 import { PricingPage } from "../../pages/Pricing"
 import { FormBuilderPage } from "../../pages/FormBuilder"
+import { LogicBuilderPage } from "../../pages/LogicBuilder"
 import { SubmissionsPage } from "../../pages/FormResponse"
 import { SummaryPage } from "../../pages/FormResponse"
 import { AnalyticsPage } from "../../pages/FormResponse"
 import { FormSettingsPage } from "../../pages/FormSettings/FormSettingsPage"
+import { GeneralSettings } from "../../pages/FormSettings/sections/GeneralSettings"
+import { EmailSettings } from "../../pages/FormSettings/sections/EmailSettings"
+import { AccessScheduling } from "../../pages/FormSettings/sections/AccessScheduling"
+import { HiddenFieldsVariables } from "../../pages/FormSettings/sections/HiddenFieldsVariables"
 import { FormIntegrationsPage } from "../../pages/FormIntegrations/FormIntegrationsPage"
 import { FormSharePage } from "../../pages/FormShare/FormSharePage"
 import { FormFillPage } from "../../pages/FormFill"
@@ -78,7 +83,14 @@ export const router = createBrowserRouter([
                         element: <FormLayout />,
                         children: [
                             { path: ROUTES.FORM_BUILDER, element: <FormBuilderPage /> },
-                            { path: ROUTES.FORM_SETTINGS, element: <FormSettingsPage /> },
+                            { path: ROUTES.FORM_LOGIC, element: <LogicBuilderPage /> },
+                            { path: ROUTES.FORM_SETTINGS, element: <FormSettingsPage />, children: [
+                                { index: true, element: <Navigate to="general" replace /> },
+                                { path: "general", element: <GeneralSettings /> },
+                                { path: "email-settings", element: <EmailSettings /> },
+                                { path: "access", element: <AccessScheduling /> },
+                                { path: "hidden-fields", element: <HiddenFieldsVariables /> },
+                            ] },
                             { path: ROUTES.FORM_INTEGRATIONS, element: <FormIntegrationsPage /> },
                             { path: ROUTES.FORM_SHARE, element: <FormSharePage /> },
                             { path: ROUTES.FORM_RESPONSE_SUBMISSIONS, element: <SubmissionsPage /> },

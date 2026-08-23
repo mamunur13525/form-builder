@@ -5,7 +5,7 @@
 // ---------------------------------------------------------------------------
 
 export interface ResponseAnswer {
-    fieldKey: string
+    pageKey: string
     label: string
     type: string
     value: unknown
@@ -54,8 +54,8 @@ export interface ResponseStats {
     completionRate: number
 }
 
-export interface ResponseSummaryField {
-    fieldKey: string
+export interface ResponseSummaryPage {
+    pageKey: string
     label: string
     type: string
     answerCount: number
@@ -64,7 +64,7 @@ export interface ResponseSummaryField {
 
 export interface ResponseSummary {
     totalResponses: number
-    fields: ResponseSummaryField[]
+    pages: ResponseSummaryPage[]
 }
 
 // ---------------------------------------------------------------------------
@@ -125,12 +125,12 @@ export interface PublicFormSchema {
             collectIP: boolean
         }
     }
-    fields: unknown[]
+    pages: unknown[]
 }
 
 export interface PublicFormPreview {
     form: unknown
-    fields: unknown[]
+    pages: unknown[]
 }
 
 export interface PublicFormTheme {

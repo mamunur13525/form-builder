@@ -55,7 +55,6 @@ export function DashboardPage() {
         </div>
         <Button
           onClick={() => setCreateDialogOpen(true)}
-          className="editorial-transition h-[48px] shrink-0 gap-2 rounded-[16px] bg-[var(--primary)] px-5 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] sm:h-[52px] sm:px-6"
         >
           <PlusCircle className="h-5 w-5" />
           <span className="hidden sm:inline">New Form</span>
@@ -69,51 +68,51 @@ export function DashboardPage() {
         onOpenChange={setCreateDialogOpen}
       />
 
-      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-4">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
             <CardTitle className="editorial-eyebrow text-[var(--editorial-subtle)]">
               Total Forms
             </CardTitle>
-            <FileText className="h-5 w-5 text-[var(--editorial-subtle)]" />
+            <FileText className="h-4 w-4 text-[var(--editorial-subtle)] sm:h-5 sm:w-5" />
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="font-display text-[32px] leading-none sm:text-[40px] text-[var(--foreground)]">
+          <CardContent className="p-4 sm:p-6">
+            <div className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
               {forms.length}
             </div>
-            <p className="mt-3 text-sm text-[var(--editorial-body)]">
+            <p className="mt-2 text-[13px] text-[var(--editorial-body)] sm:mt-3 sm:text-sm">
               {publishedForms} published, {draftForms} drafts
             </p>
           </CardContent>
         </Card>
-        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-4">
+        <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
             <CardTitle className="editorial-eyebrow text-[var(--editorial-subtle)]">
               Total Responses
             </CardTitle>
-            <BarChart3 className="h-5 w-5 text-[var(--editorial-subtle)]" />
+            <BarChart3 className="h-4 w-4 text-[var(--editorial-subtle)] sm:h-5 sm:w-5" />
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="font-display text-[32px] leading-none sm:text-[40px] text-[var(--foreground)]">
+          <CardContent className="p-4 sm:p-6">
+            <div className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
               {totalResponses}
             </div>
-            <p className="mt-3 text-sm text-[var(--editorial-body)]">
+            <p className="mt-2 text-[13px] text-[var(--editorial-body)] sm:mt-3 sm:text-sm">
               Across all forms
             </p>
           </CardContent>
         </Card>
-        <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)] p-6">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-4">
+        <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 sm:p-6">
             <CardTitle className="editorial-eyebrow text-[var(--editorial-subtle)]">
               Published
             </CardTitle>
-            <Eye className="h-5 w-5 text-[var(--editorial-subtle)]" />
+            <Eye className="h-4 w-4 text-[var(--editorial-subtle)] sm:h-5 sm:w-5" />
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="font-display text-[32px] leading-none sm:text-[40px] text-[var(--foreground)]">
+          <CardContent className="p-4 sm:p-6">
+            <div className="font-display text-[28px] leading-none text-[var(--foreground)] sm:text-[40px]">
               {publishedForms}
             </div>
-            <p className="mt-3 text-sm text-[var(--editorial-body)]">
+            <p className="mt-2 text-[13px] text-[var(--editorial-body)] sm:mt-3 sm:text-sm">
               Forms live and accepting responses
             </p>
           </CardContent>
@@ -125,13 +124,12 @@ export function DashboardPage() {
           Your Forms
         </h2>
         {forms.length === 0 ? (
-          <Card className="editorial-shadow-sm rounded-[24px] border-[var(--border)] bg-[var(--card)]">
-            <CardContent className="py-16 text-center">
+          <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
+            <CardContent className="py-16 text-center space-y-5">
               <p className="text-base text-[var(--editorial-subtle)]">
                 No forms yet
               </p>
               <Button
-                className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
                 onClick={() => setCreateDialogOpen(true)}
               >
                 Create your first form

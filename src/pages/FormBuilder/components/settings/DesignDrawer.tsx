@@ -6,9 +6,7 @@ import {
     ConfirmPopover,
     IconChoiceSetting,
     InputSetting,
-    PRIMARY_BUTTON_CLASS,
     RangeSetting,
-    SECONDARY_BUTTON_CLASS,
     SelectSetting,
     SettingsSection,
     TAB_LIST_CLASS,
@@ -23,7 +21,7 @@ import type {
     ContentAlignment,
     CornerRadius,
     FontSize,
-    FormField,
+    FormPage,
     IFormTheme,
     IThemeBackgroundImage,
     IThemeFont,
@@ -49,9 +47,9 @@ import { cn } from "@/lib/utils"
 interface DesignDrawerProps {
     open: boolean
     theme?: IFormTheme | null
-    page?: FormField
+    page?: FormPage
     pageIndex?: number
-    onUpdatePage?: (index: number, updates: Partial<FormField>) => void
+    onUpdatePage?: (index: number, updates: Partial<FormPage>) => void
     onSaveTheme: (theme: IFormTheme) => Promise<void>
     onCancel: () => void
     hasChangesRef: React.MutableRefObject<boolean>
@@ -66,7 +64,7 @@ type ThemeColorKey =
     | "backgroundColor"
     | "textColor"
 
-const COLOR_FIELDS: readonly { key: ThemeColorKey; label: string; fallback: string }[] = [
+const COLOR_PAGES: readonly { key: ThemeColorKey; label: string; fallback: string }[] = [
     { key: "questionColor", label: "Question Color", fallback: "#111111" },
     { key: "answerColor", label: "Answer / Input Color", fallback: "#111111" },
     { key: "buttonColor", label: "Button Background", fallback: "#000000" },
@@ -246,7 +244,7 @@ export function DesignDrawer({
     /**
      * Which preset the draft currently equals, or null when the theme has been
      * hand-tuned. Comparing resolved themes keeps the match stable regardless of
-     * key order or omitted optional fields.
+     * key order or omitted optional pages.
      */
     const activePresetId = React.useMemo(() => {
         const current = JSON.stringify(draftTheme)
@@ -330,9 +328,9 @@ export function DesignDrawer({
     return (
         <div ref={containerRef} className="flex h-full min-h-0 w-full overflow-hidden">
             {/* Preview area */}
-            <div className="h-full min-h-0 flex-1 overflow-y-auto bg-[var(--editorial-canvas)] p-6">
-                <div className="flex min-h-full w-full flex-col justify-center">
-                    <div className="editorial-shadow h-full max-h-full w-full overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
+            <div className="h-full min-h-0 flex-1 overflow-y-auto bg-[var(--editorial-canvas)] p-6 grid place-items-center">
+                <div className="h-8/12 flex w-full flex-col justify-center ">
+                    <div className="editorial-shadow h-full max-h-full w-full overflow-hidden rounded-xl bg-[var(--card)] border-dashed border-gray-400/80 pointer-events-none">
                         {page ? (
                             <PageContentEditor
                                 page={page}
@@ -351,7 +349,7 @@ export function DesignDrawer({
             </div>
 
             {/* Controls sidebar */}
-            <div className="flex h-full w-[470px] shrink-0 flex-col border-l border-[var(--border)] bg-[var(--editorial-surface)]">
+            <div className="flex h-full w-[470px] shrink-0 flex-col border-l border-[var(--border)] bg-[var(--background)]">
                 <div className="shrink-0 border-b border-[var(--editorial-border-light)] px-6 pt-6 pb-4">
                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">Design</p>
                     <h3 className="font-display mt-1 text-2xl text-[var(--foreground)]">
@@ -383,7 +381,7 @@ export function DesignDrawer({
                     >
                         <SettingsSection title="Colors">
                             <div className="grid grid-cols-1 gap-4">
-                                {COLOR_FIELDS.map(({ key, label, fallback }) => (
+                                {COLOR_PAGES.map(({ key, label, fallback }) => (
                                     <ColorSetting
                                         key={key}
                                         label={label}
@@ -538,7 +536,7 @@ export function DesignDrawer({
                             <Button
                                 variant="outline"
                                 className={cn(
-                                    SECONDARY_BUTTON_CLASS,
+                                    ' border-[var(--border)] bg-[var(--card)]',
                                     "flex-1",
                                     vibratingButton === "cancel" && "editorial-vibrate"
                                 )}
@@ -561,7 +559,6 @@ export function DesignDrawer({
                             <Button
                                 disabled={isSaving}
                                 className={cn(
-                                    PRIMARY_BUTTON_CLASS,
                                     "flex-1",
                                     vibratingButton === "save" && "editorial-vibrate"
                                 )}

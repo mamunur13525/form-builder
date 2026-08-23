@@ -49,7 +49,7 @@ Depth order, low to high: `canvas` → `surface` → `card`. An "active" or
 | Token | Value | Use |
 |---|---|---|
 | `--foreground` | `#2e2825` | Headings, primary text, active labels |
-| `--editorial-body` | `#665f5b` | Body copy, field labels |
+| `--editorial-body` | `#665f5b` | Body copy, page labels |
 | `--editorial-subtle` | `#a49a95` | Hints, captions, inactive tabs, eyebrows |
 | `--editorial-disabled` | `#ccc5be` | Disabled text |
 
@@ -127,7 +127,7 @@ Shadows are warm and soft, never dark or heavy.
 - `.editorial-shadow-md` — `0 12px 40px rgba(90,70,50,.06)`, panels, overlays
 - `.editorial-shadow-sm` — subtle lift
 - Selected item inside a track: `shadow-[0_2px_8px_rgba(24,20,18,.06)]`
-- Coral button glow: `shadow-[0_8px_24px_rgba(238,125,105,.25)]`
+- Coral button glow: ``
 
 `.editorial-transition` — 250ms ease-out on colour, border, shadow, transform,
 opacity. Put it on anything interactive.
@@ -163,7 +163,7 @@ Before building a labeled control, check
 
 `SettingsSection` · `ToggleRow` · `RequiredToggle` · `TextSetting` ·
 `NumberSetting` · `InputSetting` · `SelectSetting` · `IconChoiceSetting` ·
-`ColorSetting` · `RangeSetting` · `ConfirmPopover` · `CoverImageField`
+`ColorSetting` · `RangeSetting` · `ConfirmPopover` · `CoverImagePage`
 
 All are **data-driven** — pass an options array, not repeated JSX. Follow that
 pattern for anything new.

@@ -7,7 +7,7 @@ import { GoogleSignInButton } from "../../features/auth/components/GoogleSignInB
 import {
   AuthCard,
   AuthDivider,
-  AuthField,
+  AuthPage,
   AuthSwitchPrompt,
   authSubmitClass,
 } from "../../features/auth/components/auth-primitives";
@@ -43,7 +43,7 @@ export function LoginPage() {
       description="Enter your credentials to pick up where you left off."
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        <AuthField
+        <AuthPage
           id="email"
           label="Email"
           type="email"
@@ -53,7 +53,7 @@ export function LoginPage() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <AuthField
+        <AuthPage
           id="password"
           label="Password"
           type="password"

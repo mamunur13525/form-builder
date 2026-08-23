@@ -53,18 +53,18 @@ export function DuplicateFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="editorial editorial-shadow rounded-[30px] bg-[var(--popover)] p-10 ring-0 sm:max-w-[480px]">
+      <DialogContent className="editorial editorial-shadow rounded-2xl bg-[var(--popover)] p-6 ring-0 sm:px-7 sm:py-7 w-full">
         <DialogHeader>
-          <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+          <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
             Duplicate Form
           </DialogTitle>
-          <DialogDescription className="text-base leading-6 text-[var(--editorial-body)]">
+          <DialogDescription className="text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
             Enter a name for the duplicated form. The new form will be created
             as a draft.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
+        <div className="space-y-2 mb-4">
           <label
             htmlFor="duplicate-form-title"
             className="text-sm font-medium text-[var(--foreground)]"
@@ -84,20 +84,21 @@ export function DuplicateFormDialog({
           />
         </div>
 
-        <DialogFooter className="gap-3">
+        <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:justify-end">
           <Button
-            onClick={() => handleOpenChange(false)}
-            disabled={duplicateFormMutation.isPending}
-            className="editorial-transition h-[52px] rounded-[16px] border border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
-          >
-            Cancel
+                variant="ghost"
+                onClick={() => handleOpenChange(false)}
+                disabled={duplicateFormMutation.isPending}
+                className="w-full sm:w-auto"
+            >
+                Cancel
           </Button>
           <Button
-            onClick={handleDuplicate}
-            disabled={duplicateFormMutation.isPending || !title.trim()}
-            className="editorial-transition h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
-          >
-            {duplicateFormMutation.isPending ? "Duplicating..." : "Duplicate"}
+                onClick={handleDuplicate}
+                disabled={duplicateFormMutation.isPending || !title.trim()}
+                className="w-full sm:w-auto"
+            >
+                {duplicateFormMutation.isPending ? "Duplicating..." : "Duplicate"}
           </Button>
         </DialogFooter>
       </DialogContent>

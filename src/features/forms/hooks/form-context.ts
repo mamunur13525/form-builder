@@ -11,7 +11,7 @@ export interface FormContextValue {
   hasUnpublishedChanges: boolean;
   /**
    * Incremented every time the form is re-fetched from the server. Builder
-   * views watch this to re-sync local state after the server changes fields
+   * views watch this to re-sync local state after the server changes pages
    * underneath them (e.g. discarding a draft).
    */
   formRevision: number;

@@ -73,7 +73,7 @@ Return the answer in this order:
 
 * Include label, input, error, helper text, and validation support.
 * Support controlled value and onChange.
-* Support required fields and disabled state.
+* Support required pages and disabled state.
 
 ## If the user asks for a data table component
 
@@ -101,3 +101,19 @@ Before writing code, think about:
 * how it should be reused later
 
 Then generate the component in a clear, copy-paste-ready form.
+
+## Pattern: Settings Sections
+
+Form-settings sections (`src/pages/FormSettings/sections/`) compose shared
+primitives rather than bespoke markup:
+
+* `SettingsSection` — a titled card wrapping a divided list of rows.
+* `SettingRow` — label + description on the left, a control on the right, with optional revealed content beneath.
+* `ToggleRow` — a `SettingRow` whose control is a `Switch`; children render only when it is on (inside a `NestedPanel`).
+* `FieldLabel` / `NestedPanel` — captions and inset containers for nested inputs.
+* `SaveBar` — a sticky footer holding the save button and save status.
+
+A section owns its editable state via the `useSectionState` helper, maps it onto
+these primitives, and renders one `SaveBar` per save target. Keep data fetching
+in the `useFormSettings` hooks, not in the section component — the section only
+decides *what* to configure and *when* it is dirty.

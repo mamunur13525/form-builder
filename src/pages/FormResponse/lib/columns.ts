@@ -29,7 +29,7 @@ export const SUBMISSION_LAYERS: SubmissionLayerMeta[] = [
 ]
 
 export interface SubmissionColumn {
-    /** Unique column id — a `fieldKey` for answers, a metadata path otherwise. */
+    /** Unique column id — a `pageKey` for answers, a metadata path otherwise. */
     id: string
     label: string
     /** Metadata columns are only present in the "all" layer. */
@@ -86,15 +86,15 @@ const METADATA_COLUMNS: SubmissionColumn[] = [
 
 /** Build the answer columns for a form, ordered the same way as the form itself. */
 function buildAnswerColumns(form: Form): SubmissionColumn[] {
-    return [...form.fields]
+    return [...form.pages]
         .sort((a, b) => a.order - b.order)
-        .map((field) => ({
-            id: field.fieldKey,
-            label: field.label,
+        .map((page) => ({
+            id: page.pageKey,
+            label: page.label,
             group: "answer" as const,
             getValue: (response: FormResponse) =>
                 formatAnswerValue(
-                    response.answers.find((answer) => answer.fieldKey === field.fieldKey)?.value,
+                    response.answers.find((answer) => answer.pageKey === page.pageKey)?.value,
                 ),
         }))
 }

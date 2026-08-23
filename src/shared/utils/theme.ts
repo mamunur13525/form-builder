@@ -39,7 +39,7 @@ export function resolveFormTheme(theme?: IFormTheme | null) {
   };
 }
 
-/** A theme with every field filled in, as returned by `resolveFormTheme`. */
+/** A theme with every page filled in, as returned by `resolveFormTheme`. */
 export type ResolvedFormTheme = ReturnType<typeof resolveFormTheme>;
 
 export function getCornerRadiusClass(radius?: string): string {

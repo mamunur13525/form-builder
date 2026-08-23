@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react"
-import type { Form, FormField } from "../types/common"
-import { validateField } from "./useFormValidation"
+import type { Form, FormPage } from "../types/common"
+import { validatePage } from "./useFormValidation"
 import { submitPublicForm } from "@/entities/response/api/public-form.api"
 
 interface UseFormNavigationOptions {
@@ -17,11 +17,11 @@ interface UseFormNavigationReturn {
     submitted: boolean
     error: string | null
     submittedPages: Set<number>
-    activeFields: FormField[]
-    currentField: FormField | undefined
+    activePages: FormPage[]
+    currentPage: FormPage | undefined
     isLastStep: boolean
     isPreview: boolean
-    handleAnswer: (fieldKey: string, value: unknown) => void
+    handleAnswer: (pageKey: string, value: unknown) => void
     handleNext: () => void
     handlePrev: () => void
     handleNavNext: () => void
@@ -37,13 +37,13 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
     const [error, setError] = useState<string | null>(null)
     const [submittedPages, setSubmittedPages] = useState<Set<number>>(new Set())
 
-    const activeFields = useMemo(() => form.fields.filter((f) => f.isActive), [form.fields])
-    const currentField = activeFields[currentStep]
-    const isLastStep = currentStep === activeFields.length - 1
+    const activePages = useMemo(() => form.pages.filter((f) => f.isActive), [form.pages])
+    const currentPage = activePages[currentStep]
+    const isLastStep = currentStep === activePages.length - 1
     const isPreview = mode === "preview"
 
-    const handleAnswer = useCallback((fieldKey: string, value: unknown) => {
-        setAnswers((prev) => ({ ...prev, [fieldKey]: value }))
+    const handleAnswer = useCallback((pageKey: string, value: unknown) => {
+        setAnswers((prev) => ({ ...prev, [pageKey]: value }))
         if (error) setError(null)
     }, [error])
 
@@ -56,12 +56,12 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         setIsSubmitting(true)
         setError(null)
         try {
-            const answerList = Object.entries(answers).map(([fieldKey, value]) => {
-                const field = form.fields.find((f) => f.fieldKey === fieldKey)
+            const answerList = Object.entries(answers).map(([pageKey, value]) => {
+                const page = form.pages.find((f) => f.pageKey === pageKey)
                 return {
-                    fieldKey,
-                    label: field?.label || "",
-                    type: field?.type || "text",
+                    pageKey,
+                    label: page?.label || "",
+                    type: page?.type || "text",
                     value,
                 }
             })
@@ -74,12 +74,12 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         } finally {
             setIsSubmitting(false)
         }
-    }, [isPreview, answers, form.slug, form.fields, onSubmit])
+    }, [isPreview, answers, form.slug, form.pages, onSubmit])
 
     const handleNext = useCallback(() => {
-        if (!currentField) return
+        if (!currentPage) return
 
-        const validationError = validateField(currentField, answers[currentField.fieldKey])
+        const validationError = validatePage(currentPage, answers[currentPage.pageKey])
         if (validationError) {
             setError(validationError)
             return
@@ -93,7 +93,7 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         } else {
             setCurrentStep((prev) => prev + 1)
         }
-    }, [currentField, answers, currentStep, isLastStep, handleSubmit])
+    }, [currentPage, answers, currentStep, isLastStep, handleSubmit])
 
     const handlePrev = useCallback(() => {
         if (error) setError(null)
@@ -118,8 +118,8 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         submitted,
         error,
         submittedPages,
-        activeFields,
-        currentField,
+        activePages,
+        currentPage,
         isLastStep,
         isPreview,
         handleAnswer,

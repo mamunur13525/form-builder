@@ -1,15 +1,15 @@
 import React, { type ComponentType } from "react"
-import { GitBranch, ImagePlus, Palette, Plus, SlidersHorizontal, Trash2 } from "lucide-react"
+import { ImagePlus, Palette, SlidersHorizontal, Trash2 } from "lucide-react"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
-import { Button } from "../../../components/ui/button"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "../../../components/ui/select"
+    Combobox,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxItem,
+    ComboboxList,
+    ComboboxTrigger,
+} from "../../../components/ui/combobox"
 import {
     Tabs,
     TabsList,
@@ -17,18 +17,13 @@ import {
     TabsContent,
 } from "../../../components/ui/tabs"
 import { Sheet, SheetContent } from "../../../components/ui/sheet"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "../../../components/ui/dialog"
+
 import { DesignDrawer } from "./settings/DesignDrawer"
-import { FIELD_TYPE_LABELS } from "../../../shared/constants/form-types"
+import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, PAGE_TYPES, type PageType } from "../../../shared/constants/form-types"
 import type {
     ChoiceSettings,
-    FieldSettings,
-    FormField,
+    PageSettings,
+    FormPage,
     IFormTheme,
     Validation,
 } from "../../../shared/types/common"
@@ -37,7 +32,7 @@ import {
     defaultSettingsForType,
     CHOICE_TYPES,
     MULTI_ANSWER_TYPES,
-} from "@/features/forms/model/field-defaults"
+} from "@/features/forms/model/page-defaults"
 import {
     NumberSetting,
     RequiredToggle,
@@ -63,22 +58,15 @@ import {
     UploadSettingsWidget,
 } from "./settings/type-settings"
 
-const PAGE_TYPES = Object.entries(FIELD_TYPE_LABELS).map(([type, label]) => ({
-    type,
-    label,
-}))
 
 interface SettingsPanelProps {
-    page: FormField
+    page: FormPage
     pageIndex: number
-    onUpdate: (index: number, updates: Partial<FormField>) => void
+    onUpdate: (index: number, updates: Partial<FormPage>) => void
     theme?: IFormTheme | null
     designDrawerOpen: boolean
     onOpenDesignDrawer: () => void
     onCloseDesignDrawer: () => void
-    logicDialogOpen: boolean
-    onCloseLogicDialog: () => void
-    onOpenLogicDialog: () => void
     onSaveTheme: (theme: IFormTheme) => Promise<void>
 }
 
@@ -88,11 +76,8 @@ export function SettingsPanel({
     onUpdate,
     theme,
     designDrawerOpen,
-    logicDialogOpen,
     onOpenDesignDrawer,
-    onOpenLogicDialog,
     onCloseDesignDrawer,
-    onCloseLogicDialog,
     onSaveTheme
 }: SettingsPanelProps) {
 
@@ -109,11 +94,10 @@ export function SettingsPanel({
     }[] = [
             { value: "settings", label: "Settings", icon: SlidersHorizontal },
             { value: "design", label: "Design", icon: Palette, onSelect: onOpenDesignDrawer },
-            { value: "logic", label: "Logic", icon: GitBranch, onSelect: onOpenLogicDialog },
         ]
 
     /** Merge a single settings group, preserving the rest. */
-    const patchSettings = (group: Partial<FieldSettings>) => {
+    const patchSettings = (group: Partial<PageSettings>) => {
         onUpdate(pageIndex, { settings: { ...settings, ...group } })
     }
 
@@ -125,7 +109,7 @@ export function SettingsPanel({
      * Changing the type wipes settings server-side, so reset locally to the
      * new type's defaults (and reseed options for option-based types).
      */
-    const handleTypeChange = (value: FormField["type"] | null) => {
+    const handleTypeChange = (value: FormPage["type"] | null) => {
         if (!value) return
         const nextType = value
         const isOptionType = defaultOptionsForType(nextType).length > 0
@@ -153,10 +137,10 @@ export function SettingsPanel({
     }
 
     return (
-        <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--card)]">
-            <div className="flex flex-col border-b border-[var(--editorial-border-light)]">
-                <div className="flex-1 overflow-y-auto">
-                    <Tabs defaultValue="settings" className="flex h-full flex-col">
+        <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden bg-[var(--card)] border-l border-[var(--border)]">
+            <div className="flex flex-1 min-h-0 flex-col border-b border-[var(--editorial-border-light)]">
+                <div className="flex flex-1 min-h-0 flex-col">
+                    <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
                         {/* Pill tabs on the editorial palette: the list is the track,
                             the active tab is a raised card. */}
                         <div className="px-6 pt-5">
@@ -174,29 +158,48 @@ export function SettingsPanel({
                                 ))}
                             </TabsList>
                         </div>
-                        <TabsContent value="settings" className="h-full flex-1 overflow-y-auto">
-                            <div className="space-y-8 px-6 py-6 overflow-y-auto">
-                                {/* Field type — always available */}
+                        <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
+                            <div className="space-y-8 px-6 py-6">
+                                {/* Page type — always available */}
                                 <div className="space-y-2">
                                     <Label className="text-base font-semibold text-[var(--foreground)]">
-                                        Field Type
+                                        Page Type
                                     </Label>
-                                    <Select value={page.type} onValueChange={handleTypeChange}>
-                                        <SelectTrigger className="h-[52px] w-full rounded-full border-[var(--input)] bg-[var(--secondary)] text-base">
-                                            <SelectValue placeholder="Select field type" />
-                                        </SelectTrigger>
-                                        <SelectContent className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)]">
-                                            {PAGE_TYPES.map((pt) => (
-                                                <SelectItem
-                                                    key={pt.type}
-                                                    value={pt.type}
-                                                    className="rounded-[12px]"
-                                                >
-                                                    {pt.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <Combobox
+                                        items={PAGE_TYPES}
+                                        value={page.type}
+                                        onValueChange={handleTypeChange}
+                                    >
+                                        <ComboboxTrigger className="h-[52px] w-full rounded-xl border border-[var(--input)] bg-[var(--secondary)] text-base flex items-center px-4 justify-between">
+                                            {page.type && PAGE_TYPE_ICONS[page.type] ? (
+                                                (() => {
+                                                    const Icon = PAGE_TYPE_ICONS[page.type]
+                                                    return (
+                                                        <div className="flex items-center">
+                                                            <Icon className="h-4 w-4 mr-2" />
+                                                            <span>{PAGE_TYPE_LABELS[page.type]}</span>
+                                                        </div>
+                                                    )
+                                                })()
+                                            ) : (
+                                                <span className="text-muted-foreground">Select page type</span>
+                                            )}
+                                        </ComboboxTrigger>
+                                        <ComboboxContent className="editorial rounded-xl border border-[var(--border)] bg-[var(--popover)]">
+                                            <ComboboxEmpty>No items found.</ComboboxEmpty>
+                                            <ComboboxList>
+                                                    {(item: PageType) => {
+                                                    const Icon = PAGE_TYPE_ICONS[item]
+                                                    return (
+                                                        <ComboboxItem key={item} value={item} className="rounded-[12px] py-3.5!">
+                                                            <Icon className="h-5 w-5" />
+                                                            {PAGE_TYPE_LABELS[item]}
+                                                        </ComboboxItem>
+                                                    )
+                                                }}
+                                            </ComboboxList>
+                                        </ComboboxContent>
+                                    </Combobox>
                                 </div>
 
                                 {/* Required — every type except statement (forced false server-side) */}
@@ -340,9 +343,9 @@ export function SettingsPanel({
 
                                 {/* ---------------- Address ---------------- */}
                                 {page.type === "address" && (
-                                    <SettingsSection title="Address fields">
+                                    <SettingsSection title="Address pages">
                                         <AddressSettingsWidget
-                                            settings={settings.address ?? { fields: [] }}
+                                            settings={settings.address ?? { pages: [] }}
                                             onChange={(address) => patchSettings({ address })}
                                         />
                                     </SettingsSection>
@@ -407,7 +410,7 @@ export function SettingsPanel({
                                     </SettingsSection>
                                 )}
 
-                                {/* Cover image — available on every field type */}
+                                {/* Cover image — available on every page type */}
                                 <SettingsSection title="Cover image">
                                     {page.coverImage?.url ? (
                                         <div className="space-y-3">
@@ -440,7 +443,7 @@ export function SettingsPanel({
                                         <button
                                             type="button"
                                             onClick={() => setCoverDialogOpen(true)}
-                                            className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-[22px] border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]"
+                                            className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]"
                                         >
                                             <ImagePlus className="h-5 w-5" />
                                             <span>Add a cover image</span>
@@ -453,11 +456,11 @@ export function SettingsPanel({
                                     <Input
                                         value={page.validation?.message ?? ""}
                                         onChange={(e) => patchValidation({ message: e.target.value })}
-                                        placeholder="This field is required"
-                                        className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                                        placeholder="This page is required"
+                                        className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                                     />
                                     <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
-                                        Shown to respondents when this field fails validation.
+                                        Shown to respondents when this page fails validation.
                                     </p>
                                 </SettingsSection>
 
@@ -476,7 +479,7 @@ export function SettingsPanel({
                                                 })
                                             }
                                             placeholder="Submit"
-                                            className="h-[52px] rounded-2xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                                            className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                                         />
                                     </div>
                                 </SettingsSection>
@@ -504,7 +507,7 @@ export function SettingsPanel({
                         className="editorial h-full flex flex-col w-[90.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[90.666%] data-[side=right]:sm:max-w-none"
                         showCloseButton={false}
                     >
-                        <div className="flex-1 min-h-0 w-full">
+                        <div className=" flex-1 min-h-0 w-full">
                             <DesignDrawer
                                 open={designDrawerOpen}
                                 theme={theme}
@@ -525,43 +528,6 @@ export function SettingsPanel({
                     onSelect={(coverImage) => onUpdate(pageIndex, { coverImage })}
                     currentImage={page.coverImage}
                 />
-
-                <Dialog open={logicDialogOpen} onOpenChange={onCloseLogicDialog}>
-                    <DialogContent className="sm:max-w-[600px]">
-                        <DialogHeader>
-                            <DialogTitle>Logic Rules</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                            {page.logic.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">
-                                    No logic rules configured
-                                </p>
-                            ) : (
-                                page.logic.map((rule, ruleIndex) => (
-                                    <div
-                                        key={ruleIndex}
-                                        className="space-y-1 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-4"
-                                    >
-                                        <p className="text-base leading-6">
-                                            When <strong>{rule.whenFieldKey}</strong> {rule.operator} "
-                                            {String(rule.value)}"
-                                        </p>
-                                        <p className="text-xs text-[var(--editorial-subtle)]">
-                                            → {rule.action} {rule.targetFieldKey}
-                                        </p>
-                                    </div>
-                                ))
-                            )}
-                            <Button
-                                variant="outline"
-                                className="editorial-transition h-11 w-full rounded-[16px] border-[var(--border)] bg-[var(--secondary)] text-sm hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
-                            >
-                                <Plus className="mr-1.5 h-4 w-4" />
-                                Add Logic
-                            </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
             </div>
         </div>
     )

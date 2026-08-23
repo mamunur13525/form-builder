@@ -45,7 +45,7 @@ export const useFormStore = create<FormState>((set, get) => ({
         set({ isLoading: true, error: null })
         try {
             const apiForms: ApiForm[] = await getForms()
-            // Fields are now embedded in the form response
+            // Pages are now embedded in the form response
             const adaptedForms: Form[] = apiForms.map(adaptApiForm)
             set({ forms: adaptedForms, isLoading: false })
         } catch (err) {
@@ -198,12 +198,12 @@ export const useFormStore = create<FormState>((set, get) => ({
             const form = get().forms.find((f) => f.id === formId)
             if (!form) throw new Error("Form not found")
 
-            const answerList = Object.entries(answers).map(([fieldKey, value]) => {
-                const field = form?.fields.find((f) => f.fieldKey === fieldKey)
+            const answerList = Object.entries(answers).map(([pageKey, value]) => {
+                const page = form?.pages.find((f) => f.pageKey === pageKey)
                 return {
-                    fieldKey,
-                    label: field?.label || "",
-                    type: field?.type || "text",
+                    pageKey,
+                    label: page?.label || "",
+                    type: page?.type || "text",
                     value,
                 }
             })

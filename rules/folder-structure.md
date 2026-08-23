@@ -63,7 +63,7 @@ src/
 │   │   ├── components/
 │   │   │   ├── FormEditor.tsx
 │   │   │   ├── FormPreview.tsx
-│   │   │   ├── FormFieldItem.tsx
+│   │   │   ├── FormPageItem.tsx
 │   │   │   └── ResponseTable.tsx
 │   │   └── hooks/
 │   │       ├── useForms.ts
@@ -135,3 +135,32 @@ src/
 │   └── tailwind.css
 │
 └── main.tsx
+
+
+## Feature Example: Form Settings
+
+A multi-section settings page. **pages/** owns layout + local UI state,
+**entities/** owns types + endpoint wrappers, **features/** owns the query and
+mutation hooks that bind them.
+
+src/
+├── pages/
+│   └── FormSettings/
+│       ├── FormSettingsPage.tsx        — layout + section nav (owns SETTINGS_SECTIONS)
+│       ├── components/
+│       │   ├── primitives.tsx          — SettingsSection, SettingRow, ToggleRow, NestedPanel, FieldLabel
+│       │   └── SaveBar.tsx             — per-section save button + status
+│       ├── hooks/
+│       │   └── useSectionState.ts      — local editing state + dirty tracking
+│       └── sections/
+│           ├── GeneralSettings.tsx
+│           ├── EmailSettings.tsx
+│           ├── AccessScheduling.tsx
+│           └── HiddenFieldsVariables.tsx
+│
+├── entities/form/
+│   ├── model/types.ts                  — settings request/response types
+│   └── api/settings.api.ts             — endpoint wrappers (GET + five PATCH)
+│
+└── features/forms/hooks/
+    └── useFormSettings.ts              — query + per-section mutation hooks

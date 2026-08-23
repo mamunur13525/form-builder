@@ -1,27 +1,28 @@
+import { useState } from "react";
+import { Trash2, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
 import {
-  MoreVertical,
-  Copy,
-  Trash2,
-  FileText,
-  ChevronDown,
-  ChevronUp,
-  GripVertical,
-} from "lucide-react";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../../components/ui/popover";
+import { Button } from "../../../components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "../../../components/ui/dropdown-menu";
-import { FIELD_TYPE_ICONS } from "../../../shared/constants/form-types";
-import type { FormField } from "../../../shared/types/common";
-import type { LucideIcon } from "lucide-react";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../components/ui/tooltip";
+import {
+  PAGE_TYPE_ICONS,
+  PAGE_TYPE_LABELS,
+  PAGE_TYPE_COLORS,
+} from "../../../shared/constants/form-types";
+import type { FormPage } from "../../../shared/types/common";
 import type { IItemProps } from "react-movable";
 
 interface SortablePageItemProps {
   /** Props provided by react-movable, spread over the root element. */
   itemProps: Omit<IItemProps, "key">;
-  page: FormField;
+  page: FormPage;
   index: number;
   pagesCount: number;
   isSelected: boolean;
@@ -30,12 +31,10 @@ interface SortablePageItemProps {
   /** True while this item is lifted via keyboard (space bar). */
   isLifted: boolean;
   onSelect: (index: number) => void;
-  onDuplicate: (index: number) => void;
   onDelete: (index: number) => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
 }
-
 
 export function SortablePageItem({
   itemProps,
@@ -46,15 +45,18 @@ export function SortablePageItem({
   isDragged,
   isLifted,
   onSelect,
-  onDuplicate,
   onDelete,
   onMoveUp,
   onMoveDown,
 }: SortablePageItemProps) {
-  const Icon: LucideIcon =
-    FIELD_TYPE_ICONS[page.type as keyof typeof FIELD_TYPE_ICONS] || FileText;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const TypeIcon = PAGE_TYPE_ICONS[page.type];
+  const typeLabel = PAGE_TYPE_LABELS[page.type];
 
   const isActive = isDragged || isLifted;
+  const isFirst = index === 0;
+  const isLast = index === pagesCount - 1;
   const { style: itemStyle, ...restItemProps } = itemProps;
 
   // CRITICAL FIX FOR DRAG LAG:
@@ -69,138 +71,174 @@ export function SortablePageItem({
     transition: isDragged ? "none" : itemStyle?.transition,
   };
 
+  // Shared styling for the small square action buttons on the right.
+  const actionBtn =
+    "editorial-transition flex h-7 w-7 items-center justify-center rounded-md text-[var(--editorial-subtle)] hover:bg-[var(--card)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]";
+
   return (
     <div
       {...restItemProps}
       style={combinedStyle}
       onClick={() => onSelect(index)}
+      aria-current={isSelected ? "true" : undefined}
       className={`
-        group relative flex items-center gap-3 rounded-[18px] border px-4 py-3.5 text-sm cursor-pointer select-none
+        editorial group relative flex flex-col gap-3 rounded-xl border px-4 py-3.5
+        cursor-pointer select-none
         ${!isDragged ? "editorial-transition" : ""}
         ${isSelected
-          ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--foreground)]"
-          : "border-transparent text-[var(--editorial-body)] hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
+          ? "border-green-900/50 bg-green-700/5! shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+          : "border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--editorial-primary-ring)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
         }
-        ${!isDragged && !isSelected ? "hover:-translate-y-0.5" : ""}
-        ${isDragged ? "border-[var(--editorial-primary-ring)] bg-[var(--card)] shadow-[0_20px_50px_rgba(0,0,0,0.12)] scale-[1.02] cursor-grabbing" : ""}
-        ${isLifted ? "border-[var(--editorial-primary-ring)] bg-[var(--card)] shadow-[0_12px_40px_rgba(90,70,50,.06)]" : ""}
+        ${isDragged ? "border-[var(--primary)] bg-[var(--card)] shadow-[0_20px_50px_rgba(0,0,0,0.14)] scale-[1.02] cursor-grabbing" : ""}
+        ${isLifted && !isDragged ? "border-[var(--primary)] bg-[var(--card)] shadow-[0_12px_40px_rgba(0,0,0,0.08)]" : ""}
       `}
     >
-      {/* Drag handle — dragging only starts from here, so clicks still select */}
-      <span
-        data-movable-handle
-        aria-hidden="true"
-        tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
-        className={`
-          -ml-2 flex w-4 shrink-0 items-center justify-center rounded
-          text-[var(--editorial-disabled)] touch-none select-none
-          ${!isDragged ? "editorial-transition" : ""}
-          ${isDragged ? "cursor-grabbing" : "cursor-grab"}
-          ${isSelected || isActive ? "opacity-80" : "opacity-0 group-hover:opacity-100"}
-        `}
-      >
-        <GripVertical className="h-5 w-5" />
-      </span>
-
-      {/* Field type icon with page number */}
-      <div className="shrink-0 flex flex-col items-end gap-0.5">
-        <div
-          className={`
-            editorial-transition relative flex h-8 w-fit min-w-12 items-center justify-center gap-1
-            rounded-[12px] border
-            ${isSelected
-              ? "border-[var(--editorial-primary-ring)] bg-[var(--card)] text-[var(--primary)]"
-              : "border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-subtle)]"
-            }
-          `}
-        >
-          {page.required && (
-            <span className="absolute -top-0.5 -right-1 text-sm leading-none font-semibold text-[var(--primary)]">
-              *
-            </span>
-          )}
-          <Icon className="h-5 w-5" />
-          <span
-            className={`
-            editorial-transition text-xs font-semibold leading-none
-            ${isSelected ? "text-[var(--primary)]" : "text-[var(--editorial-subtle)]"}
-          `}
-          >
-            {index + 1}
-          </span>
-        </div>
-      </div>
-
-      {/* Label */}
-      <span className="min-w-0 flex-1 truncate text-sm leading-tight">
+      {/* Numbered page label — wraps to two lines, then truncates. */}
+      <p className="line-clamp-2 text-sm leading-snug text-[var(--foreground)]">
+        <span className="text-[var(--editorial-body)]">{index + 1}.</span>{" "}
         {page.label || (
           <span className="italic text-[var(--editorial-disabled)]">
-            Untitled
+            Untitled page
           </span>
         )}
-      </span>
-
-      {/* Actions dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          onClick={(e) => e.stopPropagation()}
-          className={`
-            editorial-transition flex h-7 w-7 shrink-0 items-center justify-center rounded-full
-            text-[var(--editorial-subtle)]
-            ${isSelected
-              ? "opacity-80 hover:bg-[var(--card)] hover:opacity-100"
-              : "opacity-0 group-hover:opacity-100 hover:bg-[var(--muted)]"
-            }
-          `}
-          aria-label="Page actions"
-        >
-          <MoreVertical className="h-4 w-4" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          side="right"
-          sideOffset={8}
-          className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)] p-2"
-        >
-          <DropdownMenuItem
-            onClick={() => onDuplicate(index)}
-            className="gap-2 rounded-[12px] px-3 py-2"
+        {page.required && (
+          <span
+            aria-label="Required"
+            className="ml-0.5 font-semibold text-[var(--destructive)]"
           >
-            <Copy size={16} />
-            Duplicate
-          </DropdownMenuItem>
-          {index !== 0 && (
-            <DropdownMenuItem
-              onClick={() => onMoveUp(index)}
-              disabled={index === 0}
-              className="gap-2 rounded-[12px] px-3 py-2"
-            >
-              <ChevronUp size={16} />
-              Move up
-            </DropdownMenuItem>
-          )}
-          {index !== pagesCount - 1 && (
-            <DropdownMenuItem
-              onClick={() => onMoveDown(index)}
-              disabled={index === pagesCount - 1}
-              className="gap-2 rounded-[12px] px-3 py-2"
-            >
-              <ChevronDown size={16} />
-              Move down
-            </DropdownMenuItem>
-          )}
+            *
+          </span>
+        )}
+      </p>
 
-          <DropdownMenuItem
-            onClick={() => onDelete(index)}
-            variant="destructive"
-            className="gap-2 rounded-[12px] px-3 py-2"
-          >
-            <Trash2 size={16} />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Action row — type badge + drag handle on the left, delete/move on the right. */}
+      <div className="flex items-center justify-between gap-2">
+        {/* Left: page-type badge + drag handle */}
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className={`inline-flex min-w-0 items-center gap-1 rounded-md border border-[var(--editorial-border-light)] bg-gradient-to-br ${PAGE_TYPE_COLORS[page.type]} px-1.5 py-0.5 text-[11px] font-medium`}>
+            <TypeIcon className="h-3 w-3 shrink-0" />
+            <span className="truncate">{typeLabel}</span>
+          </span>
+
+          {/* Drag handle — dragging only starts from here, so clicks still select. */}
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <span
+                  data-movable-handle
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  onClick={(e) => e.stopPropagation()}
+                  className={`
+              editorial-transition flex h-7 w-7 shrink-0 items-center justify-center rounded-md
+              text-[var(--editorial-subtle)] hover:bg-[var(--card)] hover:text-[var(--foreground)]
+              touch-none select-none
+              ${isActive ? "cursor-grabbing" : "cursor-grab"}
+            `}
+                >
+                  <GripVertical className="h-[18px] w-[18px]" />
+                </span>
+              }
+            />
+            <TooltipContent>Drag to reorder</TooltipContent>
+          </Tooltip>
+        </div>
+
+        {/* Right: delete (with confirm) + move up + move down */}
+        <div className="flex shrink-0 items-center gap-0.5">
+          <Popover open={confirmOpen} onOpenChange={setConfirmOpen}>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <PopoverTrigger
+                    type="button"
+                    aria-label="Delete page"
+                    onClick={(e) => e.stopPropagation()}
+                    className={`${actionBtn} hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)] data-[popup-open]:bg-[var(--destructive)]/10 data-[popup-open]:text-[var(--destructive)]`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </PopoverTrigger>
+                }
+              />
+              <TooltipContent>Delete</TooltipContent>
+            </Tooltip>
+            <PopoverContent
+              side="top"
+              align="end"
+              sideOffset={8}
+              onClick={(e) => e.stopPropagation()}
+              className="editorial w-64 gap-3 rounded-2xl p-4"
+            >
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-semibold text-[var(--foreground)]">
+                  Delete this page?
+                </p>
+                <p className="text-[13px] leading-snug text-[var(--muted-foreground)]">
+                  This can't be undone.
+                </p>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setConfirmOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setConfirmOpen(false);
+                    onDelete(index);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  aria-label="Move page up"
+                  disabled={isFirst}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveUp(index);
+                  }}
+                  className={actionBtn}
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </button>
+              }
+            />
+            <TooltipContent>Move up</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  aria-label="Move page down"
+                  disabled={isLast}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveDown(index);
+                  }}
+                  className={actionBtn}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              }
+            />
+            <TooltipContent>Move down</TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
     </div>
   );
 }

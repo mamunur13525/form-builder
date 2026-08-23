@@ -25,7 +25,7 @@ function RadioGroupItem({ className, ...props }: RadioPrimitive.Root.Props) {
     >
       <RadioPrimitive.Indicator
         data-slot="radio-group-indicator"
-        className="flex items-center justify-center after:size-2 after:rounded-full after:bg-primary data-unchecked:hidden"
+        className="flex items-center justify-center after:size-2 after:rounded-full after:bg-primary data-unchecked:hidden translate-y-[3px] "
       />
     </RadioPrimitive.Root>
   )

@@ -13,11 +13,11 @@ export interface Validation {
 }
 
 export interface LogicRule {
-    whenFieldKey: string
+    whenPageKey: string
     operator: "equals" | "notEquals" | "contains" | "greaterThan" | "lessThan"
     value: unknown
-    action: "show" | "hide" | "goToField" | "goToEnd"
-    targetFieldKey?: string
+    action: "show" | "hide" | "goToPage" | "goToEnd"
+    targetPageKey?: string
 }
 
 export interface Appearance {
@@ -63,6 +63,14 @@ export interface IFormTheme {
 
 export type Theme = IFormTheme
 
+/** A named value defined in the form's settings, referenced in text as `@name`. */
+export type VariableType = "text" | "number"
+
+export interface FormVariable {
+    name: string
+    type: VariableType
+    value: string | number | boolean
+}
 
 export interface FormSettings {
     oneQuestionAtATime: boolean
@@ -70,9 +78,15 @@ export interface FormSettings {
     allowMultipleSubmissions: boolean
     requireLogin: boolean
     collectIP: boolean
+    /**
+     * Variables defined on the FormSettings page. Referenced inside page labels
+     * and helper text as `@variable_name` and resolved to their value when the
+     * form is rendered (preview and published views).
+     */
+    variables?: FormVariable[]
 }
 
-export type FieldType =
+export type PageType =
     | "shortText"
     | "longText"
     | "email"
@@ -96,7 +110,7 @@ export type FieldType =
     | "matrix"
 
 // ---------------------------------------------------------------------------
-// Cover image (available on every field type)
+// Cover image (available on every page type)
 // ---------------------------------------------------------------------------
 
 export interface CoverImage {
@@ -106,8 +120,8 @@ export interface CoverImage {
 }
 
 // ---------------------------------------------------------------------------
-// Per-type field settings. Only the group matching the field's type is stored.
-// See doc/field-settings-frontend.md.
+// Per-type page settings. Only the group matching the page's type is stored.
+// See doc/page-settings-frontend.md.
 // ---------------------------------------------------------------------------
 
 export interface EmailSettings {
@@ -166,7 +180,7 @@ export interface ChoiceSettings {
     selectionLimit?: SelectionLimit
 }
 
-export interface AddressFieldSetting {
+export interface AddressPageSetting {
     key: "address1" | "address2" | "city" | "state" | "zip" | "country"
     label: string
     placeholder: string
@@ -176,7 +190,7 @@ export interface AddressFieldSetting {
 }
 
 export interface AddressSettings {
-    fields: AddressFieldSetting[]
+    pages: AddressPageSetting[]
 }
 
 export type RatingStyle = "star" | "number"
@@ -217,7 +231,7 @@ export interface MatrixSettings {
     allowMultiplePerRow: boolean
 }
 
-export interface FieldSettings {
+export interface PageSettings {
     email?: EmailSettings
     phone?: PhoneSettings
     statement?: StatementSettings
@@ -229,14 +243,14 @@ export interface FieldSettings {
     matrix?: MatrixSettings
 }
 
-export interface FormField {
+export interface FormPage {
     _id?: string
     formId?: string
-    fieldKey: string
+    pageKey: string
     label: string
     helperText: string
     placeholder: string
-    type: FieldType
+    type: PageType
     required: boolean
     order: number
     options: Option[]
@@ -245,7 +259,64 @@ export interface FormField {
     appearance: Appearance
     isActive: boolean
     coverImage?: CoverImage | null
-    settings?: FieldSettings
+    settings?: PageSettings
+}
+
+// ---------------------------------------------------------------------------
+// End pages (Thank You / completion screens). A form can hold several; the
+// first one is what respondents see after submitting. See doc/end-page-api.md.
+// ---------------------------------------------------------------------------
+
+export type EndPageEmbedProvider =
+    | "youtube"
+    | "loom"
+    | "vimeo"
+    | "pdf"
+    | "image"
+    | "other"
+
+export interface EndPageEmbed {
+    url: string
+    provider?: EndPageEmbedProvider
+    title?: string
+}
+
+export interface EndPageButton {
+    text: string
+    link: string
+}
+
+export interface EndPageRedirect {
+    isRedirect: boolean
+    link: string
+}
+
+export interface EndPageSocialShareMedia {
+    facebook: boolean
+    twitter: boolean
+    linkedin: boolean
+    whatsapp?: boolean
+}
+
+export interface EndPage {
+    _id?: string
+    key?: string
+    title: string
+    helperText?: string
+    /** Backwards-compatible alias for helperText. */
+    paragraph?: string
+    coverImage?: CoverImage | null
+    embed?: EndPageEmbed
+    alignment: ContentAlignment
+    button: EndPageButton
+    redirect: EndPageRedirect
+    showConfetti: boolean
+    socialShareButtons: boolean
+    socialShareMessage: string
+    socialShareMedia: EndPageSocialShareMedia
+    order: number
+    createdAt?: string
+    updatedAt?: string
 }
 
 export interface Form {
@@ -257,13 +328,14 @@ export interface Form {
     settings: FormSettings
     createdBy: string
     updatedBy?: string
-    fields: FormField[]
+    pages: FormPage[]
+    endPages?: EndPage[]
     createdAt?: string
     updatedAt?: string
 }
 
 export interface FormAnswer {
-    fieldKey: string
+    pageKey: string
     label: string
     type: string
     value: unknown

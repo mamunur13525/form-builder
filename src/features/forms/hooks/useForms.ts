@@ -5,7 +5,7 @@
  *   ["forms"]                       — list of all forms
  *   ["forms", formId]               — single form
  *   ["forms", formId, "slug"]       — form slug
- *   ["forms", formId, "fields"]     — form fields
+ *   ["forms", formId, "pages"]     — form pages
  *   ["forms", formId, "blocks"]     — form blocks
  *   ["forms", formId, "logic"]      — form logic rules
  *   ["forms", formId, "analytics"]  — form analytics

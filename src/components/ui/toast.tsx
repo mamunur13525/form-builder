@@ -41,8 +41,8 @@ const TOAST_ACCENTS: Record<string, ToastAccent> = {
     eyebrow: "Something went wrong",
   },
   warning: {
-    accent: "color-mix(in oklab, var(--editorial-note) 45%, #c9922a)",
-    ink: "color-mix(in oklab, #c9922a 68%, var(--foreground))",
+    accent: "color-mix(in oklab, var(--editorial-note) 45%, #6b6b6b)",
+    ink: "color-mix(in oklab, #6b6b6b 68%, var(--foreground))",
     soft: "color-mix(in oklab, var(--editorial-note) 55%, var(--card))",
     eyebrow: "Heads up",
   },

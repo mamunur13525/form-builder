@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 /**
  * Shared building blocks for the sign-in / sign-up screens.
  *
- * Both screens are the same layout with different fields, so the chrome lives
+ * Both screens are the same layout with different pages, so the chrome lives
  * here to keep the two pages in sync.
  */
 
@@ -41,7 +41,7 @@ export function AuthCard({
 }
 
 /** A labelled text input with optional inline error copy. */
-export function AuthField({
+export function AuthPage({
   id,
   label,
   error,
@@ -82,7 +82,7 @@ export function AuthField({
 
 /** Primary coral submit button used by both auth forms. */
 export const authSubmitClass =
-  "editorial-transition h-[52px] w-full rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none";
+  "editorial-transition w-full py-3 rounded-[16px] text-sm font-medium text-white  hover:-translate-y-0.5  active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none";
 
 /** "Or continue with" rule. */
 export function AuthDivider({ label }: { label: string }) {

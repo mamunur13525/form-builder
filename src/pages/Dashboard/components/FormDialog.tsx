@@ -108,15 +108,15 @@ export function FormDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="editorial editorial-shadow rounded-[30px] border-[var(--border)] bg-[var(--popover)] p-10"
+            className="editorial editorial-shadow rounded-2xl border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
         >
             <DialogContent>
                 <DialogHeader className="mb-6">
-                    <DialogTitle className="font-display text-[32px] leading-tight text-[var(--foreground)]">
+                    <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
                         {isCreate ? "Create New Form" : "Rename Form"}
                     </DialogTitle>
                     {isCreate && (
-                        <DialogDescription className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
+                        <DialogDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
                             Give your form a name to get started.
                         </DialogDescription>
                     )}
@@ -134,7 +134,7 @@ export function FormDialog({
                                 id="form-title"
                                 placeholder={isCreate ? "e.g. Customer Feedback Survey" : "Enter form title"}
                                 autoFocus
-                                className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--card)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
+                                className="h-12 rounded-xl border-[var(--input)] bg-[var(--card)] px-6 text-sm placeholder:text-[var(--editorial-subtle)] sm:h-[52px] sm:text-base"
                                 {...register("title")}
                             />
                             {errors.title && (
@@ -142,21 +142,21 @@ export function FormDialog({
                             )}
                         </div>
                     </div>
-                    <DialogFooter className="mt-8 gap-3">
+                    <DialogFooter className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
                         <Button
                             type="button"
                             variant="outline"
                             onClick={() => onOpenChange(false)}
-                            className="editorial-transition h-[52px] rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                            className="border-[var(--border)] bg-[var(--card)] w-full sm:w-auto"
                         >
                             Cancel
                         </Button>
                         <Button
-                            type="submit"
-                            disabled={isPending}
-                            className="editorial-transition h-[52px] rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white shadow-[0_8px_24px_rgba(238,125,105,.25)] hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
-                        >
-                            {isPending ? (isCreate ? "Creating..." : "Saving...") : isCreate ? "Create Form" : "Save"}
+                type="submit"
+                disabled={isPending}
+                className="w-full sm:w-auto"
+            >
+                {isPending ? (isCreate ? "Creating..." : "Saving...") : isCreate ? "Create Form" : "Save"}
                             {isPending && <Spinner data-icon="inline-start" />}
                         </Button>
                     </DialogFooter>

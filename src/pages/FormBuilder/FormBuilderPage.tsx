@@ -29,6 +29,7 @@ import { PageContentEditor } from "./components/PageContentEditor/PageContentEdi
 import { EndPageContentEditor } from "./components/EndPage/EndPageContentEditor";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { EndPageSettingsPanel } from "./components/EndPage/EndPageSettingsPanel";
+import { DesignDrawerSheet } from "./components/settings/DesignDrawerSheet";
 import { AddPageDialog } from "./components/AddPageDialog";
 import PageContentTopbar from "./components/PageContentEditor/PageContentTopbar";
 import { Drawer } from "@/components/ui/drawer";
@@ -668,17 +669,14 @@ export function FormBuilderPage() {
       endPage={selectedEndPage}
       endPageIndex={selectedEndPageIndex}
       onUpdate={updateEndPage}
+      onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
     />
   ) : selectedPage ? (
     <SettingsPanel
       page={selectedPage}
       pageIndex={selectedPageIndex}
       onUpdate={updatePage}
-      theme={form?.theme}
-      designDrawerOpen={designDrawerOpen}
       onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
-      onCloseDesignDrawer={() => setDesignDrawerOpen(false)}
-      onSaveTheme={handleSaveTheme}
     />
   ) : (
     <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden border border-[var(--border)] bg-[var(--card)]">
@@ -832,6 +830,28 @@ export function FormBuilderPage() {
         pagesLength={pages.length}
         onAddPage={addPage}
         onShowSaveStatus={showSaveStatus}
+      />
+
+      {/* One drawer for the whole workspace — it edits the form-wide theme and
+          previews whichever page or end page is currently selected. Rendered
+          here (not inside a settings panel) so it opens for both kinds and is
+          not unmounted with the compact-layout settings drawer. */}
+      <DesignDrawerSheet
+        open={designDrawerOpen}
+        onClose={() => setDesignDrawerOpen(false)}
+        theme={form?.theme}
+        onSaveTheme={handleSaveTheme}
+        {...(isEndPageSelected
+          ? {
+              endPage: selectedEndPage,
+              endPageIndex: selectedEndPageIndex,
+              onUpdateEndPage: updateEndPage,
+            }
+          : {
+              page: selectedPage,
+              pageIndex: selectedPageIndex,
+              onUpdatePage: updatePage,
+            })}
       />
 
     </div>

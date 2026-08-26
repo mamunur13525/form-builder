@@ -12,6 +12,7 @@ const WORKSPACE_ROUTES: string[] = [
     ROUTES.TEMPLATES,
     ROUTES.SETTINGS,
     ROUTES.PRICING,
+    ROUTES.ADMIN_UPDATES,
 ]
 
 export function MainLayout({ children }: { children: ReactNode }) {

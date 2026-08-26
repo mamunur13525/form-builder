@@ -8,6 +8,7 @@ import {
     ChevronsUpDown,
     Sparkles,
     X,
+    Megaphone,
     User as UserIcon,
 } from "lucide-react"
 import { ROUTES } from "../../shared/constants/routes"
@@ -67,6 +68,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     const displayName = user?.name || "Your account"
     const displayEmail = user?.email || "Not signed in"
 
+    // Admins get an extra entry for managing the changelog.
+    const items =
+        user?.role === "admin"
+            ? [...navItems, { label: "Updates", icon: Megaphone, path: ROUTES.ADMIN_UPDATES }]
+            : navItems
+
     return (
         <>
             {/* Scrim — only used while the drawer is open on small screens */}
@@ -102,7 +109,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
                     {/* Navigation */}
                     <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-4">
-                        {navItems.map((item) => {
+                        {items.map((item) => {
                             const isActive = location.pathname === item.path
                             return (
                                 <button

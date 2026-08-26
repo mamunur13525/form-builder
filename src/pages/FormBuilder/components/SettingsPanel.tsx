@@ -16,15 +16,12 @@ import {
     TabsTrigger,
     TabsContent,
 } from "../../../components/ui/tabs"
-import { Sheet, SheetContent } from "../../../components/ui/sheet"
 
-import { DesignDrawer } from "./settings/DesignDrawer"
 import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, PAGE_TYPES, type PageType } from "../../../shared/constants/form-types"
 import type {
     ChoiceSettings,
     PageSettings,
     FormPage,
-    IFormTheme,
     Validation,
 } from "../../../shared/types/common"
 import {
@@ -63,25 +60,16 @@ interface SettingsPanelProps {
     page: FormPage
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormPage>) => void
-    theme?: IFormTheme | null
-    designDrawerOpen: boolean
     onOpenDesignDrawer: () => void
-    onCloseDesignDrawer: () => void
-    onSaveTheme: (theme: IFormTheme) => Promise<void>
 }
 
 export function SettingsPanel({
     page,
     pageIndex,
     onUpdate,
-    theme,
-    designDrawerOpen,
     onOpenDesignDrawer,
-    onCloseDesignDrawer,
-    onSaveTheme
 }: SettingsPanelProps) {
 
-    const hasChangesRef = React.useRef(false)
     const [coverDialogOpen, setCoverDialogOpen] = React.useState(false)
     const settings = page.settings ?? {}
 
@@ -489,38 +477,6 @@ export function SettingsPanel({
                         <TabsContent value="design" className="h-full" />
                     </Tabs>
                 </div>
-
-                <Sheet
-                    open={designDrawerOpen}
-                    onOpenChange={(_open, eventDetails) => {
-                        // Prevent closing when clicking outside the sheet if there are unsaved changes
-                        if (hasChangesRef.current && (eventDetails?.reason === "outside-press" || eventDetails?.reason === "focus-out")) {
-                            return
-                        }
-                        onCloseDesignDrawer()
-                    }}
-                    modal
-                >
-                    {/* `editorial` re-points the design tokens for this portalled surface. */}
-                    <SheetContent
-                        side="right"
-                        className="editorial h-full flex flex-col w-[90.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[90.666%] data-[side=right]:sm:max-w-none"
-                        showCloseButton={false}
-                    >
-                        <div className=" flex-1 min-h-0 w-full">
-                            <DesignDrawer
-                                open={designDrawerOpen}
-                                theme={theme}
-                                page={page}
-                                pageIndex={pageIndex}
-                                onUpdatePage={onUpdate}
-                                onSaveTheme={onSaveTheme}
-                                onCancel={onCloseDesignDrawer}
-                                hasChangesRef={hasChangesRef}
-                            />
-                        </div>
-                    </SheetContent>
-                </Sheet>
 
                 <ImagePickerDialog
                     open={coverDialogOpen}

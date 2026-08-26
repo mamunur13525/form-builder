@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import {
     Copy,
     Share2,
@@ -23,6 +23,7 @@ import { PublishDialog } from "../FormBuilder/components/PublishDialog"
 import { useFormContext } from "@/features/forms/hooks/useFormContext"
 import { cn } from "@/lib/utils"
 import { Alert } from "@/components/ui/alert"
+import { showWarning } from "@/shared/hooks/useToast"
 
 /* -------------------------------------------------------------------------- */
 /*  Brand marks — this lucide build ships no social icons, so we inline crisp  */
@@ -194,7 +195,7 @@ export function FormSharePage() {
                     <Button
                         variant="link"
                         onClick={() => setShowPublishDialog(true)}
-                        className="h-auto shrink-0 p-0 text-sm font-medium text-[var(--editorial-purple)] sm:text-base"
+                        className="h-auto shrink-0 p-0 text-sm font-medium text-[var(--editorial-purple)] sm:text-base cursor-pointer"
                     >
                         Publish Now →
                     </Button>
@@ -309,7 +310,7 @@ export function FormSharePage() {
                                     <code>{emailCode}</code>
                                 </pre>
                                 <Button
-                                size="lg"
+                                    size="lg"
                                     onClick={() => copy("email-code", emailCode)}
                                     className="mt-4 w-full justify-center sm:w-auto"
                                 >
@@ -332,14 +333,17 @@ export function FormSharePage() {
                             Update the form title, share image, and favicon that appear when this link is opened or shared.
                         </CardDescription>
                     </div>
-                    <Button size="lg" className="w-full shrink-0 justify-center sm:w-auto">
-                        Open Link Settings
-                    </Button>
+                    <Link to={`/form-settings/${formId}/email-settings`} className="w-full sm:w-auto">
+                        <Button size="lg" className="w-full shrink-0 justify-center sm:w-auto">
+                            Open Link Settings
+                        </Button>
+                    </Link>
                 </CardHeader>
             </Card>
 
             <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
-                <CardHeader className="flex flex-col items-start justify-between p-5 sm:flex-row sm:items-center sm:p-8">
+                <CardHeader className="flex flex-col items-start justify-between p-5 sm:flex-row sm:items-center sm:p-8"
+                onClick={()=> showWarning("Feature not available yet. Please check back later.")}>
                     <div>
                         <CardTitle className="flex flex-wrap items-center gap-2 font-display text-xl text-[var(--foreground)] sm:gap-3 sm:text-2xl">
                             Custom Domain

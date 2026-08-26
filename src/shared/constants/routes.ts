@@ -18,4 +18,9 @@ export const ROUTES = {
     FORM_RESPONSE_ANALYTICS: "/form-response/:formId/analytics",
     FORM_PREVIEW: "/form-preview/:formId",
     FORM_FILL: "/form/:slug",
+    FEEDBACK: "/feedback",
+    FEEDBACK_DETAIL: "/feedback/:slug",
+    UPDATES: "/updates",
+    UPDATE_DETAIL: "/updates/:slug",
+    ADMIN_UPDATES: "/admin/updates",
 } as const

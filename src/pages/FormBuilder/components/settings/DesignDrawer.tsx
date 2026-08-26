@@ -20,6 +20,7 @@ import { THEME_PRESETS, type ThemePreset } from "./theme-presets"
 import type {
     ContentAlignment,
     CornerRadius,
+    EndPage,
     FontSize,
     FormPage,
     IFormTheme,
@@ -28,6 +29,7 @@ import type {
     ThemeFontSource,
 } from "@/shared/types/common"
 import { PageContentEditor } from "../PageContentEditor/PageContentEditor"
+import { EndPageContentEditor } from "../EndPage/EndPageContentEditor"
 import {
     Save,
     X,
@@ -50,6 +52,10 @@ interface DesignDrawerProps {
     page?: FormPage
     pageIndex?: number
     onUpdatePage?: (index: number, updates: Partial<FormPage>) => void
+    /** When set, the live preview shows this end page instead of `page`. */
+    endPage?: EndPage
+    endPageIndex?: number
+    onUpdateEndPage?: (index: number, updates: Partial<EndPage>) => void
     onSaveTheme: (theme: IFormTheme) => Promise<void>
     onCancel: () => void
     hasChangesRef: React.MutableRefObject<boolean>
@@ -158,6 +164,9 @@ export function DesignDrawer({
     page,
     pageIndex = 0,
     onUpdatePage,
+    endPage,
+    endPageIndex = 0,
+    onUpdateEndPage,
     onSaveTheme,
     onCancel,
     hasChangesRef,
@@ -331,7 +340,15 @@ export function DesignDrawer({
             <div className="h-full min-h-0 flex-1 overflow-y-auto bg-[var(--editorial-canvas)] p-6 grid place-items-center">
                 <div className="h-8/12 flex w-full flex-col justify-center ">
                     <div className="editorial-shadow h-full max-h-full w-full overflow-hidden rounded-xl bg-[var(--card)] border-dashed border-gray-400/80 pointer-events-none">
-                        {page ? (
+                        {endPage ? (
+                            <EndPageContentEditor
+                                endPage={endPage}
+                                endPageIndex={endPageIndex}
+                                onUpdate={onUpdateEndPage ?? noop}
+                                isMobileView={false}
+                                theme={draftTheme}
+                            />
+                        ) : page ? (
                             <PageContentEditor
                                 page={page}
                                 pageIndex={pageIndex}

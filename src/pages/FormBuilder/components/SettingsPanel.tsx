@@ -1,4 +1,4 @@
-import React, { type ComponentType } from "react"
+import React from "react"
 import { ImagePlus, Palette, SlidersHorizontal, Trash2 } from "lucide-react"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
@@ -73,17 +73,6 @@ export function SettingsPanel({
     const [coverDialogOpen, setCoverDialogOpen] = React.useState(false)
     const settings = page.settings ?? {}
 
-    // Design and Logic open overlays rather than swapping tab panels.
-    const SETTINGS_TABS: {
-        value: string
-        label: string
-        icon: ComponentType<{ className?: string }>
-        onSelect?: () => void
-    }[] = [
-            { value: "settings", label: "Settings", icon: SlidersHorizontal },
-            { value: "design", label: "Design", icon: Palette, onSelect: onOpenDesignDrawer },
-        ]
-
     /** Merge a single settings group, preserving the rest. */
     const patchSettings = (group: Partial<PageSettings>) => {
         onUpdate(pageIndex, { settings: { ...settings, ...group } })
@@ -133,17 +122,26 @@ export function SettingsPanel({
                             the active tab is a raised card. */}
                         <div className="px-6 pt-5">
                             <TabsList className={TAB_LIST_CLASS}>
-                                {SETTINGS_TABS.map((tab) => (
-                                    <TabsTrigger
-                                        key={tab.value}
-                                        value={tab.value}
-                                        onClick={() => tab.onSelect?.()}
-                                        className={TAB_TRIGGER_CLASS}
-                                    >
-                                        <tab.icon className="h-4 w-4" />
-                                        {tab.label}
-                                    </TabsTrigger>
-                                ))}
+                                {/* Settings is the only real tab and therefore
+                                    always active. Design is a plain action
+                                    button dressed up exactly like a tab
+                                    trigger: it opens the overlay drawer rather
+                                    than switching panels. */}
+                                <TabsTrigger value="settings" className={TAB_TRIGGER_CLASS}>
+                                    <SlidersHorizontal className="h-4 w-4" />
+                                    Settings
+                                </TabsTrigger>
+                                <button
+                                    type="button"
+                                    onClick={onOpenDesignDrawer}
+                                    className={
+                                        "inline-flex items-center justify-center whitespace-nowrap " +
+                                        TAB_TRIGGER_CLASS
+                                    }
+                                >
+                                    <Palette className="h-4 w-4" />
+                                    Design
+                                </button>
                             </TabsList>
                         </div>
                         <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
@@ -473,8 +471,6 @@ export function SettingsPanel({
                                 </SettingsSection>
                             </div>
                         </TabsContent>
-
-                        <TabsContent value="design" className="h-full" />
                     </Tabs>
                 </div>
 

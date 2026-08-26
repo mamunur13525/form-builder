@@ -1,4 +1,4 @@
-import { useState, type ComponentType } from "react"
+import { useState } from "react"
 import {
     AlignLeft,
     AlignCenter,
@@ -62,18 +62,6 @@ export function EndPageSettingsPanel({
 }: EndPageSettingsPanelProps) {
     const [coverDialogOpen, setCoverDialogOpen] = useState(false)
 
-    // Mirror the page SettingsPanel: Design opens the shared drawer overlay
-    // rather than swapping in a tab panel.
-    const SETTINGS_TABS: {
-        value: string
-        label: string
-        icon: ComponentType<{ className?: string }>
-        onSelect?: () => void
-    }[] = [
-            { value: "settings", label: "Settings", icon: SlidersHorizontal },
-            { value: "design", label: "Design", icon: Palette, onSelect: onOpenDesignDrawer },
-        ]
-
     const patch = (updates: Partial<EndPage>) => onUpdate(endPageIndex, updates)
     const patchButton = (b: Partial<EndPageButton>) =>
         patch({ button: { ...endPage.button, ...b } })
@@ -91,17 +79,25 @@ export function EndPageSettingsPanel({
                     track, the active tab a raised card. */}
                 <div className="px-6 pt-5">
                     <TabsList className={TAB_LIST_CLASS}>
-                        {SETTINGS_TABS.map((tab) => (
-                            <TabsTrigger
-                                key={tab.value}
-                                value={tab.value}
-                                onClick={() => tab.onSelect?.()}
-                                className={TAB_TRIGGER_CLASS}
-                            >
-                                <tab.icon className="h-4 w-4" />
-                                {tab.label}
-                            </TabsTrigger>
-                        ))}
+                        {/* Same treatment as the page SettingsPanel: the
+                            Settings tab is the only real tab (always active)
+                            and Design is a lookalike action button that opens
+                            the shared overlay drawer. */}
+                        <TabsTrigger value="settings" className={TAB_TRIGGER_CLASS}>
+                            <SlidersHorizontal className="h-4 w-4" />
+                            Settings
+                        </TabsTrigger>
+                        <button
+                            type="button"
+                            onClick={onOpenDesignDrawer}
+                            className={
+                                "inline-flex items-center justify-center whitespace-nowrap " +
+                                TAB_TRIGGER_CLASS
+                            }
+                        >
+                            <Palette className="h-4 w-4" />
+                            Design
+                        </button>
                     </TabsList>
                 </div>
 
@@ -253,8 +249,6 @@ export function EndPageSettingsPanel({
                     </SettingsSection>
                     </div>
                 </TabsContent>
-
-                <TabsContent value="design" className="h-full" />
             </Tabs>
 
             <ImagePickerDialog

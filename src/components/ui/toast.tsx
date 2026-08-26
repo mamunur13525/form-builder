@@ -107,7 +107,10 @@ function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
       className={cn(
         // Toasts are portalled out of the app subtree, so they opt into the
         // editorial palette here, exactly like dialogs and popovers do.
-        "editorial pointer-events-none fixed inset-x-4 bottom-4 z-50 mx-auto w-auto max-w-[400px] outline-none sm:right-6 sm:bottom-6 sm:left-auto sm:mx-0 sm:w-full",
+        // One layer above every portalled overlay (sheets, dialogs and drawers
+        // share `z-50`): with equal z-indexes, DOM order would let a sheet's
+        // portal paint over these toasts.
+        "editorial pointer-events-none fixed inset-x-4 bottom-4 z-[60] mx-auto w-auto max-w-[400px] outline-none sm:right-6 sm:bottom-6 sm:left-auto sm:mx-0 sm:w-full",
         className
       )}
       {...props}

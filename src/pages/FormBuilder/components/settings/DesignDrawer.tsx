@@ -44,6 +44,8 @@ import {
     Sparkles,
 } from "lucide-react"
 import { resolveFormTheme, loadThemeFont, getCornerRadiusCss, type ResolvedFormTheme } from "@/shared/utils/theme"
+import { playNudgeFeedback } from "@/shared/utils/nudge-feedback"
+import { showError, showSuccess } from "@/shared/hooks/useToast"
 import { cn } from "@/lib/utils"
 
 interface DesignDrawerProps {
@@ -218,10 +220,15 @@ export function DesignDrawer({
 
     React.useEffect(() => clearNudgeTimers, [clearNudgeTimers])
 
-    /** Draw the eye to Cancel, then Save, when an outside click is ignored. */
+    /**
+     * Draw the eye to Cancel, then Save when an outside click is ignored —
+     * backed by a beep and haptic buzz timed to each stage, so the block
+     * registers even if the footer sits outside the current viewport.
+     */
     const nudgeFooterButtons = React.useCallback(() => {
         clearNudgeTimers()
         setVibratingButton("cancel")
+        playNudgeFeedback()
         nudgeTimers.current.push(
             window.setTimeout(() => setVibratingButton(null), 300),
             window.setTimeout(() => setVibratingButton("save"), 300),
@@ -319,8 +326,13 @@ export function DesignDrawer({
             await onSaveTheme(draftTheme)
             hasChangesRef.current = false
             setSavePopoverOpen(false)
+            // Confirm the save first, then dismiss the drawer.
+            showSuccess("Design saved", "Your theme changes have been applied.")
+            onCancel()
         } catch (error) {
             console.error("Failed to save theme:", error)
+            // Keep the drawer open so nothing is lost; say why the save failed.
+            showError("Could not save design", error)
         } finally {
             setIsSaving(false)
         }

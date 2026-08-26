@@ -344,6 +344,23 @@ export function DesignDrawer({
         onCancel()
     }
 
+    /**
+     * Only ask "discard?" when there is something to discard. The Cancel
+     * trigger routes its open request through here, so with unsaved changes
+     * the confirm popover opens, and without them Cancel closes the drawer
+     * straight away. Close requests always pass through untouched.
+     */
+    const handleCancelPopoverOpenChange = React.useCallback(
+        (nextOpen: boolean) => {
+            if (nextOpen && !hasChangesRef.current) {
+                onCancel()
+                return
+            }
+            setCancelPopoverOpen(nextOpen)
+        },
+        [hasChangesRef, onCancel]
+    )
+
     const backgroundImage = draftTheme.backgroundImage
 
     return (
@@ -555,7 +572,7 @@ export function DesignDrawer({
                 <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[var(--editorial-border-light)] bg-[var(--card)] p-4">
                     <ConfirmPopover
                         open={cancelPopoverOpen}
-                        onOpenChange={setCancelPopoverOpen}
+                        onOpenChange={handleCancelPopoverOpenChange}
                         align="start"
                         title="Discard theme changes?"
                         description="You have unsaved theme changes. If you cancel, all changes will be lost."

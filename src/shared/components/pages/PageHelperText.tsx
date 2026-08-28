@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import { VariableEditable } from "./VariableEditable"
 import { renderVariableText, type VariableItem } from "./formVariables"
+import { VariableText } from "./VariableText"
 
 interface PageHelperTextProps {
     helperText?: string
@@ -10,6 +11,12 @@ interface PageHelperTextProps {
     fontSizeClass?: string
     /** Variables offered in the `@` menu (editable) and resolved (render). */
     variables?: VariableItem[]
+    /**
+     * Render `@tokens` as coloured chips instead of resolving their values
+     * (non-editable mode only). Used by miniature previews such as the
+     * Logic Builder page nodes.
+     */
+    highlightVariables?: boolean
 }
 
 export function PageHelperText({
@@ -19,6 +26,7 @@ export function PageHelperText({
     color,
     fontSizeClass,
     variables = [],
+    highlightVariables,
 }: PageHelperTextProps) {
     const sizeClass = fontSizeClass || "text-[18px]"
 
@@ -47,12 +55,22 @@ export function PageHelperText({
 
     return (
         <div className="w-full space-y-1 mt-1">
-            <p
-                className={cn(sizeClass, "w-full text-muted-foreground pb-1")}
-                style={color ? { color } : undefined}
-            >
-                {renderVariableText(helperText, variables)}
-            </p>
+            {highlightVariables ? (
+                <VariableText
+                    as="p"
+                    text={helperText}
+                    variables={variables}
+                    className={cn(sizeClass, "w-full text-muted-foreground pb-1")}
+                    style={color ? { color } : undefined}
+                />
+            ) : (
+                <p
+                    className={cn(sizeClass, "w-full text-muted-foreground pb-1")}
+                    style={color ? { color } : undefined}
+                >
+                    {renderVariableText(helperText, variables)}
+                </p>
+            )}
         </div>
     )
 }

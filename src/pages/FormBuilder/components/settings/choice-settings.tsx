@@ -1,6 +1,8 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import type { ChoiceSettings, OptionsPerRow } from "@/shared/types/common"
+import { CONTROL_CLASS } from "./primitives"
 
 /** "Other" option toggle (choice group). */
 export function OtherOptionSetting({
@@ -12,7 +14,10 @@ export function OtherOptionSetting({
 }) {
     return (
         <div className="flex items-center justify-between gap-3">
-            <Label htmlFor="allow-other" className="text-base cursor-pointer">
+            <Label
+                htmlFor="allow-other"
+                className="cursor-pointer text-base text-[var(--editorial-body)]"
+            >
                 "Other" option
             </Label>
             <div className="flex items-center gap-2">
@@ -22,15 +27,13 @@ export function OtherOptionSetting({
                         value={settings.otherLabel}
                         onChange={(e) => onChange({ ...settings, otherLabel: e.target.value })}
                         placeholder="Other"
-                        className="h-8 w-24 rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className={CONTROL_CLASS + " w-28 border px-3 outline-none"}
                     />
                 )}
-                <input
-                    type="checkbox"
+                <Switch
                     id="allow-other"
                     checked={settings.allowOther}
-                    onChange={(e) => onChange({ ...settings, allowOther: e.target.checked })}
-                    className="h-4 w-4"
+                    onCheckedChange={(allowOther) => onChange({ ...settings, allowOther })}
                 />
             </div>
         </div>
@@ -48,23 +51,24 @@ export function HorizontalAlignSetting({
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-                <Label htmlFor="horiz-align" className="text-base cursor-pointer">
+                <Label
+                    htmlFor="horiz-align"
+                    className="cursor-pointer text-base text-[var(--editorial-body)]"
+                >
                     Horizontally align options
                 </Label>
-                <input
-                    type="checkbox"
+                <Switch
                     id="horiz-align"
                     checked={settings.horizontalAlign}
-                    onChange={(e) =>
-                        onChange({ ...settings, horizontalAlign: e.target.checked })
+                    onCheckedChange={(horizontalAlign) =>
+                        onChange({ ...settings, horizontalAlign })
                     }
-                    className="h-4 w-4"
                 />
             </div>
 
             {settings.horizontalAlign && (
-                <div className="space-y-3 rounded-md border bg-muted/20 p-3">
-                    <Label className="text-base font-medium">
+                <div className="space-y-3 rounded-[14px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-3">
+                    <Label className="text-base text-[var(--editorial-body)]">
                         Number of options per row
                     </Label>
                     <OptionsPerRowSetting
@@ -91,13 +95,13 @@ function OptionsPerRowSetting({
 
     return (
         <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Desktop</Label>
+            <div className="space-y-1.5">
+                <Label className="text-xs text-[var(--editorial-subtle)]">Desktop</Label>
                 <Select
                     value={String(value.desktop)}
                     onValueChange={(v) => onChange({ ...value, desktop: Number(v) })}
                 >
-                    <SelectTrigger className="w-full" size="sm">
+                    <SelectTrigger className={CONTROL_CLASS + " w-full"}>
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -109,13 +113,13 @@ function OptionsPerRowSetting({
                     </SelectContent>
                 </Select>
             </div>
-            <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Mobile</Label>
+            <div className="space-y-1.5">
+                <Label className="text-xs text-[var(--editorial-subtle)]">Mobile</Label>
                 <Select
                     value={String(value.mobile)}
                     onValueChange={(v) => onChange({ ...value, mobile: Number(v) })}
                 >
-                    <SelectTrigger className="w-full" size="sm">
+                    <SelectTrigger className={CONTROL_CLASS + " w-full"}>
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -141,15 +145,16 @@ export function HideLabelsSetting({
 }) {
     return (
         <div className="flex items-center justify-between gap-3">
-            <Label htmlFor="hide-labels" className="text-base cursor-pointer">
-                Hide Labels
+            <Label
+                htmlFor="hide-labels"
+                className="cursor-pointer text-base text-[var(--editorial-body)]"
+            >
+                Hide labels
             </Label>
-            <input
-                type="checkbox"
+            <Switch
                 id="hide-labels"
                 checked={settings.hideLabels}
-                onChange={(e) => onChange({ ...settings, hideLabels: e.target.checked })}
-                className="h-4 w-4"
+                onCheckedChange={(hideLabels) => onChange({ ...settings, hideLabels })}
             />
         </div>
     )
@@ -172,7 +177,7 @@ export function SelectionLimitSetting({
 
     return (
         <div className="space-y-3">
-            <Label className="text-base">Selection Limit</Label>
+            <Label className="text-base text-[var(--editorial-body)]">Selection limit</Label>
             <Select
                 value={mode}
                 onValueChange={(v: "none" | "exact" | "range" | null) => {
@@ -183,7 +188,7 @@ export function SelectionLimitSetting({
                     })
                 }}
             >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className={CONTROL_CLASS + " w-full"}>
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
@@ -240,8 +245,8 @@ function NumberInput({
     placeholder?: string
 }) {
     return (
-        <div className="space-y-1">
-            <Label className="text-base text-muted-foreground">{label}</Label>
+        <div className="space-y-1.5">
+            <Label className="text-base text-[var(--editorial-body)]">{label}</Label>
             <input
                 type="number"
                 value={value ?? ""}
@@ -253,7 +258,7 @@ function NumberInput({
                     onChange(Number(e.target.value))
                 }}
                 placeholder={placeholder}
-                className="h-9 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className={CONTROL_CLASS + " w-full border px-4 outline-none"}
             />
         </div>
     )

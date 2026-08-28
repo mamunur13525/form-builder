@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import { VariableEditable } from "./VariableEditable"
 import { renderVariableText, type VariableItem } from "./formVariables"
+import { VariableText } from "./VariableText"
 
 interface PageLabelProps {
     label: string
@@ -11,6 +12,12 @@ interface PageLabelProps {
     fontSizeClass?: string
     /** Variables offered in the `@` menu (editable) and resolved (render). */
     variables?: VariableItem[]
+    /**
+     * Render `@tokens` as coloured chips instead of resolving their values
+     * (non-editable mode only). Used by miniature previews such as the
+     * Logic Builder page nodes.
+     */
+    highlightVariables?: boolean
 }
 
 export function PageLabel({
@@ -21,6 +28,7 @@ export function PageLabel({
     color,
     fontSizeClass,
     variables = [],
+    highlightVariables,
 }: PageLabelProps) {
     const sizeClass = fontSizeClass || "text-[26px]"
 
@@ -55,12 +63,22 @@ export function PageLabel({
                     {pageNumber}
                 </span>
             )}
-            <h2
-                className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-semibold")}
-                style={color ? { color } : undefined}
-            >
-                {renderVariableText(label, variables)}
-            </h2>
+            {highlightVariables ? (
+                <VariableText
+                    as="h2"
+                    text={label}
+                    variables={variables}
+                    className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-semibold")}
+                    style={color ? { color } : undefined}
+                />
+            ) : (
+                <h2
+                    className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-semibold")}
+                    style={color ? { color } : undefined}
+                >
+                    {renderVariableText(label, variables)}
+                </h2>
+            )}
         </div>
     )
 }

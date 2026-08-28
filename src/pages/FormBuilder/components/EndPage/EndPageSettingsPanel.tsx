@@ -164,17 +164,15 @@ export function EndPageSettingsPanel({
                                     }
                                     placeholder="Check out this form!"
                                 />
-                                <div className="space-y-3">
-                                    {SHARE_PLATFORMS.map((p) => (
-                                        <ToggleRow
-                                            key={p.key}
-                                            id={`share-${p.key}`}
-                                            label={p.label}
-                                            checked={Boolean(endPage.socialShareMedia?.[p.key])}
-                                            onCheckedChange={(v) => patchMedia({ [p.key]: v })}
-                                        />
-                                    ))}
-                                </div>
+                                {SHARE_PLATFORMS.map((p) => (
+                                    <ToggleRow
+                                        key={p.key}
+                                        id={`share-${p.key}`}
+                                        label={p.label}
+                                        checked={Boolean(endPage.socialShareMedia?.[p.key])}
+                                        onCheckedChange={(v) => patchMedia({ [p.key]: v })}
+                                    />
+                                ))}
                             </>
                         )}
                     </SettingsSection>

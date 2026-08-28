@@ -2,6 +2,7 @@ import { Star, Hash } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { RatingSettings as RatingSettingsType } from "@/shared/types/common"
+import { CONTROL_CLASS } from "./primitives"
 
 /** Rating settings: star vs number style + max rating (2–10). */
 export function RatingSettingsWidget({
@@ -15,8 +16,8 @@ export function RatingSettingsWidget({
 
     return (
         <div className="space-y-3">
-            <div className="space-y-2">
-                <Label className="text-base">Rating style</Label>
+            <div className="space-y-1.5">
+                <Label className="text-base text-[var(--editorial-body)]">Rating style</Label>
                 <div className="flex items-center gap-2">
                     <StyleButton
                         active={settings.style === "star"}
@@ -33,13 +34,13 @@ export function RatingSettingsWidget({
                 </div>
             </div>
 
-            <div className="space-y-1">
-                <Label className="text-base text-muted-foreground">Max rating</Label>
+            <div className="space-y-1.5">
+                <Label className="text-base text-[var(--editorial-body)]">Max rating</Label>
                 <Select
                     value={String(settings.max)}
                     onValueChange={(v) => onChange({ ...settings, max: Number(v) })}
                 >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className={CONTROL_CLASS + " w-full"}>
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -50,7 +51,7 @@ export function RatingSettingsWidget({
                         ))}
                     </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                     Respondents will rate from 1 to {settings.max}.
                 </p>
             </div>
@@ -73,10 +74,10 @@ function StyleButton({
         <button
             type="button"
             onClick={onClick}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm transition-colors ${
+            className={`editorial-transition flex h-[44px] flex-1 items-center justify-center gap-1.5 rounded-[12px] border px-4 text-sm ${
                 active
-                    ? "border-primary bg-primary/10 font-medium text-primary"
-                    : "hover:bg-accent"
+                    ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] font-medium text-[var(--foreground)]"
+                    : "border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
             }`}
         >
             {icon}

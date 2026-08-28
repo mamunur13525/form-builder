@@ -16,7 +16,13 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { RotateCcw } from "lucide-react";
+import { useParams } from "react-router-dom";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
+import { useFormSettings } from "@/features/forms/hooks/useFormSettings";
+import {
+  buildVariableItems,
+  type VariableItem,
+} from "@/shared/components/pages";
 import type { EndPage, FormPage } from "../../shared/types/common";
 import { PageNode, type PageNodeData, type PageNodeType } from "./components/PageNode";
 import {
@@ -51,7 +57,11 @@ function pageId(page: FormPage, index: number): string {
  * The first node never renders an incoming handle and the last node never
  * renders an outgoing handle, so the flow reads as a bounded start → end chain.
  */
-function buildNodes(pages: FormPage[], endPage: EndPage | null): FlowNode[] {
+function buildNodes(
+  pages: FormPage[],
+  endPage: EndPage | null,
+  variables: VariableItem[],
+): FlowNode[] {
   const nodes: FlowNode[] = pages.map((page, index) => ({
     id: pageId(page, index),
     type: "pageNode",
@@ -59,9 +69,11 @@ function buildNodes(pages: FormPage[], endPage: EndPage | null): FlowNode[] {
     data: {
       index,
       label: page.label,
+      helperText: page.helperText,
       type: page.type,
       required: page.required,
       ruleCount: page.logic?.length ?? 0,
+      variables,
       hasTarget: index !== 0,
       hasSource: true,
     } satisfies PageNodeData,
@@ -74,6 +86,8 @@ function buildNodes(pages: FormPage[], endPage: EndPage | null): FlowNode[] {
       position: { x: pages.length * NODE_STEP_X, y: 0 },
       data: {
         title: endPage.title,
+        helperText: endPage.helperText || endPage.paragraph,
+        variables,
         hasTarget: true,
         hasSource: false,
       } satisfies EndPageNodeData,
@@ -130,10 +144,19 @@ const defaultEdgeOptions = {
  */
 function LogicFlow() {
   const { form, isLoading, error } = useFormContext();
+  const { formId } = useParams();
   const pages = useMemo(() => form?.pages ?? [], [form]);
   const endPage = useMemo<EndPage | null>(
     () => form?.endPages?.[0] ?? null,
     [form],
+  );
+
+  // Variables (plus the built-in form_name) highlighted on the node previews —
+  // same source the Build tab's editors use.
+  const { data: settingsData } = useFormSettings(formId ?? "");
+  const variables = useMemo(
+    () => buildVariableItems(settingsData?.settings.variables, form?.title),
+    [settingsData?.settings.variables, form?.title],
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>([]);
@@ -150,10 +173,10 @@ function LogicFlow() {
   // Build (or rebuild) the graph whenever the form's pages change. Positions
   // are deterministic, so this also serves as the "initial layout".
   useEffect(() => {
-    setNodes(buildNodes(pages, endPage));
+    setNodes(buildNodes(pages, endPage, variables));
     setEdges(buildEdges(pages, endPage !== null));
     didInitialFit.current = false;
-  }, [pages, endPage, setNodes, setEdges]);
+  }, [pages, endPage, variables, setNodes, setEdges]);
 
   // Fit the flow into view once the freshly-built nodes have been measured.
   // This is the reliable moment to fit, since node dimensions are known.
@@ -180,12 +203,12 @@ function LogicFlow() {
 
   // Reload / Reset — restore the initial horizontal layout and re-fit the view.
   const handleReset = useCallback(() => {
-    setNodes(buildNodes(pages, endPage));
+    setNodes(buildNodes(pages, endPage, variables));
     setEdges(buildEdges(pages, endPage !== null));
     setSelected(null);
     // Let React Flow apply the restored positions before fitting.
     window.setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 60);
-  }, [pages, endPage, setNodes, setEdges, fitView]);
+  }, [pages, endPage, variables, setNodes, setEdges, fitView]);
 
   if (isLoading) {
     return (

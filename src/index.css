@@ -228,8 +228,6 @@
     --input: #d4d4d4;
     --ring: var(--palette-brand);
 
-    --destructive: #2b2b2b;
-
     /* Semantic — fully monochrome; strength maps to darkness */
     --editorial-success: #3f3f3f;
     --editorial-success-soft: #ededed;

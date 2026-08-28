@@ -9,7 +9,8 @@ import type {
     UploadSettings as UploadSettingsType,
 } from "@/shared/types/common"
 import { STATEMENT_PROVIDERS, UPLOAD_FILE_GROUPS } from "@/features/forms/model/page-defaults"
-import { ToggleRow, NumberSetting, TextSetting } from "./primitives"
+import { ToggleRow, NumberSetting, TextSetting, CONTROL_CLASS } from "./primitives"
+import { Switch } from "@/components/ui/switch"
 import { Eye, EyeOff, Plus, X } from "lucide-react"
 
 // ---------------------------------------------------------------------------
@@ -25,12 +26,12 @@ export function StatementSettingsWidget({
 }) {
     return (
         <div className="space-y-3">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                 Embed any link: YouTube, Loom, Vimeo, PDF etc.
             </p>
 
-            <div className="space-y-1">
-                <Label className="text-base text-muted-foreground">Provider</Label>
+            <div className="space-y-1.5">
+                <Label className="text-base text-[var(--editorial-body)]">Provider</Label>
                 <Select
                     value={settings.embedProvider}
                     onValueChange={(v) =>
@@ -40,7 +41,7 @@ export function StatementSettingsWidget({
                         })
                     }
                 >
-                    <SelectTrigger className="w-full h-[52px]! rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base ">
+                    <SelectTrigger className={CONTROL_CLASS + " w-full"}>
                         <SelectValue placeholder="Select provider" />
                     </SelectTrigger>
                     <SelectContent>
@@ -150,23 +151,21 @@ export function UploadSettingsWidget({
                 onCheckedChange={(allowMultiple) => onChange({ ...settings, allowMultiple })}
             />
 
-            <div className="space-y-2">
-                <Label className="text-base">Allowed file types</Label>
-                <p className="text-xs text-muted-foreground">
+            <div className="space-y-1.5">
+                <Label className="text-base text-[var(--editorial-body)]">Allowed file types</Label>
+                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                     Leave all unchecked to allow every file type.
                 </p>
-                <div className="space-y-1.5 rounded-md border bg-muted/20 p-3">
+                <div className="space-y-3 rounded-[14px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-3">
                     {UPLOAD_FILE_GROUPS.map((group) => (
                         <label
                             key={group.value}
                             className="flex cursor-pointer items-center justify-between text-sm"
                         >
                             <span>{group.label}</span>
-                            <input
-                                type="checkbox"
+                            <Switch
                                 checked={settings.allowedFileTypes.includes(group.value)}
-                                onChange={() => toggleType(group.value)}
-                                className="h-4 w-4"
+                                onCheckedChange={() => toggleType(group.value)}
                             />
                         </label>
                     ))}
@@ -210,28 +209,28 @@ export function AddressSettingsWidget({
     const sorted = [...settings.pages].sort((a, b) => a.order - b.order)
 
     return (
-        <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">
+        <div className="space-y-3">
+            <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                 Rename labels, set placeholders, and choose which parts are required or hidden.
             </p>
             {sorted.map((page) => (
                 <div
                     key={page.key}
-                    className="space-y-2 rounded-md border bg-muted/20 p-3"
+                    className="space-y-3 rounded-[14px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-3"
                     data-hidden={page.hidden}
                 >
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
                         <Input
                             value={page.label}
                             onChange={(e) => updatePage(page.key, { label: e.target.value })}
-                            className="h-8 flex-1 text-sm font-medium"
+                            className={CONTROL_CLASS + " flex-1 px-3 font-medium"}
                             placeholder="Label"
                         />
                         <button
                             type="button"
                             onClick={() => updatePage(page.key, { hidden: !page.hidden })}
                             title={page.hidden ? "Show page" : "Hide page"}
-                            className="rounded-md border p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                            className="editorial-transition rounded-[10px] border border-[var(--border)] bg-[var(--secondary)] p-2 text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]"
                         >
                             {page.hidden ? (
                                 <EyeOff className="h-3.5 w-3.5" />
@@ -248,20 +247,24 @@ export function AddressSettingsWidget({
                                 onChange={(e) =>
                                     updatePage(page.key, { placeholder: e.target.value })
                                 }
-                                className="h-8 text-sm"
+                                className={CONTROL_CLASS + " px-3"}
                                 placeholder="Placeholder"
                             />
-                            <label className="flex cursor-pointer items-center justify-between text-xs text-muted-foreground">
-                                Required
-                                <input
-                                    type="checkbox"
+                            <div className="flex items-center justify-between gap-3">
+                                <Label
+                                    htmlFor={`address-required-${page.key}`}
+                                    className="cursor-pointer text-xs text-[var(--editorial-subtle)]"
+                                >
+                                    Required
+                                </Label>
+                                <Switch
+                                    id={`address-required-${page.key}`}
                                     checked={page.required}
-                                    onChange={(e) =>
-                                        updatePage(page.key, { required: e.target.checked })
+                                    onCheckedChange={(required) =>
+                                        updatePage(page.key, { required })
                                     }
-                                    className="h-3.5 w-3.5"
                                 />
-                            </label>
+                            </div>
                         </>
                     )}
                 </div>
@@ -388,8 +391,8 @@ function MatrixList({
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between">
-                <Label className="text-base">{title}</Label>
-                <span className="text-xs text-muted-foreground">
+                <Label className="text-base text-[var(--editorial-body)]">{title}</Label>
+                <span className="text-xs text-[var(--editorial-subtle)]">
                     {items.length} / {max}
                 </span>
             </div>
@@ -401,14 +404,14 @@ function MatrixList({
                         <Input
                             value={item.label}
                             onChange={(e) => onRename(item.key, e.target.value)}
-                            className="h-8 flex-1 text-sm"
+                            className={CONTROL_CLASS + " flex-1 px-3"}
                             placeholder={title === "Rows" ? "Row label" : "Column label"}
                         />
                         <button
                             type="button"
                             onClick={() => onRemove(item.key)}
                             disabled={items.length <= 1}
-                            className="rounded-md border p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"
+                            className="editorial-transition rounded-[10px] border border-[var(--border)] bg-[var(--secondary)] p-2 text-[var(--editorial-subtle)] hover:border-[var(--destructive)]/30 hover:text-[var(--destructive)] disabled:pointer-events-none disabled:opacity-40"
                         >
                             <X className="h-3.5 w-3.5" />
                         </button>
@@ -418,9 +421,9 @@ function MatrixList({
                 type="button"
                 onClick={onAdd}
                 disabled={items.length >= max}
-                className="flex w-full items-center justify-center gap-1 rounded-md border py-1.5 text-sm hover:bg-accent disabled:opacity-40"
+                className="editorial-transition flex w-full items-center justify-center gap-1.5 rounded-[12px] border border-[var(--border)] bg-[var(--secondary)] py-2.5 text-sm text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] disabled:pointer-events-none disabled:opacity-40"
             >
-                <Plus className="h-3.5 w-3.5" />
+                <Plus className="h-4 w-4" />
                 Add {title === "Rows" ? "row" : "column"}
             </button>
         </div>

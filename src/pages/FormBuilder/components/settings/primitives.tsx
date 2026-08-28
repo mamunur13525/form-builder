@@ -31,8 +31,10 @@ import { showError } from "@/shared/hooks/useToast"
 import type { CoverImage } from "@/shared/types/common"
 import { cn } from "@/lib/utils"
 
-/** Shared control geometry so every settings input lines up. */
-const CONTROL_CLASS =
+/** Shared control geometry so every settings input lines up. Exported for the
+ * type-specific widget files (choice/phone/rating/type-settings) so ad-hoc
+ * controls stay pixel-identical to the primitives. */
+export const CONTROL_CLASS =
     "editorial-transition h-[44px] rounded-[14px] border-[var(--input)] bg-[var(--secondary)] text-sm text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] focus-visible:border-[var(--ring)]"
 
 /** Portalled surfaces escape the `.editorial` subtree, so they opt back in. */
@@ -53,7 +55,7 @@ export const TAB_LIST_CLASS =
     "h-auto w-full gap-1 rounded-xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)] group-data-horizontal/tabs:h-auto"
 
 export const TAB_TRIGGER_CLASS =
-    "editorial-transition flex-1 gap-2 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none"
+    "editorial-transition flex-1 gap-2 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none cursor-pointer"
 
 const PAGE_LABEL_CLASS = "text-sm font-medium text-[var(--editorial-body)]"
 
@@ -98,16 +100,20 @@ export function SettingsSection({
 }) {
     return (
         <div className={cn("space-y-4", className)}>
-            <div className="space-y-1.5">
-                <Label className="text-base font-semibold text-[var(--foreground)]">
-                    {title}
-                </Label>
-                {description && (
-                    <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
-                        {description}
-                    </p>
-                )}
-            </div>
+            {/* An empty title renders a bare group: the fields keep the shared
+                spacing without an (empty) section heading above them. */}
+            {title && (
+                <div className="space-y-1.5">
+                    <Label className="text-[15px] font-medium text-[var(--foreground)]">
+                        {title}
+                    </Label>
+                    {description && (
+                        <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                            {description}
+                        </p>
+                    )}
+                </div>
+            )}
             {children}
         </div>
     )
@@ -213,7 +219,7 @@ export function NumberSetting({
                     onChange(Number(raw))
                 }}
                 placeholder={placeholder}
-                className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                className={cn(CONTROL_CLASS, "px-4")}
             />
             {description && (
                 <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
@@ -240,12 +246,12 @@ export function TextSetting({
 }) {
     return (
         <div className="space-y-1.5">
-            <Label className="text-base text-[var(--editorial-body)]">{label}</Label>
+            <Label className="block text-[15px] text-[var(--editorial-body)]">{label}</Label>
             <Input
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
+                className={cn(CONTROL_CLASS, "px-4")}
             />
             {description && (
                 <p className="text-xs leading-5 text-[var(--editorial-subtle)]">

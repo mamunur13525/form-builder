@@ -1,7 +1,6 @@
 import React from "react"
 import { ImagePlus, Palette, SlidersHorizontal, Trash2 } from "lucide-react"
 import { Label } from "../../../components/ui/label"
-import { Input } from "../../../components/ui/input"
 import {
     Combobox,
     ComboboxContent,
@@ -36,6 +35,7 @@ import {
     SettingsSection,
     TAB_LIST_CLASS,
     TAB_TRIGGER_CLASS,
+    TextSetting,
     ToggleRow,
 } from "./settings/primitives"
 import { ImagePickerDialog } from "./settings/ImagePickerDialog"
@@ -71,6 +71,7 @@ export function SettingsPanel({
 }: SettingsPanelProps) {
 
     const [coverDialogOpen, setCoverDialogOpen] = React.useState(false)
+    const [typeQuery, setTypeQuery] = React.useState("")
     const settings = page.settings ?? {}
 
     /** Merge a single settings group, preserving the rest. */
@@ -135,7 +136,7 @@ export function SettingsPanel({
                                     type="button"
                                     onClick={onOpenDesignDrawer}
                                     className={
-                                        "inline-flex items-center justify-center whitespace-nowrap " +
+                                        "inline-flex items-center justify-center whitespace-nowrap cursor-pointer" +
                                         TAB_TRIGGER_CLASS
                                     }
                                 >
@@ -147,16 +148,25 @@ export function SettingsPanel({
                         <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
                             <div className="space-y-8 px-6 py-6">
                                 {/* Page type — always available */}
-                                <div className="space-y-2">
+                                <div className="space-y-1.5">
                                     <Label className="text-base font-semibold text-[var(--foreground)]">
-                                        Page Type
+                                        Page type
                                     </Label>
                                     <Combobox
                                         items={PAGE_TYPES}
                                         value={page.type}
                                         onValueChange={handleTypeChange}
+                                        // Controlled query: Base UI keeps the last
+                                        // selection as the filter text, which would
+                                        // reopen the list filtered down to the current
+                                        // type. Clearing on open always shows every type.
+                                        inputValue={typeQuery}
+                                        onInputValueChange={(next) => setTypeQuery(next ?? "")}
+                                        onOpenChange={(open) => {
+                                            if (open) setTypeQuery("")
+                                        }}
                                     >
-                                        <ComboboxTrigger className="h-[52px] w-full rounded-xl border border-[var(--input)] bg-[var(--secondary)] text-base flex items-center px-4 justify-between">
+                                        <ComboboxTrigger className="editorial-transition flex h-[44px] w-full items-center justify-between rounded-[14px] border border-[var(--input)] bg-[var(--secondary)] px-4 text-sm text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] focus-visible:border-[var(--ring)]">
                                             {page.type && PAGE_TYPE_ICONS[page.type] ? (
                                                 (() => {
                                                     const Icon = PAGE_TYPE_ICONS[page.type]
@@ -168,7 +178,7 @@ export function SettingsPanel({
                                                     )
                                                 })()
                                             ) : (
-                                                <span className="text-muted-foreground">Select page type</span>
+                                                <span className="text-[var(--editorial-subtle)]">Select page type</span>
                                             )}
                                         </ComboboxTrigger>
                                         <ComboboxContent className="editorial rounded-xl border border-[var(--border)] bg-[var(--popover)]">
@@ -178,7 +188,7 @@ export function SettingsPanel({
                                                     const Icon = PAGE_TYPE_ICONS[item]
                                                     return (
                                                         <ComboboxItem key={item} value={item} className="rounded-[12px] py-3.5!">
-                                                            <Icon className="h-5 w-5" />
+                                                            <Icon className="h-4 w-4" />
                                                             {PAGE_TYPE_LABELS[item]}
                                                         </ComboboxItem>
                                                     )
@@ -439,35 +449,30 @@ export function SettingsPanel({
 
                                 {/* Custom validation error message — available on every type */}
                                 <SettingsSection title="Validation message">
-                                    <Input
+                                    <TextSetting
+                                        label="Message"
+                                        description="Shown to respondents when this page fails validation."
                                         value={page.validation?.message ?? ""}
-                                        onChange={(e) => patchValidation({ message: e.target.value })}
+                                        onChange={(message) => patchValidation({ message })}
                                         placeholder="This page is required"
-                                        className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                                     />
-                                    <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
-                                        Shown to respondents when this page fails validation.
-                                    </p>
                                 </SettingsSection>
 
-                                {/* Button Text — in settings tab */}
-                                <SettingsSection title="Button Text">
-                                    <div className="space-y-1.5">
-                                        <Label className="text-base text-[var(--editorial-body)]">Button Text</Label>
-                                        <Input
-                                            value={page.appearance.submitButtonText ?? ""}
-                                            onChange={(e) =>
-                                                onUpdate(pageIndex, {
-                                                    appearance: {
-                                                        ...page.appearance,
-                                                        submitButtonText: e.target.value,
-                                                    },
-                                                })
-                                            }
-                                            placeholder="Submit"
-                                            className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
-                                        />
-                                    </div>
+                                {/* Button text — in settings tab */}
+                                <SettingsSection title="">
+                                    <TextSetting
+                                        label="Button text"
+                                        value={page.appearance.submitButtonText ?? ""}
+                                        onChange={(submitButtonText) =>
+                                            onUpdate(pageIndex, {
+                                                appearance: {
+                                                    ...page.appearance,
+                                                    submitButtonText,
+                                                },
+                                            })
+                                        }
+                                        placeholder="Submit"
+                                    />
                                 </SettingsSection>
                             </div>
                         </TabsContent>

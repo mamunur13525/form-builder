@@ -733,7 +733,7 @@ export function FormBuilderPage() {
       <div className="flex min-h-0 w-full flex-1 items-center justify-center">
         <div
           className={cn(
-            "editorial-shadow h-full w-full overflow-hidden  border border-[var(--border)] bg-[var(--card)] sm:rounded-xl",
+            "editorial-shadow h-11/12! w-full overflow-hidden  border border-[var(--border)] bg-[var(--card)] sm:rounded-xl",
             "transition-all duration-500 ease-out",
           )}
           // The phone-frame preview must never exceed the available width.

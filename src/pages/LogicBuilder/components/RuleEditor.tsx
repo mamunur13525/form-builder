@@ -11,6 +11,7 @@ import type {
     FormLogicRule,
     FormVariable,
     FormPage,
+    LogicCalcOperation,
     LogicCondition,
     LogicCombinator,
     LogicOperator,
@@ -20,6 +21,7 @@ import {
     OPERATORS_WITH_VALUE,
     OPERATOR_OPTIONS,
     NUMERIC_ONLY_OPERATORS,
+    CALC_OPERATIONS,
     type SectionConfig,
 } from "./logicEditorConfig";
 import { emptyCondition } from "./ruleUtils";
@@ -121,6 +123,23 @@ export function RuleEditor({ rule, section, pages, selectedPageKey, variables, o
     }, [rule.conditions, pages])
 
     const isCalculation = section.category === "calculation"
+
+    // Calculation target/operand only ever reference number-typed variables.
+    const numberVariables = useMemo(
+        () => variables.filter((v) => v.type === "number"),
+        [variables],
+    )
+    // The operand is stored in `action.value`: a `@name` string for a variable
+    // operand, or a plain (numeric) string for a literal. Derive the UI state.
+    const operandRaw =
+        typeof action?.value === "string"
+            ? action.value
+            : action?.value != null
+              ? String(action.value)
+              : ""
+    const operandIsVariable = operandRaw.startsWith("@")
+    const operandVarName = operandIsVariable ? operandRaw.slice(1) : ""
+    const operandNumber = operandIsVariable ? "" : operandRaw
 
     return (
         <div className="flex flex-col gap-3 rounded-xl border border-[var(--editorial-primary-ring)] bg-[var(--secondary)] p-4">
@@ -313,29 +332,65 @@ export function RuleEditor({ rule, section, pages, selectedPageKey, variables, o
                     </>
                 ) : isCalculation ? (
                     <>
-                        <span className="font-semibold text-[var(--editorial-subtle)]">Set</span>
                         <select
                             value={action?.variableName ?? ""}
                             onChange={(e) => setAction({ variableName: e.target.value })}
-                            className="min-w-[140px] rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                            className="min-w-[120px] rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 font-medium text-[13px]"
                         >
                             <option value="">Select a variable…</option>
-                            {variables
-                                .filter((v) => v.type === "number")
-                                .map((v) => (
+                            {numberVariables.map((v) => (
+                                <option key={v.name} value={v.name}>
+                                    @{v.name}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            value={action?.operation ?? "set"}
+                            onChange={(e) =>
+                                setAction({ operation: e.target.value as LogicCalcOperation })
+                            }
+                            className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                        >
+                            {CALC_OPERATIONS.map((o) => (
+                                <option key={o.value} value={o.value}>
+                                    {o.label}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            value={operandIsVariable ? "variable" : "number"}
+                            onChange={(e) =>
+                                setAction({ value: e.target.value === "variable" ? "@" : "" })
+                            }
+                            className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                        >
+                            <option value="number">a number</option>
+                            <option value="variable">a variable</option>
+                        </select>
+                        {operandIsVariable ? (
+                            <select
+                                value={operandVarName}
+                                onChange={(e) =>
+                                    setAction({ value: e.target.value ? `@${e.target.value}` : "@" })
+                                }
+                                className="min-w-[120px] rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 font-medium text-[13px]"
+                            >
+                                <option value="">Select a variable…</option>
+                                {numberVariables.map((v) => (
                                     <option key={v.name} value={v.name}>
                                         @{v.name}
                                     </option>
                                 ))}
-                        </select>
-                        <span className="text-[var(--editorial-subtle)]">=</span>
-                        <input
-                            type="text"
-                            value={action?.expression ?? ""}
-                            onChange={(e) => setAction({ expression: e.target.value })}
-                            className="min-w-[180px] flex-1 rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 font-mono text-[13px]"
-                            placeholder="e.g. @page_key + @score"
-                        />
+                            </select>
+                        ) : (
+                            <input
+                                type="number"
+                                value={operandNumber}
+                                onChange={(e) => setAction({ value: e.target.value })}
+                                className="w-28 rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                                placeholder="e.g. 5"
+                            />
+                        )}
                     </>
                 ) : (
                     <span className="font-semibold text-[var(--editorial-subtle)]">
@@ -346,9 +401,10 @@ export function RuleEditor({ rule, section, pages, selectedPageKey, variables, o
 
             {isCalculation && (
                 <p className="text-xs leading-relaxed text-[var(--editorial-subtle)]">
-                    Use <code className="font-mono">@page_key</code> (a number answer) or{" "}
-                    <code className="font-mono">@variable</code> (a number variable). Operations:{" "}
-                    <code className="font-mono">+ - * / % ^ ( )</code>
+                    Calculations run on <span className="font-medium text-[var(--foreground)]">number</span>{" "}
+                    variables only. <span className="font-medium text-[var(--foreground)]">Set to</span> replaces the
+                    value; the other operations apply to the variable's running value. The operand can be a number or
+                    another number variable.
                 </p>
             )}
 

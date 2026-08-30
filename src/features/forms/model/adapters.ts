@@ -31,6 +31,7 @@ export function adaptLogicRule(rule: ApiFormLogic): FormLogicRule {
             action: action.action,
             targetPageKey: action.targetPageKey ?? (action as any).target,
             variableName: action.variableName,
+            operation: action.operation,
             expression: action.expression,
             value: action.value,
         })),

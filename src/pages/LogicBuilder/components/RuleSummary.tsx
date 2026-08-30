@@ -11,7 +11,7 @@
 
 import type { ReactNode } from "react";
 import type { FormLogicRule, LogicCondition } from "../../../shared/types/common";
-import { OPERATOR_LABELS } from "./logicEditorConfig";
+import { CALC_OPERATION_SYMBOLS, OPERATOR_LABELS } from "./logicEditorConfig";
 
 /** The "subject" of a rule: an @page answer, an @variable, or a jump target. */
 function TokenPill({ children }: { children: ReactNode }) {
@@ -111,21 +111,37 @@ export function RuleSummary({ rule }: { rule: FormLogicRule }) {
                 else kw("(no target)")
             }
             break
-        case "calculation":
-            if (typeof action?.expression === "string" && action.expression.trim()) {
-                if (conditions.length > 0) {
-                    pushConditions()
-                    kw(":")
+        case "calculation": {
+            if (conditions.length > 0) {
+                pushConditions()
+                kw(":")
+            }
+            const target = `@${action?.variableName ?? "(variable)"}`
+            token(target)
+            kw("=")
+            if (action?.operation) {
+                const raw = String(action.value ?? "").trim()
+                const pushOperand = () => {
+                    if (raw === "" || raw === "@") kw("(value)")
+                    else if (raw.startsWith("@")) token(raw)
+                    else value(raw)
                 }
-                token(`@${action.variableName ?? "(variable)"}`)
-                kw("=")
+                if (action.operation === "set") {
+                    pushOperand()
+                } else {
+                    token(target)
+                    kw(CALC_OPERATION_SYMBOLS[action.operation])
+                    pushOperand()
+                }
+            } else if (typeof action?.expression === "string" && action.expression.trim()) {
+                // Legacy expression rule.
                 code(action.expression)
             } else {
-                kw("Set")
-                token(`@${action?.variableName ?? "(variable)"}`)
-                kw("to a static value")
+                // Legacy static-value rule.
+                kw("a static value")
             }
             break
+        }
         default:
             pushConditions()
     }

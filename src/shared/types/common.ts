@@ -53,6 +53,9 @@ export type LogicActionType =
     | "goToEnd"
     | "setVariable"
 
+/** Arithmetic operation a calculation rule applies to its target variable. */
+export type LogicCalcOperation = "set" | "add" | "subtract" | "multiply" | "divide"
+
 export interface LogicCondition {
     sourceType: LogicSourceType
     /** Page key or variable name the condition reads from. */
@@ -73,9 +76,17 @@ export interface LogicActionItem {
     targetPageKey?: string
     /** setVariable target. */
     variableName?: string
-    /** Arithmetic expression for calculation rules (`@pageKey + @variable`). */
+    /**
+     * Arithmetic operation for calculation rules. `set` overwrites the target;
+     * `add`/`subtract`/`multiply`/`divide` fold `value` onto the running value.
+     */
+    operation?: LogicCalcOperation
+    /** Legacy arithmetic expression for calculation rules (`@pageKey + @variable`). */
     expression?: string
-    /** Static value for calculation rules without an expression. */
+    /**
+     * Operand for calculation rules: a literal number or a `@number-variable`
+     * when `operation` is set; the static value otherwise.
+     */
     value?: unknown
 }
 

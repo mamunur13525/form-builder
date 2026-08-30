@@ -33,6 +33,7 @@ function normalizeLogic(raw: RawLogic): FormLogic {
             action: a.action,
             targetPageKey: a.targetPageKey ?? a.target,
             variableName: a.variableName,
+            operation: a.operation,
             expression: a.expression,
             value: a.value,
         })),

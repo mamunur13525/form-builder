@@ -6,6 +6,8 @@ import {
   PAGE_TYPE_LABELS,
 } from "../../../shared/constants/form-types";
 import type { PageType } from "../../../shared/types/common";
+import { HANDLE, type BranchHandleFlags } from "../branchGraph";
+import { BranchHandles } from "./BranchHandles";
 
 /**
  * Data carried by each page node on the Logic Builder canvas. `index` is the
@@ -25,6 +27,8 @@ export interface PageNodeData {
   hasTarget?: boolean;
   /** Render the outgoing (source) handle. Defaults to true. */
   hasSource?: boolean;
+  /** Which branch-arc anchor handles this node needs (set by the canvas). */
+  branch?: BranchHandleFlags;
   [key: string]: unknown;
 }
 
@@ -72,12 +76,16 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
       {/* Incoming connection point (from the previous page). */}
       {hasTarget && (
         <Handle
+          id={HANDLE.in}
           type="target"
           position={Position.Left}
           className={handleClass}
           isConnectable={false}
         />
       )}
+
+      {/* Branch-arc anchors (only the ones this node uses). */}
+      <BranchHandles flags={data.branch} />
 
       {/* Capped, scrollable page body: number, title and description. */}
       <div
@@ -138,6 +146,7 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
       {/* Outgoing connection point (to the next page). */}
       {hasSource && (
         <Handle
+          id={HANDLE.out}
           type="source"
           position={Position.Right}
           className={handleClass}

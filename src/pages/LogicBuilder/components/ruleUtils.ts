@@ -8,7 +8,7 @@ import type {
     LogicCategory,
     LogicCondition,
 } from "../../../shared/types/common";
-import { OPERATOR_LABELS } from "./logicEditorConfig";
+import { CALC_OPERATION_SYMBOLS, OPERATOR_LABELS } from "./logicEditorConfig";
 
 export const emptyCondition = (sourceKey = ""): LogicCondition => ({
     sourceType: "page",
@@ -26,7 +26,7 @@ export const emptyActionFor = (category: LogicCategory, targetPageKey: string) =
         case "branching":
             return { action: "jumpToPage" as const, targetPageKey: "" }
         case "calculation":
-            return { action: "setVariable" as const, variableName: "", expression: "" }
+            return { action: "setVariable" as const, variableName: "", operation: "set" as const, value: "" }
     }
 }
 
@@ -75,6 +75,7 @@ export function normalizeApiRule(rule: FormLogicRule & { conditions?: any[]; act
             action: a.action,
             targetPageKey: a.targetPageKey ?? a.target,
             variableName: a.variableName,
+            operation: a.operation,
             expression: a.expression,
             value: a.value,
         })),
@@ -113,12 +114,21 @@ export function ruleSummary(rule: FormLogicRule): string {
             return `When ${conditionText} → jump to ${
                 action?.targetPageKey ? `@${action.targetPageKey}` : "(no target)"
             }`
-        case "calculation":
-            if (typeof action?.expression === "string" && action.expression.trim()) {
-                const prefix =
-                    (rule.conditions ?? []).length > 0 ? `When ${conditionText}: ` : ""
-                return `${prefix}@${action.variableName ?? "(variable)"} = ${action.expression}`
+        case "calculation": {
+            const prefix = (rule.conditions ?? []).length > 0 ? `When ${conditionText}: ` : ""
+            const target = `@${action?.variableName ?? "(variable)"}`
+            if (action?.operation) {
+                const raw = String(action.value ?? "").trim()
+                const operandText = raw === "" || raw === "@" ? "(value)" : raw
+                if (action.operation === "set") return `${prefix}${target} = ${operandText}`
+                const sym = CALC_OPERATION_SYMBOLS[action.operation]
+                return `${prefix}${target} = ${target} ${sym} ${operandText}`
             }
-            return `Set @${action?.variableName ?? "(variable)"} to a static value`
+            // Legacy expression / static-value rules.
+            if (typeof action?.expression === "string" && action.expression.trim()) {
+                return `${prefix}${target} = ${action.expression}`
+            }
+            return `Set ${target} to a static value`
+        }
     }
 }

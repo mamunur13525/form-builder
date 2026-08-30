@@ -2,6 +2,8 @@ import { memo } from "react";
 import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import { CheckCircle2 } from "lucide-react";
 import { PageHelperText, PageLabel, type VariableItem } from "@/shared/components/pages";
+import { HANDLE, type BranchHandleFlags } from "../branchGraph";
+import { BranchHandles } from "./BranchHandles";
 
 /**
  * Data carried by the end-page node on the Logic Builder canvas. Only the first
@@ -18,6 +20,8 @@ export interface EndPageNodeData {
   hasTarget?: boolean;
   /** Render the outgoing (source) handle. Defaults to true. */
   hasSource?: boolean;
+  /** Which branch-arc anchor handles this node needs (set by the canvas). */
+  branch?: BranchHandleFlags;
   [key: string]: unknown;
 }
 
@@ -58,12 +62,16 @@ function EndPageNodeComponent({ data, selected }: NodeProps<EndPageNodeType>) {
       {/* Incoming connection point (from the last page). */}
       {hasTarget && (
         <Handle
+          id={HANDLE.in}
           type="target"
           position={Position.Left}
           className={handleClass}
           isConnectable={false}
         />
       )}
+
+      {/* Branch-arc anchors (e.g. a "jump to end" arc lands here). */}
+      <BranchHandles flags={data.branch} />
 
       {/* Capped, scrollable end-page body: title and message. */}
       <div
@@ -103,6 +111,7 @@ function EndPageNodeComponent({ data, selected }: NodeProps<EndPageNodeType>) {
       {/* Outgoing connection point (unused — the end page is the last node). */}
       {hasSource && (
         <Handle
+          id={HANDLE.out}
           type="source"
           position={Position.Right}
           className={handleClass}

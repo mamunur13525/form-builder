@@ -491,6 +491,7 @@ export type LogicActionType =
     | "jumpToPage"
     | "goToEnd"
     | "setVariable"
+export type LogicCalcOperation = "set" | "add" | "subtract" | "multiply" | "divide"
 
 export interface LogicCondition {
     sourceType: LogicSourceType
@@ -506,6 +507,7 @@ export interface LogicActionItem {
     action: LogicActionType
     targetPageKey?: string
     variableName?: string
+    operation?: LogicCalcOperation
     expression?: string
     value?: unknown
 }

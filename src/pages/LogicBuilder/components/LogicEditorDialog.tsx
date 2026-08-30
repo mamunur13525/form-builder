@@ -17,7 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Workflow, Plus } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
-import { PAGE_TYPE_ICONS, PAGE_TYPE_LABELS } from "../../../shared/constants/form-types";
+import { PAGE_TYPE_ICONS } from "../../../shared/constants/form-types";
 import type {
     FormPage,
     FormVariable,
@@ -46,6 +46,13 @@ interface LogicEditorDialogProps {
     allPages: FormPage[]
     /** Form variables (from settings), shown in condition/calculation picks. */
     variables: FormVariable[]
+    /**
+     * Rule to reveal and briefly highlight when the dialog opens — e.g. when a
+     * branch-arc label was clicked on the canvas. Null for a plain page open.
+     */
+    focusRuleId?: string | null
+    /** Category tab to switch to on open (paired with `focusRuleId`). */
+    focusCategory?: LogicCategory | null
     /** Explicit close handler — the only way the dialog closes. */
     onClose: () => void
 }
@@ -54,6 +61,8 @@ function LogicEditorDialogComponent({
     page,
     allPages,
     variables,
+    focusRuleId,
+    focusCategory,
     onClose,
 }: LogicEditorDialogProps) {
     const { formId } = useParams<{ formId: string }>()
@@ -74,6 +83,8 @@ function LogicEditorDialogComponent({
     // Which category tab is visible in the right pane. Sticky across page
     // switches; each tab's count badge shows which other tabs hold rules.
     const [activeCategory, setActiveCategory] = useState<LogicCategory>(SECTIONS[0].category)
+    // Rule to briefly highlight (e.g. when opened from a branch-arc label).
+    const [highlightRuleId, setHighlightRuleId] = useState<string | null>(null)
 
     // Re-select the clicked page (and reset transient state) on every open.
     useEffect(() => {
@@ -83,6 +94,20 @@ function LogicEditorDialogComponent({
             setSaveError(null)
         }
     }, [page])
+
+    // When opened focused on a rule (e.g. a branch-arc label was clicked),
+    // switch to its category tab and mark it for highlighting; otherwise clear
+    // any stale highlight.
+    useEffect(() => {
+        if (!open) return
+        if (focusCategory) setActiveCategory(focusCategory)
+        if (focusRuleId) {
+            setHighlightRuleId(focusRuleId)
+            setEditing(null)
+        } else {
+            setHighlightRuleId(null)
+        }
+    }, [open, focusRuleId, focusCategory])
 
     const selectedPage = useMemo<FormPage | null>(
         () =>
@@ -101,9 +126,8 @@ function LogicEditorDialogComponent({
         setSelectedPageKey(pageKey)
         setEditing(null)
         setSaveError(null)
+        setHighlightRuleId(null)
     }
-
-    const TypeIcon = selectedPage ? PAGE_TYPE_ICONS[selectedPage.type] ?? Workflow : Workflow
 
     // Rules are keyed by category: display/hide rules target the page,
     // branching rules read from it, and calculation rules are owned by the
@@ -145,6 +169,13 @@ function LogicEditorDialogComponent({
             })
     }, [selectedPage, rules, allPages])
 
+    // Once the focused rule is on screen, scroll it into view.
+    useEffect(() => {
+        if (!open || !highlightRuleId) return
+        const el = document.getElementById(`logic-rule-${highlightRuleId}`)
+        el?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+    }, [open, highlightRuleId, activeCategory, pageRules])
+
     const rulesBySection = (category: LogicCategory): FormLogicRule[] =>
         pageRules.filter((rule) => rule.category === category)
 
@@ -160,6 +191,7 @@ function LogicEditorDialogComponent({
         // Drop any half-finished draft so it can't linger on a now-hidden tab.
         setEditing(null)
         setSaveError(null)
+        setHighlightRuleId(null)
     }
 
     const saveRule = async (rule: FormLogicRule) => {
@@ -168,12 +200,19 @@ function LogicEditorDialogComponent({
         const missing = (rule.conditions ?? []).some((c) => !c.sourceKey || !c.operator)
         if (missing) return
         const action = (rule.actions ?? [])[0]
-        if (
-            (action?.action === "jumpToPage" && !action.targetPageKey) ||
-            (action?.action === "setVariable" &&
-                (!action.variableName ||
-                    !(typeof action.expression === "string" && action.expression.trim())))
-        ) {
+        // A calculation is complete when it has a target and either an operation
+        // with a filled operand (current model) or a legacy expression.
+        const calcInvalid =
+            action?.action === "setVariable" &&
+            (() => {
+                if (!action.variableName) return true
+                if (action.operation) {
+                    const raw = String(action.value ?? "").trim()
+                    return raw === "" || raw === "@"
+                }
+                return !(typeof action.expression === "string" && action.expression.trim())
+            })()
+        if ((action?.action === "jumpToPage" && !action.targetPageKey) || calcInvalid) {
             return
         }
         const isNew = rule.id.startsWith("draft-")
@@ -193,6 +232,7 @@ function LogicEditorDialogComponent({
                 action: a.action,
                 targetPageKey: a.targetPageKey,
                 variableName: a.variableName,
+                operation: a.operation,
                 expression: a.expression,
                 value: a.value,
             })),
@@ -372,6 +412,7 @@ function LogicEditorDialogComponent({
                                                     <RuleCard
                                                         key={rule.id}
                                                         rule={rule}
+                                                        highlighted={rule.id === highlightRuleId}
                                                         onEdit={() =>
                                                             setEditing({
                                                                 ...rule,

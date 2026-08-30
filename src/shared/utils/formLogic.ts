@@ -19,6 +19,7 @@ import type {
     FormLogicRule,
     FormPage,
     FormVariable,
+    LogicActionItem,
     LogicCondition,
 } from "@/shared/types/common"
 
@@ -323,6 +324,66 @@ const numericValue = (value: unknown): number | null => {
     return Number.isFinite(n) ? n : null
 }
 
+/* -------------------------------------------------------------------------- */
+/* Calculation operations                                                      */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Resolve a calculation operand to a number: a literal number, or a
+ * `@number-variable` reference (freshly computed values win over static
+ * variable defaults). Page answers are NOT valid operands — calculations act
+ * on numbers and number variables only. Returns null when unresolvable.
+ */
+const resolveCalcOperand = (raw: unknown, ctx: EngineContext): number | null => {
+    if (typeof raw === "string" && raw.trim().startsWith("@")) {
+        const name = raw.trim().slice(1)
+        if (name in ctx.computedVariables) {
+            const n = Number(ctx.computedVariables[name])
+            return Number.isFinite(n) ? n : null
+        }
+        const variable = ctx.variablesByName.get(name)
+        if (variable && variable.type === "number") {
+            return numericValue(variable.value)
+        }
+        return null
+    }
+    return numericValue(raw)
+}
+
+/**
+ * Apply an arithmetic operation. `set` overwrites (base ignored); the rest fold
+ * `operand` onto the current `base`. Division by zero yields null (skip).
+ */
+const applyCalcOperation = (
+    operation: NonNullable<LogicActionItem["operation"]>,
+    base: number,
+    operand: number,
+): number | null => {
+    switch (operation) {
+        case "set":
+            return operand
+        case "add":
+            return base + operand
+        case "subtract":
+            return base - operand
+        case "multiply":
+            return base * operand
+        case "divide":
+            return operand === 0 ? null : base / operand
+        default:
+            return null
+    }
+}
+
+/** Current numeric value of a calc variable: computed this pass, else static, else 0. */
+const currentCalcValue = (name: string, ctx: EngineContext): number => {
+    if (name in ctx.computedVariables) {
+        const n = Number(ctx.computedVariables[name])
+        return Number.isFinite(n) ? n : 0
+    }
+    return numericValue(ctx.variablesByName.get(name)?.value) ?? 0
+}
+
 const readSourceValue = (condition: LogicCondition, ctx: EngineContext): unknown => {
     if (!condition.sourceKey) return undefined
     if (condition.sourceType === "variable") {
@@ -431,9 +492,28 @@ export const resolveFormLogic = ({
 
         for (const action of rule.actions ?? []) {
             if (!action || !action.variableName) continue
+            const name = action.variableName
+
+            // Operation path (current model): `set` overwrites, the rest fold the
+            // operand onto the running value. Operand = literal number or @number-var.
+            if (action.operation) {
+                const operand = resolveCalcOperand(action.value, ctx)
+                if (operand === null) continue // unresolved operand → keep previous
+                const result = applyCalcOperation(
+                    action.operation,
+                    currentCalcValue(name, ctx),
+                    operand,
+                )
+                if (result !== null && Number.isFinite(result)) {
+                    computedVariables[name] = result
+                }
+                continue
+            }
+
+            // Legacy expression path.
             if (typeof action.expression === "string" && action.expression.trim() !== "") {
                 try {
-                    computedVariables[action.variableName] = evaluateExpression(
+                    computedVariables[name] = evaluateExpression(
                         action.expression,
                         (ref): number | undefined => {
                             // Computed variables win, then static variables, then answers.
@@ -454,7 +534,8 @@ export const resolveFormLogic = ({
                     // Unresolvable reference or empty answer: keep the previous value.
                 }
             } else if (action.value !== undefined && action.value !== null) {
-                computedVariables[action.variableName] = action.value as number | string
+                // Legacy static-value path.
+                computedVariables[name] = action.value as number | string
             }
         }
     }

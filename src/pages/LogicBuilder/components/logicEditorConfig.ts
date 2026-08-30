@@ -5,7 +5,7 @@
  */
 
 import { Eye, EyeOff, GitBranch, Calculator } from "lucide-react";
-import type { LogicCategory, LogicOperator } from "../../../shared/types/common";
+import type { LogicCalcOperation, LogicCategory, LogicOperator } from "../../../shared/types/common";
 
 export interface SectionConfig {
     category: LogicCategory
@@ -44,9 +44,9 @@ export const SECTIONS: SectionConfig[] = [
     {
         category: "calculation",
         title: "Calculations",
-        description: "Compute a number variable from answers (`@pageKey`) and variables (`@var`).",
+        description: "Set or update a number variable — add, subtract, multiply or divide by a number or another number variable.",
         icon: Calculator,
-        actionOptions: [{ value: "setVariable", label: "Set variable from expression" }],
+        actionOptions: [{ value: "setVariable", label: "Update a variable" }],
     },
 ]
 
@@ -86,3 +86,25 @@ export const NUMERIC_ONLY_OPERATORS: LogicOperator[] = [
     "lessThan",
     "lessThanOrEquals",
 ]
+
+/**
+ * Arithmetic operations offered by calculation rules. `set` overwrites the
+ * target variable; the rest fold the operand onto its running value. The verb
+ * labels read naturally after the target: "@score" + "Add" + "5".
+ */
+export const CALC_OPERATIONS: { value: LogicCalcOperation; label: string }[] = [
+    { value: "set", label: "Set to" },
+    { value: "add", label: "Add" },
+    { value: "subtract", label: "Subtract" },
+    { value: "multiply", label: "Multiply by" },
+    { value: "divide", label: "Divide by" },
+]
+
+/** Short symbol per operation, used by the read-only rule summary chips. */
+export const CALC_OPERATION_SYMBOLS: Record<LogicCalcOperation, string> = {
+    set: "=",
+    add: "+",
+    subtract: "−",
+    multiply: "×",
+    divide: "÷",
+}

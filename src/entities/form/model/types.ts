@@ -75,6 +75,8 @@ export interface PublishedForm {
     endPages?: EndPage[]
     theme: FormTheme
     settings: FormSettings
+    /** Form-level logic rules (branching / display / calculations). */
+    logic?: FormLogic[]
 }
 
 export interface CreateFormRequest {
@@ -468,35 +470,76 @@ export interface ReorderBlocksRequest {
 // Logic (form-level)
 // ---------------------------------------------------------------------------
 
-export type LogicOperator = "equals" | "notEquals" | "contains" | "greaterThan" | "lessThan"
-export type LogicAction = "show" | "hide" | "goToPage" | "goToEnd" | "skipTo"
+export type LogicOperator =
+    | "equals"
+    | "notEquals"
+    | "contains"
+    | "notContains"
+    | "greaterThan"
+    | "greaterThanOrEquals"
+    | "lessThan"
+    | "lessThanOrEquals"
+    | "isEmpty"
+    | "isNotEmpty"
+
+export type LogicCategory = "display" | "hidePage" | "branching" | "calculation"
+export type LogicSourceType = "page" | "variable"
+export type LogicCombinator = "and" | "or"
+export type LogicActionType =
+    | "showPage"
+    | "hidePage"
+    | "jumpToPage"
+    | "goToEnd"
+    | "setVariable"
 
 export interface LogicCondition {
-    pageKey: string
+    sourceType: LogicSourceType
+    /** Page key or variable name the condition reads from. */
+    sourceKey: string
     operator: LogicOperator
-    value: unknown
+    value?: unknown
+    /** How this condition joins to the previous one (ignored on the first). */
+    combinator?: LogicCombinator
 }
 
 export interface LogicActionItem {
-    action: LogicAction
-    target?: string
+    action: LogicActionType
+    targetPageKey?: string
+    variableName?: string
+    expression?: string
+    value?: unknown
 }
 
 export interface FormLogic {
     id: string
-    formId: string
+    formId?: string
+    category: LogicCategory
+    name?: string
+    enabled: boolean
+    combinator: LogicCombinator
     conditions: LogicCondition[]
     actions: LogicActionItem[]
+    order?: number
     createdAt: string
     updatedAt: string
 }
 
 export interface CreateLogicRequest {
+    category?: LogicCategory
+    name?: string
+    enabled?: boolean
+    combinator?: LogicCombinator
     conditions: LogicCondition[]
     actions: LogicActionItem[]
+    order?: number
 }
 
 export interface UpdateLogicRequest {
+    category?: LogicCategory
+    name?: string
+    enabled?: boolean
+    combinator?: LogicCombinator
     conditions?: LogicCondition[]
     actions?: LogicActionItem[]
+    order?: number
 }

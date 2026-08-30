@@ -470,7 +470,7 @@ function UpdateRow({
 // ---------------------------------------------------------------------------
 
 export function AdminUpdatesPage() {
-    const { data: user, isLoading: userLoading } = useCurrentUser()
+    const { isLoading: userLoading } = useCurrentUser()
 
     const [editorOpen, setEditorOpen] = useState(false)
     const [editingEntry, setEditingEntry] = useState<UpdateEntry | null>(null)

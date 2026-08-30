@@ -20,6 +20,79 @@ export interface LogicRule {
     targetPageKey?: string
 }
 
+// ---------------------------------------------------------------------------
+// Form-level logic rules (Logic Builder)
+// ---------------------------------------------------------------------------
+
+export type LogicOperator =
+    | "equals"
+    | "notEquals"
+    | "contains"
+    | "notContains"
+    | "greaterThan"
+    | "greaterThanOrEquals"
+    | "lessThan"
+    | "lessThanOrEquals"
+    | "isEmpty"
+    | "isNotEmpty"
+
+/** What a rule does at a glance — drives the Logic Builder sections. */
+export type LogicCategory = "display" | "hidePage" | "branching" | "calculation"
+
+/** Where a condition reads its value from. */
+export type LogicSourceType = "page" | "variable"
+
+/** How multiple conditions inside one rule combine. */
+export type LogicCombinator = "and" | "or"
+
+/** Runtime effects a rule can trigger. */
+export type LogicActionType =
+    | "showPage"
+    | "hidePage"
+    | "jumpToPage"
+    | "goToEnd"
+    | "setVariable"
+
+export interface LogicCondition {
+    sourceType: LogicSourceType
+    /** Page key or variable name the condition reads from. */
+    sourceKey: string
+    operator: LogicOperator
+    value?: unknown
+    /**
+     * How this condition joins to the PREVIOUS one. Ignored on the first
+     * condition. Falls back to the rule-level `combinator` when absent, so
+     * legacy rules (single rule-level combinator) keep working.
+     */
+    combinator?: LogicCombinator
+}
+
+export interface LogicActionItem {
+    action: LogicActionType
+    /** showPage / hidePage / jumpToPage target. */
+    targetPageKey?: string
+    /** setVariable target. */
+    variableName?: string
+    /** Arithmetic expression for calculation rules (`@pageKey + @variable`). */
+    expression?: string
+    /** Static value for calculation rules without an expression. */
+    value?: unknown
+}
+
+export interface FormLogicRule {
+    id: string
+    formId?: string
+    category: LogicCategory
+    name?: string
+    enabled: boolean
+    combinator: LogicCombinator
+    conditions: LogicCondition[]
+    actions: LogicActionItem[]
+    order?: number
+    createdAt?: string
+    updatedAt?: string
+}
+
 export interface Appearance {
     width: "full" | "half"
     icon?: string
@@ -330,6 +403,12 @@ export interface Form {
     updatedBy?: string
     pages: FormPage[]
     endPages?: EndPage[]
+    /**
+     * Form-level logic rules (Logic Builder). Included in the public /
+     * preview payloads so the respondent view can evaluate branching,
+     * display rules and calculation variables.
+     */
+    logic?: FormLogicRule[]
     createdAt?: string
     updatedAt?: string
 }

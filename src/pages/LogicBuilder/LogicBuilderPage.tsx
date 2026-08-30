@@ -23,14 +23,17 @@ import {
   buildVariableItems,
   type VariableItem,
 } from "@/shared/components/pages";
-import type { EndPage, FormPage } from "../../shared/types/common";
+import type { EndPage, FormPage, FormLogicRule } from "../../shared/types/common";
 import { PageNode, type PageNodeData, type PageNodeType } from "./components/PageNode";
 import {
   EndPageNode,
   type EndPageNodeData,
   type EndPageNodeType,
 } from "./components/EndPageNode";
-import { PageRulesDialog } from "./components/PageRulesDialog";
+import { LogicEditorDialog } from "./components/LogicEditorDialog";
+import { countRulesForPage } from "../../shared/utils/formLogic";
+import { useLogicRules } from "@/features/forms/hooks/useFormLogic";
+import { adaptLogicRule } from "@/features/forms/model/adapters";
 
 /** Union of every node kind that can appear on the canvas. */
 type FlowNode = PageNodeType | EndPageNodeType;
@@ -61,23 +64,27 @@ function buildNodes(
   pages: FormPage[],
   endPage: EndPage | null,
   variables: VariableItem[],
+  rules: FormLogicRule[],
 ): FlowNode[] {
-  const nodes: FlowNode[] = pages.map((page, index) => ({
-    id: pageId(page, index),
-    type: "pageNode",
-    position: { x: index * NODE_STEP_X, y: 0 },
-    data: {
-      index,
-      label: page.label,
-      helperText: page.helperText,
-      type: page.type,
-      required: page.required,
-      ruleCount: page.logic?.length ?? 0,
-      variables,
-      hasTarget: index !== 0,
-      hasSource: true,
-    } satisfies PageNodeData,
-  }));
+  const nodes: FlowNode[] = pages.map((page) => {
+    const index = pages.findIndex((p) => p.pageKey === page.pageKey);
+    return {
+      id: pageId(page, index),
+      type: "pageNode",
+      position: { x: index * NODE_STEP_X, y: 0 },
+      data: {
+        index,
+        label: page.label,
+        helperText: page.helperText,
+        type: page.type,
+        required: page.required,
+        ruleCount: countRulesForPage(rules, page.pageKey),
+        variables,
+        hasTarget: index !== 0,
+        hasSource: true,
+      } satisfies PageNodeData,
+    };
+  });
 
   if (endPage) {
     nodes.push({
@@ -154,10 +161,19 @@ function LogicFlow() {
   // Variables (plus the built-in form_name) highlighted on the node previews —
   // same source the Build tab's editors use.
   const { data: settingsData } = useFormSettings(formId ?? "");
-  const variables = useMemo(
-    () => buildVariableItems(settingsData?.settings.variables, form?.title),
-    [settingsData?.settings.variables, form?.title],
+  const rawVariables = useMemo(
+    () => settingsData?.settings.variables ?? [],
+    [settingsData?.settings.variables],
   );
+  const variables = useMemo(
+    () => buildVariableItems(rawVariables, form?.title),
+    [rawVariables, form?.title],
+  );
+
+  // Form-level logic rules — used for per-page rule counts on the canvas and
+  // edited from the rules dialog.
+  const { data: logicRules = [] } = useLogicRules(formId ?? "");
+  const adaptedRules = useMemo(() => logicRules.map(adaptLogicRule), [logicRules]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -173,10 +189,10 @@ function LogicFlow() {
   // Build (or rebuild) the graph whenever the form's pages change. Positions
   // are deterministic, so this also serves as the "initial layout".
   useEffect(() => {
-    setNodes(buildNodes(pages, endPage, variables));
+    setNodes(buildNodes(pages, endPage, variables, adaptedRules));
     setEdges(buildEdges(pages, endPage !== null));
     didInitialFit.current = false;
-  }, [pages, endPage, variables, setNodes, setEdges]);
+  }, [pages, endPage, variables, adaptedRules, setNodes, setEdges]);
 
   // Fit the flow into view once the freshly-built nodes have been measured.
   // This is the reliable moment to fit, since node dimensions are known.
@@ -203,12 +219,12 @@ function LogicFlow() {
 
   // Reload / Reset — restore the initial horizontal layout and re-fit the view.
   const handleReset = useCallback(() => {
-    setNodes(buildNodes(pages, endPage, variables));
+    setNodes(buildNodes(pages, endPage, variables, adaptedRules));
     setEdges(buildEdges(pages, endPage !== null));
     setSelected(null);
     // Let React Flow apply the restored positions before fitting.
     window.setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 60);
-  }, [pages, endPage, variables, setNodes, setEdges, fitView]);
+  }, [pages, endPage, variables, adaptedRules, setNodes, setEdges, fitView]);
 
   if (isLoading) {
     return (
@@ -273,9 +289,10 @@ function LogicFlow() {
         </div>
       )}
 
-      <PageRulesDialog
+      <LogicEditorDialog
         page={selected?.page ?? null}
-        pageIndex={selected?.index ?? null}
+        allPages={pages}
+        variables={rawVariables}
         onClose={() => setSelected(null)}
       />
     </>

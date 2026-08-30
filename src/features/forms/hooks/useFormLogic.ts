@@ -16,6 +16,7 @@ import {
     createLogic,
     deleteLogicRule,
     getLogicRules,
+    replaceLogicRules,
     updateLogicRule,
 } from "@/entities/form/api/logic.api"
 
@@ -62,6 +63,9 @@ export function useUpdateLogicRule() {
             updateLogicRule(formId, logicId, data),
         onSuccess: (updated: FormLogic, { formId }) => {
             queryClient.setQueryData([...LOGIC_QUERY_KEY(formId), updated.id], updated)
+            // The list (used by the Logic Builder canvas + rules dialog) must
+            // reflect the edit right away.
+            queryClient.invalidateQueries({ queryKey: LOGIC_QUERY_KEY(formId) })
         },
     })
 }
@@ -75,6 +79,19 @@ export function useDeleteLogicRule() {
             deleteLogicRule(formId, logicId),
         onSuccess: (_void: void, { formId }) => {
             queryClient.invalidateQueries({ queryKey: LOGIC_QUERY_KEY(formId) })
+        },
+    })
+}
+
+/** PUT /forms/:formId/logic — replace all logic rules at once. */
+export function useReplaceLogic() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: ({ formId, rules }: { formId: string; rules: CreateLogicRequest[] }) =>
+            replaceLogicRules(formId, rules),
+        onSuccess: (updated: FormLogic[], { formId }) => {
+            queryClient.setQueryData(LOGIC_QUERY_KEY(formId), updated)
         },
     })
 }

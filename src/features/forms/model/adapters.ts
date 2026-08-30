@@ -6,9 +6,39 @@
  * `shared/types/common.ts` types used throughout the pages.
  */
 
-import type { Form as ApiForm, FormPage as ApiPage, EndPage as ApiEndPage, PublishedForm } from "@/entities/form/model/types"
+import type { Form as ApiForm, FormPage as ApiPage, EndPage as ApiEndPage, FormLogic as ApiFormLogic, PublishedForm } from "@/entities/form/model/types"
 import type { FormResponse as ApiResponse } from "@/entities/response/model/types"
-import type { Form, FormPage, EndPage, FormResponse as CommonFormResponse } from "@/shared/types/common"
+import type { Form, FormPage, EndPage, FormLogicRule, FormResponse as CommonFormResponse } from "@/shared/types/common"
+
+/** Convert a form-level logic rule from the API into the shared type. */
+export function adaptLogicRule(rule: ApiFormLogic): FormLogicRule {
+    return {
+        id: rule.id,
+        formId: rule.formId,
+        category: rule.category ?? "display",
+        name: rule.name,
+        enabled: rule.enabled ?? true,
+        combinator: rule.combinator ?? "and",
+        conditions: (rule.conditions ?? []).map((condition) => ({
+            sourceType: condition.sourceType ?? "page",
+            // Legacy rules stored the page key under `pageKey`.
+            sourceKey: condition.sourceKey ?? (condition as any).pageKey ?? "",
+            operator: condition.operator ?? "equals",
+            value: condition.value,
+            combinator: condition.combinator,
+        })),
+        actions: (rule.actions ?? []).map((action) => ({
+            action: action.action,
+            targetPageKey: action.targetPageKey ?? (action as any).target,
+            variableName: action.variableName,
+            expression: action.expression,
+            value: action.value,
+        })),
+        order: rule.order,
+        createdAt: rule.createdAt,
+        updatedAt: rule.updatedAt,
+    }
+}
 
 /** Convert an API Form into the legacy Form type. Pages are now embedded in the form. */
 export function adaptApiForm(apiForm: ApiForm): Form {
@@ -23,6 +53,9 @@ export function adaptApiForm(apiForm: ApiForm): Form {
         updatedBy: undefined,
         pages: (apiForm.pages ?? []).map((a) => adaptApiPage(a, apiForm.id)),
         endPages: (apiForm.endPages ?? []).map(adaptApiEndPage),
+        logic: (apiForm as any).logic
+            ? ((apiForm as any).logic as ApiFormLogic[]).map(adaptLogicRule)
+            : undefined,
         createdAt: apiForm.createdAt,
         updatedAt: apiForm.updatedAt,
     }
@@ -41,6 +74,7 @@ export function adaptPublishedForm(publishedForm: PublishedForm): Form {
         updatedBy: undefined,
         pages: (publishedForm.pages ?? []).map((a) => adaptApiPage(a, publishedForm.id)),
         endPages: (publishedForm.endPages ?? []).map(adaptApiEndPage),
+        logic: (publishedForm.logic ?? []).map(adaptLogicRule),
         createdAt: "",
         updatedAt: "",
     }

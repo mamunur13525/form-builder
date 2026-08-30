@@ -168,6 +168,7 @@ function EndPageItem({
                     <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-[var(--border)] bg-[var(--card)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--editorial-body)]">
                         <Flag className="h-3 w-3 shrink-0" />
                         <span className="truncate">End page</span>
+                     
                     </span>
                 )}
 

@@ -3,6 +3,7 @@ import type { Form, FormPage } from "../types/common"
 import { validatePage } from "./useFormValidation"
 import { submitPublicForm } from "@/entities/response/api/public-form.api"
 import { resolveFormLogic, JUMP_TO_END } from "../utils/formLogic"
+import { useFormStore } from "@/app/store/formStore"
 
 interface UseFormNavigationOptions {
     form: Form
@@ -47,7 +48,16 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
     const isPreview = mode === "preview"
 
     // Logic rules (branching / display / calculations) shipped with the form.
-    const logicRules = useMemo(() => form.logic ?? [], [form.logic])
+    // In preview mode the builder's live rules come from the form store — the
+    // store is kept in sync after every save, so the preview reflects new rules
+    // immediately. Published mode always uses the server snapshot (`form.logic`).
+    const storedRules = useFormStore((s) =>
+        mode === "preview" && form.id ? s.logicRules[form.id] : undefined,
+    )
+    const logicRules = useMemo(
+        () => storedRules ?? form.logic ?? [],
+        [storedRules, form.logic],
+    )
     const allPages = useMemo(() => form.pages.filter((f) => f.isActive), [form.pages])
     const formVariables = useMemo(() => form.settings?.variables ?? [], [form.settings])
 

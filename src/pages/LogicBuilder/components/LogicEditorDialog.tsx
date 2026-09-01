@@ -1,12 +1,16 @@
 /**
- * Logic editor dialog — the two-pane container.
+ * Logic editor dialog — single-pane rule manager.
  *
- * Opened from the Logic Builder canvas. Left pane: every form page (click to
- * switch). Right pane: a four-tab switcher mapping one-to-one onto the rule
- * categories the backend supports — Display, Hide page, Branching and
- * Calculations. Only the active tab's rules are shown. Each rule combines
- * multiple conditions with AND/OR and persists through the form-level logic
- * API (useLogicRules + mutations).
+ * Opened from the Logic Builder canvas. A dropdown at the top picks which
+ * page's rules are managed. Below it, every saved rule on that page is listed
+ * one by one — no sidebar, no category tabs and no grouped sections. A single
+ * centered "Add rule" button at the bottom opens a rule editor: it first
+ * asks for the rule type via a dropdown (Display page / Hide page / Page
+ * branching / Calculations), then shows the matching editor where conditions,
+ * values and the type-specific action are filled in. Editing a saved rule
+ * opens the same editor for it. Each rule combines multiple conditions with
+ * AND/OR and persists through the form-level logic API (useLogicRules +
+ * mutations).
  *
  * Split across: ./logicEditorConfig (static config), ./ruleUtils (helpers),
  * ./RuleEditor (single-rule editor), ./RuleCard (read-only rule summary).
@@ -14,10 +18,20 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Workflow, Plus } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
-import { PAGE_TYPE_ICONS } from "../../../shared/constants/form-types";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../../components/ui/select";
+import {
+    PAGE_TYPE_COLORS,
+    PAGE_TYPE_ICONS,
+} from "../../../shared/constants/form-types";
 import type {
     FormPage,
     FormVariable,
@@ -30,6 +44,8 @@ import {
     useUpdateLogicRule,
     useDeleteLogicRule,
 } from "@/features/forms/hooks/useFormLogic";
+import { getLogicRules } from "@/entities/form/api/logic.api";
+import { useFormStore } from "@/app/store/formStore";
 import { SECTIONS } from "./logicEditorConfig";
 import { normalizeApiRule, emptyRule } from "./ruleUtils";
 import { RuleEditor } from "./RuleEditor";
@@ -38,8 +54,8 @@ import { RuleCard } from "./RuleCard";
 interface LogicEditorDialogProps {
     /**
      * The page pre-selected when the dialog opens (the canvas node that was
-     * clicked), or null when closed. The user can switch pages inside the
-     * dialog via the left-hand page list.
+     * clicked), or null when closed. A different page is picked via the
+     * dropdown at the top of the dialog.
      */
     page: FormPage | null
     /** All form pages (for source / target picks), in form order. */
@@ -51,10 +67,43 @@ interface LogicEditorDialogProps {
      * branch-arc label was clicked on the canvas. Null for a plain page open.
      */
     focusRuleId?: string | null
-    /** Category tab to switch to on open (paired with `focusRuleId`). */
+    /**
+     * Kept for call-site compatibility — rules are listed flat now, so there
+     * is no category tab left to pre-select.
+     */
     focusCategory?: LogicCategory | null
     /** Explicit close handler — the only way the dialog closes. */
     onClose: () => void
+}
+
+/**
+ * The rule editor open below the rule list. While `rule` is null the user
+ * still has to pick the rule type from the dropdown; `category` carries the
+ * picked / edited type so the matching editor config can be resolved.
+ */
+interface EditorState {
+    category: LogicCategory | null
+    rule: FormLogicRule | null
+}
+
+/** Light, tinted page-type icon chip — matches the Build tab page styling. */
+function PageTypeChip({ page }: { page: FormPage }) {
+    const Icon = PAGE_TYPE_ICONS[page.type]
+    if (!Icon) return null
+    return (
+        <span
+            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-gradient-to-br ${PAGE_TYPE_COLORS[page.type]}`}
+        >
+            <Icon className="h-3 w-3" />
+        </span>
+    )
+}
+
+/** Plain page-type icon that inherits its color from the surrounding styles. */
+function PageTypeIcon({ page }: { page: FormPage }) {
+    const Icon = PAGE_TYPE_ICONS[page.type]
+    if (!Icon) return null
+    return <Icon className="h-3.5 w-3.5 shrink-0" />
 }
 
 function LogicEditorDialogComponent({
@@ -62,7 +111,6 @@ function LogicEditorDialogComponent({
     allPages,
     variables,
     focusRuleId,
-    focusCategory,
     onClose,
 }: LogicEditorDialogProps) {
     const { formId } = useParams<{ formId: string }>()
@@ -72,42 +120,39 @@ function LogicEditorDialogComponent({
     const createMutation = useCreateLogic()
     const updateMutation = useUpdateLogicRule()
     const deleteMutation = useDeleteLogicRule()
+    // The preview reads its rules from the form store, so after any rule
+    // mutation the store is re-synced with the freshly saved rules.
+    const setLogicRules = useFormStore((s) => s.setLogicRules)
 
-    // One rule being edited per session (could be a fresh draft).
-    const [editing, setEditing] = useState<FormLogicRule | null>(null)
-    // Error from the last save/delete attempt — surfaced next to the Save button.
+    // Keep the store hydrated whenever the rules load, so opening the dialog
+    // alone is enough for the preview to reflect the current rules.
+    useEffect(() => {
+        if (formId && !rulesLoading) setLogicRules(formId, rules)
+    }, [formId, rules, rulesLoading, setLogicRules])
+
+    // The open rule editor (a new draft or a saved rule being edited) — null
+    // when the list is idle.
+    const [editor, setEditor] = useState<EditorState | null>(null)
+    // Error from the last save/delete attempt — surfaced near the editor.
     const [saveError, setSaveError] = useState<string | null>(null)
-    // The page whose rules are shown in the right pane. Pre-selected from the
-    // `page` prop when the dialog opens; the user can switch from the list.
+    // The page whose rules are managed. Pre-selected from the `page` prop when
+    // the dialog opens; switchable from the dropdown at the top.
     const [selectedPageKey, setSelectedPageKey] = useState<string>(page?.pageKey ?? "")
-    // Which category tab is visible in the right pane. Sticky across page
-    // switches; each tab's count badge shows which other tabs hold rules.
-    const [activeCategory, setActiveCategory] = useState<LogicCategory>(SECTIONS[0].category)
-    // Rule to briefly highlight (e.g. when opened from a branch-arc label).
-    const [highlightRuleId, setHighlightRuleId] = useState<string | null>(null)
 
-    // Re-select the clicked page (and reset transient state) on every open.
-    useEffect(() => {
-        if (page) {
-            setSelectedPageKey(page.pageKey)
-            setEditing(null)
-            setSaveError(null)
-        }
-    }, [page])
+    // Re-select the clicked page and drop any half-finished editor whenever
+    // the dialog opens on a page (prop identity changes). Adjusted during
+    // render — the React-recommended alternative to a prop-syncing effect.
+    const [prevPage, setPrevPage] = useState<FormPage | null>(page)
+    if (page !== prevPage) {
+        setPrevPage(page)
+        setEditor(null)
+        setSaveError(null)
+        if (page) setSelectedPageKey(page.pageKey)
+    }
 
-    // When opened focused on a rule (e.g. a branch-arc label was clicked),
-    // switch to its category tab and mark it for highlighting; otherwise clear
-    // any stale highlight.
-    useEffect(() => {
-        if (!open) return
-        if (focusCategory) setActiveCategory(focusCategory)
-        if (focusRuleId) {
-            setHighlightRuleId(focusRuleId)
-            setEditing(null)
-        } else {
-            setHighlightRuleId(null)
-        }
-    }, [open, focusRuleId, focusCategory])
+    // Highlight is fully derived: the canvas can only point at a rule at the
+    // moment the dialog opens, so no separate state is needed.
+    const highlightRuleId = focusRuleId ?? null
 
     const selectedPage = useMemo<FormPage | null>(
         () =>
@@ -117,16 +162,12 @@ function LogicEditorDialogComponent({
             null,
         [allPages, selectedPageKey, page],
     )
-    const selectedIndex = selectedPage
-        ? allPages.findIndex((p) => p.pageKey === selectedPage.pageKey)
-        : -1
 
     const handleSelectPage = (pageKey: string) => {
         if (pageKey === selectedPage?.pageKey) return
         setSelectedPageKey(pageKey)
-        setEditing(null)
+        setEditor(null)
         setSaveError(null)
-        setHighlightRuleId(null)
     }
 
     // Rules are keyed by category: display/hide rules target the page,
@@ -174,31 +215,58 @@ function LogicEditorDialogComponent({
         if (!open || !highlightRuleId) return
         const el = document.getElementById(`logic-rule-${highlightRuleId}`)
         el?.scrollIntoView({ block: "nearest", behavior: "smooth" })
-    }, [open, highlightRuleId, activeCategory, pageRules])
+    }, [open, highlightRuleId, pageRules])
 
-    const rulesBySection = (category: LogicCategory): FormLogicRule[] =>
-        pageRules.filter((rule) => rule.category === category)
+    // Editor config for the category being added/edited (drives the action row).
+    const editorSection =
+        editor && editor.rule !== null && editor.category
+            ? SECTIONS.find((s) => s.category === editor.category) ?? null
+            : null
 
-    const activeSection =
-        SECTIONS.find((s) => s.category === activeCategory) ?? SECTIONS[0]
-    const activeSectionRules = rulesBySection(activeSection.category)
-    const isEditingActive =
-        editing !== null && editing.category === activeSection.category
+    // The saved rule currently being edited in place in the list — null while
+    // idle or during the add-rule flow (which always edits a fresh draft at
+    // the bottom instead). Rules before and after it stay in view.
+    const editingRule =
+        editor !== null && editor.rule !== null && !editor.rule.id.startsWith("draft-")
+            ? editor.rule
+            : null
 
-    const selectTab = (category: LogicCategory): void => {
-        if (category === activeCategory) return
-        setActiveCategory(category)
-        // Drop any half-finished draft so it can't linger on a now-hidden tab.
-        setEditing(null)
+    // Centered "Add rule" — opens the editor with the type dropdown first.
+    const startAdding = () => {
         setSaveError(null)
-        setHighlightRuleId(null)
+        setEditor({ category: null, rule: null })
+    }
+
+    // Rule type picked from the dropdown — open a fresh editor for it.
+    const selectRuleType = (category: LogicCategory) => {
+        setSaveError(null)
+        setEditor({ category, rule: emptyRule(category, selectedPage?.pageKey ?? "") })
+    }
+
+    // Edit a saved rule from its card — same editor, type already known.
+    const editRule = (rule: FormLogicRule) => {
+        setSaveError(null)
+        setEditor({
+            category: rule.category,
+            rule: { ...rule, conditions: rule.conditions ?? [], actions: rule.actions ?? [] },
+        })
+    }
+
+    const cancelEditor = () => {
+        setEditor(null)
+        setSaveError(null)
     }
 
     const saveRule = async (rule: FormLogicRule) => {
         if (!formId) return
         // Do not persist incomplete rules — keep the editor open.
         const missing = (rule.conditions ?? []).some((c) => !c.sourceKey || !c.operator)
-        if (missing) return
+        if (missing) {
+            setSaveError(
+                "This rule is incomplete — pick a source and operator for every condition.",
+            )
+            return
+        }
         const action = (rule.actions ?? [])[0]
         // A calculation is complete when it has a target and either an operation
         // with a filled operand (current model) or a legacy expression.
@@ -213,6 +281,7 @@ function LogicEditorDialogComponent({
                 return !(typeof action.expression === "string" && action.expression.trim())
             })()
         if ((action?.action === "jumpToPage" && !action.targetPageKey) || calcInvalid) {
+            setSaveError("This rule is incomplete — finish the action before saving.")
             return
         }
         const isNew = rule.id.startsWith("draft-")
@@ -244,8 +313,10 @@ function LogicEditorDialogComponent({
             } else {
                 await updateMutation.mutateAsync({ formId, logicId: rule.id, data: common })
             }
+            // Sync the form store so the preview picks up the new rules.
+            setLogicRules(formId, await getLogicRules(formId))
             // Only close the editor once the rule is actually persisted.
-            setEditing(null)
+            setEditor(null)
         } catch (err) {
             setSaveError(
                 err instanceof Error ? err.message : "Could not save the rule. Please try again.",
@@ -258,14 +329,25 @@ function LogicEditorDialogComponent({
         try {
             setSaveError(null)
             await deleteMutation.mutateAsync({ formId, logicId: ruleId })
+            // Sync the form store so the preview drops the deleted rule.
+            setLogicRules(formId, await getLogicRules(formId))
+            // If the deleted rule was open in the in-place editor, close it.
+            setEditor((prev) => (prev?.rule && prev.rule.id === ruleId ? null : prev))
         } catch (err) {
             setSaveError(
-                err instanceof Error ? err.message : "Could not delete the rule. Please try again.",
+                err instanceof Error
+                    ? err.message
+                    : "Could not delete the rule. Please try again.",
             )
         }
     }
 
     if (!open || !selectedPage) return null
+
+    // Trigger label: "03 · Contact info" — the selected page's number + title.
+    const selectedPageLabel = `${String(
+        allPages.findIndex((p) => p.pageKey === selectedPage.pageKey) + 1,
+    ).padStart(2, "0")} · ${selectedPage.label || "Untitled page"}`
 
     return (
         <AnimatePresence>
@@ -290,16 +372,56 @@ function LogicEditorDialogComponent({
                     exit={{ opacity: 0, scale: 0.96, y: 12 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-3 border-b border-[var(--editorial-border-light)] px-4 py-4 sm:px-6">
-                        <div className="flex min-w-0 flex-col gap-0.5">
+                    {/* Header — eyebrow, page dropdown, close */}
+                    <div className="flex items-start justify-between gap-3 border-b border-[var(--editorial-border-light)] px-4 py-3 sm:px-6 sm:py-4">
+                        <div className="flex min-w-0 flex-1 flex-col gap-2">
                             <span className="editorial-eyebrow text-[var(--editorial-subtle)]">
                                 Logic builder
                             </span>
-                            <h2 className="truncate font-display text-base text-[var(--foreground)] sm:text-lg">
-                                Page {String(selectedIndex + 1).padStart(2, "0")} ·{" "}
-                                {selectedPage.label || "Untitled page"}
-                            </h2>
+                            <div className="flex w-full max-w-sm mx-auto flex-col gap-1">
+                                <label
+                                    htmlFor="logic-builder-page-select"
+                                    className="text-[11px] text-center font-semibold uppercase tracking-wide text-[var(--editorial-subtle)]"
+                                >
+                                    Select page
+                                </label>
+                                <Select
+                                    value={selectedPage.pageKey}
+                                    onValueChange={(v) => {
+                                        if (v) handleSelectPage(v)
+                                    }}
+                                >
+                                    <SelectTrigger
+                                        id="logic-builder-page-select"
+                                        size="sm"
+                                        aria-label="Select page"
+                                        title={selectedPageLabel}
+                                        className={`w-full rounded-lg bg-gradient-to-br text-[13px] font-medium hover:opacity-90 ${PAGE_TYPE_COLORS[selectedPage.type]}`}
+                                    >
+                                        <SelectValue>
+                                            <span className="flex min-w-0 items-center gap-2">
+                                                <PageTypeIcon page={selectedPage} />
+                                                <span className="truncate">
+                                                    {selectedPageLabel}
+                                                </span>
+                                            </span>
+                                        </SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent className="editorial">
+                                        {allPages.map((p, index) => (
+                                            <SelectItem key={p.pageKey} value={p.pageKey}>
+                                                <span className="flex items-center gap-2">
+                                                    <PageTypeChip page={p} />
+                                                    <span>
+                                                        {String(index + 1).padStart(2, "0")} ·{" "}
+                                                        {p.label || "Untitled page"}
+                                                    </span>
+                                                </span>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                         <button
                             type="button"
@@ -311,158 +433,132 @@ function LogicEditorDialogComponent({
                         </button>
                     </div>
 
-                    {/* Two-pane body — side by side on desktop, stacked on mobile */}
-                    <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-                        {/* Left: page list (horizontal chips on mobile, sidebar on desktop) */}
-                        <aside className="shrink-0 border-b border-[var(--editorial-border-light)] p-3 md:w-60 md:border-b-0 md:border-r">
-                            <p className="hidden px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--editorial-subtle)] md:block">
-                                Pages
-                            </p>
-                            <ul className="flex gap-1 overflow-x-auto pb-1 md:flex-col md:gap-1 md:overflow-x-visible md:pb-0">
-                                {allPages.map((p, index) => {
-                                    const PageIcon = PAGE_TYPE_ICONS[p.type] ?? Workflow
-                                    const isSelected = p.pageKey === selectedPage.pageKey
-                                    return (
-                                        <li key={p.pageKey} className="shrink-0 md:w-full">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleSelectPage(p.pageKey)}
-                                                className={`flex w-full items-center gap-2 whitespace-nowrap rounded-lg px-2.5 py-2 text-left text-[13px] transition-colors ${isSelected
-                                                    ? "bg-[var(--editorial-primary-selected)] font-medium text-[var(--primary)]"
-                                                    : "text-[var(--foreground)] hover:bg-[var(--secondary)]"
-                                                    }`}
-                                            >
-                                                <span className="hidden w-5 shrink-0 text-[11px] text-[var(--editorial-subtle)] md:block">
-                                                    {String(index + 1).padStart(2, "0")}
-                                                </span>
-                                                <PageIcon className="h-3.5 w-3.5 shrink-0" />
-                                                <span className="max-w-[180px] truncate md:max-w-none">
-                                                    {p.label || "Untitled page"}
-                                                </span>
-                                            </button>
-                                        </li>
-                                    )
-                                })}
-                            </ul>
-                        </aside>
-
-                        {/* Right: logic sections for the selected page */}
-                        <div className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-5">
-                            {rulesLoading ? (
-                                <div className="flex items-center justify-center py-12 text-sm text-[var(--editorial-subtle)]">
-                                    Loading rules…
-                                </div>
-                            ) : (
-                                <>
-                                    {/* Category tabs */}
-                                    <div
-                                        role="tablist"
-                                        aria-label="Rule categories"
-                                        className="mb-4 w-full flex gap-1 border-b border-[var(--border)]"
-                                    >
-                                        {SECTIONS.map((section) => {
-                                            const SectionIcon = section.icon
-                                            const count = rulesBySection(section.category).length
-                                            const isActive = section.category === activeCategory
-                                            return (
-                                                <button
-                                                    key={section.category}
-                                                    type="button"
-                                                    role="tab"
-                                                    aria-selected={isActive}
-                                                    onClick={() => selectTab(section.category)}
-                                                    className={`flex-1 cursor-pointer -mb-px flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-[13px] transition-colors ${isActive
-                                                        ? "border-[var(--primary)] font-semibold text-[var(--foreground)]"
-                                                        : "border-transparent font-medium text-[var(--editorial-subtle)] hover:text-[var(--foreground)]"
-                                                        }`}
-                                                >
-                                                    <SectionIcon className="h-4 w-4 shrink-0" />
-                                                    {section.title}
-                                                    {count > 0 && (
-                                                        <span
-                                                            className={`rounded-md px-1.5 py-0.5 text-[11px] font-medium ${isActive
-                                                                ? "bg-[var(--editorial-primary-selected)] text-[var(--primary)]"
-                                                                : "bg-[var(--secondary)] text-[var(--editorial-subtle)]"
-                                                                }`}
-                                                        >
-                                                            {count}
-                                                        </span>
-                                                    )}
-                                                </button>
-                                            )
-                                        })}
-                                    </div>
-
-                                    {/* Active tab panel */}
-                                    <motion.div
-                                        key={activeSection.category}
-                                        role="tabpanel"
-                                        initial={{ opacity: 0, y: 4 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.15, ease: "easeOut" }}
-                                        className="flex flex-col gap-2"
-                                    >
-                                        <p className="text-xs leading-relaxed text-[var(--editorial-subtle)]">
-                                            {activeSection.description}
-                                        </p>
-
-                                        {activeSectionRules.length > 0 ? (
-                                            <ul className="flex flex-col gap-2">
-                                                {activeSectionRules.map((rule) => (
-                                                    <RuleCard
-                                                        key={rule.id}
-                                                        rule={rule}
-                                                        highlighted={rule.id === highlightRuleId}
-                                                        onEdit={() =>
-                                                            setEditing({
-                                                                ...rule,
-                                                                conditions: rule.conditions ?? [],
-                                                                actions: rule.actions ?? [],
+                    {/* Body — every rule one by one, plus the add-rule flow */}
+                    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+                        {rulesLoading ? (
+                            <div className="flex items-center justify-center py-12 text-sm text-[var(--editorial-subtle)]">
+                                Loading rules…
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-2.5">
+                                {/* Every saved rule on the selected page, one by one */}
+                                {pageRules.length > 0 ? (
+                                    <ul className="flex flex-col gap-2">
+                                        {/* Editing opens the editor on the rule itself, so
+                                            the rules before and after it stay in view. */}
+                                        {pageRules.map((rule) =>
+                                            editingRule && editingRule.id === rule.id ? (
+                                                <li key={rule.id}>
+                                                    <RuleEditor
+                                                        rule={editingRule}
+                                                        section={editorSection ?? SECTIONS[0]}
+                                                        pages={allPages}
+                                                        selectedPageKey={selectedPage.pageKey}
+                                                        variables={variables}
+                                                        onUpdate={(next) =>
+                                                            setEditor({
+                                                                category: next.category,
+                                                                rule: next,
                                                             })
                                                         }
-                                                        onDelete={() => deleteRule(rule.id)}
+                                                        onSave={saveRule}
+                                                        error={saveError}
+                                                        onCancel={cancelEditor}
                                                     />
-                                                ))}
-                                            </ul>
-                                        ) : !isEditingActive ? (
-                                            <div className="rounded-lg border border-dashed border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-[13px] text-[var(--editorial-subtle)]">
-                                                No rules on this tab yet.
-                                            </div>
-                                        ) : null}
-                                        {!isEditingActive && !editing && (
+                                                </li>
+                                            ) : (
+                                                <RuleCard
+                                                    key={rule.id}
+                                                    rule={rule}
+                                                    pages={allPages}
+                                                    highlighted={rule.id === highlightRuleId}
+                                                    onEdit={() => editRule(rule)}
+                                                    onDelete={() => deleteRule(rule.id)}
+                                                />
+                                            ),
+                                        )}
+                                    </ul>
+                                ) : !editor ? (
+                                    <div className="rounded-lg text-center px-4 py-3 text-[13px] text-[var(--editorial-subtle)]">
+                                        No rules on this page yet 
+                                    </div>
+                                ) : null}
+
+                                {/* Add flow — pick a rule type first, then edit the draft */}
+                                {editor && !editingRule &&
+                                    (editor.rule === null ? (
+                                        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-3.5 py-3">
+                                            <span className="text-[13px] font-semibold text-[var(--foreground)]">
+                                                What you want
+                                            </span>
+                                            <Select
+                                                onValueChange={(v) => {
+                                                    if (v) selectRuleType(v as LogicCategory)
+                                                }}
+                                            >
+                                                <SelectTrigger
+                                                    size="sm"
+                                                    aria-label="Rule type"
+                                                    className="w-full rounded-md border-[var(--border)] bg-[var(--card)] text-[13px] font-medium sm:w-64"
+                                                >
+                                                    <SelectValue placeholder="Select rule type…" />
+                                                </SelectTrigger>
+                                                <SelectContent className="editorial">
+                                                    {SECTIONS.map((s) => (
+                                                        <SelectItem
+                                                            key={s.category}
+                                                            value={s.category}
+                                                        >
+                                                            {s.title}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                             <button
                                                 type="button"
-                                                onClick={() =>
-                                                    setEditing(
-                                                        emptyRule(
-                                                            activeSection.category,
-                                                            selectedPage.pageKey,
-                                                        ),
-                                                    )
-                                                }
-                                                className="flex w-fit items-center gap-1 text-[13px] font-medium text-[var(--primary)] hover:underline"
+                                                onClick={cancelEditor}
+                                                className="ml-auto text-[13px] font-medium text-[var(--editorial-subtle)] hover:text-[var(--foreground)]"
                                             >
-                                                <Plus className="h-3.5 w-3.5" /> Add{" "}
-                                                {activeSection.title.toLowerCase()} rule
+                                                Cancel
                                             </button>
-                                        )}
-                                        {isEditingActive && editing && (
-                                            <RuleEditor
-                                                rule={editing}
-                                                section={activeSection}
-                                                pages={allPages}
-                                                selectedPageKey={selectedPage.pageKey}
-                                                variables={variables}
-                                                onUpdate={(next) => setEditing(next)}
-                                                onSave={(next) => saveRule(next)}
-                                                error={saveError}
-                                                onCancel={() => setEditing(null)}
-                                            />
-                                        )}
-                                    </motion.div>
-                                </>
-                            )}
-                        </div>
+                                        </div>
+                                    ) : editorSection ? (
+                                        <RuleEditor
+                                            rule={editor.rule}
+                                            section={editorSection}
+                                            pages={allPages}
+                                            selectedPageKey={selectedPage.pageKey}
+                                            variables={variables}
+                                            onUpdate={(next) =>
+                                                setEditor({ category: next.category, rule: next })
+                                            }
+                                            onSave={saveRule}
+                                            error={saveError}
+                                            onCancel={cancelEditor}
+                                        />
+                                    ) : null)}
+
+                                {/* Save/delete error with no editor open */}
+                                {saveError && !editor && (
+                                    <p className="text-xs font-medium text-[var(--destructive)]">
+                                        {saveError}
+                                    </p>
+                                )}
+
+                                {/* Centered add-rule button */}
+                                {!editor && (
+                                    <div className="flex justify-center pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={startAdding}
+                                            className="editorial-transition flex h-9 items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] px-4 text-[13px] font-medium text-[var(--foreground)] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:bg-[var(--editorial-primary-selected)]"
+                                        >
+                                            <Plus className="h-4 w-4" /> Add new rule
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Footer */}

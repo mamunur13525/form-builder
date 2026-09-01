@@ -1,12 +1,21 @@
 /**
  * Editor for a single logic rule — condition rows (AND/OR combinable) plus the
  * category-specific action row (target page / variable expression), with the
- * save/cancel footer.
+ * save/cancel footer. Controls are shadcn/ui Select, Input and Switch.
  */
 
 import { useEffect, useMemo } from "react";
 import { Plus, Trash2, Save } from "lucide-react";
 import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../../components/ui/select";
+import { Switch } from "../../../components/ui/switch";
 import type {
     FormLogicRule,
     FormVariable,
@@ -15,7 +24,6 @@ import type {
     LogicCondition,
     LogicCombinator,
     LogicOperator,
-    LogicSourceType,
 } from "../../../shared/types/common";
 import {
     OPERATORS_WITH_VALUE,
@@ -25,6 +33,14 @@ import {
     type SectionConfig,
 } from "./logicEditorConfig";
 import { emptyCondition } from "./ruleUtils";
+
+/** Compact editorial styling shared by every select trigger in the editor. */
+const selectTriggerClass =
+    "rounded-md border-[var(--border)] bg-[var(--secondary)] px-2 text-[13px] hover:bg-[var(--editorial-primary-selected)]"
+
+/** Compact editorial styling shared by every input in the editor. */
+const inputClass =
+    "h-8 rounded-md border-[var(--border)] bg-[var(--secondary)] px-2 text-[13px]"
 
 interface RuleEditorProps {
     rule: FormLogicRule
@@ -144,11 +160,11 @@ export function RuleEditor({ rule, section, pages, selectedPageKey, variables, o
     return (
         <div className="flex flex-col gap-3 rounded-xl border border-[var(--editorial-primary-ring)] bg-[var(--secondary)] p-4">
             <label className="flex cursor-pointer items-center gap-2 text-[13px] font-medium text-[var(--foreground)]">
-                <input
-                    type="checkbox"
+                <Switch
+                    size="sm"
                     checked={rule.enabled !== false}
-                    onChange={(e) => onUpdate({ ...rule, enabled: e.target.checked })}
-                    className="h-3.5 w-3.5 accent-[var(--primary)]"
+                    onCheckedChange={(checked) => onUpdate({ ...rule, enabled: checked })}
+                    aria-label="Rule enabled"
                 />
                 Rule enabled
             </label>
@@ -166,104 +182,140 @@ export function RuleEditor({ rule, section, pages, selectedPageKey, variables, o
                                     When
                                 </span>
                             ) : (
-                                <select
+                                <Select
                                     value={condition.combinator ?? "and"}
-                                    onChange={(e) =>
-                                        setCondition(index, {
-                                            combinator: e.target.value as LogicCombinator,
-                                        })
-                                    }
-                                    className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px] font-semibold uppercase text-[var(--primary)]"
-                                    aria-label="Combine with previous condition"
+                                    onValueChange={(v) => {
+                                        if (v === "and" || v === "or") {
+                                            setCondition(index, { combinator: v })
+                                        }
+                                    }}
                                 >
-                                    <option value="and">AND</option>
-                                    <option value="or">OR</option>
-                                </select>
+                                    <SelectTrigger
+                                        size="sm"
+                                        aria-label="Combine with previous condition"
+                                        className={`${selectTriggerClass} w-20 font-semibold uppercase text-[var(--primary)]`}
+                                    >
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="editorial">
+                                        <SelectItem value="and">AND</SelectItem>
+                                        <SelectItem value="or">OR</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             )}
-                            <select
+
+                            <Select
                                 value={condition.sourceType}
-                                onChange={(e) => {
-                                    const nextType = e.target.value as LogicSourceType
+                                onValueChange={(v) => {
+                                    if (v !== "page" && v !== "variable") return
                                     setCondition(index, {
-                                        sourceType: nextType,
-                                        sourceKey: nextType === "page" ? selectedPageKey : "",
+                                        sourceType: v,
+                                        sourceKey: v === "page" ? selectedPageKey : "",
                                         operator: "equals",
                                         value: "",
                                     })
                                 }}
-                                className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
                             >
-                                <option value="page">a page answer</option>
-                                <option value="variable">a variable</option>
-                            </select>
+                                <SelectTrigger
+                                    size="sm"
+                                    aria-label="Condition source type"
+                                    className={`${selectTriggerClass} w-36`}
+                                >
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="editorial">
+                                    <SelectItem value="page">a page answer</SelectItem>
+                                    <SelectItem value="variable">a variable</SelectItem>
+                                </SelectContent>
+                            </Select>
 
                             {condition.sourceType === "variable" && (
-                                <select
-                                    value={condition.sourceKey}
-                                    onChange={(e) =>
-                                        setCondition(index, { sourceKey: e.target.value, value: "" })
-                                    }
-                                    className="min-w-[140px] rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                                <Select
+                                    value={condition.sourceKey || null}
+                                    onValueChange={(v) => {
+                                        if (!v) return
+                                        setCondition(index, { sourceKey: v, value: "" })
+                                    }}
                                 >
-                                    <option value="">Select…</option>
-                                    {variables.map((v) => (
-                                        <option key={v.name} value={v.name}>
-                                            @{v.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger
+                                        size="sm"
+                                        aria-label="Variable"
+                                        className={`${selectTriggerClass} w-44`}
+                                    >
+                                        <SelectValue placeholder="Select…" />
+                                    </SelectTrigger>
+                                    <SelectContent className="editorial">
+                                        {variables.map((v) => (
+                                            <SelectItem key={v.name} value={v.name}>
+                                                @{v.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             )}
 
-                            <select
+                            <Select
                                 value={condition.operator}
-                                onChange={(e) =>
-                                    setCondition(index, { operator: e.target.value as LogicOperator })
-                                }
-                                className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                                onValueChange={(v) => {
+                                    if (v) setCondition(index, { operator: v as LogicOperator })
+                                }}
                             >
-                                {operatorOptions.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                        {o.label}
-                                    </option>
-                                ))}
-                            </select>
+                                <SelectTrigger size="sm" aria-label="Operator" className={`${selectTriggerClass} w-52`}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="editorial">
+                                    {operatorOptions.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                            {o.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
                             {hasValue &&
                                 (showValueSelect ? (
-                                    <select
-                                        value={String(condition.value ?? "")}
-                                        onChange={(e) =>
-                                            setCondition(index, { value: e.target.value })
+                                    <Select
+                                        value={
+                                            condition.value == null || condition.value === ""
+                                                ? null
+                                                : String(condition.value)
                                         }
-                                        className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                                        onValueChange={(v) => {
+                                            if (v != null) setCondition(index, { value: v })
+                                        }}
                                     >
-                                        <option value="">Select…</option>
-                                        {valueOptions.map((o) => (
-                                            <option
-                                                key={o.value ?? o.label}
-                                                value={o.value ?? o.label ?? ""}
-                                            >
-                                                {o.label ?? o.value}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        <SelectTrigger size="sm" aria-label="Value" className={`${selectTriggerClass} w-44`}>
+                                            <SelectValue placeholder="Select…" />
+                                        </SelectTrigger>
+                                        <SelectContent className="editorial">
+                                            {valueOptions.map((o) => (
+                                                <SelectItem
+                                                    key={o.value ?? o.label}
+                                                    value={o.value ?? o.label ?? ""}
+                                                >
+                                                    {o.label ?? o.value}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 ) : sourceIsPage && isCalculation ? (
-                                    <input
+                                    <Input
                                         type="number"
                                         value={String(condition.value ?? "")}
                                         onChange={(e) =>
                                             setCondition(index, { value: e.target.value })
                                         }
-                                        className="w-24 rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                                        className={`${inputClass} w-24`}
                                         placeholder="Value"
                                     />
                                 ) : (
-                                    <input
+                                    <Input
                                         type="text"
                                         value={String(condition.value ?? "")}
                                         onChange={(e) =>
                                             setCondition(index, { value: e.target.value })
                                         }
-                                        className="w-24 rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                                        className={`${inputClass} w-24`}
                                         placeholder="Value"
                                     />
                                 ))}
@@ -294,100 +346,155 @@ export function RuleEditor({ rule, section, pages, selectedPageKey, variables, o
                 {section.category === "branching" ? (
                     <>
                         <span className="font-semibold text-[var(--editorial-subtle)]">Then</span>
-                        <select
+                        <Select
                             value={action?.action ?? "jumpToPage"}
-                            onChange={(e) =>
+                            onValueChange={(v) => {
+                                if (v !== "jumpToPage" && v !== "goToEnd") return
                                 setAction({
-                                    action: e.target.value as "jumpToPage" | "goToEnd",
+                                    action: v,
                                     targetPageKey:
-                                        e.target.value === "goToEnd"
-                                            ? undefined
-                                            : action?.targetPageKey,
+                                        v === "goToEnd" ? undefined : action?.targetPageKey,
                                 })
-                            }
-                            className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                            }}
                         >
-                            {section.actionOptions.map((o) => (
-                                <option key={o.value} value={o.value}>
-                                    {o.label}
-                                </option>
-                            ))}
-                        </select>
-                        {action?.action === "jumpToPage" && (
-                            <select
-                                value={action.targetPageKey ?? ""}
-                                onChange={(e) => setAction({ targetPageKey: e.target.value })}
-                                className="min-w-[140px] rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                            <SelectTrigger
+                                size="sm"
+                                aria-label="Branching action"
+                                className={`${selectTriggerClass} w-40`}
                             >
-                                <option value="">Select a page…</option>
-                                {pages
-                                    .filter((p) => p.pageKey !== rule.conditions?.[0]?.sourceKey)
-                                    .map((p) => (
-                                        <option key={p.pageKey} value={p.pageKey}>
-                                            {p.label || p.pageKey}
-                                        </option>
-                                    ))}
-                            </select>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="editorial">
+                                {section.actionOptions.map((o) => (
+                                    <SelectItem key={o.value} value={o.value}>
+                                        {o.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {action?.action === "jumpToPage" && (
+                            <Select
+                                value={action.targetPageKey || null}
+                                onValueChange={(v) => {
+                                    if (!v) return
+                                    setAction({ targetPageKey: v })
+                                }}
+                            >
+                                <SelectTrigger
+                                    size="sm"
+                                    aria-label="Jump target page"
+                                    className={`${selectTriggerClass} w-56`}
+                                >
+                                    <SelectValue placeholder="Select a page…" />
+                                </SelectTrigger>
+                                <SelectContent className="editorial">
+                                    {pages
+                                        .filter(
+                                            (p) => p.pageKey !== rule.conditions?.[0]?.sourceKey,
+                                        )
+                                        .map((p) => (
+                                            <SelectItem key={p.pageKey} value={p.pageKey}>
+                                                {p.label || p.pageKey}
+                                            </SelectItem>
+                                        ))}
+                                </SelectContent>
+                            </Select>
                         )}
                     </>
                 ) : isCalculation ? (
                     <>
-                        <select
-                            value={action?.variableName ?? ""}
-                            onChange={(e) => setAction({ variableName: e.target.value })}
-                            className="min-w-[120px] rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 font-medium text-[13px]"
+                        <Select
+                            value={action?.variableName || null}
+                            onValueChange={(v) => {
+                                if (!v) return
+                                setAction({ variableName: v })
+                            }}
                         >
-                            <option value="">Select a variable…</option>
-                            {numberVariables.map((v) => (
-                                <option key={v.name} value={v.name}>
-                                    @{v.name}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            value={action?.operation ?? "set"}
-                            onChange={(e) =>
-                                setAction({ operation: e.target.value as LogicCalcOperation })
-                            }
-                            className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
-                        >
-                            {CALC_OPERATIONS.map((o) => (
-                                <option key={o.value} value={o.value}>
-                                    {o.label}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            value={operandIsVariable ? "variable" : "number"}
-                            onChange={(e) =>
-                                setAction({ value: e.target.value === "variable" ? "@" : "" })
-                            }
-                            className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
-                        >
-                            <option value="number">a number</option>
-                            <option value="variable">a variable</option>
-                        </select>
-                        {operandIsVariable ? (
-                            <select
-                                value={operandVarName}
-                                onChange={(e) =>
-                                    setAction({ value: e.target.value ? `@${e.target.value}` : "@" })
-                                }
-                                className="min-w-[120px] rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 font-medium text-[13px]"
+                            <SelectTrigger
+                                size="sm"
+                                aria-label="Target variable"
+                                className={`${selectTriggerClass} w-44 font-medium`}
                             >
-                                <option value="">Select a variable…</option>
+                                <SelectValue placeholder="Select a variable…" />
+                            </SelectTrigger>
+                            <SelectContent className="editorial">
                                 {numberVariables.map((v) => (
-                                    <option key={v.name} value={v.name}>
+                                    <SelectItem key={v.name} value={v.name}>
                                         @{v.name}
-                                    </option>
+                                    </SelectItem>
                                 ))}
-                            </select>
+                            </SelectContent>
+                        </Select>
+                        <Select
+                            value={action?.operation ?? "set"}
+                            onValueChange={(v) => {
+                                if (v) setAction({ operation: v as LogicCalcOperation })
+                            }}
+                        >
+                            <SelectTrigger
+                                size="sm"
+                                aria-label="Calculation operation"
+                                className={`${selectTriggerClass} w-36`}
+                            >
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="editorial">
+                                {CALC_OPERATIONS.map((o) => (
+                                    <SelectItem key={o.value} value={o.value}>
+                                        {o.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select
+                            value={operandIsVariable ? "variable" : "number"}
+                            onValueChange={(v) => {
+                                if (v === "variable" || v === "number") {
+                                    setAction({ value: v === "variable" ? "@" : "" })
+                                }
+                            }}
+                        >
+                            <SelectTrigger
+                                size="sm"
+                                aria-label="Operand type"
+                                className={`${selectTriggerClass} w-32`}
+                            >
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="editorial">
+                                <SelectItem value="number">a number</SelectItem>
+                                <SelectItem value="variable">a variable</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        {operandIsVariable ? (
+                            <Select
+                                value={operandVarName || null}
+                                onValueChange={(v) => {
+                                    if (!v) return
+                                    setAction({ value: `@${v}` })
+                                }}
+                            >
+                                <SelectTrigger
+                                    size="sm"
+                                    aria-label="Operand variable"
+                                    className={`${selectTriggerClass} w-44 font-medium`}
+                                >
+                                    <SelectValue placeholder="Select a variable…" />
+                                </SelectTrigger>
+                                <SelectContent className="editorial">
+                                    {numberVariables.map((v) => (
+                                        <SelectItem key={v.name} value={v.name}>
+                                            @{v.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         ) : (
-                            <input
+                            <Input
                                 type="number"
                                 value={operandNumber}
                                 onChange={(e) => setAction({ value: e.target.value })}
-                                className="w-28 rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-[13px]"
+                                className={`${inputClass} w-28`}
                                 placeholder="e.g. 5"
                             />
                         )}

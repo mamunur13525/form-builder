@@ -3,20 +3,34 @@
  *
  * Mirrors the plain-text `ruleSummary()` (which RuleCard keeps as the hover
  * title / accessible label) but styles the meaningful tokens so a rule reads
- * at a glance: @page-answer / @variable sources and jump targets become bold
- * tinted pills, literal comparison values become bordered neutral pills, and
+ * at a glance: page answers / jump targets show as "page 03 · Title" pills
+ * (truncating with "…" and the full title on hover), @variables become bold
+ * pills, literal comparison values become bordered neutral pills, and
  * operators / connectives stay muted. Monochrome editorial tokens only — the
  * hierarchy comes from weight + background, not hue.
  */
 
 import type { ReactNode } from "react";
-import type { FormLogicRule, LogicCondition } from "../../../shared/types/common";
+import type { FormLogicRule, FormPage, LogicCondition } from "../../../shared/types/common";
 import { CALC_OPERATION_SYMBOLS, OPERATOR_LABELS } from "./logicEditorConfig";
+import { pageLabel } from "./ruleUtils";
 
-/** The "subject" of a rule: an @page answer, an @variable, or a jump target. */
+/** A page reference, shown as "page 03 · Title" — truncates with a tooltip. */
+function PagePill({ label }: { label: string }) {
+    return (
+        <span
+            title={label}
+            className="inline-flex max-w-56 items-center truncate rounded-md border border-[var(--border)] bg-[var(--card)] px-1.5 py-0.5 font-medium text-[var(--foreground)]"
+        >
+            {label}
+        </span>
+    )
+}
+
+/** The "subject" of a rule: an @variable or a calculation operand. */
 function TokenPill({ children }: { children: ReactNode }) {
     return (
-        <span className="inline-flex items-center rounded-md bg-[var(--primary)]/90 px-1.5 py-0.5 font-semibold text-[var(--card)]">
+        <span className="inline-flex items-center rounded-md border border-[var(--border)] bg-[var(--card)] px-1.5 py-0.5 font-medium text-[var(--foreground)]">
             {children}
         </span>
     )
@@ -54,7 +68,14 @@ function Combinator({ op }: { op: "and" | "or" }) {
     )
 }
 
-export function RuleSummary({ rule }: { rule: FormLogicRule }) {
+export function RuleSummary({
+    rule,
+    pages = [],
+}: {
+    rule: FormLogicRule
+    /** All form pages — page references resolve to "page 03 · Title" labels. */
+    pages?: FormPage[]
+}) {
     const conditions = rule.conditions ?? []
     const ruleFallback: "and" | "or" = rule.combinator === "or" ? "or" : "and"
     const action = (rule.actions ?? [])[0]
@@ -64,6 +85,8 @@ export function RuleSummary({ rule }: { rule: FormLogicRule }) {
 
     const kw = (text: string) => nodes.push(<Kw key={key++}>{text}</Kw>)
     const token = (text: string) => nodes.push(<TokenPill key={key++}>{text}</TokenPill>)
+    const page = (pageKey: string) =>
+        nodes.push(<PagePill key={key++} label={pageLabel(pages, pageKey)} />)
     const value = (text: string) => nodes.push(<ValuePill key={key++}>{text}</ValuePill>)
     const code = (text: string) => nodes.push(<CodePill key={key++}>{text}</CodePill>)
     const combinator = (op: "and" | "or") => nodes.push(<Combinator key={key++} op={op} />)
@@ -85,7 +108,11 @@ export function RuleSummary({ rule }: { rule: FormLogicRule }) {
                 kw("(choose a source)")
                 return
             }
-            token(`@${c.sourceKey}`)
+            if (c.sourceType === "page") {
+                page(c.sourceKey)
+            } else {
+                token(`@${c.sourceKey}`)
+            }
             kw(OPERATOR_LABELS[c.operator] ?? c.operator)
             if (c.operator !== "isEmpty" && c.operator !== "isNotEmpty") {
                 const v = String(c.value ?? "")
@@ -107,7 +134,7 @@ export function RuleSummary({ rule }: { rule: FormLogicRule }) {
                 kw("finish the form")
             } else {
                 kw("jump to")
-                if (action?.targetPageKey) token(`@${action.targetPageKey}`)
+                if (action?.targetPageKey) page(action.targetPageKey)
                 else kw("(no target)")
             }
             break

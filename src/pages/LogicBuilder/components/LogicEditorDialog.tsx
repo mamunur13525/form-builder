@@ -62,16 +62,6 @@ interface LogicEditorDialogProps {
     allPages: FormPage[]
     /** Form variables (from settings), shown in condition/calculation picks. */
     variables: FormVariable[]
-    /**
-     * Rule to reveal and briefly highlight when the dialog opens — e.g. when a
-     * branch-arc label was clicked on the canvas. Null for a plain page open.
-     */
-    focusRuleId?: string | null
-    /**
-     * Kept for call-site compatibility — rules are listed flat now, so there
-     * is no category tab left to pre-select.
-     */
-    focusCategory?: LogicCategory | null
     /** Explicit close handler — the only way the dialog closes. */
     onClose: () => void
 }
@@ -110,7 +100,6 @@ function LogicEditorDialogComponent({
     page,
     allPages,
     variables,
-    focusRuleId,
     onClose,
 }: LogicEditorDialogProps) {
     const { formId } = useParams<{ formId: string }>()
@@ -149,10 +138,6 @@ function LogicEditorDialogComponent({
         setSaveError(null)
         if (page) setSelectedPageKey(page.pageKey)
     }
-
-    // Highlight is fully derived: the canvas can only point at a rule at the
-    // moment the dialog opens, so no separate state is needed.
-    const highlightRuleId = focusRuleId ?? null
 
     const selectedPage = useMemo<FormPage | null>(
         () =>
@@ -209,13 +194,6 @@ function LogicEditorDialogComponent({
                 return allPages[0]?.pageKey === selectedPage.pageKey
             })
     }, [selectedPage, rules, allPages])
-
-    // Once the focused rule is on screen, scroll it into view.
-    useEffect(() => {
-        if (!open || !highlightRuleId) return
-        const el = document.getElementById(`logic-rule-${highlightRuleId}`)
-        el?.scrollIntoView({ block: "nearest", behavior: "smooth" })
-    }, [open, highlightRuleId, pageRules])
 
     // Editor config for the category being added/edited (drives the action row).
     const editorSection =
@@ -375,9 +353,6 @@ function LogicEditorDialogComponent({
                     {/* Header — eyebrow, page dropdown, close */}
                     <div className="flex items-start justify-between gap-3 border-b border-[var(--editorial-border-light)] px-4 py-3 sm:px-6 sm:py-4">
                         <div className="flex min-w-0 flex-1 flex-col gap-2">
-                            <span className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                                Logic builder
-                            </span>
                             <div className="flex w-full max-w-sm mx-auto flex-col gap-1">
                                 <label
                                     htmlFor="logic-builder-page-select"
@@ -396,7 +371,7 @@ function LogicEditorDialogComponent({
                                         size="sm"
                                         aria-label="Select page"
                                         title={selectedPageLabel}
-                                        className={`w-full rounded-lg bg-gradient-to-br text-[13px] font-medium hover:opacity-90 ${PAGE_TYPE_COLORS[selectedPage.type]}`}
+                                        className={`w-full rounded-lg border`}
                                     >
                                         <SelectValue>
                                             <span className="flex min-w-0 items-center gap-2">
@@ -440,13 +415,13 @@ function LogicEditorDialogComponent({
                                 Loading rules…
                             </div>
                         ) : (
-                            <div className="flex flex-col gap-2.5">
+                            <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
                                 {/* Every saved rule on the selected page, one by one */}
                                 {pageRules.length > 0 ? (
-                                    <ul className="flex flex-col gap-2">
+                                    <ul className="flex flex-col gap-6">
                                         {/* Editing opens the editor on the rule itself, so
                                             the rules before and after it stay in view. */}
-                                        {pageRules.map((rule) =>
+                                        {pageRules.map((rule, ruleIndex) =>
                                             editingRule && editingRule.id === rule.id ? (
                                                 <li key={rule.id}>
                                                     <RuleEditor
@@ -455,6 +430,7 @@ function LogicEditorDialogComponent({
                                                         pages={allPages}
                                                         selectedPageKey={selectedPage.pageKey}
                                                         variables={variables}
+                                                        index={ruleIndex + 1}
                                                         onUpdate={(next) =>
                                                             setEditor({
                                                                 category: next.category,
@@ -470,8 +446,8 @@ function LogicEditorDialogComponent({
                                                 <RuleCard
                                                     key={rule.id}
                                                     rule={rule}
+                                                    index={ruleIndex + 1}
                                                     pages={allPages}
-                                                    highlighted={rule.id === highlightRuleId}
                                                     onEdit={() => editRule(rule)}
                                                     onDelete={() => deleteRule(rule.id)}
                                                 />
@@ -479,16 +455,16 @@ function LogicEditorDialogComponent({
                                         )}
                                     </ul>
                                 ) : !editor ? (
-                                    <div className="rounded-lg text-center px-4 py-3 text-[13px] text-[var(--editorial-subtle)]">
-                                        No rules on this page yet 
+                                    <div className="rounded-xl border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] px-4 py-6 text-center text-[15px] text-[var(--editorial-subtle)]">
+                                        No rules on this page yet.
                                     </div>
                                 ) : null}
 
                                 {/* Add flow — pick a rule type first, then edit the draft */}
                                 {editor && !editingRule &&
                                     (editor.rule === null ? (
-                                        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-3.5 py-3">
-                                            <span className="text-[13px] font-semibold text-[var(--foreground)]">
+                                        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-3">
+                                            <span className="text-[15px] font-semibold text-[var(--foreground)]">
                                                 What you want
                                             </span>
                                             <Select
@@ -497,9 +473,8 @@ function LogicEditorDialogComponent({
                                                 }}
                                             >
                                                 <SelectTrigger
-                                                    size="sm"
                                                     aria-label="Rule type"
-                                                    className="w-full rounded-md border-[var(--border)] bg-[var(--card)] text-[13px] font-medium sm:w-64"
+                                                    className="h-11 w-full rounded-xl border-[var(--input)] bg-[var(--card)] px-4 text-[15px] font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] sm:w-72 data-placeholder:text-[var(--editorial-subtle)]"
                                                 >
                                                     <SelectValue placeholder="Select rule type…" />
                                                 </SelectTrigger>
@@ -517,7 +492,7 @@ function LogicEditorDialogComponent({
                                             <button
                                                 type="button"
                                                 onClick={cancelEditor}
-                                                className="ml-auto text-[13px] font-medium text-[var(--editorial-subtle)] hover:text-[var(--foreground)]"
+                                                className="ml-auto rounded-lg px-2 py-1 text-[15px] font-medium text-[var(--editorial-subtle)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                                             >
                                                 Cancel
                                             </button>
@@ -529,6 +504,7 @@ function LogicEditorDialogComponent({
                                             pages={allPages}
                                             selectedPageKey={selectedPage.pageKey}
                                             variables={variables}
+                                            index={pageRules.length + 1}
                                             onUpdate={(next) =>
                                                 setEditor({ category: next.category, rule: next })
                                             }
@@ -540,21 +516,22 @@ function LogicEditorDialogComponent({
 
                                 {/* Save/delete error with no editor open */}
                                 {saveError && !editor && (
-                                    <p className="text-xs font-medium text-[var(--destructive)]">
+                                    <p className="text-sm font-medium text-[var(--destructive)]">
                                         {saveError}
                                     </p>
                                 )}
 
                                 {/* Centered add-rule button */}
                                 {!editor && (
-                                    <div className="flex justify-center pt-2">
-                                        <button
+                                    <div className="flex justify-center pt-1">
+                                        <Button
                                             type="button"
                                             onClick={startAdding}
-                                            className="editorial-transition flex h-9 items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] px-4 text-[13px] font-medium text-[var(--foreground)] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:bg-[var(--editorial-primary-selected)]"
+                                            variant={'outline'}
+                                            className={'text-sm'}
                                         >
-                                            <Plus className="h-4 w-4" /> Add new rule
-                                        </button>
+                                            <Plus className="h-4! w-4!" /> Add new rule
+                                        </Button>
                                     </div>
                                 )}
                             </div>

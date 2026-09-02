@@ -23,7 +23,7 @@ import {
   buildVariableItems,
   type VariableItem,
 } from "@/shared/components/pages";
-import type { EndPage, FormPage, FormLogicRule, LogicCategory } from "../../shared/types/common";
+import type { EndPage, FormPage, FormLogicRule } from "../../shared/types/common";
 import { PageNode, type PageNodeData, type PageNodeType } from "./components/PageNode";
 import {
   EndPageNode,
@@ -261,10 +261,6 @@ function LogicFlow() {
   const [selected, setSelected] = useState<{
     page: FormPage;
     index: number;
-    /** When set, the dialog opens focused on (and highlighting) this rule. */
-    focusRuleId?: string;
-    /** When set, the dialog opens on this category tab. */
-    focusCategory?: LogicCategory;
   } | null>(null);
 
   const { fitView, getNodes } = useReactFlow();
@@ -343,28 +339,6 @@ function LogicFlow() {
     [pages],
   );
 
-  // Clicking a branch arc (or its label) opens the rules dialog on that rule:
-  // select the page the rule is owned by, switch to the Branching tab, and
-  // highlight the rule. Default-flow connectors carry no rule data, so they are
-  // ignored.
-  const handleEdgeClick = useCallback(
-    (_event: React.MouseEvent, edge: Edge) => {
-      const data = edge.data as
-        | { ruleId?: string; ownerKey?: string }
-        | undefined;
-      if (!data?.ownerKey) return;
-      const index = pages.findIndex((p) => p.pageKey === data.ownerKey);
-      if (index < 0) return;
-      setSelected({
-        page: pages[index],
-        index,
-        focusRuleId: data.ruleId || undefined,
-        focusCategory: "branching",
-      });
-    },
-    [pages],
-  );
-
   // Reload / Reset — restore the initial layout and re-fit the view.
   const handleReset = useCallback(() => {
     const { nodes: nextNodes, edges: nextEdges } = buildGraph(
@@ -418,7 +392,6 @@ function LogicFlow() {
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         onNodeClick={handleNodeClick}
-        onEdgeClick={handleEdgeClick}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.2}
@@ -460,8 +433,6 @@ function LogicFlow() {
         page={selected?.page ?? null}
         allPages={pages}
         variables={rawVariables}
-        focusRuleId={selected?.focusRuleId ?? null}
-        focusCategory={selected?.focusCategory ?? null}
         onClose={() => setSelected(null)}
       />
     </>

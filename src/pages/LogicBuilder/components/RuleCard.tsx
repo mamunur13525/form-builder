@@ -13,6 +13,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import type { FormLogicRule, FormPage } from "../../../shared/types/common";
 import { CALC_OPERATION_SYMBOLS, OPERATOR_LABELS } from "./logicEditorConfig";
 import { pageLabel } from "./ruleUtils";
+import { PageTypeChip } from "./RuleEditor";
 import { Button } from "@/components/ui/button";
 
 interface RuleCardProps {
@@ -97,6 +98,19 @@ export function RuleCard({ rule, index, pages = [], onEdit, onDelete }: RuleCard
     const operator = OPERATOR_LABELS[(rule.conditions ?? [])[0]?.operator ?? "equals"]
     const value = valueLabel(rule, pages)
     const outcome = outcomeLabel(rule, pages)
+    const condition = (rule.conditions ?? [])[0]
+    // The page referenced by the IF side (when the source is a page answer).
+    const sourcePage =
+        condition?.sourceType !== "variable" && condition?.sourceKey
+            ? pages.find((p) => p.pageKey === condition.sourceKey)
+            : undefined
+    const action = (rule.actions ?? [])[0]
+    // The page referenced by the THEN side (jump / show / hide targets).
+    const targetPage = action?.targetPageKey
+        ? pages.find((p) => p.pageKey === action.targetPageKey)
+        : undefined
+    const pageNumber = (pageKey: string | undefined) =>
+        pageKey ? pages.findIndex((p) => p.pageKey === pageKey) + 1 : 0
 
     return (
         <li
@@ -129,11 +143,40 @@ export function RuleCard({ rule, index, pages = [], onEdit, onDelete }: RuleCard
 
             <div className="flex flex-wrap items-center gap-2  px-4 py-6">
                 <span className="text-[13px] font-bold text-[var(--foreground)]">IF</span>
-                <Pill title={source}>{source}</Pill>
+                {sourcePage ? (
+                    <Pill title={sourcePage.label || sourcePage.pageKey}>
+                        <PageTypeChip
+                            page={sourcePage}
+                            pageNumber={pageNumber(sourcePage.pageKey)}
+                        />
+                        <span className="ml-1.5 truncate">
+                            {sourcePage.label || sourcePage.pageKey}
+                        </span>
+                    </Pill>
+                ) : (
+                    <Pill title={source}>{source}</Pill>
+                )}
                 <Pill>{operator}</Pill>
                 {value !== "" && <Pill title={value}>{value}</Pill>}
                 <span className="text-[13px] font-bold text-[var(--foreground)]">THEN</span>
-                <Pill title={outcome}>{outcome}</Pill>
+                {targetPage ? (
+                    <Pill title={outcome}>
+                        {rule.category === "branching"
+                            ? "jump to"
+                            : rule.category === "display"
+                              ? "show"
+                              : "hide"}
+                        <PageTypeChip
+                            page={targetPage}
+                            pageNumber={pageNumber(targetPage.pageKey)}
+                        />
+                        <span className="ml-1.5 truncate">
+                            {targetPage.label || targetPage.pageKey}
+                        </span>
+                    </Pill>
+                ) : (
+                    <Pill title={outcome}>{outcome}</Pill>
+                )}
             </div>
         </li>
     )

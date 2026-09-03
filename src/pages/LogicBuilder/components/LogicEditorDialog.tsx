@@ -76,24 +76,18 @@ interface EditorState {
     rule: FormLogicRule | null
 }
 
-/** Light, tinted page-type icon chip — matches the Build tab page styling. */
-function PageTypeChip({ page }: { page: FormPage }) {
+/** Tinted page-type chip — icon + page number, used in page select items. */
+function PageTypeChip({ page, pageNumber }: { page: FormPage; pageNumber: number }) {
     const Icon = PAGE_TYPE_ICONS[page.type]
     if (!Icon) return null
     return (
         <span
-            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-gradient-to-br ${PAGE_TYPE_COLORS[page.type]}`}
+            className={`flex shrink-0 items-center gap-1.5 rounded-md bg-gradient-to-br px-2 py-0.5 text-xs font-semibold ${PAGE_TYPE_COLORS[page.type]}`}
         >
-            <Icon className="h-3 w-3" />
+            <Icon className="h-3.5 w-3.5" aria-hidden />
+            Q{pageNumber}
         </span>
     )
-}
-
-/** Plain page-type icon that inherits its color from the surrounding styles. */
-function PageTypeIcon({ page }: { page: FormPage }) {
-    const Icon = PAGE_TYPE_ICONS[page.type]
-    if (!Icon) return null
-    return <Icon className="h-3.5 w-3.5 shrink-0" />
 }
 
 function LogicEditorDialogComponent({
@@ -322,11 +316,6 @@ function LogicEditorDialogComponent({
 
     if (!open || !selectedPage) return null
 
-    // Trigger label: "03 · Contact info" — the selected page's number + title.
-    const selectedPageLabel = `${String(
-        allPages.findIndex((p) => p.pageKey === selectedPage.pageKey) + 1,
-    ).padStart(2, "0")} · ${selectedPage.label || "Untitled page"}`
-
     return (
         <AnimatePresence>
             <div
@@ -370,14 +359,22 @@ function LogicEditorDialogComponent({
                                         id="logic-builder-page-select"
                                         size="sm"
                                         aria-label="Select page"
-                                        title={selectedPageLabel}
-                                        className={`w-full rounded-lg border`}
+                                        className="w-full rounded-lg border-[var(--input)] bg-[var(--card)] px-3.5 text-[15px] shadow-sm hover:border-[var(--editorial-primary-ring)]"
                                     >
                                         <SelectValue>
-                                            <span className="flex min-w-0 items-center gap-2">
-                                                <PageTypeIcon page={selectedPage} />
+                                            <span className="flex min-w-0 items-center gap-2 truncate">
+                                                <PageTypeChip
+                                                    page={selectedPage}
+                                                    pageNumber={
+                                                        allPages.findIndex(
+                                                            (p) =>
+                                                                p.pageKey ===
+                                                                selectedPage.pageKey,
+                                                        ) + 1
+                                                    }
+                                                />
                                                 <span className="truncate">
-                                                    {selectedPageLabel}
+                                                    {selectedPage.label || "Untitled page"}
                                                 </span>
                                             </span>
                                         </SelectValue>
@@ -386,9 +383,8 @@ function LogicEditorDialogComponent({
                                         {allPages.map((p, index) => (
                                             <SelectItem key={p.pageKey} value={p.pageKey}>
                                                 <span className="flex items-center gap-2">
-                                                    <PageTypeChip page={p} />
-                                                    <span>
-                                                        {String(index + 1).padStart(2, "0")} ·{" "}
+                                                    <PageTypeChip page={p} pageNumber={index + 1} />
+                                                    <span className="truncate">
                                                         {p.label || "Untitled page"}
                                                     </span>
                                                 </span>

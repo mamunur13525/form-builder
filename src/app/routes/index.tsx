@@ -11,6 +11,7 @@ import { FormsPage } from "../../pages/Forms"
 import { TemplatesPage } from "../../pages/Templates"
 import { SettingsPage } from "../../pages/Settings"
 import { PricingPage } from "../../pages/Pricing"
+import { BillingSuccessPage } from "../../pages/BillingSuccess"
 import { FormBuilderPage } from "../../pages/FormBuilder"
 import { LogicBuilderPage } from "../../pages/LogicBuilder"
 import { SubmissionsPage } from "../../pages/FormResponse"
@@ -88,6 +89,7 @@ export const router = createBrowserRouter([
                     { path: ROUTES.TEMPLATES, element: <TemplatesPage /> },
                     { path: ROUTES.SETTINGS, element: <SettingsPage /> },
                     { path: ROUTES.PRICING, element: <PricingPage /> },
+                    { path: ROUTES.BILLING_SUCCESS, element: <BillingSuccessPage /> },
                     {
                         element: <FormLayout />,
                         children: [

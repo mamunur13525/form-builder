@@ -1,77 +1,128 @@
-import { useState } from "react"
-import { Check, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
+import type { BillingInterval, PaidPlan } from "@/entities/billing/model/types"
+import {
+    hasPaidAccess,
+    useCancelSubscription,
+    useCustomerPortal,
+    usePlanActions,
+    usePlans,
+    useResumeSubscription,
+    useSubscription,
+} from "@/features/billing/hooks/useBilling"
+import { showError, showSuccess } from "@/shared/hooks/useToast"
+import { formatDate } from "@/shared/utils/formatDate"
+import { CancelDialog } from "./components/CancelDialog"
+import { PlanCard } from "./components/PlanCard"
+import { SubscriptionBanner } from "./components/SubscriptionBanner"
+import {
+    getCtaForPlan,
+    isCurrentPlan,
+    planDisplayName,
+    toPricingPlans,
+    type CtaAction,
+    type PricingPlan,
+} from "./plans"
 
-type BillingCycle = "monthly" | "yearly"
+type BillingCycle = BillingInterval
 
-interface Plan {
-    id: string
-    name: string
-    description: string
-    monthly: number
-    yearly: number
-    features: string[]
-    /** Highlights the plan as the recommended choice. */
-    featured?: boolean
+const ERROR_TITLES: Record<CtaAction, string> = {
+    checkout: "Could not start the checkout",
+    change: "Could not update your plan",
+    resume: "Could not resume your subscription",
+    cancel: "Could not cancel your subscription",
 }
 
-const PLANS: Plan[] = [
-    {
-        id: "free",
-        name: "Free",
-        description: "For trying things out and the occasional form.",
-        monthly: 0,
-        yearly: 0,
-        features: [
-            "3 forms",
-            "100 responses per month",
-            "Core question types",
-            "Basic summary view",
-        ],
-    },
-    {
-        id: "pro",
-        name: "Pro",
-        description: "For makers who need room to grow and a custom look.",
-        monthly: 19,
-        yearly: 190,
-        features: [
-            "Unlimited forms",
-            "10,000 responses per month",
-            "Custom domain",
-            "Advanced analytics",
-            "Remove branding",
-            "File uploads",
-        ],
-        featured: true,
-    },
-    {
-        id: "team",
-        name: "Team",
-        description: "For teams collecting and reviewing responses together.",
-        monthly: 49,
-        yearly: 490,
-        features: [
-            "Everything in Pro",
-            "Unlimited responses",
-            "Shared workspaces",
-            "Roles and permissions",
-            "Priority support",
-        ],
-    },
-]
+function createPriceFormatter(currency: string): Intl.NumberFormat {
+    try {
+        return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 })
+    } catch {
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })
+    }
+}
 
 export function PricingPage() {
     const [cycle, setCycle] = useState<BillingCycle>("monthly")
+    const [pendingKey, setPendingKey] = useState<string | null>(null)
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+
+    const plansQuery = usePlans()
+    const subscriptionQuery = useSubscription()
+    const { startSubscription, switchPlan } = usePlanActions()
+    const cancelMutation = useCancelSubscription()
+    const resumeMutation = useResumeSubscription()
+    const portalMutation = useCustomerPortal()
+
+    const plans = useMemo(() => toPricingPlans(plansQuery.data?.plans), [plansQuery.data])
+    const formatPrice = useMemo(() => {
+        const formatter = createPriceFormatter(plansQuery.data?.currency ?? "USD")
+        return (amount: number) => formatter.format(amount)
+    }, [plansQuery.data])
+
+    const subscription = subscriptionQuery.data
+    const subscriptionLoading = subscriptionQuery.isLoading
+    const paid = hasPaidAccess(subscription)
+    const showBanner =
+        !!subscription &&
+        subscription.plan !== "free" &&
+        (paid || subscription.status === "cancelled")
+
+    function handleSelect(plan: PricingPlan, action: CtaAction) {
+        // The free tier has no checkout — cancelling runs through a confirm dialog.
+        if (action === "cancel") {
+            setCancelDialogOpen(true)
+            return
+        }
+        setPendingKey(plan.id)
+        const request = { plan: plan.id as PaidPlan, interval: cycle }
+        const run =
+            action === "checkout"
+                ? () => startSubscription(request)
+                : action === "change"
+                    ? () => switchPlan(request)
+                    : () => resumeMutation.mutateAsync()
+        run()
+            .then((result) => {
+                // When checkout fell back to an in-place change (409) or a
+                // switch fell back to checkout (404) no redirect happened.
+                if (action !== "resume" && !("checkoutUrl" in result)) {
+                    showSuccess("Plan updated", `You're now on the ${plan.name} plan (${cycle}).`)
+                }
+            })
+            .catch((error) => showError(ERROR_TITLES[action], error))
+            .finally(() => setPendingKey(null))
+    }
+
+    async function handleManageBilling() {
+        setPendingKey("portal")
+        try {
+            const { url } = await portalMutation.mutateAsync()
+            window.open(url, "_blank", "noopener,noreferrer")
+        } catch (error) {
+            showError("Could not open the billing portal", error)
+        } finally {
+            setPendingKey(null)
+        }
+    }
+
+    async function handleConfirmCancel() {
+        try {
+            const updated = await cancelMutation.mutateAsync()
+            setCancelDialogOpen(false)
+            showSuccess(
+                "Subscription cancelled",
+                updated.endsAt
+                    ? `Your plan stays active until ${formatDate(updated.endsAt)} — you keep everything you paid for.`
+                    : "Your plan stays active until the end of the current billing period.",
+            )
+        } catch (error) {
+            showError(ERROR_TITLES.cancel, error)
+        }
+    }
 
     return (
         <div className="editorial mx-auto w-full max-w-[1600px] px-8 pt-12 pb-16">
             <div className="mx-auto max-w-2xl text-center">
-
-            </div>
-            <div className="min-w-0 mx-auto text-center flex-1">
                 <h1 className="font-display text-4xl leading-tight sm:text-5xl text-[var(--foreground)]">
                     Simple, honest pricing
                 </h1>
@@ -105,79 +156,47 @@ export function PricingPage() {
                 </div>
             </div>
 
+            {showBanner && subscription && (
+                <SubscriptionBanner
+                    subscription={subscription}
+                    planName={planDisplayName(subscription.plan, plans)}
+                    portalPending={pendingKey === "portal"}
+                    onManageBilling={handleManageBilling}
+                />
+            )}
+
+            {plansQuery.isError && (
+                <p className="mt-8 text-center text-sm text-[var(--editorial-subtle)]">
+                    Couldn't load live pricing right now — showing our standard plans.
+                </p>
+            )}
+
             <div className="mt-12 grid gap-6 lg:grid-cols-3">
-                {PLANS.map((plan) => {
-                    const price = cycle === "monthly" ? plan.monthly : plan.yearly
-                    return (
-                        <Card
-                            key={plan.id}
-                            className={cn(
-                                "editorial-transition flex flex-col rounded-xl p-8",
-                                plan.featured
-                                    ? "editorial-shadow border-[var(--editorial-primary-ring)] bg-[var(--card)]"
-                                    : "editorial-shadow-sm border-[var(--border)] bg-[var(--card)] ",
-                            )}
-                        >
-                            <CardContent className="flex flex-1 flex-col p-0">
-                                <div className="flex items-center justify-between gap-3">
-                                    <h2 className="font-display text-2xl text-[var(--foreground)]">
-                                        {plan.name}
-                                    </h2>
-                                    {plan.featured && (
-                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">
-                                            <Sparkles className="h-3.5 w-3.5" />
-                                            Popular
-                                        </span>
-                                    )}
-                                </div>
-
-                                <p className="mt-2 text-base leading-6 text-[var(--editorial-body)]">
-                                    {plan.description}
-                                </p>
-
-                                <div className="mt-8 flex items-baseline gap-2">
-                                    <span className="font-display text-[48px] leading-none text-[var(--foreground)]">
-                                        ${price}
-                                    </span>
-                                    <span className="text-sm text-[var(--editorial-subtle)]">
-                                        {price === 0
-                                            ? "forever"
-                                            : cycle === "monthly"
-                                                ? "per month"
-                                                : "per year"}
-                                    </span>
-                                </div>
-
-                                <ul className="mt-8 flex-1 space-y-3">
-                                    {plan.features.map((feature) => (
-                                        <li key={feature} className="flex items-start gap-3">
-                                            <Check className="mt-0.5 h-5 w-5 shrink-0 text-[var(--editorial-success)]" />
-                                            <span className="text-base leading-6 text-[var(--editorial-body)]">
-                                                {feature}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <Button
-                                    className={cn(
-                                        "editorial-transition mt-8 h-[52px] w-full rounded-[16px] text-sm font-medium active:scale-[.98]",
-                                        plan.featured
-                                            ? "bg-[var(--primary)] text-white   hover:bg-[var(--editorial-primary-hover)] active:bg-[var(--editorial-primary-pressed)]"
-                                            : "border border-[var(--border)] bg-[var(--secondary)] text-[var(--foreground)]  hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]",
-                                    )}
-                                >
-                                    {plan.monthly === 0 ? "Current plan" : `Choose ${plan.name}`}
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    )
-                })}
+                {plans.map((plan) => (
+                    <PlanCard
+                        key={plan.id}
+                        plan={plan}
+                        cycle={cycle}
+                        formatPrice={formatPrice}
+                        cta={getCtaForPlan(plan, subscription, cycle, subscriptionLoading)}
+                        pending={pendingKey === plan.id}
+                        current={isCurrentPlan(subscription, plan.id)}
+                        onSelect={handleSelect}
+                    />
+                ))}
             </div>
 
             <p className="mt-12 text-center text-sm text-[var(--editorial-subtle)]">
                 Prices in USD. Cancel any time — your forms and responses stay yours.
             </p>
+
+            <CancelDialog
+                open={cancelDialogOpen}
+                onOpenChange={setCancelDialogOpen}
+                planName={subscription ? planDisplayName(subscription.plan, plans) : "paid"}
+                isPending={cancelMutation.isPending}
+                onConfirm={() => void handleConfirmCancel()}
+            />
         </div>
     )
 }

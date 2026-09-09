@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import type { Form } from "@/entities/form/model/types";
+import { useFormPermissions } from "@/features/forms/hooks/useFormPermissions";
 import type { ComponentProps } from "react";
 
 interface FormCardProps {
@@ -36,52 +37,64 @@ type MenuItemData =
     >;
     onClick: () => void;
     variant?: ComponentProps<typeof DropdownMenuItem>["variant"];
+    /** Omitted from the menu when false. */
+    enabled?: boolean;
   }
   | { isSeparator: true };
 
 export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProps) {
   const navigate = useNavigate();
+  const { canCreate, canEdit, canDelete, canViewResponses } = useFormPermissions();
 
+  // Built as one list and then filtered, so the separator can be dropped along
+  // with the group it introduces rather than left dangling at the bottom.
   const menuItems: MenuItemData[] = [
     {
       label: "View Responses",
       icon: List,
+      enabled: canViewResponses,
       onClick: () =>
         navigate(`/form-response/${form.id}/submissions`),
     },
     {
       label: "Analytics",
       icon: BarChart3,
+      enabled: canViewResponses,
       onClick: () => navigate(`/form-response/${form.id}/analytics`),
     },
     {
       label: "Settings",
       icon: Settings,
+      enabled: canEdit,
       onClick: () => navigate(`/form-settings/${form.id}`),
     },
     {
       label: "Share Form",
       icon: Share2,
+      enabled: canEdit,
       onClick: () => navigate(`/form-share/${form.id}`),
     },
     {
       label: "Integrations",
       icon: Puzzle,
+      enabled: canEdit,
       onClick: () => navigate(`/form-integrate/${form.id}`),
     },
-    { isSeparator: true },
+    ...(canCreate || canDelete ? [{ isSeparator: true } as MenuItemData] : []),
     {
       label: "Duplicate",
       icon: Copy,
+      enabled: canCreate,
       onClick: () => onDuplicateClick(form.id),
     },
     {
       label: "Delete",
       icon: Trash2,
       variant: "destructive" as const,
+      enabled: canDelete,
       onClick: () => onDeleteClick(form.id),
     },
-  ];
+  ].filter((item) => "isSeparator" in item || item.enabled !== false);
 
   return (
     <Card

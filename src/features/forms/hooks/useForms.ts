@@ -2,13 +2,19 @@
  * Forms feature hooks — TanStack Query wrappers around the form entity API.
  *
  * Query keys:
- *   ["forms"]                       — list of all forms
- *   ["forms", formId]               — single form
- *   ["forms", formId, "slug"]       — form slug
- *   ["forms", formId, "pages"]     — form pages
- *   ["forms", formId, "blocks"]     — form blocks
- *   ["forms", formId, "logic"]      — form logic rules
- *   ["forms", formId, "analytics"]  — form analytics
+ *   ["forms"]                          — prefix every form query shares
+ *   ["forms", "list", workspaceId, p]  — list of forms in one workspace
+ *   ["forms", formId]                  — single form
+ *   ["forms", formId, "slug"]          — form slug
+ *   ["forms", formId, "pages"]         — form pages
+ *   ["forms", formId, "blocks"]        — form blocks
+ *   ["forms", formId, "logic"]         — form logic rules
+ *   ["forms", formId, "analytics"]     — form analytics
+ *
+ * The list key carries the workspace id because forms belong to a workspace:
+ * switching workspaces has to show a different list, and caching both under one
+ * key would flash the wrong team's forms. The `"list"` segment keeps that key
+ * from colliding with `["forms", formId]`, which sits at the same depth.
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -37,18 +43,48 @@ import {
     updateFormShare,
     updateFormTheme,
 } from "@/entities/form/api/form.api"
+import { useActiveWorkspace } from "@/features/workspaces/hooks/useWorkspaces"
 
 const FORMS_QUERY_KEY = ["forms"]
+
+interface FormListParams {
+    page?: number
+    limit?: number
+    sort?: string
+}
+
+/** Key for a workspace's form list. Exported so a switch can drop just that list. */
+export const formListKey = (
+    workspaceId: string | null,
+    params?: FormListParams,
+) => [...FORMS_QUERY_KEY, "list", workspaceId, params ?? null] as const
 
 // ---------------------------------------------------------------------------
 // Queries
 // ---------------------------------------------------------------------------
 
-/** GET /forms — list all forms for the authenticated user. */
-export function useForms(params?: { page?: number; limit?: number; sort?: string }) {
+/**
+ * GET /forms — the forms in the caller's active workspace.
+ *
+ * The workspace id comes from `useActiveWorkspace`, which has already reconciled
+ * the persisted choice against the workspaces the user actually belongs to — so
+ * a workspace they were removed from cannot leak into the request. The fetch
+ * waits for that reconciliation; while it is loading, `workspaceId` is null and
+ * the query stays idle rather than fetching an unscoped list it would throw away.
+ */
+export function useForms(params?: FormListParams) {
+    const { activeWorkspaceId, isLoading: isLoadingWorkspaces } = useActiveWorkspace()
+
     return useQuery({
-        queryKey: [...FORMS_QUERY_KEY, params],
-        queryFn: () => getForms(params),
+        queryKey: formListKey(activeWorkspaceId, params),
+        queryFn: () =>
+            getForms({
+                ...params,
+                ...(activeWorkspaceId ? { workspaceId: activeWorkspaceId } : {}),
+            }),
+        // An account with no workspace at all still gets a list: the server
+        // provisions one on demand. Only the reconciliation itself blocks.
+        enabled: !isLoadingWorkspaces,
         staleTime: 5 * 60 * 1000,
         gcTime: 10 * 60 * 1000,
     })
@@ -81,12 +117,22 @@ export function useFormSlug(formId: string) {
 // Mutations
 // ---------------------------------------------------------------------------
 
-/** POST /forms — create a new form. */
+/**
+ * POST /forms — create a form in the active workspace.
+ *
+ * Callers pass a title; the workspace is filled in here so no page has to know
+ * about workspace state to make a form. An explicit `workspaceId` in the payload
+ * still wins, which is what a "create in another workspace" flow would use.
+ */
 export function useCreateForm() {
     const queryClient = useQueryClient()
+    const { activeWorkspaceId } = useActiveWorkspace()
 
     return useMutation({
-        mutationFn: (data: CreateFormRequest) => createForm(data),
+        mutationFn: (data: CreateFormRequest) => {
+            const workspaceId = data.workspaceId ?? activeWorkspaceId
+            return createForm({ ...data, ...(workspaceId ? { workspaceId } : {}) })
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: FORMS_QUERY_KEY })
         },

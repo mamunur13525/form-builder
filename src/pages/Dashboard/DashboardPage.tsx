@@ -12,6 +12,7 @@ import {
   CardContent,
 } from "../../components/ui/card";
 import { useForms } from "../../features/forms/hooks/useForms";
+import { useFormPermissions } from "../../features/forms/hooks/useFormPermissions";
 
 export function DashboardPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -24,6 +25,7 @@ export function DashboardPage() {
   } | null>(null);
 
   const { data: forms = [], isLoading } = useForms();
+  const { canCreate } = useFormPermissions();
 
   const publishedForms = forms.filter((f) => f.status === "published").length;
   const draftForms = forms.filter((f) => f.status === "draft").length;
@@ -53,13 +55,16 @@ export function DashboardPage() {
             Manage your forms and view responses
           </p>
         </div>
-        <Button
-          onClick={() => setCreateDialogOpen(true)}
-        >
-          <PlusCircle className="h-5 w-5" />
-          <span className="hidden sm:inline">New Form</span>
-          <span className="sm:hidden">New</span>
-        </Button>
+        {/* A viewer sees the same dashboard, minus the ways to change it. */}
+        {canCreate && (
+          <Button
+            onClick={() => setCreateDialogOpen(true)}
+          >
+            <PlusCircle className="h-5 w-5" />
+            <span className="hidden sm:inline">New Form</span>
+            <span className="sm:hidden">New</span>
+          </Button>
+        )}
       </div>
 
       <FormDialog

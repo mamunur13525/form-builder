@@ -17,6 +17,17 @@ export interface AuthUser {
 export interface AuthResponse {
     user: AuthUser
     tokens: AuthTokens
+    /**
+     * The workspace the account landed in — created on signup, resolved on login.
+     * The client seeds its active workspace from this so the first dashboard
+     * render is already scoped. Absent if server-side provisioning failed, in
+     * which case `GET /workspaces/active` is the fallback.
+     */
+    workspace?: {
+        id: string
+        name: string
+        slug: string
+    }
 }
 
 export interface RegisterRequest {

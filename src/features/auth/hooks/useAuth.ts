@@ -6,7 +6,9 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import type { QueryClient } from "@tanstack/react-query"
 import { tokenStorage } from "@/shared/utils/storage"
+import { useWorkspaceStore } from "@/shared/stores/workspaceStore"
 import type { AuthResponse, LoginRequest, RegisterRequest, GoogleLoginRequest } from "@/entities/auth/model/types"
 import {
     changePassword,
@@ -21,6 +23,32 @@ import {
 } from "@/entities/auth/api/auth.api"
 
 const AUTH_QUERY_KEY = ["auth", "me"]
+
+/** Prefix of every workspace-scoped cache. A literal, to avoid a feature cycle. */
+const WORKSPACE_SCOPED_KEYS = [["workspaces"], ["forms"]]
+
+/**
+ * Everything a successful sign-in has to do besides storing the user.
+ *
+ * The previous account's workspace and form caches are dropped first: both are
+ * keyed by workspace, and the persisted `activeWorkspaceId` outlives a logout, so
+ * signing in as someone else on the same browser would otherwise start out
+ * pointing at a workspace this user cannot load.
+ */
+const adoptSession = (
+    queryClient: QueryClient,
+    data: AuthResponse,
+    setActiveWorkspaceId: (workspaceId: string | null) => void,
+): void => {
+    tokenStorage.setTokens(data.tokens.accessToken, data.tokens.refreshToken)
+    for (const queryKey of WORKSPACE_SCOPED_KEYS) {
+        queryClient.removeQueries({ queryKey })
+    }
+    // Seeded from the auth response so the dashboard is scoped on first render
+    // instead of after a round trip to /workspaces.
+    setActiveWorkspaceId(data.workspace?.id ?? null)
+    queryClient.setQueryData(AUTH_QUERY_KEY, data.user)
+}
 
 // ---------------------------------------------------------------------------
 // Queries
@@ -46,12 +74,12 @@ export function useCurrentUser() {
 /** POST /auth/login — authenticate and store tokens. */
 export function useLogin() {
     const queryClient = useQueryClient()
+    const setActiveWorkspaceId = useWorkspaceStore((state) => state.setActiveWorkspaceId)
 
     return useMutation({
         mutationFn: (data: LoginRequest) => loginUser(data),
         onSuccess: (data: AuthResponse) => {
-            tokenStorage.setTokens(data.tokens.accessToken, data.tokens.refreshToken)
-            queryClient.setQueryData(AUTH_QUERY_KEY, data.user)
+            adoptSession(queryClient, data, setActiveWorkspaceId)
         },
     })
 }
@@ -59,12 +87,14 @@ export function useLogin() {
 /** POST /auth/register — register a new user and store tokens. */
 export function useRegister() {
     const queryClient = useQueryClient()
+    const setActiveWorkspaceId = useWorkspaceStore((state) => state.setActiveWorkspaceId)
 
     return useMutation({
         mutationFn: (data: RegisterRequest) => registerUser(data),
         onSuccess: (data: AuthResponse) => {
-            tokenStorage.setTokens(data.tokens.accessToken, data.tokens.refreshToken)
-            queryClient.setQueryData(AUTH_QUERY_KEY, data.user)
+            // A workspace is created alongside the account, so a brand-new user
+            // lands in one without ever seeing an empty-state.
+            adoptSession(queryClient, data, setActiveWorkspaceId)
         },
     })
 }
@@ -72,12 +102,19 @@ export function useRegister() {
 /** POST /auth/logout — clear tokens and invalidate auth state. */
 export function useLogout() {
     const queryClient = useQueryClient()
+    const clearActiveWorkspaceId = useWorkspaceStore((state) => state.clearActiveWorkspaceId)
 
     return useMutation({
         mutationFn: logoutUser,
         onSuccess: () => {
             tokenStorage.clearTokens()
             queryClient.removeQueries({ queryKey: AUTH_QUERY_KEY })
+            // The workspace choice is persisted, so it has to be cleared here or
+            // it would follow the next account signed in on this browser.
+            clearActiveWorkspaceId()
+            for (const queryKey of WORKSPACE_SCOPED_KEYS) {
+                queryClient.removeQueries({ queryKey })
+            }
         },
     })
 }
@@ -107,12 +144,12 @@ export function useVerifyEmail() {
 /** POST /auth/google — sign up or sign in with Google using a Google ID token. */
 export function useGoogleAuth() {
     const queryClient = useQueryClient()
+    const setActiveWorkspaceId = useWorkspaceStore((state) => state.setActiveWorkspaceId)
 
     return useMutation({
         mutationFn: (data: GoogleLoginRequest) => googleAuth(data),
         onSuccess: (data: AuthResponse) => {
-            tokenStorage.setTokens(data.tokens.accessToken, data.tokens.refreshToken)
-            queryClient.setQueryData(AUTH_QUERY_KEY, data.user)
+            adoptSession(queryClient, data, setActiveWorkspaceId)
         },
     })
 }

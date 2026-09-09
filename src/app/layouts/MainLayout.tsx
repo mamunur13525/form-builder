@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { Sidebar } from "../../widgets/Sidebar"
+import { SettingsModal } from "../../widgets/SettingsModal"
 import { useLocation } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { Menu } from "lucide-react"
@@ -10,8 +11,6 @@ const WORKSPACE_ROUTES: string[] = [
     ROUTES.DASHBOARD,
     ROUTES.FORMS,
     ROUTES.TEMPLATES,
-    ROUTES.SETTINGS,
-    ROUTES.PRICING,
     ROUTES.ADMIN_UPDATES,
 ]
 
@@ -31,6 +30,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
         return (
             <div className="editorial min-h-dvh bg-[var(--editorial-canvas)]">
                 <main>{children}</main>
+                <SettingsModal />
             </div>
         )
     }
@@ -57,6 +57,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
                 <main>{children}</main>
             </div>
+            <SettingsModal />
         </div>
     )
 }

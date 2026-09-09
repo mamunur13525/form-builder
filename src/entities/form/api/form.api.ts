@@ -26,11 +26,17 @@ export async function createForm(data: CreateFormRequest): Promise<Form> {
   });
 }
 
-/** GET /forms — list all forms for the authenticated user. */
+/**
+ * GET /forms — forms in one workspace.
+ *
+ * `workspaceId` is optional on the wire: the server falls back to the caller's
+ * active workspace when it is absent.
+ */
 export async function getForms(params?: {
   page?: number;
   limit?: number;
   sort?: string;
+  workspaceId?: string;
 }): Promise<Form[]> {
   return apiRequest<Form[]>(`/forms${buildQuery(params)}`);
 }

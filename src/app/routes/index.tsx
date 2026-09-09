@@ -9,8 +9,7 @@ import { ForgotPasswordPage } from "../../pages/ForgotPassword"
 import { DashboardPage } from "../../pages/Dashboard"
 import { FormsPage } from "../../pages/Forms"
 import { TemplatesPage } from "../../pages/Templates"
-import { SettingsPage } from "../../pages/Settings"
-import { PricingPage } from "../../pages/Pricing"
+import { AcceptInvitationPage } from "../../pages/AcceptInvitation"
 import { BillingSuccessPage } from "../../pages/BillingSuccess"
 import { FormBuilderPage } from "../../pages/FormBuilder"
 import { LogicBuilderPage } from "../../pages/LogicBuilder"
@@ -36,6 +35,7 @@ import {
 import { FormLayout } from "../layouts/FormLayout"
 import { ROUTES } from "@/shared/constants/routes"
 import { tokenStorage } from "@/shared/utils/storage"
+import { SettingsDeepLink } from "../../widgets/SettingsModal"
 
 function AppShell() {
     return (
@@ -87,8 +87,13 @@ export const router = createBrowserRouter([
                     { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
                     { path: ROUTES.FORMS, element: <FormsPage /> },
                     { path: ROUTES.TEMPLATES, element: <TemplatesPage /> },
-                    { path: ROUTES.SETTINGS, element: <SettingsPage /> },
-                    { path: ROUTES.PRICING, element: <PricingPage /> },
+                    { path: ROUTES.SETTINGS, element: <SettingsDeepLink section="account" /> },
+                    { path: ROUTES.WORKSPACE_SETTINGS, element: <SettingsDeepLink section="workspace" /> },
+                    { path: ROUTES.BILLING, element: <SettingsDeepLink section="billing" /> },
+                    { path: ROUTES.PRICING, element: <SettingsDeepLink section="pricing" /> },
+                    // Behind auth: the server matches the signed-in email against
+                    // the invited address before accepting.
+                    { path: ROUTES.INVITATION_ACCEPT, element: <AcceptInvitationPage /> },
                     { path: ROUTES.BILLING_SUCCESS, element: <BillingSuccessPage /> },
                     {
                         element: <FormLayout />,

@@ -49,6 +49,11 @@ export interface Form {
     title: string
     slug: string
     status: FormStatus
+    /**
+     * Owning workspace. `null` only for forms created before workspaces existed
+     * and not yet migrated — those stay visible to their creator alone.
+     */
+    workspace?: string | null
     theme: FormTheme
     settings: FormSettings
     createdBy: string
@@ -81,6 +86,12 @@ export interface PublishedForm {
 
 export interface CreateFormRequest {
     title: string
+    /**
+     * Workspace to create the form in. Omit to let the server use the caller's
+     * active workspace — the hooks send it explicitly so a stale server-side
+     * "last active workspace" can't put the form somewhere unexpected.
+     */
+    workspaceId?: string
 }
 
 export interface UpdateFormRequest {

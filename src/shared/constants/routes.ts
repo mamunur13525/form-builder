@@ -7,7 +7,11 @@ export const ROUTES = {
     FORMS: "/forms",
     TEMPLATES: "/templates",
     SETTINGS: "/settings",
+    WORKSPACE_SETTINGS: "/workspace/settings",
+    // Must match `buildInviteUrl` on the server: `${FRONTEND_URL}/invitations/:token`
+    INVITATION_ACCEPT: "/invitations/:token",
     PRICING: "/pricing",
+    BILLING: "/billing",
     BILLING_SUCCESS: "/billing/success",
     FORM_BUILDER: "/form-builder/:formId",
     FORM_LOGIC: "/form-logic/:formId",

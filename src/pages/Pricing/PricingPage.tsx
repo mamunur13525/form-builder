@@ -41,7 +41,7 @@ function createPriceFormatter(currency: string): Intl.NumberFormat {
     }
 }
 
-export function PricingPage() {
+export function PricingPage({ embedded = false }: { embedded?: boolean }) {
     const [cycle, setCycle] = useState<BillingCycle>("monthly")
     const [pendingKey, setPendingKey] = useState<string | null>(null)
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
@@ -121,8 +121,13 @@ export function PricingPage() {
     }
 
     return (
-        <div className="editorial mx-auto w-full max-w-[1600px] px-8 pt-12 pb-16">
-            <div className="mx-auto max-w-2xl text-center">
+        <div
+            className={cn(
+                "editorial mx-auto w-full",
+                embedded ? "max-w-none px-1 pb-4" : "max-w-[1600px] px-8 pt-12 pb-16",
+            )}
+        >
+            <div className={cn("mx-auto max-w-2xl text-center", embedded && "text-left sm:text-center")}>
                 <h1 className="font-display text-4xl leading-tight sm:text-5xl text-[var(--foreground)]">
                     Simple, honest pricing
                 </h1>

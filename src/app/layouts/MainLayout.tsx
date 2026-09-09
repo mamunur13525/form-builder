@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { Sidebar } from "../../widgets/Sidebar"
 import { SettingsModal } from "../../widgets/SettingsModal"
+import { CreateWorkspaceDialogHost } from "@/features/workspaces/components/CreateWorkspaceDialog"
 import { useLocation } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { Menu } from "lucide-react"
@@ -31,6 +32,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
             <div className="editorial min-h-dvh bg-[var(--editorial-canvas)]">
                 <main>{children}</main>
                 <SettingsModal />
+                <CreateWorkspaceDialogHost />
             </div>
         )
     }
@@ -58,6 +60,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
                 <main>{children}</main>
             </div>
             <SettingsModal />
+            <CreateWorkspaceDialogHost />
         </div>
     )
 }

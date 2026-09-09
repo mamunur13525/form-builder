@@ -128,7 +128,12 @@ export function PricingPage({ embedded = false }: { embedded?: boolean }) {
             )}
         >
             <div className={cn("mx-auto max-w-2xl text-center", embedded && "text-left sm:text-center")}>
-                <h1 className="font-display text-4xl leading-tight sm:text-5xl text-[var(--foreground)]">
+                <h1
+                    className={cn(
+                        "font-display leading-tight text-[var(--foreground)]",
+                        embedded ? "text-2xl sm:text-4xl" : "text-4xl sm:text-5xl",
+                    )}
+                >
                     Simple, honest pricing
                 </h1>
                 <p className="mt-1 text-sm leading-6 sm:text-base text-[var(--editorial-body)]">
@@ -138,15 +143,15 @@ export function PricingPage({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             {/* Billing cycle toggle */}
-            <div className="mt-12 flex justify-center">
-                <div className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--card)] p-1.5">
+            <div className={cn("flex justify-center", embedded ? "mt-6 sm:mt-10" : "mt-12")}>
+                <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-[var(--border)] bg-[var(--card)] p-1.5">
                     {(["monthly", "yearly"] as BillingCycle[]).map((value) => (
                         <button
                             key={value}
                             type="button"
                             onClick={() => setCycle(value)}
                             className={cn(
-                                "editorial-transition h-11 rounded-full px-6 text-sm capitalize",
+                                "editorial-transition h-10 rounded-full px-4 text-sm capitalize sm:h-11 sm:px-6",
                                 cycle === value
                                     ? "bg-[var(--primary)] text-white "
                                     : "text-[var(--editorial-body)] hover:text-[var(--foreground)]",
@@ -154,7 +159,7 @@ export function PricingPage({ embedded = false }: { embedded?: boolean }) {
                         >
                             {value}
                             {value === "yearly" && (
-                                <span className="ml-2 text-xs opacity-80">2 months free</span>
+                                <span className="ml-2 hidden text-xs opacity-80 sm:inline">2 months free</span>
                             )}
                         </button>
                     ))}
@@ -176,7 +181,7 @@ export function PricingPage({ embedded = false }: { embedded?: boolean }) {
                 </p>
             )}
 
-            <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            <div className={cn("grid gap-6 sm:grid-cols-2 lg:grid-cols-3", embedded ? "mt-6 sm:mt-10" : "mt-12")}>
                 {plans.map((plan) => (
                     <PlanCard
                         key={plan.id}

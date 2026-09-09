@@ -16,6 +16,7 @@ import {
     useCreateWorkspace,
     useSlugAvailability,
 } from "@/features/workspaces/hooks/useWorkspaces"
+import { useCreateWorkspaceModalStore } from "@/shared/stores/createWorkspaceModalStore"
 
 interface CreateWorkspaceDialogProps {
     open: boolean
@@ -291,5 +292,16 @@ export function CreateWorkspaceDialog({
                 </Button>
             </DialogFooter>
         </Dialog>
+    )
+}
+
+/** Lives on the app layout so the dialog is never trapped inside the sidebar. */
+export function CreateWorkspaceDialogHost() {
+    const open = useCreateWorkspaceModalStore((state) => state.open)
+    const setCreateWorkspaceOpen = useCreateWorkspaceModalStore(
+        (state) => state.setCreateWorkspaceOpen,
+    )
+    return (
+        <CreateWorkspaceDialog open={open} onOpenChange={setCreateWorkspaceOpen} />
     )
 }

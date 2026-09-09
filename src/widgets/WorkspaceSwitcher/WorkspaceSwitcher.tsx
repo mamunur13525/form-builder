@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Check, ChevronsUpDown, Plus, Settings2 } from "lucide-react"
 import {
     DropdownMenu,
@@ -10,11 +9,11 @@ import {
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { useSettingsModalStore } from "@/shared/stores/settingsModalStore"
+import { useCreateWorkspaceModalStore } from "@/shared/stores/createWorkspaceModalStore"
 import {
     useActiveWorkspace,
     useSwitchWorkspace,
 } from "@/features/workspaces/hooks/useWorkspaces"
-import { CreateWorkspaceDialog } from "@/features/workspaces/components/CreateWorkspaceDialog"
 import { WORKSPACE_ROLE_LABELS, type Workspace } from "@/entities/workspace/model/types"
 import {
     Avatar, AvatarImage,
@@ -69,12 +68,19 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
         useActiveWorkspace()
     const switchWorkspace = useSwitchWorkspace()
     const openSettings = useSettingsModalStore((state) => state.openSettings)
-    const [createOpen, setCreateOpen] = useState(false)
+    const openCreateWorkspace = useCreateWorkspaceModalStore(
+        (state) => state.openCreateWorkspace,
+    )
 
     const handleSelect = (workspaceId: string) => {
         if (workspaceId !== activeWorkspace?.id) {
             switchWorkspace.mutate(workspaceId)
         }
+    }
+
+    const handleCreateWorkspace = () => {
+        openCreateWorkspace()
+        onNavigate?.()
     }
 
     // Loading — a skeleton rather than an empty box, so the sidebar does not jump.
@@ -87,17 +93,14 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
     // No workspaces yet — the switcher becomes a single call to action.
     if (hasNoWorkspaces || !activeWorkspace) {
         return (
-            <>
-                <button
-                    type="button"
-                    onClick={() => setCreateOpen(true)}
-                    className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-[16px] border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] px-4 text-left text-sm text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)]"
-                >
-                    <Plus className="h-4 w-4 shrink-0" />
-                    Create a workspace
-                </button>
-                <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
-            </>
+            <button
+                type="button"
+                onClick={handleCreateWorkspace}
+                className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-[16px] border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] px-4 text-left text-sm text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)]"
+            >
+                <Plus className="h-4 w-4 shrink-0" />
+                Create a workspace
+            </button>
         )
     }
 
@@ -183,15 +186,13 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         className="rounded-[12px] px-3 py-2.5"
-                        onClick={() => setCreateOpen(true)}
+                        onClick={handleCreateWorkspace}
                     >
                         <Plus className="h-4 w-4" />
                         Create workspace
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-
-            <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
         </>
     )
 }

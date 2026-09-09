@@ -14,11 +14,11 @@ import {
     useWorkspaceMembers,
 } from "@/features/workspaces/hooks/useWorkspaces"
 import { ActivityFeed } from "@/features/workspaces/components/ActivityFeed"
-import { CreateWorkspaceDialog } from "@/features/workspaces/components/CreateWorkspaceDialog"
 import { DangerZone } from "@/features/workspaces/components/DangerZone"
 import { IncomingInvitations } from "@/features/workspaces/components/IncomingInvitations"
 import { MembersPanel } from "@/features/workspaces/components/MembersPanel"
 import { WorkspaceGeneralSettings } from "@/features/workspaces/components/WorkspaceGeneralSettings"
+import { useCreateWorkspaceModalStore } from "@/shared/stores/createWorkspaceModalStore"
 
 type TabId = "general" | "members" | "activity" | "danger"
 
@@ -55,7 +55,9 @@ function shellClass(embedded: boolean) {
  */
 export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean }) {
     const [tab, setTab] = useState<TabId>("general")
-    const [createOpen, setCreateOpen] = useState(false)
+    const openCreateWorkspace = useCreateWorkspaceModalStore(
+        (state) => state.openCreateWorkspace,
+    )
 
     const { data: currentUser } = useCurrentUserProfile()
     const { activeWorkspaceId, isLoading: isResolving, hasNoWorkspaces } =
@@ -86,7 +88,7 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
         return (
             <div className={shellClass(embedded)}>
                 <div>
-                    <h1 className="font-display text-[32px] leading-[1.1] text-[var(--foreground)] sm:text-[48px]">
+                    <h1 className="font-display text-[28px] leading-[1.1] text-[var(--foreground)] sm:text-[48px]">
                         Workspace
                     </h1>
                     <p className="mt-1 text-sm leading-6 text-[var(--editorial-body)] sm:mt-2 sm:text-base">
@@ -110,14 +112,12 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
                     </p>
                     <Button
                         type="button"
-                        onClick={() => setCreateOpen(true)}
+                        onClick={openCreateWorkspace}
                         className="editorial-transition mt-8 h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                     >
                         Create a workspace
                     </Button>
                 </div>
-
-                <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
             </div>
         )
     }
@@ -148,7 +148,7 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
                         </span>
                     )}
                     <div className="min-w-0">
-                        <h1 className="font-display truncate text-[32px] leading-[1.1] text-[var(--foreground)] sm:text-[40px]">
+                        <h1 className="font-display truncate text-[28px] leading-[1.1] text-[var(--foreground)] sm:text-[40px]">
                             {workspace.name}
                         </h1>
                         <p className="mt-1 text-sm text-[var(--editorial-body)]">

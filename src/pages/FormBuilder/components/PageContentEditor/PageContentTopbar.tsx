@@ -127,7 +127,7 @@ const PageContentTopbar = ({
             aria-label={button.label}
             className={
               button.variant === "default"
-                ? "editorial-transition h-10 shrink-0 gap-2 rounded-[16px] bg-[var(--primary)] px-3 text-sm font-medium text-white hover:text-white hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-hover)] sm:h-11 sm:px-5"
+                ? "editorial-transition h-10 shrink-0 gap-2 rounded-[16px] bg-[var(--primary)] px-3 text-sm font-medium text-white hover:text-white hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] dark:hover:bg-[var(--editorial-primary-hover)] dark:hover:text-white active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-hover)] sm:h-11 sm:px-5"
                 : "editorial-transition h-10 shrink-0 gap-2 rounded-[16px] px-3 text-sm text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] sm:h-11 sm:px-4"
             }
             onClick={() => handleBtnClick(button.type)}

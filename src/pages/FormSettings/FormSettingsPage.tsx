@@ -57,9 +57,9 @@ export function FormSettingsPage() {
     const base = `/form-settings/${formId ?? "new"}`
 
     return (
-        <div className="h-full w-full overflow-y-auto bg-[var(--editorial-purple-light)]">
+        <div className="editorial h-full w-full overflow-y-auto bg-[var(--editorial-canvas)] pb-12">
             {/* Mobile: horizontally scrollable pill nav pinned to the top. */}
-            <nav className="sticky top-0 z-20 border-b border-[var(--border)] px-4 py-3 md:hidden bg-[var(--background)]">
+            <nav className="sticky top-0 z-20 border-b border-slate-200 dark:border-zinc-800 px-4 py-3 md:hidden bg-white/95 dark:bg-[#141418]/95 backdrop-blur-md">
                 <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {SETTINGS_SECTIONS.map(({ slug, label, icon: Icon }) => (
                         <NavLink
@@ -69,8 +69,8 @@ export function FormSettingsPage() {
                                 cn(
                                     "editorial-transition flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[13px] font-medium",
                                     isActive
-                                        ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)]"
-                                        : "border-[var(--border)] text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]",
+                                        ? "border-[#FF5722]/40 bg-[#FF5722]/15 text-[#FF5722]"
+                                        : "border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800/60 hover:text-slate-900 dark:hover:text-zinc-200",
                                 )
                             }
                         >
@@ -81,10 +81,10 @@ export function FormSettingsPage() {
                 </div>
             </nav>
 
-            <div className="mx-auto flex max-w-[1160px] gap-8 px-4 py-6 md:px-8 md:py-10  bg-[var(--background)] rounded-xl md:mt-10">
+            <div className="mx-auto flex max-w-[1160px] gap-8 px-4 py-6 md:px-8 md:py-10 bg-white dark:bg-[#141418] border border-slate-200/90 dark:border-zinc-800/90 rounded-2xl md:mt-10 shadow-xl dark:shadow-2xl">
                 {/* Desktop: sticky vertical section nav. */}
                 <aside className="hidden md:block md:w-64 md:shrink-0">
-                    <div className="sticky top-10 flex flex-col gap-1">
+                    <div className="sticky top-10 flex flex-col gap-1.5">
                         {SETTINGS_SECTIONS.map(
                             ({ slug, label, description, icon: Icon }) => (
                                 <NavLink
@@ -92,10 +92,10 @@ export function FormSettingsPage() {
                                     to={`${base}/${slug}`}
                                     className={({ isActive }) =>
                                         cn(
-                                            "editorial-transition group flex items-start gap-3 rounded-xl border px-3 py-2.5 text-left",
+                                            "editorial-transition group flex items-start gap-3 rounded-xl border px-3.5 py-3 text-left",
                                             isActive
-                                                ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)]"
-                                                : "border-transparent hover:bg-[var(--secondary)]",
+                                                ? "border-[#FF5722]/40 bg-[#FF5722]/15 shadow-sm"
+                                                : "border-transparent hover:bg-slate-100 dark:hover:bg-zinc-800/60",
                                         )
                                     }
                                 >
@@ -105,8 +105,8 @@ export function FormSettingsPage() {
                                                 className={cn(
                                                     "editorial-transition flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border",
                                                     isActive
-                                                        ? "border-[var(--editorial-primary-ring)] bg-[var(--card)] text-[var(--primary)]"
-                                                        : "border-[var(--border)] bg-[var(--card)] text-[var(--editorial-subtle)] group-hover:text-[var(--foreground)]",
+                                                        ? "border-[#FF5722]/50 bg-[#FF5722]/20 text-[#FF5722]"
+                                                        : "border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 text-slate-500 dark:text-zinc-400 group-hover:text-slate-800 dark:group-hover:text-zinc-200",
                                                 )}
                                             >
                                                 <Icon className="h-4 w-4" />
@@ -116,13 +116,13 @@ export function FormSettingsPage() {
                                                     className={cn(
                                                         "block text-sm font-medium",
                                                         isActive
-                                                            ? "text-[var(--primary)]"
-                                                            : "text-[var(--foreground)]",
+                                                            ? "text-[#FF5722]"
+                                                            : "text-slate-800 dark:text-zinc-200",
                                                     )}
                                                 >
                                                     {label}
                                                 </span>
-                                                <span className="mt-0.5 block text-[12px] leading-snug text-[var(--muted-foreground)]">
+                                                <span className="mt-0.5 block text-[12px] leading-snug text-slate-500 dark:text-zinc-500">
                                                     {description}
                                                 </span>
                                             </span>

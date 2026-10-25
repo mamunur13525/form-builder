@@ -9,8 +9,6 @@ import {
     RangeSetting,
     SelectSetting,
     SettingsSection,
-    TAB_LIST_CLASS,
-    TAB_TRIGGER_CLASS,
     ToggleRow,
     type IconChoiceOption,
     type SelectSettingOption,
@@ -42,6 +40,10 @@ import {
     AlignRight,
     SlidersHorizontal,
     Sparkles,
+    Palette,
+    Type,
+    LayoutTemplate,
+    Image as ImageIcon,
 } from "lucide-react"
 import { resolveFormTheme, loadThemeFont, getCornerRadiusCss, type ResolvedFormTheme } from "@/shared/utils/theme"
 import { playNudgeFeedback } from "@/shared/utils/nudge-feedback"
@@ -366,9 +368,26 @@ export function DesignDrawer({
     return (
         <div ref={containerRef} className="flex h-full min-h-0 w-full overflow-hidden">
             {/* Preview area */}
-            <div className="h-full min-h-0 flex-1 overflow-y-auto bg-[var(--editorial-canvas)] p-6 grid place-items-center">
-                <div className="h-8/12 flex w-full flex-col justify-center ">
-                    <div className="editorial-shadow h-full max-h-full w-full overflow-hidden rounded-xl bg-[var(--card)] border-dashed border-gray-400/80 pointer-events-none">
+            <div className="relative h-full min-h-0 flex-1 overflow-y-auto bg-[#F4F6FB] dark:bg-[#0c0c0f] p-6 sm:p-10 flex flex-col items-center justify-center">
+                {/* Ambient glow blobs */}
+                <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-purple-200/25 dark:bg-purple-900/10 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-indigo-200/25 dark:bg-[#FF5722]/10 blur-3xl" />
+
+                <div className="relative z-10 flex flex-col h-full max-h-[85vh] w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-[#141418] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] dark:shadow-2xl">
+                    {/* Mockup Window Header */}
+                    <div className="flex h-11 shrink-0 items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 bg-white/95 dark:bg-[#141418]/95 px-4 backdrop-blur-xs select-none">
+                        <div className="flex items-center gap-2">
+                            <span className="h-3 w-3 rounded-full bg-red-400/80" />
+                            <span className="h-3 w-3 rounded-full bg-amber-400/80" />
+                            <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
+                        </div>
+                        <div className="flex items-center gap-1.5 rounded-full bg-slate-100/80 dark:bg-zinc-800/80 px-4 py-1 text-xs font-medium text-slate-500 dark:text-zinc-400">
+                            <span>Live Theme Preview</span>
+                        </div>
+                        <div className="w-12" />
+                    </div>
+
+                    <div className="relative flex-1 min-h-0 overflow-y-auto p-4 sm:p-8">
                         {endPage ? (
                             <EndPageContentEditor
                                 endPage={endPage}
@@ -386,7 +405,7 @@ export function DesignDrawer({
                                 theme={draftTheme}
                             />
                         ) : (
-                            <div className="flex h-64 items-center justify-center text-sm text-[var(--editorial-subtle)]">
+                            <div className="flex h-64 items-center justify-center text-sm text-slate-400 dark:text-zinc-500">
                                 Select a page to see live preview
                             </div>
                         )}
@@ -395,12 +414,25 @@ export function DesignDrawer({
             </div>
 
             {/* Controls sidebar */}
-            <div className="flex h-full w-[470px] shrink-0 flex-col border-l border-[var(--border)] bg-[var(--background)]">
-                <div className="shrink-0 border-b border-[var(--editorial-border-light)] px-6 pt-6 pb-4">
-                    <p className="editorial-eyebrow text-[var(--editorial-subtle)]">Design</p>
-                    <h3 className="font-display mt-1 text-2xl text-[var(--foreground)]">
-                        Theme settings
-                    </h3>
+            <div className="flex h-full w-[470px] shrink-0 flex-col border-l border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-[#141418]">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 px-6 py-4 shrink-0 bg-white dark:bg-[#141418]">
+                    <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF5722]/10 text-[#FF5722]">
+                            <Palette className="h-4 w-4" />
+                        </div>
+                        <div>
+                            <h3 className="text-base font-semibold text-slate-900 dark:text-zinc-100 leading-tight">Theme settings</h3>
+                            <p className="text-xs text-slate-500 dark:text-zinc-400">Customize form colors, fonts & layout</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => handleCancelPopoverOpenChange(true)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                        title="Close design settings"
+                    >
+                        <X className="h-4 w-4" />
+                    </button>
                 </div>
 
                 <Tabs
@@ -408,13 +440,29 @@ export function DesignDrawer({
                     onValueChange={(next) => setSidebarTab(next === "presets" ? "presets" : "settings")}
                     className="flex min-h-0 flex-1 flex-col"
                 >
-                    <div className="shrink-0 px-6 pt-4">
-                        <TabsList className={TAB_LIST_CLASS}>
-                            <TabsTrigger value="settings" className={TAB_TRIGGER_CLASS}>
+                    <div className="shrink-0 px-6 pt-3 pb-1 bg-white dark:bg-[#141418]">
+                        <TabsList className="flex w-full h-auto rounded-xl bg-slate-100 dark:bg-zinc-900 p-1 group-data-horizontal/tabs:h-auto border border-transparent dark:border-zinc-800 gap-1">
+                            <TabsTrigger
+                                value="settings"
+                                className={cn(
+                                    "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all cursor-pointer h-auto border-0",
+                                    sidebarTab === "settings"
+                                        ? "bg-white dark:bg-[#1f1f26] text-[#FF5722] shadow-xs border border-slate-200/60 dark:border-zinc-700/60 font-semibold"
+                                        : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100"
+                                )}
+                            >
                                 <SlidersHorizontal className="h-4 w-4" />
-                                Current
+                                Customize
                             </TabsTrigger>
-                            <TabsTrigger value="presets" className={TAB_TRIGGER_CLASS}>
+                            <TabsTrigger
+                                value="presets"
+                                className={cn(
+                                    "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all cursor-pointer h-auto border-0",
+                                    sidebarTab === "presets"
+                                        ? "bg-white dark:bg-[#1f1f26] text-[#FF5722] shadow-xs border border-slate-200/60 dark:border-zinc-700/60 font-semibold"
+                                        : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100"
+                                )}
+                            >
                                 <Sparkles className="h-4 w-4" />
                                 Themes
                             </TabsTrigger>
@@ -423,10 +471,13 @@ export function DesignDrawer({
 
                     <TabsContent
                         value="settings"
-                        className="min-h-0 flex-1 space-y-8 overflow-y-auto px-6 py-6"
+                        className="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-4"
                     >
-                        <SettingsSection title="Colors">
-                            <div className="grid grid-cols-1 gap-4">
+                        <SettingsSection
+                            title="Colors"
+                            icon={<Palette className="h-4 w-4 text-slate-500" />}
+                        >
+                            <div className="grid grid-cols-1 gap-3.5">
                                 {COLOR_PAGES.map(({ key, label, fallback }) => (
                                     <ColorSetting
                                         key={key}
@@ -439,7 +490,10 @@ export function DesignDrawer({
                             </div>
                         </SettingsSection>
 
-                        <SettingsSection title="Typography">
+                        <SettingsSection
+                            title="Typography"
+                            icon={<Type className="h-4 w-4 text-slate-500" />}
+                        >
                             <div className="space-y-4">
                                 <SelectSetting
                                     label="Font Family"
@@ -473,7 +527,10 @@ export function DesignDrawer({
                             </div>
                         </SettingsSection>
 
-                        <SettingsSection title="Layout & Corners">
+                        <SettingsSection
+                            title="Layout & Corners"
+                            icon={<LayoutTemplate className="h-4 w-4 text-slate-500" />}
+                        >
                             <div className="space-y-4">
                                 <IconChoiceSetting
                                     label="Content Alignment"
@@ -492,7 +549,10 @@ export function DesignDrawer({
                             </div>
                         </SettingsSection>
 
-                        <SettingsSection title="Background Image">
+                        <SettingsSection
+                            title="Background Image"
+                            icon={<ImageIcon className="h-4 w-4 text-slate-500" />}
+                        >
                             <div className="space-y-4">
                                 <InputSetting
                                     label="Image URL"
@@ -507,7 +567,7 @@ export function DesignDrawer({
                                                 size="icon"
                                                 aria-label="Remove background image"
                                                 onClick={() => patchTheme({ backgroundImage: null })}
-                                                className="editorial-transition h-[44px] w-[44px] shrink-0 rounded-[14px] text-[var(--destructive)] hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
+                                                className="h-[42px] w-[42px] shrink-0 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
@@ -546,16 +606,18 @@ export function DesignDrawer({
 
                     <TabsContent
                         value="presets"
-                        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-6"
+                        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4"
                     >
-                        <div className="space-y-1.5">
-                            <p className="text-sm text-[var(--editorial-body)]">
-                                Pick a starting point. Applying a theme updates the live preview
-                                only — nothing is saved until you press Save design.
+                        <div className="space-y-1">
+                            <p className="text-sm font-medium text-slate-700 dark:text-zinc-200">
+                                Pick a starting point
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-zinc-400">
+                                Applying a theme updates the live preview only — nothing is saved until you click Save Design.
                             </p>
                             {activePresetId === null && (
-                                <p className="text-xs text-[var(--editorial-subtle)]">
-                                    Your current theme is customised, so no preset is highlighted.
+                                <p className="text-xs text-[#FF5722] font-medium">
+                                    • Custom theme active
                                 </p>
                             )}
                         </div>
@@ -569,7 +631,7 @@ export function DesignDrawer({
                 </Tabs>
 
                 {/* Footer action buttons */}
-                <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[var(--editorial-border-light)] bg-[var(--card)] p-4">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 dark:border-zinc-800 bg-white dark:bg-[#141418] p-4">
                     <ConfirmPopover
                         open={cancelPopoverOpen}
                         onOpenChange={handleCancelPopoverOpenChange}
@@ -582,12 +644,11 @@ export function DesignDrawer({
                             <Button
                                 variant="outline"
                                 className={cn(
-                                    ' border-[var(--border)] bg-[var(--card)]',
-                                    "flex-1",
+                                    "flex-1 h-10 rounded-xl border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white shadow-xs cursor-pointer",
                                     vibratingButton === "cancel" && "editorial-vibrate"
                                 )}
                             >
-                                <X className="h-4 w-4" />
+                                <X className="h-4 w-4 mr-1.5 text-slate-500 dark:text-zinc-400" />
                                 Cancel
                             </Button>
                         }
@@ -605,11 +666,11 @@ export function DesignDrawer({
                             <Button
                                 disabled={isSaving}
                                 className={cn(
-                                    "flex-1",
+                                    "flex-1 h-10 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] text-sm font-medium text-white shadow-xs cursor-pointer transition-colors",
                                     vibratingButton === "save" && "editorial-vibrate"
                                 )}
                             >
-                                <Save className="h-4 w-4" />
+                                <Save className="h-4 w-4 mr-1.5" />
                                 {isSaving ? "Saving..." : "Save Design"}
                             </Button>
                         }

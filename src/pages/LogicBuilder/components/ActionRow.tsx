@@ -63,7 +63,7 @@ export function ActionRow({
                         <span className="text-[#9ca3af] text-[12px]">to</span>
                         <Select
                             value={action.targetPageKey ?? ""}
-                            onValueChange={(value) => onUpdateAction({ targetPageKey: value })}
+                            onValueChange={(value) => onUpdateAction({ targetPageKey: value ?? undefined })}
                         >
                             <SelectTrigger className="h-8 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-[13px] text-[#374151] min-w-[180px]">
                                 <SelectValue placeholder="Select destination" />
@@ -94,7 +94,7 @@ export function ActionRow({
             <div className="flex flex-wrap items-center gap-2.5 rounded-xl bg-[#06b6d4]/5 border border-[#06b6d4]/15 px-3 py-2.5">
                 <Select
                     value={action?.variableName ?? ""}
-                    onValueChange={(value) => onUpdateAction({ variableName: value })}
+                    onValueChange={(value) => onUpdateAction({ variableName: value ?? undefined })}
                 >
                     <SelectTrigger className="h-8 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-[13px] text-[#374151] min-w-[140px]">
                         <SelectValue placeholder="Select variable" />

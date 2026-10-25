@@ -98,7 +98,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
 
   return (
     <Card
-      className="editorial editorial-transition editorial-shadow-sm cursor-pointer border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(110,80,60,.08)] flex flex-col justify-between"
+      className="editorial editorial-transition cursor-pointer border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:border-[#FF5722]/50 hover:shadow-[0_12px_32px_rgba(255,87,34,0.08)] transition-all flex flex-col justify-between rounded-2xl"
       onClick={() => navigate(`/form-builder/${form.id}`)}
     >
       <CardHeader className="p-0">
@@ -109,8 +109,8 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
           <Badge
             className={
               form.status === "published"
-                ? "whitespace-nowrap rounded-lg border border-[var(--editorial-success)]/30 bg-[var(--editorial-success)]/12 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#4E7F62]"
-                : "whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--editorial-subtle)]"
+                ? "whitespace-nowrap rounded-lg border border-emerald-500/30 bg-emerald-500/15 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-emerald-400"
+                : "whitespace-nowrap rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-zinc-400"
             }
           >
             {form.status}

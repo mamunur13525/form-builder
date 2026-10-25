@@ -22,18 +22,18 @@ function SortDropdown({ order, setOrder }: { order: SortOrder; setOrder: (o: Sor
     const Active = ORDER_META[order].icon
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 outline-none hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-[#f2542d]/40">
-                <Active className="h-4 w-4 text-gray-500" />
+            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-[#16161a] px-3 py-1.5 text-sm font-medium text-zinc-300 outline-none hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-[#FF5722]/40">
+                <Active className="h-4 w-4 text-zinc-400" />
                 {ORDER_META[order].label}
-                <ChevronDown className="h-4 w-4 text-gray-400" />
+                <ChevronDown className="h-4 w-4 text-zinc-500" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40 bg-white text-gray-700">
+            <DropdownMenuContent align="end" className="w-40 border border-zinc-800 bg-[#18181c] text-zinc-200">
                 <DropdownMenuRadioGroup value={order} onValueChange={(v) => setOrder(v as SortOrder)}>
                     {(Object.keys(ORDER_META) as SortOrder[]).map((o) => {
                         const Icon = ORDER_META[o].icon
                         return (
                             <DropdownMenuRadioItem key={o} value={o}>
-                                <Icon className="h-4 w-4 text-gray-500" />
+                                <Icon className="h-4 w-4 text-zinc-400" />
                                 {ORDER_META[o].label}
                             </DropdownMenuRadioItem>
                         )
@@ -69,8 +69,8 @@ export function StatusFilterBar({
                         className={cn(
                             "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                             isActive(s)
-                                ? "border-[#f2542d] bg-[#fff1ec] text-[#f2542d]"
-                                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
+                                ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
+                                : "border-zinc-800 bg-[#141418] text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-200",
                         )}
                     >
                         <StatusDot status={s} size={12} />

@@ -54,8 +54,8 @@ function EndPageNodeComponent({ data, selected }: NodeProps<EndPageNodeType>) {
         editorial-transition cursor-pointer select-none
         ${
           selected
-            ? "border-green-900/50 bg-green-700/10 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
-            : "border-green-900/30 bg-green-700/5 hover:border-green-900/50 hover:shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
+            ? "border-[#FF5722] ring-2 ring-[#FF5722]/30 bg-white dark:bg-[#1e1e24] shadow-md dark:shadow-[0_4px_20px_rgba(255,87,34,0.15)]"
+            : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#16161a] hover:border-slate-300 dark:hover:border-zinc-700 hover:shadow-md dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         }
       `}
     >
@@ -101,8 +101,8 @@ function EndPageNodeComponent({ data, selected }: NodeProps<EndPageNodeType>) {
       </div>
 
       {/* Footer: "Shown on submit" badge pinned bottom-left. */}
-      <div className="flex items-center justify-between gap-2 border-t border-green-900/20 bg-green-700/5 px-3 py-2">
-        <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-green-900/30 bg-green-700/10 px-1.5 py-0.5 text-[11px] font-medium text-green-800">
+      <div className="flex items-center justify-between gap-2 border-t border-slate-200 dark:border-zinc-800/80 bg-slate-50 dark:bg-[#121215] px-3 py-2">
+        <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-[#FF5722]/30 bg-[#FF5722]/10 px-1.5 py-0.5 text-[11px] font-medium text-[#FF5722]">
           <CheckCircle2 className="h-3 w-3 shrink-0" />
           <span className="truncate">Shown on submit</span>
         </span>

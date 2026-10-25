@@ -26,11 +26,10 @@ function ThemePresetCard({ preset, selected, onSelect }: ThemePresetCardProps) {
             aria-pressed={selected}
             title={`${name} — ${mood}`}
             className={cn(
-                "editorial-transition group overflow-hidden rounded-lg border text-left",
-                "focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none",
+                "group overflow-hidden rounded-xl border text-left transition-all cursor-pointer",
                 selected
-                    ? "border-[var(--primary)] shadow-[0_2px_10px_rgba(238,125,105,.22)]"
-                    : "border-[var(--editorial-border-light)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:shadow-[0_8px_20px_rgba(90,70,50,.08)]"
+                    ? "border-2 border-[#FF5722] ring-4 ring-[#FF5722]/15 shadow-sm"
+                    : "border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 hover:shadow-xs hover:-translate-y-0.5"
             )}
         >
             {/* Preview surface */}
@@ -90,21 +89,21 @@ function ThemePresetCard({ preset, selected, onSelect }: ThemePresetCardProps) {
             </div>
 
             {/* Meta row */}
-            <div className="flex items-center justify-between gap-2 border-t border-[var(--editorial-border-light)] bg-[var(--card)] px-3 py-2">
+            <div className="flex items-center justify-between gap-2 border-t border-slate-100 dark:border-zinc-800/80 bg-white dark:bg-[#16161a] px-3 py-2.5">
                 <span className="min-w-0 flex-1">
-                    <span className="block truncate text-xs font-medium text-[var(--foreground)]">
+                    <span className="block truncate text-xs font-semibold text-slate-800 dark:text-zinc-100">
                         {name}
                     </span>
-                    <span className="block text-[10px] text-[var(--editorial-subtle)]">
+                    <span className="block text-[10px] text-slate-500 dark:text-zinc-400">
                         {mood}
                     </span>
                 </span>
                 {selected && (
                     <span
                         aria-hidden
-                        className="flex size-4 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)]"
+                        className="flex size-4 shrink-0 items-center justify-center rounded-full bg-[#FF5722] text-white"
                     >
-                        <Check className="size-3" />
+                        <Check className="size-2.5 stroke-[3]" />
                     </span>
                 )}
             </div>

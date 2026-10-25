@@ -1,16 +1,16 @@
 import { cn } from "@/lib/utils"
 import { useProductActivity } from "../hooks"
 
-const INTENSITY = ["bg-gray-100", "bg-[#fcd9c8]", "bg-[#f7a98c]", "bg-[#f2542d]"] as const
+const INTENSITY = ["bg-zinc-800", "bg-[#FF5722]/30", "bg-[#FF5722]/60", "bg-[#FF5722]"] as const
 
 export function ProductActivity() {
     const { data } = useProductActivity()
     const weeks = data?.weeks ?? []
 
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white p-4">
-            <p className="text-sm font-semibold text-gray-900">Product activity</p>
-            <p className="mt-0.5 text-xs text-gray-500">
+        <div className="rounded-2xl border border-zinc-800 bg-[#141418] p-4">
+            <p className="text-sm font-semibold text-zinc-100">Product activity</p>
+            <p className="mt-0.5 text-xs text-zinc-400">
                 {data ? `${data.completed} shipped in the last 3 months` : "Loading…"}
             </p>
 
@@ -24,7 +24,7 @@ export function ProductActivity() {
                 ))}
             </div>
 
-            <div className="mt-3 flex items-center justify-end gap-1.5 text-[10px] text-gray-400">
+            <div className="mt-3 flex items-center justify-end gap-1.5 text-[10px] text-zinc-500">
                 <span>Less</span>
                 {INTENSITY.map((c) => (
                     <span key={c} className={cn("h-2.5 w-2.5 rounded-[3px]", c)} />

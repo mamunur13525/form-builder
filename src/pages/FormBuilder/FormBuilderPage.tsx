@@ -1,11 +1,17 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+} from "lucide-react";
+import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
 } from "../../components/ui/resizable";
 import type { FormPage, EndPage, IFormTheme } from "../../shared/types/common";
+import { PAGE_TYPE_LABELS } from "../../shared/constants/form-types";
 import {
   createPage,
   updatePage as updatePageApi,
@@ -82,6 +88,10 @@ export function FormBuilderPage() {
   const [showPagesDrawer, setShowPagesDrawer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   const [designDrawerOpen, setDesignDrawerOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(100);
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(150, prev + 10));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(50, prev - 10));
+  const handleResetZoom = () => setZoomLevel(100);
   const syncedKeyRef = useRef<string | undefined>(undefined);
   const isDesktop = useIsDesktop();
 
@@ -679,14 +689,14 @@ export function FormBuilderPage() {
       onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
     />
   ) : (
-    <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden border border-[var(--border)] bg-[var(--card)]">
-      <div className="border-b border-[var(--editorial-border-light)] px-6 py-5">
-        <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
-          Settings
+    <div className="flex h-full w-full flex-col overflow-hidden border-l border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] text-slate-800 dark:text-zinc-100">
+      <div className="border-b border-slate-200/80 dark:border-zinc-800/80 px-6 py-4">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+          Page settings
         </h3>
       </div>
       <div className="flex h-full items-center justify-center p-8 text-center">
-        <p className="text-base leading-6 text-[var(--editorial-subtle)]">
+        <p className="text-sm leading-6 text-slate-500 dark:text-zinc-500">
           Select a page to view its settings.
         </p>
       </div>
@@ -694,17 +704,22 @@ export function FormBuilderPage() {
   );
 
   const editorColumn = (
-    <div className="flex h-full min-h-0 w-full flex-col gap-3 py-3 bg-transparent">
-      <PageContentTopbar
-        onAddPage={() => {
-          setShowAddPageDialog(true);
-        }}
-        onPreview={async () => {
-          // Flush any pending debounced updates before showing preview
-          await flushPendingUpdate();
-          openPreview(
-            form
-              ? {
+    <div className="relative flex h-full min-h-0 w-full flex-col gap-3 p-3 bg-[#f4f6fb] dark:bg-[#0c0c0f] bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#22222a_1px,transparent_1px)] [background-size:24px_24px] overflow-hidden">
+      {/* Ambient radiant spotlight glow behind canvas artboard */}
+      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[650px] rounded-full bg-gradient-to-tr from-purple-400/10 via-indigo-300/10 to-orange-400/10 dark:from-purple-600/25 dark:via-indigo-500/20 dark:to-purple-800/25 blur-[140px]" />
+      <div className="pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full bg-[#FF5722]/5 dark:bg-[#FF5722]/10 blur-[100px]" />
+
+      <div className="relative z-10 w-full">
+        <PageContentTopbar
+          onAddPage={() => {
+            setShowAddPageDialog(true);
+          }}
+          onPreview={async () => {
+            // Flush any pending debounced updates before showing preview
+            await flushPendingUpdate();
+            openPreview(
+              form
+                ? {
                   ...form,
                   pages,
                   endPages,
@@ -717,111 +732,193 @@ export function FormBuilderPage() {
                       [],
                   },
                 }
-              : null,
-          );
-        }}
-        isMobileView={isMobileView}
-        onToggleView={() => setIsMobileView((prev) => !prev)}
-        onOpenPages={isDesktop ? undefined : () => setShowPagesDrawer(true)}
-        onOpenSettings={
-          isDesktop ? undefined : () => setShowSettingsDrawer(true)
-        }
-        onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
+                : null,
+            );
+          }}
+          isMobileView={isMobileView}
+          onToggleView={() => setIsMobileView((prev) => !prev)}
+          onOpenPages={isDesktop ? undefined : () => setShowPagesDrawer(true)}
+          onOpenSettings={
+            isDesktop ? undefined : () => setShowSettingsDrawer(true)
+          }
+          onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
+        />
+      </div>
 
-      />
-
-      <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+      <div className="relative z-10 flex min-h-0 w-full flex-1 items-center justify-center overflow-auto p-1 sm:p-3">
         <div
           className={cn(
-            "editorial-shadow h-11/12! w-full overflow-hidden  border border-[var(--border)] bg-[var(--card)] sm:rounded-xl",
-            "transition-all duration-500 ease-out",
+            "relative flex flex-col h-full max-h-[85vh] w-full overflow-hidden rounded-3xl border border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
           )}
-          // The phone-frame preview must never exceed the available width.
-          style={{ width: isMobileView ? "min(420px, 100%)" : "100%" }}
+          style={{
+            width: isMobileView ? "min(420px, 100%)" : "100%",
+            transform: zoomLevel !== 100 ? `scale(${zoomLevel / 100})` : undefined,
+            transformOrigin: "top center",
+          }}
         >
-          {isEndPageSelected ? (
-            <EndPageContentEditor
-              endPage={selectedEndPage}
-              endPageIndex={selectedEndPageIndex}
-              onUpdate={updateEndPage}
-              isMobileView={isMobileView}
-              theme={form?.theme}
-              variables={variableItems}
-            />
-          ) : selectedPage ? (
-            <PageContentEditor
-              page={selectedPage}
-              pageIndex={selectedPageIndex}
-              onUpdate={updatePage}
-              isMobileView={isMobileView}
-              theme={form?.theme}
-              variables={variableItems}
-            />
-          ) : (
-            <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-              <p className="font-display text-xl text-[var(--foreground)] sm:text-2xl">
-                Nothing selected
-              </p>
-              <p className="mt-2 text-sm text-[var(--editorial-subtle)] sm:text-base">
-                {isDesktop
-                  ? "Choose a page from the left to begin editing."
-                  : "Open the pages panel to choose a page."}
-              </p>
+          {/* Browser Mockup Window Header Bar */}
+          <div className="flex h-10 shrink-0 items-center justify-between border-b border-slate-200/80 dark:border-zinc-800/80 bg-slate-100/90 dark:bg-[#16161a] px-4">
+            {/* Window control dots */}
+            <div className="flex items-center gap-1.5">
+              <div className="h-3 w-3 rounded-full bg-[#FF5F56]" />
+              <div className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
+              <div className="h-3 w-3 rounded-full bg-[#27C93F]" />
             </div>
-          )}
+
+            {/* Address bar pill mockup */}
+            <div className="h-5 w-48 sm:w-64 rounded-full bg-slate-200/80 dark:bg-zinc-800/70 border border-slate-300/60 dark:border-zinc-700/50 mx-auto flex items-center justify-center text-[11px] text-slate-500 dark:text-zinc-400 font-mono tracking-tight">
+              forms.studio/preview
+            </div>
+
+            {/* Spacer for symmetry */}
+            <div className="w-12" />
+          </div>
+
+          {/* Window Canvas Content with Studio Bounding Box */}
+          <div className="flex-1 min-h-0 overflow-y-auto relative p-2 sm:p-4">
+            {isEndPageSelected ? (
+              <div className="relative h-full w-full rounded-2xl ring-2 ring-[#FF5722] ring-offset-2 ring-offset-white dark:ring-offset-[#141418] transition-all">
+                {/* Top-left tag badge */}
+                <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-md bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
+                  <span>End Page</span>
+                </div>
+                {/* 4 Corner pip handles */}
+                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+
+                <EndPageContentEditor
+                  endPage={selectedEndPage}
+                  endPageIndex={selectedEndPageIndex}
+                  onUpdate={updateEndPage}
+                  isMobileView={isMobileView}
+                  theme={form?.theme}
+                  variables={variableItems}
+                />
+              </div>
+            ) : selectedPage ? (
+              <div className="relative h-full w-full rounded-2xl ring-2 ring-[#FF5722] ring-offset-2 ring-offset-white dark:ring-offset-[#141418] transition-all">
+                {/* Top-left tag badge */}
+                <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-md bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
+                  <span>{selectedPageIndex + 1}. {PAGE_TYPE_LABELS[selectedPage.type] || selectedPage.label || "Page"}</span>
+                </div>
+                {/* 4 Corner pip handles */}
+                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+
+                <PageContentEditor
+                  page={selectedPage}
+                  pageIndex={selectedPageIndex}
+                  onUpdate={updatePage}
+                  isMobileView={isMobileView}
+                  theme={form?.theme}
+                  variables={variableItems}
+                />
+              </div>
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+                <p className="font-semibold text-xl text-slate-800 dark:text-zinc-100 sm:text-2xl">
+                  Nothing selected
+                </p>
+                <p className="mt-2 text-sm text-slate-500 dark:text-zinc-400 sm:text-base">
+                  {isDesktop
+                    ? "Choose a page from the left to begin editing."
+                    : "Open the pages panel to choose a page."}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* Floating Zoom Controls at Bottom Right */}
+      <div className="absolute bottom-5 right-5 z-20 flex items-center gap-3 rounded-2xl border border-slate-200/90 dark:border-zinc-800/90 bg-white/95 dark:bg-[#16161a]/95 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xl dark:shadow-2xl backdrop-blur-md">
+        <button
+          type="button"
+          onClick={handleZoomOut}
+          aria-label="Zoom out"
+          className="flex h-6 w-6 items-center justify-center rounded-lg text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+        >
+          <ZoomOut className="h-3.5 w-3.5" />
+        </button>
+        <span className="w-9 text-center tabular-nums select-none font-medium text-slate-800 dark:text-zinc-200">
+          {zoomLevel}%
+        </span>
+        <button
+          type="button"
+          onClick={handleZoomIn}
+          aria-label="Zoom in"
+          className="flex h-6 w-6 items-center justify-center rounded-lg text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+        >
+          <ZoomIn className="h-3.5 w-3.5" />
+        </button>
+        <div className="h-3.5 w-px bg-slate-200 dark:bg-zinc-800" />
+        <button
+          type="button"
+          onClick={handleResetZoom}
+          aria-label="Reset zoom"
+          className="flex h-6 w-6 items-center justify-center rounded-lg text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+        >
+          <Maximize2 className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   );
 
   return (
-    <div className="editorial h-full flex flex-col bg-[var(--editorial-canvas)]">
-      {isDesktop ? (
-        <ResizablePanelGroup
-          orientation="horizontal"
-          className="mx-auto w-full flex-1 min-h-0"
-        >
-          <ResizablePanel defaultSize={300} minSize={260} maxSize={400}>
-            {sidebarPanel}
-          </ResizablePanel>
-
-          <ResizableHandle className="w-4 bg-transparent after:hidden" />
-
-          <ResizablePanel defaultSize={600} minSize={300} className="bg-transparent">
-            {editorColumn}
-          </ResizablePanel>
-
-          <ResizableHandle className="w-4 bg-transparent after:hidden" />
-
-          <ResizablePanel defaultSize={340} minSize={300} maxSize={420}>
-            {settingsPanel}
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      ) : (
-        <>
-          <div className="flex min-h-0 w-full flex-1 flex-col">
-            {editorColumn}
-          </div>
-
-          <Drawer
-            open={showPagesDrawer}
-            onOpenChange={setShowPagesDrawer}
-            side="left"
-            title="Pages"
+    <div className="editorial h-full flex bg-[var(--editorial-canvas)] text-[var(--foreground)]">
+      {/* Main Resizable Workspace */}
+      <div className="flex-1 min-w-0 h-full flex flex-col">
+        {isDesktop ? (
+          <ResizablePanelGroup
+            orientation="horizontal"
+            className="mx-auto w-full flex-1 min-h-0"
           >
-            {sidebarPanel}
-          </Drawer>
+            <ResizablePanel defaultSize={280} minSize={240} maxSize={380}>
+              {sidebarPanel}
+            </ResizablePanel>
 
-          <Drawer
-            open={showSettingsDrawer}
-            onOpenChange={setShowSettingsDrawer}
-            side="right"
-            title="Settings"
-          >
-            {settingsPanel}
-          </Drawer>
-        </>
-      )}
+            <ResizableHandle className="w-1.5 bg-transparent hover:bg-slate-200 dark:hover:bg-zinc-800 transition-colors after:hidden" />
+
+            <ResizablePanel defaultSize={600} minSize={300} className="bg-transparent">
+              {editorColumn}
+            </ResizablePanel>
+
+            <ResizableHandle className="w-1.5 bg-transparent hover:bg-slate-200 dark:hover:bg-zinc-800 transition-colors after:hidden" />
+
+            <ResizablePanel defaultSize={340} minSize={300} maxSize={420}>
+              {settingsPanel}
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        ) : (
+          <>
+            <div className="flex min-h-0 w-full flex-1 flex-col">
+              {editorColumn}
+            </div>
+
+            <Drawer
+              open={showPagesDrawer}
+              onOpenChange={setShowPagesDrawer}
+              side="left"
+              title="Pages"
+            >
+              {sidebarPanel}
+            </Drawer>
+
+            <Drawer
+              open={showSettingsDrawer}
+              onOpenChange={setShowSettingsDrawer}
+              side="right"
+              title="Settings"
+            >
+              {settingsPanel}
+            </Drawer>
+          </>
+        )}
+      </div>
 
       <AddPageDialog
         open={showAddPageDialog}
@@ -843,15 +940,15 @@ export function FormBuilderPage() {
         onSaveTheme={handleSaveTheme}
         {...(isEndPageSelected
           ? {
-              endPage: selectedEndPage,
-              endPageIndex: selectedEndPageIndex,
-              onUpdateEndPage: updateEndPage,
-            }
+            endPage: selectedEndPage,
+            endPageIndex: selectedEndPageIndex,
+            onUpdateEndPage: updateEndPage,
+          }
           : {
-              page: selectedPage,
-              pageIndex: selectedPageIndex,
-              onUpdatePage: updatePage,
-            })}
+            page: selectedPage,
+            pageIndex: selectedPageIndex,
+            onUpdatePage: updatePage,
+          })}
       />
 
     </div>

@@ -57,6 +57,7 @@ export function FormBuilderSidebar({
   onReorderPages,
   onAddPage,
   onDeletePage,
+  onDuplicatePage,
   endPages,
   selectedEndPageIndex,
   isEndPageSelected,
@@ -114,16 +115,16 @@ export function FormBuilderSidebar({
   );
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden border-r border-[var(--border)] bg-[var(--card)]">
+    <div className="flex h-full w-full flex-col overflow-hidden border-r border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] text-slate-800 dark:text-zinc-100">
       <ResizablePanelGroup orientation="vertical" className="h-full w-full">
         {/* Top: pages */}
         <ResizablePanel defaultSize={340} minSize={160}>
           <div className="flex h-full w-full flex-col overflow-hidden">
-            {/* Header — "Pages" with a count and an add button. */}
-            <div className="flex items-center justify-between gap-2 px-4 py-4">
-              <div className="flex items-center gap-2 text-[var(--foreground)]">
-                <span className="text-[15px] font-semibold">Pages</span>
-                <span className="rounded-md border border-[var(--border)] bg-[var(--secondary)] px-1.5 py-0.5 text-xs font-medium tabular-nums text-[var(--muted-foreground)]">
+            {/* Header — "Pages" with a count and an add button */}
+            <div className="flex items-center justify-between gap-2 px-5 py-4 border-b border-slate-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#141418]">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Pages</span>
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-800 px-2 text-xs font-semibold text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700/50">
                   {pages.length}
                 </span>
               </div>
@@ -135,9 +136,9 @@ export function FormBuilderSidebar({
                       type="button"
                       onClick={onAddPage}
                       aria-label="Add page"
-                      className="editorial-transition flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-700/80 bg-slate-100 dark:bg-zinc-800/90 text-slate-600 dark:text-zinc-300 hover:text-white hover:border-[#FF5722] hover:bg-[#FF5722] transition-all shadow-xs cursor-pointer active:scale-95"
                     >
-                      <Plus className="h-5 w-5" />
+                      <Plus className="h-4 w-4" />
                     </button>
                   }
                 />
@@ -153,7 +154,7 @@ export function FormBuilderSidebar({
               renderList={({ children, props }) => (
                 <div
                   {...props}
-                  className="flex-1 space-y-2.5 overflow-y-auto overflow-x-hidden px-3 pb-4 select-none"
+                  className="flex-1 space-y-2.5 overflow-y-auto overflow-x-hidden p-3 select-none"
                 >
                   {children}
                 </div>
@@ -172,6 +173,7 @@ export function FormBuilderSidebar({
                     isLifted={isSelected}
                     onSelect={selectPage}
                     onDelete={removePage}
+                    onDuplicate={onDuplicatePage}
                     onMoveUp={movePageUp}
                     onMoveDown={movePageDown}
                   />
@@ -181,10 +183,15 @@ export function FormBuilderSidebar({
           </div>
         </ResizablePanel>
 
-        <ResizableHandle
-          withHandle
-          className="aria-[orientation=horizontal]:h-2.5 border-y border-[var(--border)] bg-[var(--secondary)] transition-colors hover:bg-[var(--editorial-primary-light)] [&[aria-orientation=horizontal]>div]:h-9 [&[aria-orientation=horizontal]>div]:w-1.5 [&>div]:bg-[var(--muted-foreground)]"
-        />
+        {/* Separator line with 4 dots handle */}
+        <div className="relative flex items-center justify-center border-y border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#111114] h-3">
+          <ResizableHandle
+            className="absolute inset-0 h-full w-full opacity-0 cursor-row-resize"
+          />
+          <span className="absolute -top-1 text-slate-400 dark:text-zinc-600 text-xs font-bold select-none pointer-events-none">
+            ••••
+          </span>
+        </div>
 
         {/* Bottom: end pages */}
         <ResizablePanel defaultSize={240} minSize={150}>

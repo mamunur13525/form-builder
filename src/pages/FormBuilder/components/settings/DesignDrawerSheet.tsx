@@ -58,7 +58,7 @@ export function DesignDrawerSheet({
             {/* `editorial` re-points the design tokens for this portalled surface. */}
             <SheetContent
                 side="right"
-                className="editorial h-full flex flex-col w-[90.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[90.666%] data-[side=right]:sm:max-w-none"
+                className="editorial h-full flex flex-col w-[92%] max-w-none min-w-0 overflow-hidden border-l border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] text-slate-800 dark:text-zinc-100 p-0 data-[side=right]:w-[92%] data-[side=right]:sm:max-w-none shadow-2xl"
                 showCloseButton={false}
             >
                 <div className="flex-1 min-h-0 w-full">

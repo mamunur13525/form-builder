@@ -58,8 +58,8 @@ const NODE_STEP_X = 320;
  * arcs are a darker dashed line (with a small white label) so conditional jumps
  * read as clearly distinct from the linear page order.
  */
-const FLOW_COLOR = "#94a3b8";
-const BRANCH_COLOR = "#191919";
+const FLOW_COLOR = "#52525b";
+const BRANCH_COLOR = "#FF5722";
 
 const flowEdgeStyle = { stroke: FLOW_COLOR, strokeWidth: 1.5 };
 const flowMarker = {
@@ -71,7 +71,7 @@ const flowMarker = {
 
 const branchEdgeStyle = {
   stroke: BRANCH_COLOR,
-  strokeWidth: 1.75,
+  strokeWidth: 2,
   strokeDasharray: "6 4",
 };
 const branchMarker = {
@@ -80,8 +80,8 @@ const branchMarker = {
   height: 16,
   color: BRANCH_COLOR,
 };
-const branchLabelStyle = { fill: BRANCH_COLOR, fontSize: 11, fontWeight: 600 };
-const branchLabelBgStyle = { fill: "#ffffff", stroke: "#e5e5e5" };
+const branchLabelStyle = { fill: "#FF7043", fontSize: 11, fontWeight: 600 };
+const branchLabelBgStyle = { fill: "#18181c", stroke: "#3f3f46" };
 
 /**
  * Build the full canvas graph — nodes plus edges — for a form.

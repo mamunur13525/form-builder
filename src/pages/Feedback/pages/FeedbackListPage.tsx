@@ -10,12 +10,12 @@ import {
 
 function CardSkeleton() {
     return (
-        <div className="flex gap-4 rounded-2xl border border-gray-200 bg-white p-4">
-            <div className="h-14 w-12 shrink-0 animate-pulse rounded-xl bg-gray-100" />
+        <div className="flex gap-4 rounded-2xl border border-zinc-800 bg-[#141418] p-4">
+            <div className="h-14 w-12 shrink-0 animate-pulse rounded-xl bg-zinc-800" />
             <div className="flex-1 space-y-2 py-1">
-                <div className="h-4 w-2/3 animate-pulse rounded bg-gray-100" />
-                <div className="h-3 w-1/3 animate-pulse rounded bg-gray-100" />
-                <div className="h-6 w-24 animate-pulse rounded-full bg-gray-100" />
+                <div className="h-4 w-2/3 animate-pulse rounded bg-zinc-800" />
+                <div className="h-3 w-1/3 animate-pulse rounded bg-zinc-800" />
+                <div className="h-6 w-24 animate-pulse rounded-full bg-zinc-800" />
             </div>
         </div>
     )
@@ -48,14 +48,14 @@ export function FeedbackListPage() {
                 />
 
                 {filters.search && (
-                    <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#fff1ec] px-3 py-1.5 text-sm text-[#f2542d]">
+                    <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#FF5722]/30 bg-[#FF5722]/15 px-3 py-1.5 text-sm text-[#FF5722]">
                         <span>
                             Search: <span className="font-semibold">{filters.search}</span>
                         </span>
                         <button
                             type="button"
                             onClick={() => setSearch("")}
-                            className="rounded-full p-0.5 hover:bg-[#f2542d]/10"
+                            className="rounded-full p-0.5 hover:bg-[#FF5722]/20"
                             aria-label="Clear search"
                         >
                             <X className="h-3.5 w-3.5" />
@@ -71,13 +71,13 @@ export function FeedbackListPage() {
                             <CardSkeleton />
                         </>
                     ) : isError ? (
-                        <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
+                        <div className="rounded-2xl border border-zinc-800 bg-[#141418] p-10 text-center text-sm text-zinc-400">
                             Something went wrong loading feedback. Please try again.
                         </div>
                     ) : posts.length === 0 ? (
-                        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
-                            <p className="text-sm font-medium text-gray-900">No posts found</p>
-                            <p className="mt-1 text-sm text-gray-500">
+                        <div className="rounded-2xl border border-dashed border-zinc-800 bg-[#141418] p-12 text-center">
+                            <p className="text-sm font-medium text-zinc-200">No posts found</p>
+                            <p className="mt-1 text-sm text-zinc-400">
                                 Try clearing filters or searching for something else.
                             </p>
                         </div>

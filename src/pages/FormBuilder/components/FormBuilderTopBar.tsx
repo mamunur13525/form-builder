@@ -9,12 +9,15 @@ import {
   BarChart3,
   Loader2,
   AlertCircle,
-  Home,
   Pencil,
   CheckCheck,
   ChevronDown,
+  ChevronRight,
+  Send,
+  Sun,
+  Moon,
 } from "lucide-react";
-import { Button } from "../../../components/ui/button";
+import { useTheme } from "@/app/providers/ThemeProvider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,19 +62,17 @@ export function FormBuilderTopBar({
   const { formId } = useParams<{ formId: string }>();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { theme, setTheme } = useTheme();
   const { saveStatus, showSaveStatus, openPreview, hasUnpublishedChanges } =
     useFormContext();
   const activeTab =
     navLinks.find(({ to }) => pathname.startsWith(tabPrefix(to))) ?? navLinks[0];
   const ActiveTabIcon = activeTab.icon;
   const baseNavLinkClass =
-    "editorial-transition flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]";
+    "transition-all flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-zinc-800/50 border border-transparent";
   const activeNavLinkClass =
-    "border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)] hover:text-[var(--primary)]";
-  const navLabelClass = "text-[10px] font-semibold uppercase tracking-[0.08em]";
-  // Publish CTA accent — green gradient (#4a7f11); overrides the monochrome default button
-  const publishButtonClass =
-    "border-0 from-[#4a7f11] to-[#355b0c]";
+    "border-[#FF5722] text-[#FF5722] bg-transparent font-semibold shadow-xs hover:text-[#FF5722] hover:bg-transparent";
+  const navLabelClass = "text-sm font-medium";
 
   const [title, setTitle] = useState(initialTitle);
   const prevInitialTitleRef = useRef(initialTitle);
@@ -89,34 +90,37 @@ export function FormBuilderTopBar({
 
 
   return (
-    <div className="bg-white editorial flex h-14 shrink-0 items-center justify-between gap-2 border-b border-[var(--border)] px-3 lg:h-[72px] lg:gap-4 lg:px-8">
-      <div className="flex min-w-0 items-center gap-2">
+    <div className="bg-white dark:bg-[#141418] flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-800 px-4 lg:h-[64px] lg:gap-4 lg:px-6 select-none">
+      <div className="flex min-w-0 items-center gap-3">
+        {/* App Logo */}
+        <div
+          onClick={() => navigate("/dashboard")}
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl hover:opacity-90 transition-opacity p-1 active:scale-95"
+          title="Dashboard"
+        >
+          <img src="/flogo.png" alt="FormFlow logo" className="h-full w-full object-contain" />
+        </div>
+
         <nav className="flex min-w-0 items-center gap-2 text-sm">
           <button
             onClick={() => navigate("/dashboard")}
-            className="editorial-transition flex shrink-0 cursor-pointer items-center gap-1.5 text-[var(--editorial-body)] hover:text-[var(--primary)]"
+            className="flex shrink-0 cursor-pointer items-center text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-medium transition-colors"
           >
-            <Home className="h-4 w-4" />
-            <span className="hidden sm:inline">Forms</span>
+            Forms
           </button>
-          <span className="hidden shrink-0 text-[var(--editorial-disabled)] sm:inline">
-            /
-          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 dark:text-zinc-600" />
           <button
             onClick={() => setDialogOpen(true)}
-            className="editorial-transition group flex min-w-0 cursor-pointer items-center gap-1.5 font-display text-base text-[var(--foreground)] hover:text-[var(--primary)] sm:text-lg lg:text-xl"
+            className="group flex min-w-0 cursor-pointer items-center gap-1.5 font-semibold text-slate-900 dark:text-white hover:text-[#FF5722] dark:hover:text-[#FF5722] text-sm sm:text-base transition-colors"
           >
-            <span className="truncate">{title}</span>
-            {/* Hover affordance only — hidden on touch widths, where it would
-                just eat room the title needs. */}
-            <Pencil className="hidden h-4 w-4 shrink-0 opacity-0 transition-opacity duration-250 group-hover:opacity-100 lg:block" />
+            <span className="truncate">{title || "Untitled form"}</span>
+            <Pencil className="hidden h-3.5 w-3.5 shrink-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:block text-slate-400 dark:text-zinc-500" />
           </button>
         </nav>
       </div>
 
-      {/* Section nav. Five tabs need ~500px, so below `lg` they collapse into a
-          menu that shows the active section and opens the full list. */}
-      <nav className="hidden shrink-0 items-center gap-1 md:flex">
+      {/* Section nav */}
+      <nav className="hidden shrink-0 items-center gap-1 md:flex rounded-2xl bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800/80 p-1">
         {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={label}
@@ -142,30 +146,31 @@ export function FormBuilderTopBar({
               className={cn(
                 baseNavLinkClass,
                 activeNavLinkClass,
-                "shrink-0 cursor-pointer px-2.5 md:hidden",
+                "shrink-0 cursor-pointer px-3 md:hidden",
               )}
             >
               <ActiveTabIcon className="h-4 w-4 shrink-0" />
               <span className={navLabelClass}>{activeTab.label}</span>
-              <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-60" />
+              <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" />
             </button>
           }
         />
         <DropdownMenuContent
           align="center"
-          className="editorial w-52 rounded-[18px] border border-[var(--border)] bg-[var(--popover)] p-2"
+          className="w-52 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-2 shadow-xl text-slate-900 dark:text-zinc-100"
         >
           {navLinks.map(({ to, icon: Icon, label }) => (
             <DropdownMenuItem
               key={label}
               className={cn(
-                "cursor-pointer rounded-[12px] px-3 py-2",
-                activeTab.label === label &&
-                  "bg-[var(--editorial-primary-selected)] text-[var(--primary)]",
+                "cursor-pointer rounded-xl px-3 py-2 text-sm font-medium",
+                activeTab.label === label
+                  ? "border border-[#FF5722] text-[#FF5722] font-semibold bg-transparent"
+                  : "text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white",
               )}
               onClick={() => navigate(to.replace(":formId", formId || "new"))}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4 mr-2" />
               {label}
             </DropdownMenuItem>
           ))}
@@ -175,20 +180,20 @@ export function FormBuilderTopBar({
       <div className="flex shrink-0 items-center gap-2 lg:gap-3">
         <span
           className={cn(
-            "flex w-4 shrink-0 items-center gap-1.5 overflow-hidden text-xs text-[var(--editorial-subtle)] transition-opacity duration-250 ease-out lg:w-16",
+            "flex shrink-0 items-center gap-1.5 overflow-hidden text-xs text-slate-500 dark:text-zinc-400 transition-opacity duration-200 ease-out",
             saveStatus !== "idle" ? "opacity-100" : "opacity-0",
           )}
         >
           {saveStatus === "saving" && (
-            <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+            <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#FF5722]" />
           )}
           {saveStatus === "saved" && (
-            <CheckCheck className="h-4 w-4 shrink-0 text-[var(--editorial-success)]" />
+            <CheckCheck className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
           )}
           {saveStatus === "error" && (
-            <AlertCircle className="h-4 w-4 shrink-0 text-[var(--destructive)]" />
+            <AlertCircle className="h-4 w-4 shrink-0 text-rose-500 dark:text-rose-400" />
           )}
-          <span className="hidden lg:inline">
+          <span className="hidden lg:inline font-medium">
             {saveStatus === "saving"
               ? "Saving..."
               : saveStatus === "saved"
@@ -197,43 +202,56 @@ export function FormBuilderTopBar({
           </span>
         </span>
 
-        <Button
-          variant="outline"
+        <button
+          type="button"
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+        >
+          {theme === "dark" ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-600" />}
+        </button>
+
+        <button
+          type="button"
           aria-label="Preview"
           onClick={() => openPreview()}
+          className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] px-3.5 py-2 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
         >
-          <Play className="h-5 w-5" />
-          <span className="hidden xl:inline">Preview</span>
-        </Button>
+          <Play className="h-4 w-4 text-slate-500 dark:text-zinc-400" />
+          <span className="hidden sm:inline">Preview</span>
+        </button>
+
         {!isPublished ? (
-          <Button
+          <button
+            type="button"
             aria-label="Publish"
-            className={publishButtonClass}
+            className="flex items-center gap-2 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] px-4 py-2 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
             onClick={onPublish}
           >
-            <Share2 className="h-5 w-5" />
-            <span className="hidden xl:inline">Publish</span>
-          </Button>
+            <Send className="h-4 w-4" />
+            <span className="hidden sm:inline">Publish</span>
+          </button>
         ) : hasUnpublishedChanges ? (
-          <Button
-            variant="default"
+          <button
+            type="button"
             aria-label="Publish changes"
-            className={publishButtonClass}
+            className="flex items-center gap-2 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] px-4 py-2 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
             onClick={onPublishedClick}
           >
-            <AlertCircle className="h-5 w-5" />
-            <span className="hidden xl:inline">Publish changes</span>
-          </Button>
+            <AlertCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Publish changes</span>
+          </button>
         ) : (
-          <Button
-            variant="default"
+          <button
+            type="button"
             aria-label="Published"
-            className={publishButtonClass}
+            className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm font-medium text-white shadow-xs transition-colors cursor-pointer"
             onClick={onPublishedClick}
           >
-            <CheckCircle className="h-5 w-5" />
-            <span className="hidden xl:inline">Published</span>
-          </Button>
+            <CheckCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Published</span>
+          </button>
         )}
       </div>
 

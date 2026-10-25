@@ -56,10 +56,10 @@ export function SubmissionsToolbar({
                                     render={
                                         <TabsTrigger
                                             value={value}
-                                            className="editorial-transition h-9 gap-1.5 rounded-xl px-2.5 text-xs whitespace-nowrap text-[var(--editorial-body)] data-[selected]:border data-[selected]:border-[var(--editorial-primary-ring)] data-[selected]:bg-[var(--editorial-primary-selected)] data-[selected]:text-[var(--primary)] sm:gap-2 sm:px-4 sm:text-sm"
+                                            className="editorial-transition h-9 gap-1.5 rounded-xl px-2.5 text-xs whitespace-nowrap text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 data-[selected]:border data-[selected]:border-[#FF5722]/40 data-[selected]:bg-[#FF5722]/15 data-[selected]:text-[#FF5722] data-[selected]:font-semibold sm:gap-2 sm:px-4 sm:text-sm"
                                         >
                                             {label}
-                                            <span className="text-xs tabular-nums text-[var(--editorial-subtle)]">
+                                            <span className="text-xs tabular-nums text-slate-400 dark:text-zinc-500">
                                                 {columnCounts[value]}
                                             </span>
                                         </TabsTrigger>

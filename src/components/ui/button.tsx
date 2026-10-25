@@ -9,16 +9,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border-black/80 bg-gradient-to-b from-[#3a3a40] to-[#1f1f24] text-white shadow-[0_2px_4px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.22)] hover:brightness-110 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.35)]",
+          "border border-[#FF5722]/80 bg-[#FF5722] hover:bg-[#F4511E] text-white shadow-[0_2px_10px_rgba(255,87,34,0.25)] font-medium active:scale-[0.98] transition-all",
         outline:
-          "rounded-[14px] bg-[#f3f3f5] text-[#17171b] shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] hover:bg-[#ededf0] active:translate-y-[1px] dark:bg-transparent dark:hover:bg-input/30 border border-[var(--border)] dark:border-[var(--border)] dark:text-[var(--foreground)]",
+          "rounded-xl bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white active:scale-[0.98] transition-all cursor-pointer shadow-xs",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "bg-slate-100 dark:bg-[#1a1a20] text-slate-800 dark:text-zinc-200 hover:bg-slate-200/80 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-zinc-800/80 active:scale-[0.98] transition-all",
         ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+          "text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800/60 hover:text-slate-900 dark:hover:text-white active:scale-[0.98] transition-all aria-expanded:bg-slate-100 dark:aria-expanded:bg-zinc-800/60 aria-expanded:text-slate-900 dark:aria-expanded:text-white",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/20 focus-visible:border-red-500/40 focus-visible:ring-red-500/20",
+        link: "text-[#FF5722] hover:text-[#FF7043] underline-offset-4 hover:underline",
       },
       size: {
         default: "px-4 py-2.5",

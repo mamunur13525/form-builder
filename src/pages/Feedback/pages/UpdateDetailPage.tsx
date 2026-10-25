@@ -13,7 +13,7 @@ function Run({ run }: { run: TextRun }) {
                 href={run.link}
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-[#f2542d] hover:underline"
+                className="font-medium text-[#FF5722] hover:underline"
             >
                 {run.text}
             </a>
@@ -21,12 +21,12 @@ function Run({ run }: { run: TextRun }) {
     }
     if (run.code) {
         return (
-            <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[13px] text-gray-800">
+            <code className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[13px] text-zinc-200 border border-zinc-700">
                 {run.text}
             </code>
         )
     }
-    if (run.bold) return <strong className="font-semibold text-gray-900">{run.text}</strong>
+    if (run.bold) return <strong className="font-semibold text-white">{run.text}</strong>
     return <>{run.text}</>
 }
 
@@ -37,7 +37,7 @@ function Block({ block }: { block: UpdateBlock }) {
                 href={block.url}
                 target="_blank"
                 rel="noreferrer"
-                className="my-2 inline-flex items-center gap-1.5 rounded-lg bg-[#fff1ec] px-4 py-2 text-sm font-semibold text-[#f2542d] hover:bg-[#ffe4d8]"
+                className="my-2 inline-flex items-center gap-1.5 rounded-lg border border-[#FF5722]/30 bg-[#FF5722]/15 px-4 py-2 text-sm font-semibold text-[#FF5722] hover:bg-[#FF5722]/25"
             >
                 {block.label}
                 <ExternalLink className="h-4 w-4" />
@@ -45,7 +45,7 @@ function Block({ block }: { block: UpdateBlock }) {
         )
     }
     return (
-        <p className="text-[15px] leading-relaxed text-gray-700">
+        <p className="text-[15px] leading-relaxed text-zinc-300">
             {block.runs.map((r, i) => (
                 <Run key={i} run={r} />
             ))}
@@ -60,8 +60,8 @@ export function UpdateDetailPage() {
     if (isLoading) {
         return (
             <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-                <div className="h-6 w-32 animate-pulse rounded bg-gray-100" />
-                <div className="mt-6 h-56 animate-pulse rounded-2xl bg-gray-100" />
+                <div className="h-6 w-32 animate-pulse rounded bg-zinc-800" />
+                <div className="mt-6 h-56 animate-pulse rounded-2xl bg-zinc-800" />
             </div>
         )
     }
@@ -69,8 +69,8 @@ export function UpdateDetailPage() {
     if (!update) {
         return (
             <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
-                <p className="text-lg font-semibold text-gray-900">Update not found</p>
-                <Link to={ROUTES.UPDATES} className="mt-4 inline-block text-sm font-medium text-[#f2542d]">
+                <p className="text-lg font-semibold text-white">Update not found</p>
+                <Link to={ROUTES.UPDATES} className="mt-4 inline-block text-sm font-medium text-[#FF5722] hover:underline">
                     ← Back to Updates
                 </Link>
             </div>
@@ -81,7 +81,7 @@ export function UpdateDetailPage() {
         <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:py-8">
             <Link
                 to={ROUTES.UPDATES}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-800"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-zinc-200"
             >
                 <ArrowLeft className="h-4 w-4" />
                 Updates
@@ -95,15 +95,15 @@ export function UpdateDetailPage() {
                 {update.tags.map((t) => (
                     <UpdateTag key={t} tag={t} />
                 ))}
-                <span className="text-xs text-gray-400">{formatLong(update.date)}</span>
+                <span className="text-xs text-zinc-400">{formatLong(update.date)}</span>
             </div>
 
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900">{update.title}</h1>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-white">{update.title}</h1>
 
             {update.author && (
                 <div className="mt-4 flex items-center gap-2">
                     <Avatar author={update.author} size="sm" />
-                    <span className="text-sm text-gray-600">{update.author.name}</span>
+                    <span className="text-sm text-zinc-300">{update.author.name}</span>
                 </div>
             )}
 

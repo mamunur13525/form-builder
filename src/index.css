@@ -1,14 +1,14 @@
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "@fontsource-variable/inter";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Inter Variable', sans-serif;
+    --font-heading: 'Plus Jakarta Sans Variable', 'Inter Variable', sans-serif;
+    --font-sans: 'Plus Jakarta Sans Variable', 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -50,72 +50,72 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --primary: #FF5722;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
+    --destructive: #ef4444;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #FF5722;
+    --chart-1: #FF5722;
+    --chart-2: #818cf8;
+    --chart-3: #34d399;
+    --chart-4: #f59e0b;
+    --chart-5: #ec4899;
+    --radius: 0.75rem;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #0f172a;
+    --sidebar-primary: #FF5722;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #f1f5f9;
+    --sidebar-accent-foreground: #0f172a;
+    --sidebar-border: #e2e8f0;
+    --sidebar-ring: #FF5722;
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --background: #0c0c0f;
+    --foreground: #f4f4f5;
+    --card: #141418;
+    --card-foreground: #f4f4f5;
+    --popover: #18181c;
+    --popover-foreground: #f4f4f5;
+    --primary: #FF5722;
+    --primary-foreground: #ffffff;
+    --secondary: #1a1a20;
+    --secondary-foreground: #f4f4f5;
+    --muted: #1e1e24;
+    --muted-foreground: #a1a1aa;
+    --accent: #27272a;
+    --accent-foreground: #f4f4f5;
+    --destructive: #ef4444;
+    --border: #27272a;
+    --input: #27272a;
+    --ring: #FF5722;
+    --chart-1: #FF5722;
+    --chart-2: #818cf8;
+    --chart-3: #34d399;
+    --chart-4: #f59e0b;
+    --chart-5: #ec4899;
+    --sidebar: #111114;
+    --sidebar-foreground: #f4f4f5;
+    --sidebar-primary: #FF5722;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #1a1a20;
+    --sidebar-accent-foreground: #f4f4f5;
+    --sidebar-border: #27272a;
+    --sidebar-ring: #FF5722;
 }
 
 @layer base {
@@ -123,8 +123,16 @@
         @apply border-border outline-ring/50;
     }
 
+    html {
+        @apply font-sans;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground font-sans;
+        letter-spacing: -0.011em;
         /* Ambient monochrome wash — a soft light-from-above gradient,
            fixed to the viewport so it stays put while content scrolls. */
         background-image:
@@ -142,9 +150,6 @@
         background-image: linear-gradient(180deg,
                 color-mix(in oklch, var(--foreground) 3%, transparent),
                 transparent 60%);
-    }
-  html {
-    @apply font-sans;
     }
 
 }
@@ -180,100 +185,183 @@
 /* and card surfaces further down.                                     */
 /* ------------------------------------------------------------------ */
 .editorial {
-    /* Palette — Mono */
+    /* Palette — Light Modern (from Modern Form Builder Dashboard) */
     --palette-background: #ffffff;
-    --palette-surface: #f5f5f5;
-    --palette-text-dark: #0a0a0a;
-    --palette-text: #5c5c5c;
-    --palette-muted: #757575;
-    --palette-brand: #191919;
-    --palette-brand-hover: #2e2e2e;
-    --palette-brand-dark: #000000;
-    --palette-soft: #e6e6e6;
+    --palette-surface: #f8fafc;
+    --palette-text-dark: #0f172a;
+    --palette-text: #475569;
+    --palette-muted: #64748b;
+    --palette-brand: #FF5722;
+    --palette-brand-hover: #F4511E;
+    --palette-brand-dark: #D84315;
+    --palette-soft: #f1f5f9;
 
     /* Surfaces */
-    --editorial-canvas: #f6f6f6;
-    --editorial-surface: var(--palette-surface);
-    --background: var(--palette-background);
-    --card: var(--palette-background);
-    --card-foreground: var(--palette-text-dark);
-    --popover: var(--palette-background);
-    --popover-foreground: var(--palette-text-dark);
+    --editorial-canvas: #f4f6fb;
+    --editorial-surface: #ffffff;
+    --background: #f8fafc;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
 
-    /* Text — near-black, never pure black for body */
-    --foreground: var(--palette-text-dark);
-    --editorial-body: var(--palette-text);
-    --muted-foreground: var(--palette-muted);
-    --editorial-subtle: #a1a1a1;
-    --editorial-disabled: #d4d4d4;
+    /* Text */
+    --foreground: #0f172a;
+    --editorial-body: #475569;
+    --muted-foreground: #64748b;
+    --editorial-subtle: #64748b;
+    --editorial-disabled: #cbd5e1;
 
-    /* Brand is the single accent — black */
-    --primary: var(--palette-brand);
+    /* Brand is the warm coral / orange accent */
+    --primary: #FF5722;
     --primary-foreground: #ffffff;
-    --editorial-primary-hover: var(--palette-brand-hover);
-    --editorial-primary-pressed: var(--palette-brand-dark);
-    --editorial-primary-light: var(--palette-soft);
-    --editorial-primary-selected: #f0f0f0;
-    --editorial-primary-ring: #a1a1a1;
+    --editorial-primary-hover: #F4511E;
+    --editorial-primary-pressed: #D84315;
+    --editorial-primary-light: rgba(255, 87, 34, 0.08);
+    --editorial-primary-selected: rgba(255, 87, 34, 0.14);
+    --editorial-primary-ring: rgba(255, 87, 34, 0.35);
 
-    --secondary: var(--palette-surface);
-    --secondary-foreground: var(--palette-text-dark);
-    --muted: var(--palette-surface);
-    --accent: var(--palette-soft);
-    --accent-foreground: var(--palette-text-dark);
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
 
     /* Borders */
-    --border: #e5e5e5;
-    --editorial-border-light: #ececec;
-    --input: #d4d4d4;
-    --ring: var(--palette-brand);
+    --border: #e2e8f0;
+    --editorial-border-light: #f1f5f9;
+    --input: #e2e8f0;
+    --ring: #FF5722;
 
-    /* Semantic — fully monochrome; strength maps to darkness */
-    --editorial-success: #3f3f3f;
-    --editorial-success-soft: #ededed;
-    --editorial-warning: #6b6b6b;
-    --editorial-warning-soft: #ebebeb;
-    --editorial-error: #2b2b2b;
-    --editorial-error-soft: #e9e9e9;
+    /* Semantic */
+    --editorial-success: #10b981;
+    --editorial-success-soft: rgba(16, 185, 129, 0.12);
+    --editorial-warning: #f59e0b;
+    --editorial-warning-soft: rgba(245, 158, 11, 0.12);
+    --editorial-error: #ef4444;
+    --editorial-error-soft: rgba(239, 68, 68, 0.12);
 
     /* Status */
-    --editorial-note: #ededed;
-    --editorial-purple: #525252;
-    --editorial-purple-light: #e8e8e8;
-    --editorial-blue: #4d4d4d;
+    --editorial-note: #f1f5f9;
+    --editorial-purple: #9333ea;
+    --editorial-purple-light: rgba(147, 51, 234, 0.08);
+    --editorial-blue: #2563eb;
 
-    /* Theme accents — distinct grays so any coding stays legible */
-    --editorial-matcha: #8a8a8a;
-    --editorial-slate: #4a4a4a;
-    --editorial-indigo: #5f5f5f;
-    --editorial-sandstone: #9c9c9c;
-    --editorial-mauve: #6e6e6e;
-    --editorial-mint: #3f3f3f;
+    /* Theme accents */
+    --editorial-matcha: #10b981;
+    --editorial-slate: #64748b;
+    --editorial-indigo: #6366f1;
+    --editorial-sandstone: #f59e0b;
+    --editorial-mauve: #ec4899;
+    --editorial-mint: #14b8a6;
 
     color: var(--foreground);
 
-    /* Ambient monochrome wash — soft, fixed to the viewport so it reads
-       as one continuous gradient even across nested editorial regions. */
+    /* Ambient soft pastel glow */
     background-image:
         radial-gradient(900px 620px at 12% -6%,
-            color-mix(in oklch, var(--foreground) 4.5%, transparent),
+            rgba(147, 51, 234, 0.03),
             transparent 55%),
         radial-gradient(1000px 720px at 104% 2%,
-            color-mix(in oklch, var(--foreground) 3.5%, transparent),
+            rgba(255, 87, 34, 0.03),
             transparent 60%);
     background-attachment: fixed;
     background-repeat: no-repeat;
 }
 
-/* Serif reserved for major headings only. */
+.dark .editorial,
+.dark.editorial,
+:root.dark .editorial {
+    /* Palette — Dark Studio */
+    --palette-background: #0c0c0f;
+    --palette-surface: #141418;
+    --palette-text-dark: #f4f4f5;
+    --palette-text: #a1a1aa;
+    --palette-muted: #71717a;
+    --palette-brand: #FF5722;
+    --palette-brand-hover: #F4511E;
+    --palette-brand-dark: #D84315;
+    --palette-soft: #27272a;
+
+    /* Surfaces */
+    --editorial-canvas: #0c0c0f;
+    --editorial-surface: #141418;
+    --background: #0c0c0f;
+    --card: #141418;
+    --card-foreground: #f4f4f5;
+    --popover: #18181c;
+    --popover-foreground: #f4f4f5;
+
+    /* Text */
+    --foreground: #f4f4f5;
+    --editorial-body: #a1a1aa;
+    --muted-foreground: #71717a;
+    --editorial-subtle: #71717a;
+    --editorial-disabled: #3f3f46;
+
+    /* Brand is the warm coral / orange accent */
+    --primary: #FF5722;
+    --primary-foreground: #ffffff;
+    --editorial-primary-hover: #F4511E;
+    --editorial-primary-pressed: #D84315;
+    --editorial-primary-light: rgba(255, 87, 34, 0.12);
+    --editorial-primary-selected: rgba(255, 87, 34, 0.18);
+    --editorial-primary-ring: rgba(255, 87, 34, 0.4);
+
+    --secondary: #1a1a20;
+    --secondary-foreground: #f4f4f5;
+    --muted: #1e1e24;
+    --accent: #27272a;
+    --accent-foreground: #f4f4f5;
+
+    /* Borders */
+    --border: #27272a;
+    --editorial-border-light: #222226;
+    --input: #27272a;
+    --ring: #FF5722;
+
+    /* Semantic */
+    --editorial-success: #10b981;
+    --editorial-success-soft: rgba(16, 185, 129, 0.15);
+    --editorial-warning: #f59e0b;
+    --editorial-warning-soft: rgba(245, 158, 11, 0.15);
+    --editorial-error: #ef4444;
+    --editorial-error-soft: rgba(239, 68, 68, 0.15);
+
+    /* Status */
+    --editorial-note: #27272a;
+    --editorial-purple: #c084fc;
+    --editorial-purple-light: rgba(192, 132, 252, 0.12);
+    --editorial-blue: #60a5fa;
+
+    /* Theme accents */
+    --editorial-matcha: #34d399;
+    --editorial-slate: #71717a;
+    --editorial-indigo: #818cf8;
+    --editorial-sandstone: #fbbf24;
+    --editorial-mauve: #f472b6;
+    --editorial-mint: #2dd4bf;
+
+    color: var(--foreground);
+
+    /* Ambient studio radiant wash: subtle neon purple & warm coral */
+    background-image:
+        radial-gradient(900px 620px at 12% -6%,
+            rgba(168, 85, 247, 0.08),
+            transparent 55%),
+        radial-gradient(1000px 720px at 104% 2%,
+            rgba(255, 87, 34, 0.06),
+            transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+/* Modern display headings — clean, tight geometric sans matching our dashboard & studio design */
 .font-display {
-    font-family: "Playfair Display", ui-serif, Georgia, "Times New Roman", serif;
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -0.01em;
-    font-optical-sizing: auto;
-    font-feature-settings: "liga" 1, "kern" 1, "ss01" 1;
-    font-variant-ligatures: contextual;
+    font-family: 'Plus Jakarta Sans Variable', 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

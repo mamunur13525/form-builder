@@ -44,7 +44,7 @@ const TEMPLATES: Template[] = [
         category: "General",
         pageCount: 4,
         icon: ClipboardList,
-        tint: "bg-[var(--editorial-primary-light)] text-[var(--primary)]",
+        tint: "bg-[#FF5722]/15 text-[#FF5722]",
         badge: "Everyday",
     },
     {
@@ -54,7 +54,7 @@ const TEMPLATES: Template[] = [
         category: "Research",
         pageCount: 6,
         icon: MessageSquareHeart,
-        tint: "bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
+        tint: "bg-violet-500/15 text-violet-400",
         badge: "Research",
     },
     {
@@ -64,7 +64,7 @@ const TEMPLATES: Template[] = [
         category: "Events",
         pageCount: 7,
         icon: CalendarCheck,
-        tint: "bg-[var(--editorial-blue)]/12 text-[var(--editorial-blue)]",
+        tint: "bg-sky-500/15 text-sky-400",
         badge: "Events",
     },
     {
@@ -74,7 +74,7 @@ const TEMPLATES: Template[] = [
         category: "Hiring",
         pageCount: 8,
         icon: Briefcase,
-        tint: "bg-[var(--editorial-success)]/12 text-[#4E7F62]",
+        tint: "bg-emerald-500/15 text-emerald-400",
         badge: "Hiring",
     },
     {
@@ -84,7 +84,7 @@ const TEMPLATES: Template[] = [
         category: "Research",
         pageCount: 10,
         icon: Users,
-        tint: "bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
+        tint: "bg-amber-500/15 text-amber-400",
         badge: "Research",
     },
     {
@@ -94,7 +94,7 @@ const TEMPLATES: Template[] = [
         category: "Education",
         pageCount: 6,
         icon: GraduationCap,
-        tint: "bg-[var(--editorial-blue)]/12 text-[var(--editorial-blue)]",
+        tint: "bg-rose-500/15 text-rose-400",
         badge: "Education",
     },
 ]
@@ -158,17 +158,17 @@ export function TemplatesPage() {
                 </div>
 
                 {/* Segmented control — inset track with a raised active item. */}
-                <div className="flex items-center gap-1 overflow-x-auto rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible">
+                <div className="flex items-center gap-1 overflow-x-auto rounded-[18px] border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible shadow-xs">
                     {CATEGORIES.map((item) => (
                         <button
                             key={item}
                             type="button"
                             onClick={() => setCategory(item)}
                             className={cn(
-                                "editorial-transition shrink-0 rounded-[13px] border px-4 py-2.5 text-sm font-medium",
+                                "editorial-transition shrink-0 rounded-[13px] border px-4 py-2 text-sm font-medium cursor-pointer",
                                 category === item
-                                    ? "border-[var(--editorial-border-light)] bg-[var(--card)] text-[var(--foreground)] shadow-[0_2px_8px_rgba(24,20,18,.06)]"
-                                    : "border-transparent text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]",
+                                    ? "border-[#FF5722]/30 bg-[#FF5722]/15 text-[#FF5722] font-semibold shadow-sm"
+                                    : "border-transparent text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800/60 hover:text-slate-900 dark:hover:text-zinc-100",
                             )}
                         >
                             {item}

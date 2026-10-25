@@ -35,31 +35,24 @@ import { cn } from "@/lib/utils"
  * type-specific widget files (choice/phone/rating/type-settings) so ad-hoc
  * controls stay pixel-identical to the primitives. */
 export const CONTROL_CLASS =
-    "editorial-transition h-[44px] rounded-[14px] border-[var(--input)] bg-[var(--secondary)] text-sm text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] focus-visible:border-[var(--ring)]"
+    "transition-colors h-[40px] rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
 
-/** Portalled surfaces escape the `.editorial` subtree, so they opt back in. */
-const OVERLAY_CLASS =
-    "editorial rounded-xl border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
-
-/**
- * Editorial button treatments, matching PublishDialog so confirmation prompts
- * and drawer footers read as the same product surface.
- */
+/** Portalled surfaces escape the container, so they get standard popover styling. */
+export const OVERLAY_CLASS =
+    "rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-900 dark:text-zinc-100 shadow-2xl p-1.5 z-50"
 
 /**
- * Segmented pill tabs: the list is an inset track, the active tab a raised
- * card. Keep `TabsList` on its default variant — the `line` variant forces
- * `data-active:bg-transparent` and would cancel the raised fill.
+ * Segmented pill tabs: the list is an inset track, the active tab a raised card.
  */
 export const TAB_LIST_CLASS =
-    "h-auto w-full gap-1 rounded-xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 text-[var(--editorial-body)] group-data-horizontal/tabs:h-auto"
+    "h-auto w-full gap-1 rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 p-1 text-slate-600 dark:text-zinc-400 group-data-horizontal/tabs:h-auto"
 
 export const TAB_TRIGGER_CLASS =
-    "editorial-transition flex-1 gap-2 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] data-active:border-[var(--editorial-border-light)] data-active:bg-[var(--card)] data-active:text-[var(--foreground)] data-active:shadow-[0_2px_8px_rgba(24,20,18,.06)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:outline-none cursor-pointer"
+    "transition-all flex-1 gap-2 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white data-active:border-slate-200 dark:data-active:border-zinc-700 data-active:bg-white dark:data-active:bg-[#1e1e24] data-active:text-slate-900 dark:data-active:text-white data-active:shadow-xs focus-visible:outline-none cursor-pointer"
 
-const PAGE_LABEL_CLASS = "text-sm font-medium text-[var(--editorial-body)]"
+const PAGE_LABEL_CLASS = "text-xs font-medium text-slate-700 dark:text-zinc-400"
 
-const HINT_CLASS = "text-xs leading-5 text-[var(--editorial-subtle)]"
+const HINT_CLASS = "text-xs leading-4 text-slate-500 dark:text-zinc-500"
 
 /** A label + control + optional hint stack, used by every page below. */
 function Page({
@@ -86,29 +79,32 @@ function Page({
     )
 }
 
-/** A labeled settings section with an optional description. */
+/** A labeled settings section with an optional description and icon. */
 export function SettingsSection({
     title,
     description,
     children,
     className,
+    icon,
 }: {
     title: string
     description?: string
     children?: ReactNode
     className?: string
+    icon?: ReactNode
 }) {
     return (
-        <div className={cn("space-y-4", className)}>
-            {/* An empty title renders a bare group: the fields keep the shared
-                spacing without an (empty) section heading above them. */}
+        <div className={cn("space-y-3.5", className)}>
             {title && (
-                <div className="space-y-1.5">
-                    <Label className="text-[15px] font-medium text-[var(--foreground)]">
-                        {title}
-                    </Label>
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                        {icon}
+                        <Label className="text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                            {title}
+                        </Label>
+                    </div>
                     {description && (
-                        <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                        <p className="text-xs leading-4 text-slate-500 dark:text-zinc-500">
                             {description}
                         </p>
                     )}
@@ -142,7 +138,7 @@ export function ToggleRow({
                     {icon}
                     <Label
                         htmlFor={id}
-                        className="cursor-pointer text-base text-[var(--editorial-body)]"
+                        className="cursor-pointer text-sm font-medium text-slate-800 dark:text-zinc-200"
                     >
                         {label}
                     </Label>
@@ -151,10 +147,11 @@ export function ToggleRow({
                     id={id}
                     checked={checked}
                     onCheckedChange={onCheckedChange}
+                    className="data-checked:bg-[#FF5722] data-checked:border-[#FF5722]"
                 />
             </div>
             {description && (
-                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                <p className="text-xs leading-5 text-slate-500 dark:text-zinc-500">
                     {description}
                 </p>
             )}
@@ -179,7 +176,7 @@ export function RequiredToggle({
             description={description}
             checked={checked}
             onCheckedChange={onCheckedChange}
-            icon={<Asterisk className="h-4 w-4 text-[var(--primary)]" />}
+            icon={<Asterisk className="h-4 w-4 text-[#FF5722]" />}
         />
     )
 }
@@ -230,31 +227,40 @@ export function NumberSetting({
     )
 }
 
-/** A labeled text input. */
+/** A labeled text input with optional leading icon. */
 export function TextSetting({
     label,
     description,
     value,
     onChange,
     placeholder,
+    icon,
 }: {
-    label: string
+    label?: string
     description?: string
     value: string
     onChange: (value: string) => void
     placeholder?: string
+    icon?: ReactNode
 }) {
     return (
         <div className="space-y-1.5">
-            <Label className="block text-[15px] text-[var(--editorial-body)]">{label}</Label>
-            <Input
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-                className={cn(CONTROL_CLASS, "px-4")}
-            />
+            {label && <Label className="block text-xs font-medium text-slate-600 dark:text-zinc-400">{label}</Label>}
+            <div className="relative flex items-center">
+                {icon && (
+                    <div className="pointer-events-none absolute left-3 flex items-center text-slate-400 dark:text-zinc-500">
+                        {icon}
+                    </div>
+                )}
+                <Input
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder={placeholder}
+                    className={cn(CONTROL_CLASS, icon ? "pl-9" : "px-3.5")}
+                />
+            </div>
             {description && (
-                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                <p className="text-xs leading-4 text-slate-500 dark:text-zinc-500">
                     {description}
                 </p>
             )}
@@ -297,16 +303,17 @@ export function SelectSetting<T extends string>({
                     onChange(next)
                 }}
             >
-                <SelectTrigger className={cn(CONTROL_CLASS, "w-full")}>
-                    <SelectValue placeholder={placeholder ?? `Select ${label}`} />
+                <SelectTrigger className={cn(CONTROL_CLASS, "w-full text-slate-900 dark:text-zinc-100 [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500")}>
+                    <SelectValue placeholder={placeholder ?? `Select ${label}`} className="text-slate-900 dark:text-zinc-100 font-medium" />
                 </SelectTrigger>
                 <SelectContent className={OVERLAY_CLASS}>
                     {options.map((option) => (
                         <SelectItem
                             key={option.value}
                             value={option.value}
+                            className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-slate-700 dark:text-zinc-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 focus:bg-slate-100 dark:focus:bg-zinc-800 focus:text-slate-900 dark:focus:text-white"
                         >
-                            {option.label}
+                            <span className="text-slate-800 dark:text-zinc-100 font-medium">{option.label}</span>
                         </SelectItem>
                     ))}
                 </SelectContent>
@@ -357,7 +364,7 @@ export function IconChoiceSetting<T extends string>({
                     onChange(next as T)
                 }}
                 aria-label={label}
-                className="gap-1 rounded-[16px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5"
+                className="gap-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/90 p-1"
                 style={{
                     gridTemplateColumns: `repeat(${columns ?? options.length}, minmax(0, 1fr))`,
                 }}
@@ -370,16 +377,14 @@ export function IconChoiceSetting<T extends string>({
                             value={option.value}
                             title={option.title ?? option.label}
                             className={cn(
-                                "editorial-transition text-[var(--editorial-subtle)] gap-1",
-                                "hover:bg-[var(--card)]/60 hover:text-[var(--foreground)]",
-                                "data-checked:border-[var(--editorial-border-light)] data-checked:bg-[var(--card)]",
-                                "data-checked:text-[var(--foreground)] data-checked:shadow-[0_2px_8px_rgba(24,20,18,.06)]",
-                                "data-checked:[&>:first-child]:text-[var(--primary)]"
+                                "flex flex-col items-center justify-center gap-1.5 rounded-lg py-2.5 px-1 text-slate-600 dark:text-zinc-400 transition-all cursor-pointer",
+                                "hover:bg-slate-200/70 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-zinc-200",
+                                "data-checked:border data-checked:border-slate-300/80 dark:data-checked:border-zinc-700 data-checked:bg-white dark:data-checked:bg-zinc-800 data-checked:text-[#FF5722] data-checked:shadow-xs font-semibold"
                             )}
                         >
-                            <Icon className="h-[24px] w-[24px]" />
+                            <Icon className="h-5 w-5" />
                             {!hideLabels && (
-                                <span className="w-full text-xs truncate text-center">{option.label}</span>
+                                <span className="w-full text-xs truncate text-center font-medium">{option.label}</span>
                             )}
                         </RadioGroupCard>
                     )
@@ -438,16 +443,15 @@ export function ColorSetting({
     const current = value || fallback
     return (
         <Page label={label} className="flex items-center justify-between">
-
             <div className="flex items-center ml-2">
                 <Input
                     type="text"
                     value={current}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={fallback}
-                    className={cn(CONTROL_CLASS, "font-mono uppercase w-24 border-r-transparent rounded-r-none")}
+                    className={cn(CONTROL_CLASS, "font-mono uppercase w-24 border-r-transparent rounded-r-none text-slate-900 dark:text-zinc-100")}
                 />
-                <span className="editorial-transition relative h-[44px] w-[44px] shrink-0 overflow-hidden rounded-[14px] rounded-l-none border border-l-transparent border-[var(--input)] bg-[var(--secondary)] p-1 hover:border-[var(--editorial-primary-ring)]">
+                <span className="relative h-[40px] w-[40px] shrink-0 overflow-hidden rounded-xl rounded-l-none border border-l-transparent border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] p-1 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors">
                     <input
                         type="color"
                         aria-label={label}
@@ -457,11 +461,10 @@ export function ColorSetting({
                     />
                     <span
                         aria-hidden
-                        className="block h-full w-full rounded-[10px] border border-[var(--editorial-border-light)]"
+                        className="block h-full w-full rounded-lg border border-black/10 dark:border-white/10 shadow-inner"
                         style={{ backgroundColor: current }}
                     />
                 </span>
-
             </div>
         </Page>
     )
@@ -485,14 +488,9 @@ export function RangeSetting({
 }) {
     return (
         <div className="space-y-1.5">
-            <div
-                className={cn(
-                    "flex items-center justify-between",
-                    PAGE_LABEL_CLASS
-                )}
-            >
+            <div className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-zinc-400">
                 <span>{label}</span>
-                <span className="tabular-nums text-[var(--editorial-subtle)]">
+                <span className="tabular-nums font-semibold text-slate-900 dark:text-zinc-200">
                     {value}
                 </span>
             </div>
@@ -504,7 +502,7 @@ export function RangeSetting({
                 step={step}
                 value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-full border border-[var(--editorial-border-light)] bg-[var(--muted)] accent-[var(--primary)]"
+                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 dark:bg-zinc-800 accent-[#FF5722]"
             />
         </div>
     )
@@ -543,33 +541,33 @@ export function ConfirmPopover({
         <Popover open={open} onOpenChange={onOpenChange}>
             <PopoverTrigger render={trigger} />
             <PopoverContent
-                className={cn(OVERLAY_CLASS, "editorial-shadow-md w-80")}
+                className={cn(OVERLAY_CLASS, "w-80 p-4 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-900 dark:text-zinc-100 shadow-xl")}
                 align={align}
                 side="top"
                 sideOffset={16}
             >
                 <PopoverHeader>
-                    <PopoverTitle className="text-[var(--foreground)]">{title}</PopoverTitle>
-                    <PopoverDescription className="text-[var(--editorial-body)]">
+                    <PopoverTitle className="text-sm font-semibold text-slate-900 dark:text-white">{title}</PopoverTitle>
+                    <PopoverDescription className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
                         {description}
                     </PopoverDescription>
                 </PopoverHeader>
                 <div className="mt-4 flex justify-end gap-2">
                     <Button
                         variant="outline"
-                        size="lg"
-                        className="editorial-transition h-11 gap-2 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-6 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
+                        size="sm"
+                        className="h-9 rounded-xl border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 px-4 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white shadow-xs cursor-pointer"
                         onClick={() => onOpenChange(false)}
                     >
                         {cancelLabel}
                     </Button>
                     <Button
-                        size="lg"
+                        size="sm"
                         onClick={onConfirm}
                         disabled={confirmDisabled}
                         className={destructive ?
-                            "editorial-transition h-11 gap-2 rounded-[16px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-6 text-sm font-medium text-[var(--destructive)] hover:-translate-y-0.5 hover:bg-[var(--destructive)]/16 active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
-                            : "editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-[var(--primary-foreground)] hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"}
+                            "h-9 rounded-xl bg-red-600 hover:bg-red-700 px-4 text-xs font-medium text-white shadow-xs cursor-pointer transition-colors"
+                            : "h-9 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] px-4 text-xs font-medium text-white shadow-xs cursor-pointer transition-colors"}
                     >
                         {confirmLabel}
                     </Button>
@@ -618,24 +616,24 @@ export function CoverImagePage({
             />
             {value?.url ? (
                 <div className="space-y-3">
-                    <div className="relative overflow-hidden rounded-xl border border-[var(--editorial-border-light)]">
+                    <div className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-xs">
                         <img
                             src={value.url}
                             alt={value.alt || "Cover"}
                             className="h-28 w-full object-cover"
                         />
                         {uploading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-[var(--card)]/70">
-                                <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-[#141418]/70">
+                                <Loader2 className="h-5 w-5 animate-spin text-[#FF5722]" />
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                         <button
                             type="button"
                             onClick={() => inputRef.current?.click()}
                             disabled={uploading}
-                            className="editorial-transition flex-1 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
+                            className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                         >
                             Replace
                         </button>
@@ -643,9 +641,9 @@ export function CoverImagePage({
                             type="button"
                             onClick={() => onChange(null)}
                             disabled={uploading}
-                            className="editorial-transition flex items-center justify-center gap-1.5 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--destructive)] hover:-translate-y-0.5 hover:border-[var(--destructive)]/30 active:translate-y-0 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50"
+                            className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                         >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3.5 w-3.5" />
                             Remove
                         </button>
                     </div>
@@ -655,14 +653,21 @@ export function CoverImagePage({
                     type="button"
                     onClick={() => inputRef.current?.click()}
                     disabled={uploading}
-                    className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-50"
+                    className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group disabled:pointer-events-none disabled:opacity-50"
                 >
-                    {uploading ? (
-                        <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />
-                    ) : (
-                        <ImagePlus className="h-5 w-5" />
-                    )}
-                    <span>{uploading ? "Uploading..." : "Add a cover image"}</span>
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
+                        {uploading ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                            <ImagePlus className="h-5 w-5" />
+                        )}
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-slate-800 dark:text-zinc-200">
+                        {uploading ? "Uploading..." : "Add a cover image or drag & drop"}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-zinc-500">
+                        JPG, PNG, SVG • Max 5MB
+                    </p>
                 </button>
             )}
         </SettingsSection>

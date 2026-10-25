@@ -22,7 +22,6 @@ import { TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "../FormBuilder/components/set
 import { PublishDialog } from "../FormBuilder/components/PublishDialog"
 import { useFormContext } from "@/features/forms/hooks/useFormContext"
 import { cn } from "@/lib/utils"
-import { Alert } from "@/components/ui/alert"
 import { showWarning } from "@/shared/hooks/useToast"
 
 /* -------------------------------------------------------------------------- */
@@ -104,42 +103,42 @@ export function FormSharePage() {
             key: "open",
             label: "Open form",
             icon: ExternalLink,
-            hover: "hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]",
+            hover: "hover:border-[#FF5722]/60 hover:text-[#FF5722] hover:bg-[#FF5722]/5",
             action: () => window.open(formUrl, "_blank", "noopener,noreferrer"),
         },
         {
             key: "x",
             label: "Share on X",
             icon: XIcon,
-            hover: "hover:border-[#111]/25 hover:bg-[#111]/5 hover:text-[#111]",
+            hover: "hover:border-slate-400 dark:hover:border-zinc-500 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white",
             action: () => openWindow(`https://twitter.com/intent/tweet?url=${enc(formUrl)}&text=${enc(shareText)}`),
         },
         {
             key: "facebook",
             label: "Share on Facebook",
             icon: FacebookIcon,
-            hover: "hover:border-[#1877F2]/30 hover:bg-[#1877F2]/8 hover:text-[#1877F2]",
+            hover: "hover:border-[#1877F2]/60 hover:bg-[#1877F2]/10 hover:text-[#1877F2]",
             action: () => openWindow(`https://www.facebook.com/sharer/sharer.php?u=${enc(formUrl)}`),
         },
         {
             key: "linkedin",
             label: "Share on LinkedIn",
             icon: LinkedInIcon,
-            hover: "hover:border-[#0A66C2]/30 hover:bg-[#0A66C2]/8 hover:text-[#0A66C2]",
+            hover: "hover:border-[#0A66C2]/60 hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]",
             action: () => openWindow(`https://www.linkedin.com/sharing/share-offsite/?url=${enc(formUrl)}`),
         },
         {
             key: "whatsapp",
             label: "Share on WhatsApp",
             icon: WhatsAppIcon,
-            hover: "hover:border-[#25D366]/35 hover:bg-[#25D366]/10 hover:text-[#25D366]",
+            hover: "hover:border-[#25D366]/60 hover:bg-[#25D366]/10 hover:text-[#25D366]",
             action: () => openWindow(`https://wa.me/?text=${enc(`${shareText} ${formUrl}`)}`),
         },
         {
             key: "email",
             label: "Share via email",
             icon: Mail,
-            hover: "hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]",
+            hover: "hover:border-[#FF5722]/60 hover:bg-[#FF5722]/10 hover:text-[#FF5722]",
             action: () => {
                 window.location.href = `mailto:?subject=${enc(shareText)}&body=${enc(`${shareText}:\n${formUrl}`)}`
             },
@@ -148,7 +147,7 @@ export function FormSharePage() {
             key: "qr",
             label: "Show QR code",
             icon: QrCode,
-            hover: "hover:border-[var(--editorial-purple)]/40 hover:bg-[var(--editorial-purple-light)] hover:text-[var(--editorial-purple)]",
+            hover: "hover:border-[#FF5722]/60 hover:bg-[#FF5722]/10 hover:text-[#FF5722]",
             action: () => {
                 setQrLoaded(false)
                 setQrOpen(true)
@@ -182,27 +181,26 @@ export function FormSharePage() {
     return (
         <div className="editorial mx-auto max-w-[1160px] space-y-5 px-4 pt-6 pb-12 sm:space-y-6 sm:px-6 sm:pt-10 lg:px-8 lg:pb-16">
             {hasUnpublishedChanges && (
-                <Alert
-                    variant={"destructive"}
-                    className="flex flex-col items-start gap-2 rounded-xl sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                <div
+                    className="flex flex-col items-start justify-between gap-3 rounded-xl border border-[#FF5722]/30 bg-[#FF5722]/10 p-4 sm:flex-row sm:items-center sm:gap-4"
                 >
                     <div className="flex items-center gap-2.5 sm:gap-3">
-                        <Info className="h-5 w-5 shrink-0 text-[var(--editorial-purple)]" />
-                        <p className="text-sm text-[var(--foreground)] sm:text-base">
+                        <Info className="h-5 w-5 shrink-0 text-[#FF5722]" />
+                        <p className="text-sm text-slate-800 dark:text-zinc-200 sm:text-base">
                             You have some unpublished changes.
                         </p>
                     </div>
                     <Button
                         variant="link"
                         onClick={() => setShowPublishDialog(true)}
-                        className="h-auto shrink-0 p-0 text-sm font-medium text-[var(--editorial-purple)] sm:text-base cursor-pointer"
+                        className="h-auto shrink-0 p-0 text-sm font-semibold text-[#FF5722] hover:text-[#FF7043] sm:text-base cursor-pointer"
                     >
                         Publish Now →
                     </Button>
-                </Alert>
+                </div>
             )}
 
-            <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
+            <Card className="editorial-shadow-sm rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
                 <CardContent className="p-5 sm:p-8">
                     <Tabs defaultValue="share" className="w-full">
                         <TabsList className={cn(TAB_LIST_CLASS, "mb-6 sm:mb-8")}>
@@ -239,25 +237,25 @@ export function FormSharePage() {
                                         value={formUrl}
                                         readOnly
                                         onFocus={(e) => e.currentTarget.select()}
-                                        className=" flex-1 rounded-lg border-[var(--input)] bg-[var(--secondary)] px-4 text-center text-sm sm:px-6 sm:text-base"
+                                        className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 text-center text-sm sm:px-6 sm:text-base text-slate-800 dark:text-zinc-100"
                                     />
                                     <Button
                                         size="lg"
                                         onClick={() => copy("link", formUrl)}
-                                        className="rounded-lg shrink-0 justify-center"
+                                        className="rounded-xl shrink-0 justify-center"
                                     >
                                         {copiedKey === "link" ? <Check className="h-4! w-4!" /> : <Copy className="h-4! w-4!" />}
                                         {copiedKey === "link" ? "Copied" : "Copy Link"}
                                     </Button>
                                 </div>
-                                <p className="mt-3 text-xs leading-5 text-[var(--editorial-subtle)] sm:text-sm">
+                                <p className="mt-3 text-xs leading-5 text-slate-500 dark:text-zinc-400 sm:text-sm">
                                     Make sure your form is published before you share it to the world.
                                 </p>
 
                                 <div className="mt-6 flex w-full items-center gap-4 sm:mt-8">
-                                    <span className="h-px flex-1 bg-[var(--editorial-border-light)]" />
-                                    <p className="text-xs font-medium text-[var(--editorial-subtle)] sm:text-sm">Share on</p>
-                                    <span className="h-px flex-1 bg-[var(--editorial-border-light)]" />
+                                    <span className="h-px flex-1 bg-slate-200 dark:bg-zinc-800" />
+                                    <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 sm:text-sm">Share on</p>
+                                    <span className="h-px flex-1 bg-slate-200 dark:bg-zinc-800" />
                                 </div>
 
                                 <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 sm:mt-6">
@@ -271,7 +269,7 @@ export function FormSharePage() {
                                             title={label}
                                             onClick={action}
                                             className={cn(
-                                                "editorial-transition rounded-xl text-[var(--editorial-body)]",
+                                                "editorial-transition rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-700 dark:text-zinc-300 shadow-xs",
                                                 hover,
                                             )}
                                         >
@@ -284,10 +282,10 @@ export function FormSharePage() {
 
                         <TabsContent value="website">
                             <div className="mx-auto flex max-w-xl flex-col items-center text-center">
-                                <p className="text-sm text-[var(--editorial-body)] sm:text-base">
+                                <p className="text-sm text-slate-700 dark:text-zinc-300 sm:text-base">
                                     Paste this snippet into your site's HTML to embed the form inline.
                                 </p>
-                                <pre className="mt-4 w-full overflow-x-auto rounded-lg border border-[var(--input)] bg-[var(--secondary)] px-4 py-3.5 text-left text-xs text-[var(--foreground)] sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
+                                <pre className="mt-4 w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 py-3.5 text-left text-xs text-slate-800 dark:text-zinc-100 sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
                                     <code>{iframeCode}</code>
                                 </pre>
                                 <Button
@@ -303,10 +301,10 @@ export function FormSharePage() {
 
                         <TabsContent value="email">
                             <div className="mx-auto flex max-w-xl flex-col items-center text-center">
-                                <p className="text-sm text-[var(--editorial-body)] sm:text-base">
+                                <p className="text-sm text-slate-700 dark:text-zinc-300 sm:text-base">
                                     Add this button link to an email so recipients can open the form.
                                 </p>
-                                <pre className="mt-4 w-full overflow-x-auto rounded-lg border border-[var(--input)] bg-[var(--secondary)] px-4 py-3.5 text-left text-xs text-[var(--foreground)] sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
+                                <pre className="mt-4 w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 py-3.5 text-left text-xs text-slate-800 dark:text-zinc-100 sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
                                     <code>{emailCode}</code>
                                 </pre>
                                 <Button
@@ -323,13 +321,13 @@ export function FormSharePage() {
                 </CardContent>
             </Card>
 
-            <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
+            <Card className="editorial-shadow-sm rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
                 <CardHeader className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-8">
                     <div>
-                        <CardTitle className="font-display text-xl text-[var(--foreground)] sm:text-2xl">
+                        <CardTitle className="font-display text-xl text-slate-900 dark:text-white sm:text-2xl">
                             Link Settings
                         </CardTitle>
-                        <CardDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
+                        <CardDescription className="mt-2 text-sm leading-6 text-slate-600 dark:text-zinc-400 sm:text-base">
                             Update the form title, share image, and favicon that appear when this link is opened or shared.
                         </CardDescription>
                     </div>
@@ -341,17 +339,17 @@ export function FormSharePage() {
                 </CardHeader>
             </Card>
 
-            <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
+            <Card className="editorial-shadow-sm rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
                 <CardHeader className="flex flex-col items-start justify-between p-5 sm:flex-row sm:items-center sm:p-8"
                 onClick={()=> showWarning("Feature not available yet. Please check back later.")}>
                     <div>
-                        <CardTitle className="flex flex-wrap items-center gap-2 font-display text-xl text-[var(--foreground)] sm:gap-3 sm:text-2xl">
+                        <CardTitle className="flex flex-wrap items-center gap-2 font-display text-xl text-slate-900 dark:text-white sm:gap-3 sm:text-2xl">
                             Custom Domain
-                            <Badge className="rounded-full border border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--editorial-purple)] sm:px-3 sm:py-1 sm:text-[12px]">
+                            <Badge className="rounded-full border border-[#FF5722]/30 bg-[#FF5722]/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#FF5722] sm:px-3 sm:py-1 sm:text-[12px]">
                                 PRO
                             </Badge>
                         </CardTitle>
-                        <CardDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
+                        <CardDescription className="mt-2 text-sm leading-6 text-slate-600 dark:text-zinc-400 sm:text-base">
                             Please buy a PRO plan to add your own custom domain.
                         </CardDescription>
                     </div>
@@ -361,7 +359,7 @@ export function FormSharePage() {
             <Dialog
                 open={qrOpen}
                 onOpenChange={setQrOpen}
-                className="editorial editorial-shadow-md w-[calc(100%-2rem)] max-w-md rounded-2xl border-[var(--border)] bg-[var(--popover)] p-5 sm:p-8"
+                className="editorial editorial-shadow-md w-[calc(100%-2rem)] max-w-md rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] p-5 sm:p-8 text-slate-900 dark:text-zinc-100"
             >
                 <button
                     type="button"

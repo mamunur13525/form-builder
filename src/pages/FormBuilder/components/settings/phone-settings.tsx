@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 import { COUNTRIES, type Country } from "@/shared/constants/countries"
 import type { PhoneSettings as PhoneSettingsType } from "@/shared/types/common"
-import { ToggleRow, CONTROL_CLASS } from "./primitives"
+import { ToggleRow, CONTROL_CLASS, OVERLAY_CLASS } from "./primitives"
 
 /** Phone settings: verification + country code mode + specific country picker. */
 export function PhoneSettingsWidget({
@@ -23,8 +23,8 @@ export function PhoneSettingsWidget({
             />
 
             <div className="space-y-1.5">
-                <Label className="text-base text-[var(--editorial-body)]">Default country code</Label>
-                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                <Label className="text-sm font-medium text-zinc-200">Default country code</Label>
+                <p className="text-xs leading-5 text-zinc-400">
                     We'll auto-select the country code from the respondent's country. They can
                     still change it before submitting.
                 </p>
@@ -33,10 +33,10 @@ export function PhoneSettingsWidget({
                     <button
                         type="button"
                         onClick={() => onChange({ ...settings, countryCodeMode: "auto" })}
-                        className={`editorial-transition flex h-[44px] flex-1 items-center justify-center rounded-[12px] border px-4 text-sm ${
+                        className={`flex h-[40px] flex-1 items-center justify-center rounded-xl border px-4 text-xs font-medium transition-all cursor-pointer ${
                             settings.countryCodeMode === "auto"
-                                ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] font-medium text-[var(--foreground)]"
-                                : "border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                                ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
+                                : "border-zinc-800 bg-[#1a1a20] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
                         }`}
                     >
                         Auto-detect
@@ -54,10 +54,10 @@ export function PhoneSettingsWidget({
                                 },
                             })
                         }
-                        className={`editorial-transition flex h-[44px] flex-1 items-center justify-center rounded-[12px] border px-4 text-sm ${
+                        className={`flex h-[40px] flex-1 items-center justify-center rounded-xl border px-4 text-xs font-medium transition-all cursor-pointer ${
                             settings.countryCodeMode === "specific"
-                                ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] font-medium text-[var(--foreground)]"
-                                : "border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                                ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
+                                : "border-zinc-800 bg-[#1a1a20] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
                         }`}
                     >
                         Specific
@@ -100,17 +100,21 @@ function CountrySelect({
                 if (country) onChange(country)
             }}
         >
-            <SelectTrigger className={CONTROL_CLASS + " w-full"}>
+            <SelectTrigger className={CONTROL_CLASS + " w-full [&>svg:last-child]:text-zinc-400"}>
                 <SelectValue placeholder="Select a country" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={OVERLAY_CLASS}>
                 {COUNTRIES.map((country) => (
-                    <SelectItem key={country.iso2} value={country.iso2}>
+                    <SelectItem
+                        key={country.iso2}
+                        value={country.iso2}
+                        className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                    >
                         <span className="flex items-center gap-2">
-                            <span className="w-16 shrink-0 text-[var(--editorial-subtle)]">
+                            <span className="w-16 shrink-0 text-zinc-500 font-normal">
                                 {country.dialCode}
                             </span>
-                            {country.name}
+                            <span className="text-zinc-200 font-medium">{country.name}</span>
                         </span>
                     </SelectItem>
                 ))}

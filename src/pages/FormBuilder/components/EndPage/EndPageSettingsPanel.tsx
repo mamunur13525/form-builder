@@ -7,7 +7,8 @@ import {
     ImagePlus,
     Trash2,
     Palette,
-    SlidersHorizontal,
+    Layers,
+    Settings as SettingsIcon,
 } from "lucide-react"
 import type {
     EndPage,
@@ -22,10 +23,8 @@ import {
     InputSetting,
     IconChoiceSetting,
     ToggleRow,
-    TAB_LIST_CLASS,
-    TAB_TRIGGER_CLASS,
 } from "../settings/primitives"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { ImagePickerDialog } from "../settings/ImagePickerDialog"
 
 interface EndPageSettingsPanelProps {
@@ -73,36 +72,35 @@ export function EndPageSettingsPanel({
         patch({ embed: { ...(endPage.embed ?? { url: "" }), ...e } })
 
     return (
-        <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden bg-[var(--card)] border-l border-[var(--border)]">
-            <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
-                {/* Pill tabs, matching the page settings panel: the list is the
-                    track, the active tab a raised card. */}
-                <div className="px-6 pt-5">
-                    <TabsList className={TAB_LIST_CLASS}>
-                        {/* Same treatment as the page SettingsPanel: the
-                            Settings tab is the only real tab (always active)
-                            and Design is a lookalike action button that opens
-                            the shared overlay drawer. */}
-                        <TabsTrigger value="settings" className={TAB_TRIGGER_CLASS}>
-                            <SlidersHorizontal className="h-4 w-4" />
-                            Settings
-                        </TabsTrigger>
-                        <button
-                            type="button"
-                            onClick={onOpenDesignDrawer}
-                            className={
-                                "inline-flex items-center justify-center whitespace-nowrap " +
-                                TAB_TRIGGER_CLASS
-                            }
-                        >
-                            <Palette className="h-4 w-4" />
-                            Design
-                        </button>
-                    </TabsList>
-                </div>
+        <div className="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-[#141418] border-l border-slate-200/90 dark:border-zinc-800/90 text-slate-800 dark:text-zinc-100">
+            {/* Header: Page settings */}
+            <div className="flex items-center gap-2 px-6 pt-5 pb-2">
+                <Layers className="h-5 w-5 text-slate-900 dark:text-white" />
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Page settings</h3>
+            </div>
 
-                <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
-                    <div className="space-y-8 px-6 py-6">
+            <div className="flex flex-1 min-h-0 flex-col">
+                <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
+                    {/* Pill tabs: Settings (active) | Design */}
+                    <div className="px-6 py-2">
+                        <div className="flex rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1">
+                            <div className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#1e1e24] py-2 text-sm font-medium text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-zinc-700/60">
+                                <SettingsIcon className="h-4 w-4 text-[#FF5722]" />
+                                Settings
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onOpenDesignDrawer}
+                                className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                            >
+                                <Palette className="h-4 w-4 text-slate-400 dark:text-zinc-400" />
+                                Design
+                            </button>
+                        </div>
+                    </div>
+
+                    <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
+                        <div className="space-y-6 px-6 py-4">
                     {/* Alignment */}
                     <SettingsSection title="Alignment">
                         <IconChoiceSetting<ContentAlignment>
@@ -193,40 +191,46 @@ export function EndPageSettingsPanel({
                     <SettingsSection title="Cover image">
                         {endPage.coverImage?.url ? (
                             <div className="space-y-3">
-                                <div className="relative overflow-hidden rounded-[22px] border border-[var(--editorial-border-light)]">
+                                <div className="relative overflow-hidden rounded-2xl border border-zinc-800 shadow-xs">
                                     <img
                                         src={endPage.coverImage.url}
                                         alt={endPage.coverImage.alt || "Cover"}
                                         className="h-28 w-full object-cover"
                                     />
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                     <button
                                         type="button"
                                         onClick={() => setCoverDialogOpen(true)}
-                                        className="editorial-transition flex-1 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                                        className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     >
                                         Replace
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => patch({ coverImage: null })}
-                                        className="editorial-transition flex items-center justify-center gap-1.5 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--destructive)] hover:-translate-y-0.5 hover:border-[var(--destructive)]/30 active:translate-y-0 active:scale-[.98]"
+                                        className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                                     >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="h-3.5 w-3.5" />
                                         Remove
                                     </button>
                                 </div>
                             </div>
                         ) : (
-                            <button
-                                type="button"
+                            <div
                                 onClick={() => setCoverDialogOpen(true)}
-                                className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]"
+                                className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group"
                             >
-                                <ImagePlus className="h-5 w-5" />
-                                <span>Add a cover image</span>
-                            </button>
+                                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
+                                    <ImagePlus className="h-5 w-5" />
+                                </div>
+                                <p className="mt-3 text-sm font-medium text-slate-800 dark:text-zinc-200">
+                                    Add a cover image or drag & drop
+                                </p>
+                                <p className="mt-1 text-xs text-slate-500 dark:text-zinc-500">
+                                    JPG, PNG, SVG • Max 5MB
+                                </p>
+                            </div>
                         )}
                     </SettingsSection>
 
@@ -248,8 +252,9 @@ export function EndPageSettingsPanel({
                     </div>
                 </TabsContent>
             </Tabs>
+        </div>
 
-            <ImagePickerDialog
+        <ImagePickerDialog
                 open={coverDialogOpen}
                 onOpenChange={setCoverDialogOpen}
                 onSelect={(coverImage) => patch({ coverImage })}

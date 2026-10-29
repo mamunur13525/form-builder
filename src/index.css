@@ -4,7 +4,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *):not(:where(.light, .light *)));
 
 @theme inline {
     --font-heading: 'Plus Jakarta Sans Variable', 'Inter Variable', sans-serif;
@@ -116,6 +116,43 @@
     --sidebar-accent-foreground: #f4f4f5;
     --sidebar-border: #27272a;
     --sidebar-ring: #FF5722;
+}
+
+.light,
+.dark .light,
+:root.dark .light {
+    --background: #ffffff;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --primary: #FF5722;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
+    --destructive: #ef4444;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #FF5722;
+    --chart-1: #FF5722;
+    --chart-2: #818cf8;
+    --chart-3: #34d399;
+    --chart-4: #f59e0b;
+    --chart-5: #ec4899;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #0f172a;
+    --sidebar-primary: #FF5722;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #f1f5f9;
+    --sidebar-accent-foreground: #0f172a;
+    --sidebar-border: #e2e8f0;
+    --sidebar-ring: #FF5722;
+    color-scheme: light;
 }
 
 @layer base {
@@ -354,6 +391,78 @@
             transparent 60%);
     background-attachment: fixed;
     background-repeat: no-repeat;
+}
+
+.light.editorial,
+.light .editorial,
+.dark .light.editorial,
+.dark .light .editorial,
+:root.dark .light.editorial,
+:root.dark .light .editorial {
+    --palette-background: #ffffff;
+    --palette-surface: #f8fafc;
+    --palette-text-dark: #0f172a;
+    --palette-text: #475569;
+    --palette-muted: #64748b;
+    --palette-brand: #FF5722;
+    --palette-brand-hover: #F4511E;
+    --palette-brand-dark: #D84315;
+    --palette-soft: #f1f5f9;
+
+    --editorial-canvas: #f4f6fb;
+    --editorial-surface: #ffffff;
+    --background: #ffffff;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+
+    --foreground: #0f172a;
+    --editorial-body: #475569;
+    --muted-foreground: #64748b;
+    --editorial-subtle: #64748b;
+    --editorial-disabled: #cbd5e1;
+
+    --primary: #FF5722;
+    --primary-foreground: #ffffff;
+    --editorial-primary-hover: #F4511E;
+    --editorial-primary-pressed: #D84315;
+    --editorial-primary-light: rgba(255, 87, 34, 0.08);
+    --editorial-primary-selected: rgba(255, 87, 34, 0.14);
+    --editorial-primary-ring: rgba(255, 87, 34, 0.35);
+
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
+
+    --border: #e2e8f0;
+    --editorial-border-light: #f1f5f9;
+    --input: #e2e8f0;
+    --ring: #FF5722;
+
+    --editorial-success: #10b981;
+    --editorial-success-soft: rgba(16, 185, 129, 0.12);
+    --editorial-warning: #f59e0b;
+    --editorial-warning-soft: rgba(245, 158, 11, 0.12);
+    --editorial-error: #ef4444;
+    --editorial-error-soft: rgba(239, 68, 68, 0.12);
+
+    --editorial-note: #f1f5f9;
+    --editorial-purple: #9333ea;
+    --editorial-purple-light: rgba(147, 51, 234, 0.08);
+    --editorial-blue: #2563eb;
+
+    --editorial-matcha: #10b981;
+    --editorial-slate: #64748b;
+    --editorial-indigo: #6366f1;
+    --editorial-sandstone: #f59e0b;
+    --editorial-mauve: #ec4899;
+    --editorial-mint: #14b8a6;
+
+    color: var(--foreground);
+    background-image: none;
 }
 
 /* Modern display headings — clean, tight geometric sans matching our dashboard & studio design */

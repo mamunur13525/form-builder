@@ -102,6 +102,7 @@ export interface WorkspaceMember {
 
 export interface Workspace {
   id: string;
+  _id?: string;
   name: string;
   slug: string;
   logoUrl: string;
@@ -280,10 +281,45 @@ export const WORKSPACE_VISIBILITY_DESCRIPTIONS: Record<WorkspaceVisibility, stri
 
 /**
  * Whether the signed-in user holds a permission. Reads the server-sent
- * `permissions` array rather than re-deriving the matrix on the client, so the
- * two can never disagree.
+ * `permissions` array when available. If permissions are not sent by the
+ * server (e.g. backend does not provide RBAC permissions), it falls back
+ * to deriving permissions from the user's role, or defaults to true for
+ * content permissions so users are not locked out of their forms.
  */
 export const hasWorkspacePermission = (
-  workspace: Pick<Workspace, "permissions"> | null | undefined,
+  workspace: (Pick<Workspace, "permissions"> & Partial<Pick<Workspace, "currentUserRole">>) | null | undefined,
   permission: WorkspacePermission
-): boolean => workspace?.permissions?.includes(permission) ?? false;
+): boolean => {
+  // If the server explicitly provided a permissions array, use it directly.
+  if (workspace?.permissions && Array.isArray(workspace.permissions)) {
+    return workspace.permissions.includes(permission);
+  }
+
+  // If a role is present without explicit permissions, derive permissions based on the role.
+  const role = workspace?.currentUserRole;
+  if (role) {
+    if (role === "owner" || role === "admin") return true;
+    if (role === "member") {
+      return (
+        permission.startsWith("form:") ||
+        permission.startsWith("response:") ||
+        permission === "workspace:view" ||
+        permission === "member:view" ||
+        permission === "activity:view"
+      );
+    }
+    if (role === "viewer") {
+      return (
+        permission === "workspace:view" ||
+        permission === "member:view" ||
+        permission === "activity:view" ||
+        permission === "form:view" ||
+        permission === "response:view"
+      );
+    }
+  }
+
+  // When permissions and role are not configured (single-user / unmigrated backend),
+  // default to true so users are not blocked from their forms.
+  return true;
+};

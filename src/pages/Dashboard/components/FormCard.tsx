@@ -44,7 +44,13 @@ type MenuItemData =
 
 export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProps) {
   const navigate = useNavigate();
-  const { canCreate, canEdit, canDelete, canViewResponses } = useFormPermissions();
+  const { canCreate, canEdit, canDelete, canViewResponses, isReady } = useFormPermissions();
+
+  // Until the workspace context is ready, default permissions to true so items are not prematurely hidden.
+  const allowCreate = !isReady || canCreate;
+  const allowEdit = !isReady || canEdit;
+  const allowDelete = !isReady || canDelete;
+  const allowViewResponses = !isReady || canViewResponses;
 
   // Built as one list and then filtered, so the separator can be dropped along
   // with the group it introduces rather than left dangling at the bottom.
@@ -52,46 +58,46 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
     {
       label: "View Responses",
       icon: List,
-      enabled: canViewResponses,
+      enabled: allowViewResponses,
       onClick: () =>
         navigate(`/form-response/${form.id}/submissions`),
     },
     {
       label: "Analytics",
       icon: BarChart3,
-      enabled: canViewResponses,
+      enabled: allowViewResponses,
       onClick: () => navigate(`/form-response/${form.id}/analytics`),
     },
     {
       label: "Settings",
       icon: Settings,
-      enabled: canEdit,
+      enabled: allowEdit,
       onClick: () => navigate(`/form-settings/${form.id}`),
     },
     {
       label: "Share Form",
       icon: Share2,
-      enabled: canEdit,
+      enabled: allowEdit,
       onClick: () => navigate(`/form-share/${form.id}`),
     },
     {
       label: "Integrations",
       icon: Puzzle,
-      enabled: canEdit,
+      enabled: allowEdit,
       onClick: () => navigate(`/form-integrate/${form.id}`),
     },
-    ...(canCreate || canDelete ? [{ isSeparator: true } as MenuItemData] : []),
+    ...(allowCreate || allowDelete ? [{ isSeparator: true } as MenuItemData] : []),
     {
       label: "Duplicate",
       icon: Copy,
-      enabled: canCreate,
+      enabled: allowCreate,
       onClick: () => onDuplicateClick(form.id),
     },
     {
       label: "Delete",
       icon: Trash2,
       variant: "destructive" as const,
-      enabled: canDelete,
+      enabled: allowDelete,
       onClick: () => onDeleteClick(form.id),
     },
   ].filter((item) => "isSeparator" in item || item.enabled !== false);
@@ -130,12 +136,12 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
                 variant="ghost"
                 size="icon"
                 aria-label="Form actions"
-              />
+              >
+                <EllipsisVertical className="h-5 w-5" />
+              </Button>
             }
             onClick={(e) => e.stopPropagation()}
-          >
-            <EllipsisVertical className="h-5 w-5" />
-          </DropdownMenuTrigger>
+          />
           <DropdownMenuContent
             align="end"
             className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)] p-2"
@@ -156,7 +162,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
               return (
                 <DropdownMenuItem
                   key={index}
-                  className="rounded-[12px] px-3 py-2"
+                  className="rounded-[12px] px-3 py-2 cursor-pointer"
                   variant={item.variant}
                   onClick={item.onClick}
                 >

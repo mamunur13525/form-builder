@@ -177,10 +177,10 @@ export function FormBuilderTopBar({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div className="flex shrink-0 items-center gap-2 lg:gap-3">
+      <div className="relative flex shrink-0 items-center gap-2 lg:gap-3">
         <span
           className={cn(
-            "flex shrink-0 items-center gap-1.5 overflow-hidden text-xs text-slate-500 dark:text-zinc-400 transition-opacity duration-200 ease-out",
+            "absolute -left-20 flex shrink-0 items-center gap-1.5 overflow-hidden text-xs text-slate-500 dark:text-zinc-400",
             saveStatus !== "idle" ? "opacity-100" : "opacity-0",
           )}
         >

@@ -377,7 +377,7 @@ export function VariableEditable({
                 createPortal(
                     <div
                         ref={menuRef}
-                        className="editorial"
+                        className="light editorial"
                         style={{
                             position: "fixed",
                             top: menu.top,

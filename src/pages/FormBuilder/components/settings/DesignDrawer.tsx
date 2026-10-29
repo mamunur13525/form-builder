@@ -368,26 +368,21 @@ export function DesignDrawer({
     return (
         <div ref={containerRef} className="flex h-full min-h-0 w-full overflow-hidden">
             {/* Preview area */}
-            <div className="relative h-full min-h-0 flex-1 overflow-y-auto bg-[#F4F6FB] dark:bg-[#0c0c0f] p-6 sm:p-10 flex flex-col items-center justify-center">
+            <div className="relative h-full min-h-0 flex-1 overflow-hidden bg-[#F4F6FB] dark:bg-[#0c0c0f] p-6 sm:p-10 flex flex-col items-center justify-center">
                 {/* Ambient glow blobs */}
                 <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-purple-200/25 dark:bg-purple-900/10 blur-3xl" />
                 <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-indigo-200/25 dark:bg-[#FF5722]/10 blur-3xl" />
 
-                <div className="relative z-10 flex flex-col h-full max-h-[85vh] w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-[#141418] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] dark:shadow-2xl">
+                <div className="light relative z-10 flex flex-col h-full max-h-[85vh] w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] dark:shadow-2xl">
                     {/* Mockup Window Header */}
-                    <div className="flex h-11 shrink-0 items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 bg-white/95 dark:bg-[#141418]/95 px-4 backdrop-blur-xs select-none">
-                        <div className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded-full bg-red-400/80" />
-                            <span className="h-3 w-3 rounded-full bg-amber-400/80" />
-                            <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
-                        </div>
-                        <div className="flex items-center gap-1.5 rounded-full bg-slate-100/80 dark:bg-zinc-800/80 px-4 py-1 text-xs font-medium text-slate-500 dark:text-zinc-400">
+                    <div className="flex h-11 shrink-0 items-center justify-between border-b border-slate-100 bg-white/95 px-4 backdrop-blur-xs select-none">
+                        <div className="mx-auto flex items-center gap-1.5 rounded-full bg-slate-100/80 px-4 py-1 text-xs font-medium text-slate-500">
                             <span>Live Theme Preview</span>
                         </div>
-                        <div className="w-12" />
+                        
                     </div>
 
-                    <div className="relative flex-1 min-h-0 overflow-y-auto p-4 sm:p-8">
+                    <div className="relative flex-1 min-h-0 overflow-y-auto p-4 sm:p-8 bg-white">
                         {endPage ? (
                             <EndPageContentEditor
                                 endPage={endPage}
@@ -405,7 +400,7 @@ export function DesignDrawer({
                                 theme={draftTheme}
                             />
                         ) : (
-                            <div className="flex h-64 items-center justify-center text-sm text-slate-400 dark:text-zinc-500">
+                            <div className="flex h-64 items-center justify-center text-sm text-slate-400">
                                 Select a page to see live preview
                             </div>
                         )}

@@ -748,7 +748,7 @@ export function FormBuilderPage() {
       <div className="relative z-10 flex min-h-0 w-full flex-1 items-center justify-center overflow-auto p-1 sm:p-3">
         <div
           className={cn(
-            "relative flex flex-col h-full max-h-[85vh] w-full overflow-hidden rounded-3xl border border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
+            "light relative flex flex-col h-full max-h-[85vh] w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
           )}
           style={{
             width: isMobileView ? "min(420px, 100%)" : "100%",
@@ -757,16 +757,9 @@ export function FormBuilderPage() {
           }}
         >
           {/* Browser Mockup Window Header Bar */}
-          <div className="flex h-10 shrink-0 items-center justify-between border-b border-slate-200/80 dark:border-zinc-800/80 bg-slate-100/90 dark:bg-[#16161a] px-4">
-            {/* Window control dots */}
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded-full bg-[#FF5F56]" />
-              <div className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
-              <div className="h-3 w-3 rounded-full bg-[#27C93F]" />
-            </div>
-
+          <div className="flex h-10 shrink-0 items-center justify-between border-b border-slate-200/80 bg-slate-100/90 px-4">
             {/* Address bar pill mockup */}
-            <div className="h-5 w-48 sm:w-64 rounded-full bg-slate-200/80 dark:bg-zinc-800/70 border border-slate-300/60 dark:border-zinc-700/50 mx-auto flex items-center justify-center text-[11px] text-slate-500 dark:text-zinc-400 font-mono tracking-tight">
+            <div className="h-5 w-48 sm:w-64 rounded-full bg-slate-200/80 border border-slate-300/60 mx-auto flex items-center justify-center text-[11px] text-slate-500 font-mono tracking-tight">
               forms.studio/preview
             </div>
 
@@ -775,18 +768,18 @@ export function FormBuilderPage() {
           </div>
 
           {/* Window Canvas Content with Studio Bounding Box */}
-          <div className="flex-1 min-h-0 overflow-y-auto relative p-2 sm:p-4">
+          <div className="flex-1 min-h-0 overflow-y-auto relative p-2 sm:p-4 bg-white">
             {isEndPageSelected ? (
-              <div className="relative h-full w-full rounded-2xl ring-2 ring-[#FF5722] ring-offset-2 ring-offset-white dark:ring-offset-[#141418] transition-all">
+              <div className="relative h-full w-full rounded-2xl  transition-all">
                 {/* Top-left tag badge */}
                 <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-md bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
                   <span>End Page</span>
                 </div>
                 {/* 4 Corner pip handles */}
-                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
-                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
-                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
-                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
 
                 <EndPageContentEditor
                   endPage={selectedEndPage}
@@ -798,16 +791,16 @@ export function FormBuilderPage() {
                 />
               </div>
             ) : selectedPage ? (
-              <div className="relative h-full w-full rounded-2xl ring-2 ring-[#FF5722] ring-offset-2 ring-offset-white dark:ring-offset-[#141418] transition-all">
+              <div className="relative h-full w-full transition-all">
                 {/* Top-left tag badge */}
                 <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-md bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
                   <span>{selectedPageIndex + 1}. {PAGE_TYPE_LABELS[selectedPage.type] || selectedPage.label || "Page"}</span>
                 </div>
                 {/* 4 Corner pip handles */}
-                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
-                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
-                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
-                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white dark:bg-zinc-900 z-20 pointer-events-none" />
+                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
 
                 <PageContentEditor
                   page={selectedPage}
@@ -820,10 +813,10 @@ export function FormBuilderPage() {
               </div>
             ) : (
               <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-                <p className="font-semibold text-xl text-slate-800 dark:text-zinc-100 sm:text-2xl">
+                <p className="font-semibold text-xl text-slate-800 sm:text-2xl">
                   Nothing selected
                 </p>
-                <p className="mt-2 text-sm text-slate-500 dark:text-zinc-400 sm:text-base">
+                <p className="mt-2 text-sm text-slate-500 sm:text-base">
                   {isDesktop
                     ? "Choose a page from the left to begin editing."
                     : "Open the pages panel to choose a page."}

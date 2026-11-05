@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 import { COUNTRIES, type Country } from "@/shared/constants/countries"
 import type { PhoneSettings as PhoneSettingsType } from "@/shared/types/common"
-import { ToggleRow } from "./primitives"
+import { ToggleRow, CONTROL_CLASS } from "./primitives"
 
 /** Phone settings: verification + country code mode + specific country picker. */
 export function PhoneSettingsWidget({
@@ -22,9 +22,9 @@ export function PhoneSettingsWidget({
                 onCheckedChange={(checked) => onChange({ ...settings, phoneVerification: checked })}
             />
 
-            <div className="space-y-2">
-                <Label className="text-base font-medium">Default country code</Label>
-                <p className="text-xs text-muted-foreground">
+            <div className="space-y-1.5">
+                <Label className="text-base text-[var(--editorial-body)]">Default country code</Label>
+                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
                     We'll auto-select the country code from the respondent's country. They can
                     still change it before submitting.
                 </p>
@@ -33,10 +33,10 @@ export function PhoneSettingsWidget({
                     <button
                         type="button"
                         onClick={() => onChange({ ...settings, countryCodeMode: "auto" })}
-                        className={`flex-1 rounded-md border px-3 py-2 text-sm transition-colors ${
+                        className={`editorial-transition flex h-[44px] flex-1 items-center justify-center rounded-[12px] border px-4 text-sm ${
                             settings.countryCodeMode === "auto"
-                                ? "border-primary bg-primary/10 font-medium text-primary"
-                                : "hover:bg-accent"
+                                ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] font-medium text-[var(--foreground)]"
+                                : "border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
                         }`}
                     >
                         Auto-detect
@@ -54,10 +54,10 @@ export function PhoneSettingsWidget({
                                 },
                             })
                         }
-                        className={`flex-1 rounded-md border px-3 py-2 text-sm transition-colors ${
+                        className={`editorial-transition flex h-[44px] flex-1 items-center justify-center rounded-[12px] border px-4 text-sm ${
                             settings.countryCodeMode === "specific"
-                                ? "border-primary bg-primary/10 font-medium text-primary"
-                                : "hover:bg-accent"
+                                ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] font-medium text-[var(--foreground)]"
+                                : "border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
                         }`}
                     >
                         Specific
@@ -100,14 +100,14 @@ function CountrySelect({
                 if (country) onChange(country)
             }}
         >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className={CONTROL_CLASS + " w-full"}>
                 <SelectValue placeholder="Select a country" />
             </SelectTrigger>
             <SelectContent>
                 {COUNTRIES.map((country) => (
                     <SelectItem key={country.iso2} value={country.iso2}>
                         <span className="flex items-center gap-2">
-                            <span className="w-16 shrink-0 text-muted-foreground">
+                            <span className="w-16 shrink-0 text-[var(--editorial-subtle)]">
                                 {country.dialCode}
                             </span>
                             {country.name}

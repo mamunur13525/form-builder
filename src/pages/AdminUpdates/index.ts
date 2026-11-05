@@ -1,0 +1,1 @@
+export { AdminUpdatesPage } from "./AdminUpdatesPage"

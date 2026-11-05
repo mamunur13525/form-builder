@@ -8,8 +8,9 @@ import { create } from "zustand"
 import { getForms, createForm as apiCreateForm, updateForm as apiUpdateForm, deleteForm as apiDeleteForm, publishForm as apiPublishForm, unpublishForm as apiUnpublishForm, discardDraft as apiDiscardDraft } from "@/entities/form/api/form.api"
 import { getResponses } from "@/entities/response/api/response.api"
 import { submitPublicForm } from "@/entities/response/api/public-form.api"
+import { getLogicRules } from "@/entities/form/api/logic.api"
 import type { Form as ApiForm } from "@/entities/form/model/types"
-import type { Form, FormResponse } from "@/shared/types/common"
+import type { Form, FormResponse, FormLogicRule } from "@/shared/types/common"
 import { adaptApiForm, adaptApiResponse } from "@/features/forms/model/adapters"
 
 interface FormState {
@@ -17,6 +18,9 @@ interface FormState {
     responses: FormResponse[]
     isLoading: boolean
     error: string | null
+
+    /** Form-level logic rules keyed by formId — kept in sync after saves. */
+    logicRules: Record<string, FormLogicRule[]>
 
     // Form actions
     fetchForms: () => Promise<void>
@@ -29,6 +33,10 @@ interface FormState {
     unpublishForm: (id: string) => Promise<ApiForm>
     discardDraft: (id: string) => Promise<ApiForm>
 
+    // Logic actions
+    fetchLogicRules: (formId: string) => Promise<FormLogicRule[]>
+    setLogicRules: (formId: string, rules: FormLogicRule[]) => void
+
     // Response actions
     fetchResponses: (formId: string) => Promise<void>
     getResponsesByFormId: (formId: string) => FormResponse[]
@@ -40,6 +48,7 @@ export const useFormStore = create<FormState>((set, get) => ({
     responses: [],
     isLoading: false,
     error: null,
+    logicRules: {},
 
     fetchForms: async () => {
         set({ isLoading: true, error: null })
@@ -60,6 +69,22 @@ export const useFormStore = create<FormState>((set, get) => ({
     getFormBySlug: (slug: string) => {
         return get().forms.find((f) => f.slug === slug)
     },
+
+    // -------------------------------------------------------------------------
+    // Logic rules — the live source of truth for the form preview. Kept in
+    // sync after every create/update/delete so the preview picks up new rules
+    // without a full form refetch.
+    // -------------------------------------------------------------------------
+    fetchLogicRules: async (formId: string) => {
+        const rules = await getLogicRules(formId)
+        get().setLogicRules(formId, rules)
+        return rules
+    },
+
+    setLogicRules: (formId, rules) =>
+        set((state) => ({
+            logicRules: { ...state.logicRules, [formId]: rules },
+        })),
 
     createForm: async (formData) => {
         set({ isLoading: true, error: null })

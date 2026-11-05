@@ -7,11 +7,11 @@ import {
     LogOut,
     ChevronsUpDown,
     Sparkles,
-    X,
-    User as UserIcon,
+    Megaphone,
 } from "lucide-react"
 import { ROUTES } from "../../shared/constants/routes"
 import { cn } from "../../shared/utils/cn"
+import { useSettingsModalStore } from "../../shared/stores/settingsModalStore"
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -20,7 +20,9 @@ import {
     DropdownMenuSeparator,
 } from "../../components/ui/dropdown-menu"
 import { useLogout, useCurrentUser } from "../../features/auth/hooks/useAuth"
+import { WorkspaceSwitcher } from "../WorkspaceSwitcher"
 import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface SidebarProps {
     /** Drawer visibility on small screens. The sidebar is always shown from `lg` up. */
@@ -33,7 +35,6 @@ const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: ROUTES.DASHBOARD },
     { label: "Forms", icon: FileText, path: ROUTES.FORMS },
     { label: "Templates", icon: LayoutTemplate, path: ROUTES.TEMPLATES },
-    { label: "Settings", icon: Settings, path: ROUTES.SETTINGS },
 ]
 
 /** First letters of the display name, used when the user has no avatar. */
@@ -52,6 +53,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     const location = useLocation()
     const logout = useLogout()
     const { data: user } = useCurrentUser()
+    const openSettings = useSettingsModalStore((state) => state.openSettings)
 
     const handleLogout = () => {
         logout.mutate()
@@ -64,8 +66,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         onClose()
     }
 
+    const openSettingsPanel = (section: "account" | "pricing") => {
+        openSettings(section)
+        onClose()
+    }
+
     const displayName = user?.name || "Your account"
     const displayEmail = user?.email || "Not signed in"
+
+    // Admins get an extra entry for managing the changelog.
+    const items =
+        user?.role === "admin"
+            ? [...navItems, { label: "Updates", icon: Megaphone, path: ROUTES.ADMIN_UPDATES }]
+            : navItems
 
     return (
         <>
@@ -87,22 +100,16 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 )}
             >
                 <div className="editorial-shadow-md flex min-h-0 flex-1 flex-col bg-[var(--card)]">
-                    {/* Logo */}
-                    <div className="flex items-center justify-between border-b border-[var(--editorial-border-light)] px-6 py-6">
-                        <h1 className="font-display text-2xl text-[var(--foreground)]">FormFlow</h1>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            aria-label="Close menu"
-                            className="editorial-transition flex h-9 w-9 items-center justify-center rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:text-[var(--foreground)] lg:hidden"
-                        >
-                            <X className="h-5 w-5" />
-                        </button>
+                
+
+                    {/* Active workspace + switcher */}
+                    <div className="border-b border-[var(--editorial-border-light)] p-4">
+                        <WorkspaceSwitcher onNavigate={onClose} />
                     </div>
 
                     {/* Navigation */}
                     <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-4">
-                        {navItems.map((item) => {
+                        {items.map((item) => {
                             const isActive = location.pathname === item.path
                             return (
                                 <button
@@ -136,7 +143,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                             </p>
                             <Button
                                 type="button"
-                                onClick={() => go(ROUTES.PRICING)}
+                                onClick={() => openSettingsPanel("pricing")}
                                 className="editorial-transition mt-4 h-11 w-full rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
                             >
                                 Upgrade now
@@ -151,17 +158,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                                 className="editorial-transition flex w-full items-center gap-3 rounded-[16px] border border-transparent px-3 py-2.5 text-left hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)]"
                                 aria-label="Account menu"
                             >
-                                {user?.avatarUrl ? (
-                                    <img
-                                        src={user.avatarUrl}
-                                        alt=""
-                                        className="h-10 w-10 shrink-0 rounded-full border border-[var(--editorial-border-light)] object-cover"
-                                    />
-                                ) : (
-                                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-sm font-semibold text-[var(--editorial-body)]">
-                                        {initialsOf(user?.name)}
-                                    </span>
-                                )}
+                                <Avatar size="lg">
+                                    {user?.avatarUrl ? (
+                                        <AvatarImage src={user.avatarUrl} />
+                                    ) : (
+                                        <AvatarFallback>{initialsOf(user?.name)}</AvatarFallback>
+                                    )}
+                                </Avatar>
+
                                 <span className="min-w-0 flex-1">
                                     <span className="block truncate text-sm text-[var(--foreground)]">
                                         {displayName}
@@ -180,17 +184,10 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                             >
                                 <DropdownMenuItem
                                     className="rounded-[12px] px-3 py-2.5"
-                                    onClick={() => go(ROUTES.SETTINGS)}
-                                >
-                                    <UserIcon className="h-4 w-4" />
-                                    Profile
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    className="rounded-[12px] px-3 py-2.5"
-                                    onClick={() => go(ROUTES.SETTINGS)}
+                                    onClick={() => openSettingsPanel("account")}
                                 >
                                     <Settings className="h-4 w-4" />
-                                    Account settings
+                                    Settings
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
                                 <DropdownMenuItem

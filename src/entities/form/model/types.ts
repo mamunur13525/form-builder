@@ -49,6 +49,11 @@ export interface Form {
     title: string
     slug: string
     status: FormStatus
+    /**
+     * Owning workspace. `null` only for forms created before workspaces existed
+     * and not yet migrated — those stay visible to their creator alone.
+     */
+    workspace?: string | null
     theme: FormTheme
     settings: FormSettings
     createdBy: string
@@ -75,10 +80,18 @@ export interface PublishedForm {
     endPages?: EndPage[]
     theme: FormTheme
     settings: FormSettings
+    /** Form-level logic rules (branching / display / calculations). */
+    logic?: FormLogic[]
 }
 
 export interface CreateFormRequest {
     title: string
+    /**
+     * Workspace to create the form in. Omit to let the server use the caller's
+     * active workspace — the hooks send it explicitly so a stale server-side
+     * "last active workspace" can't put the form somewhere unexpected.
+     */
+    workspaceId?: string
 }
 
 export interface UpdateFormRequest {
@@ -468,35 +481,78 @@ export interface ReorderBlocksRequest {
 // Logic (form-level)
 // ---------------------------------------------------------------------------
 
-export type LogicOperator = "equals" | "notEquals" | "contains" | "greaterThan" | "lessThan"
-export type LogicAction = "show" | "hide" | "goToPage" | "goToEnd" | "skipTo"
+export type LogicOperator =
+    | "equals"
+    | "notEquals"
+    | "contains"
+    | "notContains"
+    | "greaterThan"
+    | "greaterThanOrEquals"
+    | "lessThan"
+    | "lessThanOrEquals"
+    | "isEmpty"
+    | "isNotEmpty"
+
+export type LogicCategory = "display" | "hidePage" | "branching" | "calculation"
+export type LogicSourceType = "page" | "variable"
+export type LogicCombinator = "and" | "or"
+export type LogicActionType =
+    | "showPage"
+    | "hidePage"
+    | "jumpToPage"
+    | "goToEnd"
+    | "setVariable"
+export type LogicCalcOperation = "set" | "add" | "subtract" | "multiply" | "divide"
 
 export interface LogicCondition {
-    pageKey: string
+    sourceType: LogicSourceType
+    /** Page key or variable name the condition reads from. */
+    sourceKey: string
     operator: LogicOperator
-    value: unknown
+    value?: unknown
+    /** How this condition joins to the previous one (ignored on the first). */
+    combinator?: LogicCombinator
 }
 
 export interface LogicActionItem {
-    action: LogicAction
-    target?: string
+    action: LogicActionType
+    targetPageKey?: string
+    variableName?: string
+    operation?: LogicCalcOperation
+    expression?: string
+    value?: unknown
 }
 
 export interface FormLogic {
     id: string
-    formId: string
+    formId?: string
+    category: LogicCategory
+    name?: string
+    enabled: boolean
+    combinator: LogicCombinator
     conditions: LogicCondition[]
     actions: LogicActionItem[]
+    order?: number
     createdAt: string
     updatedAt: string
 }
 
 export interface CreateLogicRequest {
+    category?: LogicCategory
+    name?: string
+    enabled?: boolean
+    combinator?: LogicCombinator
     conditions: LogicCondition[]
     actions: LogicActionItem[]
+    order?: number
 }
 
 export interface UpdateLogicRequest {
+    category?: LogicCategory
+    name?: string
+    enabled?: boolean
+    combinator?: LogicCombinator
     conditions?: LogicCondition[]
     actions?: LogicActionItem[]
+    order?: number
 }

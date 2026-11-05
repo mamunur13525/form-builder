@@ -49,17 +49,26 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
     handleNext,
     handlePrev,
     handleNavNext,
+    computedVariables,
   } = useFormNavigation({ form, mode, onSubmit });
 
   const themeResolved = resolveFormTheme(form.theme);
 
   // Variables (plus the built-in form_name) resolved into @token replacements.
   // `extractFormVariables` tolerates the public payload putting them either
-  // under `settings` or at the top level.
-  const variableItems = useMemo(
-    () => buildVariableItems(extractFormVariables(form), form.title),
-    [form],
-  );
+  // under `settings` or at the top level. Calculation variables override the
+  // static values as answers are collected.
+  const variableItems = useMemo(() => {
+    const base = buildVariableItems(extractFormVariables(form), form.title);
+    const computedEntries = Object.entries(computedVariables ?? {});
+    if (computedEntries.length === 0) return base;
+
+    const items = new Map(base.map((item) => [item.name, item]));
+    for (const [name, value] of computedEntries) {
+      items.set(name, { name, value: String(value) });
+    }
+    return Array.from(items.values());
+  }, [form, computedVariables]);
 
   useEffect(() => {
     if (themeResolved.font) {

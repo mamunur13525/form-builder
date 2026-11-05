@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Bell, Building2, Link2, Pencil, Shield, User as UserIcon } from "lucide-react"
+import { Bell, Link2, Pencil, Shield, User as UserIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -51,7 +51,7 @@ function SettingsCard({
     )
 }
 
-export function SettingsPage() {
+export function SettingsPage({ embedded = false }: { embedded?: boolean }) {
     const { data: user } = useCurrentUserProfile()
     const updateProfile = useUpdateCurrentUserProfile()
     const changePassword = useChangePassword()
@@ -138,15 +138,24 @@ export function SettingsPage() {
     }
 
     return (
-        <div className="editorial mx-auto w-full max-w-[900px] space-y-6 px-4 pt-8 pb-12 sm:space-y-12 sm:px-6 sm:pt-12 sm:pb-16 lg:px-8">
-            <div>
-                <h1 className="font-display text-[32px] leading-[1.1] sm:text-[48px] text-[var(--foreground)]">
-                    Settings
-                </h1>
-                <p className="mt-1 text-sm leading-6 sm:mt-2 sm:text-base text-[var(--editorial-body)]">
-                    Manage your profile, security and workspace preferences.
-                </p>
-            </div>
+        <div
+            className={cn(
+                "editorial mx-auto w-full space-y-6",
+                embedded
+                    ? "max-w-none px-1 pb-4"
+                    : "max-w-[900px] px-4 pt-8 pb-12 sm:space-y-12 sm:px-6 sm:pt-12 sm:pb-16 lg:px-8",
+            )}
+        >
+            {!embedded && (
+                <div>
+                    <h1 className="font-display text-[32px] leading-[1.1] sm:text-[48px] text-[var(--foreground)]">
+                        Settings
+                    </h1>
+                    <p className="mt-1 text-sm leading-6 sm:mt-2 sm:text-base text-[var(--editorial-body)]">
+                        Manage your profile, security and workspace preferences.
+                    </p>
+                </div>
+            )}
 
             <SettingsCard
                 icon={UserIcon}
@@ -360,26 +369,6 @@ export function SettingsPage() {
                         onCheckedChange={setWeeklyDigest}
                     />
                 </div>
-            </SettingsCard>
-
-            <SettingsCard
-                icon={Building2}
-                title="Workspace"
-                description="Details shared by everyone in this workspace."
-            >
-                <div className="space-y-2">
-                    <Label htmlFor="settings-workspace" className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                        Workspace name
-                    </Label>
-                    <Input
-                        id="settings-workspace"
-                        defaultValue="My Workspace"
-                        className={inputClass}
-                    />
-                </div>
-                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
-                    Workspace management, including members and roles, is coming soon.
-                </p>
             </SettingsCard>
         </div>
     )

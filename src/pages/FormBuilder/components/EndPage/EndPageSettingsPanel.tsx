@@ -6,6 +6,8 @@ import {
     PartyPopper,
     ImagePlus,
     Trash2,
+    Palette,
+    SlidersHorizontal,
 } from "lucide-react"
 import type {
     EndPage,
@@ -20,13 +22,17 @@ import {
     InputSetting,
     IconChoiceSetting,
     ToggleRow,
+    TAB_LIST_CLASS,
+    TAB_TRIGGER_CLASS,
 } from "../settings/primitives"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ImagePickerDialog } from "../settings/ImagePickerDialog"
 
 interface EndPageSettingsPanelProps {
     endPage: EndPage
     endPageIndex: number
     onUpdate: (index: number, updates: Partial<EndPage>) => void
+    onOpenDesignDrawer: () => void
 }
 
 const ALIGN_OPTIONS = [
@@ -52,6 +58,7 @@ export function EndPageSettingsPanel({
     endPage,
     endPageIndex,
     onUpdate,
+    onOpenDesignDrawer,
 }: EndPageSettingsPanelProps) {
     const [coverDialogOpen, setCoverDialogOpen] = useState(false)
 
@@ -67,14 +74,35 @@ export function EndPageSettingsPanel({
 
     return (
         <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden bg-[var(--card)] border-l border-[var(--border)]">
-            <div className="border-b border-[var(--editorial-border-light)] px-6 py-5">
-                <h3 className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                    End page settings
-                </h3>
-            </div>
+            <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
+                {/* Pill tabs, matching the page settings panel: the list is the
+                    track, the active tab a raised card. */}
+                <div className="px-6 pt-5">
+                    <TabsList className={TAB_LIST_CLASS}>
+                        {/* Same treatment as the page SettingsPanel: the
+                            Settings tab is the only real tab (always active)
+                            and Design is a lookalike action button that opens
+                            the shared overlay drawer. */}
+                        <TabsTrigger value="settings" className={TAB_TRIGGER_CLASS}>
+                            <SlidersHorizontal className="h-4 w-4" />
+                            Settings
+                        </TabsTrigger>
+                        <button
+                            type="button"
+                            onClick={onOpenDesignDrawer}
+                            className={
+                                "inline-flex items-center justify-center whitespace-nowrap " +
+                                TAB_TRIGGER_CLASS
+                            }
+                        >
+                            <Palette className="h-4 w-4" />
+                            Design
+                        </button>
+                    </TabsList>
+                </div>
 
-            <div className="flex-1 overflow-y-auto">
-                <div className="space-y-8 px-6 py-6">
+                <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
+                    <div className="space-y-8 px-6 py-6">
                     {/* Alignment */}
                     <SettingsSection title="Alignment">
                         <IconChoiceSetting<ContentAlignment>
@@ -136,17 +164,15 @@ export function EndPageSettingsPanel({
                                     }
                                     placeholder="Check out this form!"
                                 />
-                                <div className="space-y-3">
-                                    {SHARE_PLATFORMS.map((p) => (
-                                        <ToggleRow
-                                            key={p.key}
-                                            id={`share-${p.key}`}
-                                            label={p.label}
-                                            checked={Boolean(endPage.socialShareMedia?.[p.key])}
-                                            onCheckedChange={(v) => patchMedia({ [p.key]: v })}
-                                        />
-                                    ))}
-                                </div>
+                                {SHARE_PLATFORMS.map((p) => (
+                                    <ToggleRow
+                                        key={p.key}
+                                        id={`share-${p.key}`}
+                                        label={p.label}
+                                        checked={Boolean(endPage.socialShareMedia?.[p.key])}
+                                        onCheckedChange={(v) => patchMedia({ [p.key]: v })}
+                                    />
+                                ))}
                             </>
                         )}
                     </SettingsSection>
@@ -219,8 +245,9 @@ export function EndPageSettingsPanel({
                             placeholder="https://example.com"
                         />
                     </SettingsSection>
-                </div>
-            </div>
+                    </div>
+                </TabsContent>
+            </Tabs>
 
             <ImagePickerDialog
                 open={coverDialogOpen}

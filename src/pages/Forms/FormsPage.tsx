@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useForms } from "@/features/forms/hooks/useForms"
+import { useFormPermissions } from "@/features/forms/hooks/useFormPermissions"
 import { FormCard } from "@/pages/Dashboard/components/FormCard"
 import { FormDialog } from "@/pages/Dashboard/components/FormDialog"
 import { DeleteFormDialog } from "@/pages/Dashboard/components/DeleteFormDialog"
@@ -21,6 +22,7 @@ const FILTERS: { value: FormStatus | "all"; label: string }[] = [
 
 export function FormsPage() {
     const { data: forms = [], isLoading } = useForms()
+    const { canCreate } = useFormPermissions()
 
     const [query, setQuery] = useState("")
     const [status, setStatus] = useState<FormStatus | "all">("all")
@@ -50,13 +52,16 @@ export function FormsPage() {
                         Every form in your workspace, in one calm place.
                     </p>
                 </div>
-                <Button
-                    onClick={() => setCreateDialogOpen(true)}
-                >
-                    <Plus className="h-5 w-5" />
-                    <span className="hidden sm:inline">New Form</span>
-                    <span className="sm:hidden">New</span>
-                </Button>
+                {/* A viewer can read every form here but cannot add one. */}
+                {canCreate && (
+                    <Button
+                        onClick={() => setCreateDialogOpen(true)}
+                    >
+                        <Plus className="h-5 w-5" />
+                        <span className="hidden sm:inline">New Form</span>
+                        <span className="sm:hidden">New</span>
+                    </Button>
+                )}
             </div>
 
             {/* Search + status filters */}
@@ -104,7 +109,7 @@ export function FormsPage() {
                                 ? "No forms yet"
                                 : "No forms match your search"}
                         </p>
-                        {forms.length === 0 && (
+                        {forms.length === 0 && canCreate && (
                             <Button
                                 className="mt-7"
                                 onClick={() => setCreateDialogOpen(true)}

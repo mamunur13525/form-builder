@@ -1,7 +1,6 @@
-import React, { type ComponentType } from "react"
+import React from "react"
 import { ImagePlus, Palette, SlidersHorizontal, Trash2 } from "lucide-react"
 import { Label } from "../../../components/ui/label"
-import { Input } from "../../../components/ui/input"
 import {
     Combobox,
     ComboboxContent,
@@ -16,15 +15,12 @@ import {
     TabsTrigger,
     TabsContent,
 } from "../../../components/ui/tabs"
-import { Sheet, SheetContent } from "../../../components/ui/sheet"
 
-import { DesignDrawer } from "./settings/DesignDrawer"
 import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, PAGE_TYPES, type PageType } from "../../../shared/constants/form-types"
 import type {
     ChoiceSettings,
     PageSettings,
     FormPage,
-    IFormTheme,
     Validation,
 } from "../../../shared/types/common"
 import {
@@ -39,6 +35,7 @@ import {
     SettingsSection,
     TAB_LIST_CLASS,
     TAB_TRIGGER_CLASS,
+    TextSetting,
     ToggleRow,
 } from "./settings/primitives"
 import { ImagePickerDialog } from "./settings/ImagePickerDialog"
@@ -63,38 +60,19 @@ interface SettingsPanelProps {
     page: FormPage
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormPage>) => void
-    theme?: IFormTheme | null
-    designDrawerOpen: boolean
     onOpenDesignDrawer: () => void
-    onCloseDesignDrawer: () => void
-    onSaveTheme: (theme: IFormTheme) => Promise<void>
 }
 
 export function SettingsPanel({
     page,
     pageIndex,
     onUpdate,
-    theme,
-    designDrawerOpen,
     onOpenDesignDrawer,
-    onCloseDesignDrawer,
-    onSaveTheme
 }: SettingsPanelProps) {
 
-    const hasChangesRef = React.useRef(false)
     const [coverDialogOpen, setCoverDialogOpen] = React.useState(false)
+    const [typeQuery, setTypeQuery] = React.useState("")
     const settings = page.settings ?? {}
-
-    // Design and Logic open overlays rather than swapping tab panels.
-    const SETTINGS_TABS: {
-        value: string
-        label: string
-        icon: ComponentType<{ className?: string }>
-        onSelect?: () => void
-    }[] = [
-            { value: "settings", label: "Settings", icon: SlidersHorizontal },
-            { value: "design", label: "Design", icon: Palette, onSelect: onOpenDesignDrawer },
-        ]
 
     /** Merge a single settings group, preserving the rest. */
     const patchSettings = (group: Partial<PageSettings>) => {
@@ -145,32 +123,50 @@ export function SettingsPanel({
                             the active tab is a raised card. */}
                         <div className="px-6 pt-5">
                             <TabsList className={TAB_LIST_CLASS}>
-                                {SETTINGS_TABS.map((tab) => (
-                                    <TabsTrigger
-                                        key={tab.value}
-                                        value={tab.value}
-                                        onClick={() => tab.onSelect?.()}
-                                        className={TAB_TRIGGER_CLASS}
-                                    >
-                                        <tab.icon className="h-4 w-4" />
-                                        {tab.label}
-                                    </TabsTrigger>
-                                ))}
+                                {/* Settings is the only real tab and therefore
+                                    always active. Design is a plain action
+                                    button dressed up exactly like a tab
+                                    trigger: it opens the overlay drawer rather
+                                    than switching panels. */}
+                                <TabsTrigger value="settings" className={TAB_TRIGGER_CLASS}>
+                                    <SlidersHorizontal className="h-4 w-4" />
+                                    Settings
+                                </TabsTrigger>
+                                <button
+                                    type="button"
+                                    onClick={onOpenDesignDrawer}
+                                    className={
+                                        "inline-flex items-center justify-center whitespace-nowrap cursor-pointer" +
+                                        TAB_TRIGGER_CLASS
+                                    }
+                                >
+                                    <Palette className="h-4 w-4" />
+                                    Design
+                                </button>
                             </TabsList>
                         </div>
                         <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
                             <div className="space-y-8 px-6 py-6">
                                 {/* Page type — always available */}
-                                <div className="space-y-2">
+                                <div className="space-y-1.5">
                                     <Label className="text-base font-semibold text-[var(--foreground)]">
-                                        Page Type
+                                        Page type
                                     </Label>
                                     <Combobox
                                         items={PAGE_TYPES}
                                         value={page.type}
                                         onValueChange={handleTypeChange}
+                                        // Controlled query: Base UI keeps the last
+                                        // selection as the filter text, which would
+                                        // reopen the list filtered down to the current
+                                        // type. Clearing on open always shows every type.
+                                        inputValue={typeQuery}
+                                        onInputValueChange={(next) => setTypeQuery(next ?? "")}
+                                        onOpenChange={(open) => {
+                                            if (open) setTypeQuery("")
+                                        }}
                                     >
-                                        <ComboboxTrigger className="h-[52px] w-full rounded-xl border border-[var(--input)] bg-[var(--secondary)] text-base flex items-center px-4 justify-between">
+                                        <ComboboxTrigger className="editorial-transition flex h-[44px] w-full items-center justify-between rounded-[14px] border border-[var(--input)] bg-[var(--secondary)] px-4 text-sm text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] focus-visible:border-[var(--ring)]">
                                             {page.type && PAGE_TYPE_ICONS[page.type] ? (
                                                 (() => {
                                                     const Icon = PAGE_TYPE_ICONS[page.type]
@@ -182,7 +178,7 @@ export function SettingsPanel({
                                                     )
                                                 })()
                                             ) : (
-                                                <span className="text-muted-foreground">Select page type</span>
+                                                <span className="text-[var(--editorial-subtle)]">Select page type</span>
                                             )}
                                         </ComboboxTrigger>
                                         <ComboboxContent className="editorial rounded-xl border border-[var(--border)] bg-[var(--popover)]">
@@ -192,7 +188,7 @@ export function SettingsPanel({
                                                     const Icon = PAGE_TYPE_ICONS[item]
                                                     return (
                                                         <ComboboxItem key={item} value={item} className="rounded-[12px] py-3.5!">
-                                                            <Icon className="h-5 w-5" />
+                                                            <Icon className="h-4 w-4" />
                                                             {PAGE_TYPE_LABELS[item]}
                                                         </ComboboxItem>
                                                     )
@@ -453,74 +449,35 @@ export function SettingsPanel({
 
                                 {/* Custom validation error message — available on every type */}
                                 <SettingsSection title="Validation message">
-                                    <Input
+                                    <TextSetting
+                                        label="Message"
+                                        description="Shown to respondents when this page fails validation."
                                         value={page.validation?.message ?? ""}
-                                        onChange={(e) => patchValidation({ message: e.target.value })}
+                                        onChange={(message) => patchValidation({ message })}
                                         placeholder="This page is required"
-                                        className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
                                     />
-                                    <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
-                                        Shown to respondents when this page fails validation.
-                                    </p>
                                 </SettingsSection>
 
-                                {/* Button Text — in settings tab */}
-                                <SettingsSection title="Button Text">
-                                    <div className="space-y-1.5">
-                                        <Label className="text-base text-[var(--editorial-body)]">Button Text</Label>
-                                        <Input
-                                            value={page.appearance.submitButtonText ?? ""}
-                                            onChange={(e) =>
-                                                onUpdate(pageIndex, {
-                                                    appearance: {
-                                                        ...page.appearance,
-                                                        submitButtonText: e.target.value,
-                                                    },
-                                                })
-                                            }
-                                            placeholder="Submit"
-                                            className="h-[52px] rounded-xl border-[var(--input)] bg-[var(--secondary)] px-5 text-base"
-                                        />
-                                    </div>
+                                {/* Button text — in settings tab */}
+                                <SettingsSection title="">
+                                    <TextSetting
+                                        label="Button text"
+                                        value={page.appearance.submitButtonText ?? ""}
+                                        onChange={(submitButtonText) =>
+                                            onUpdate(pageIndex, {
+                                                appearance: {
+                                                    ...page.appearance,
+                                                    submitButtonText,
+                                                },
+                                            })
+                                        }
+                                        placeholder="Submit"
+                                    />
                                 </SettingsSection>
                             </div>
                         </TabsContent>
-
-                        <TabsContent value="design" className="h-full" />
                     </Tabs>
                 </div>
-
-                <Sheet
-                    open={designDrawerOpen}
-                    onOpenChange={(_open, eventDetails) => {
-                        // Prevent closing when clicking outside the sheet if there are unsaved changes
-                        if (hasChangesRef.current && (eventDetails?.reason === "outside-press" || eventDetails?.reason === "focus-out")) {
-                            return
-                        }
-                        onCloseDesignDrawer()
-                    }}
-                    modal
-                >
-                    {/* `editorial` re-points the design tokens for this portalled surface. */}
-                    <SheetContent
-                        side="right"
-                        className="editorial h-full flex flex-col w-[90.666%] max-w-none min-w-0 overflow-hidden border-l border-[var(--border)] bg-[var(--card)] p-0 data-[side=right]:w-[90.666%] data-[side=right]:sm:max-w-none"
-                        showCloseButton={false}
-                    >
-                        <div className=" flex-1 min-h-0 w-full">
-                            <DesignDrawer
-                                open={designDrawerOpen}
-                                theme={theme}
-                                page={page}
-                                pageIndex={pageIndex}
-                                onUpdatePage={onUpdate}
-                                onSaveTheme={onSaveTheme}
-                                onCancel={onCloseDesignDrawer}
-                                hasChangesRef={hasChangesRef}
-                            />
-                        </div>
-                    </SheetContent>
-                </Sheet>
 
                 <ImagePickerDialog
                     open={coverDialogOpen}

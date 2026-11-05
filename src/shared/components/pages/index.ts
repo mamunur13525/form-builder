@@ -1,6 +1,8 @@
 export { PageLabel } from "./PageLabel"
 export { PageHelperText } from "./PageHelperText"
 export { VariableEditable } from "./VariableEditable"
+export { VariableText } from "./VariableText"
+export { VARIABLE_TOKEN_COLOR, renderVariableSegments } from "./variableTokens"
 export {
     buildVariableItems,
     renderVariableText,

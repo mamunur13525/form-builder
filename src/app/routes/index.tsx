@@ -9,8 +9,8 @@ import { ForgotPasswordPage } from "../../pages/ForgotPassword"
 import { DashboardPage } from "../../pages/Dashboard"
 import { FormsPage } from "../../pages/Forms"
 import { TemplatesPage } from "../../pages/Templates"
-import { SettingsPage } from "../../pages/Settings"
-import { PricingPage } from "../../pages/Pricing"
+import { AcceptInvitationPage } from "../../pages/AcceptInvitation"
+import { BillingSuccessPage } from "../../pages/BillingSuccess"
 import { FormBuilderPage } from "../../pages/FormBuilder"
 import { LogicBuilderPage } from "../../pages/LogicBuilder"
 import { SubmissionsPage } from "../../pages/FormResponse"
@@ -24,9 +24,18 @@ import { HiddenFieldsVariables } from "../../pages/FormSettings/sections/HiddenF
 import { FormIntegrationsPage } from "../../pages/FormIntegrations/FormIntegrationsPage"
 import { FormSharePage } from "../../pages/FormShare/FormSharePage"
 import { FormFillPage } from "../../pages/FormFill"
+import { AdminUpdatesPage } from "../../pages/AdminUpdates"
+import {
+    FeedbackLayout,
+    FeedbackListPage,
+    FeedbackDetailPage,
+    UpdatesListPage,
+    UpdateDetailPage,
+} from "../../pages/Feedback"
 import { FormLayout } from "../layouts/FormLayout"
 import { ROUTES } from "@/shared/constants/routes"
 import { tokenStorage } from "@/shared/utils/storage"
+import { SettingsDeepLink } from "../../widgets/SettingsModal"
 
 function AppShell() {
     return (
@@ -38,11 +47,11 @@ function AppShell() {
 
 function ProtectedLayout() {
     const hasToken = !!tokenStorage.getAccessToken()
-    
+
     if (!hasToken) {
         return <Navigate to={ROUTES.LOGIN} replace />
     }
-    
+
     return (
         <MainLayout>
             <Outlet />
@@ -69,6 +78,7 @@ export const router = createBrowserRouter([
                     { path: ROUTES.LOGIN, element: <LoginPage /> },
                     { path: ROUTES.SIGNUP, element: <SignupPage /> },
                     { path: ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
+                    { path: ROUTES.ADMIN_UPDATES, element: <AdminUpdatesPage /> },
                 ],
             },
             {
@@ -77,20 +87,28 @@ export const router = createBrowserRouter([
                     { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
                     { path: ROUTES.FORMS, element: <FormsPage /> },
                     { path: ROUTES.TEMPLATES, element: <TemplatesPage /> },
-                    { path: ROUTES.SETTINGS, element: <SettingsPage /> },
-                    { path: ROUTES.PRICING, element: <PricingPage /> },
+                    { path: ROUTES.SETTINGS, element: <SettingsDeepLink section="account" /> },
+                    { path: ROUTES.WORKSPACE_SETTINGS, element: <SettingsDeepLink section="workspace" /> },
+                    { path: ROUTES.BILLING, element: <SettingsDeepLink section="billing" /> },
+                    { path: ROUTES.PRICING, element: <SettingsDeepLink section="pricing" /> },
+                    // Behind auth: the server matches the signed-in email against
+                    // the invited address before accepting.
+                    { path: ROUTES.INVITATION_ACCEPT, element: <AcceptInvitationPage /> },
+                    { path: ROUTES.BILLING_SUCCESS, element: <BillingSuccessPage /> },
                     {
                         element: <FormLayout />,
                         children: [
                             { path: ROUTES.FORM_BUILDER, element: <FormBuilderPage /> },
                             { path: ROUTES.FORM_LOGIC, element: <LogicBuilderPage /> },
-                            { path: ROUTES.FORM_SETTINGS, element: <FormSettingsPage />, children: [
-                                { index: true, element: <Navigate to="general" replace /> },
-                                { path: "general", element: <GeneralSettings /> },
-                                { path: "email-settings", element: <EmailSettings /> },
-                                { path: "access", element: <AccessScheduling /> },
-                                { path: "hidden-fields", element: <HiddenFieldsVariables /> },
-                            ] },
+                            {
+                                path: ROUTES.FORM_SETTINGS, element: <FormSettingsPage />, children: [
+                                    { index: true, element: <Navigate to="general" replace /> },
+                                    { path: "general", element: <GeneralSettings /> },
+                                    { path: "email-settings", element: <EmailSettings /> },
+                                    { path: "access", element: <AccessScheduling /> },
+                                    { path: "hidden-fields", element: <HiddenFieldsVariables /> },
+                                ]
+                            },
                             { path: ROUTES.FORM_INTEGRATIONS, element: <FormIntegrationsPage /> },
                             { path: ROUTES.FORM_SHARE, element: <FormSharePage /> },
                             { path: ROUTES.FORM_RESPONSE_SUBMISSIONS, element: <SubmissionsPage /> },
@@ -101,6 +119,15 @@ export const router = createBrowserRouter([
                 ],
             },
             { path: ROUTES.FORM_FILL, element: <FormFillPage /> },
+            {
+                element: <FeedbackLayout />,
+                children: [
+                    { path: ROUTES.FEEDBACK, element: <FeedbackListPage /> },
+                    { path: ROUTES.FEEDBACK_DETAIL, element: <FeedbackDetailPage /> },
+                    { path: ROUTES.UPDATES, element: <UpdatesListPage /> },
+                    { path: ROUTES.UPDATE_DETAIL, element: <UpdateDetailPage /> },
+                ],
+            },
             { path: "*", element: <Navigate to={ROUTES.HOME} replace /> },
         ],
     },

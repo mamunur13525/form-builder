@@ -16,6 +16,7 @@ import type {
     UpdateGeneralSettingsRequest,
     UpdateHiddenFieldsRequest,
     UpdateVariablesRequest,
+    UpdateIntegrationsRequest,
 } from "@/entities/form/model/types"
 import {
     getFormSettings,
@@ -24,6 +25,7 @@ import {
     updateGeneralSettings,
     updateHiddenFields,
     updateVariables,
+    updateIntegrationsSettings,
 } from "@/entities/form/api/settings.api"
 
 export const SETTINGS_QUERY_KEY = (formId: string) => [
@@ -109,5 +111,12 @@ export function useUpdateHiddenFields() {
 export function useUpdateVariables() {
     return useSettingsMutation<UpdateVariablesRequest>(({ formId, data }) =>
         updateVariables(formId, data),
+    )
+}
+
+/** PATCH /forms/:formId/settings/integrations */
+export function useUpdateIntegrationsSettings() {
+    return useSettingsMutation<UpdateIntegrationsRequest>(({ formId, data }) =>
+        updateIntegrationsSettings(formId, data),
     )
 }

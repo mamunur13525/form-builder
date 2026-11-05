@@ -26,7 +26,9 @@ function ConnectedRow({
 }) {
     const Icon = integration.icon
     const subline =
-        integration.id === "email-to-me" ? (
+        integration.subline ? (
+            integration.subline
+        ) : integration.id === "email-to-me" ? (
             <>
                 Notifying{" "}
                 <span className="font-medium text-[var(--foreground)]">

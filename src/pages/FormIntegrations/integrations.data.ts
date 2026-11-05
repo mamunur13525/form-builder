@@ -30,6 +30,8 @@ export interface Integration {
     cta: IntegrationCta
     /** Whether this integration is already live for the current form. */
     connected?: boolean
+    /** Summary subline when active (e.g. "Posting to #channel"). */
+    subline?: string
     /** The URL to the integration's settings page. */
     link?: string
 }

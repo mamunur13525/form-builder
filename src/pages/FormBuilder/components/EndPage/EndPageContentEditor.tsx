@@ -14,6 +14,12 @@ interface EndPageContentEditorProps {
     isMobileView: boolean
     theme?: IFormTheme | null
     variables?: VariableItem[]
+    /**
+     * When false the canvas background (colour + image) is owned by an outer
+     * container, e.g. the form builder's window canvas, so the editor stays
+     * transparent and lets it show through.
+     */
+    withBackground?: boolean
 }
 
 /**
@@ -28,6 +34,7 @@ export function EndPageContentEditor({
     isMobileView,
     theme,
     variables = [],
+    withBackground = true,
 }: EndPageContentEditorProps) {
     const themeResolved = resolveFormTheme(theme)
 
@@ -52,7 +59,7 @@ export function EndPageContentEditor({
     )
 
     const containerStyle: React.CSSProperties = {
-        backgroundColor: themeResolved.backgroundColor,
+        ...(withBackground ? { backgroundColor: themeResolved.backgroundColor } : {}),
         color: themeResolved.textColor,
         fontFamily: themeResolved.font?.family
             ? `"${themeResolved.font.family}", sans-serif`
@@ -77,7 +84,7 @@ export function EndPageContentEditor({
             className="light relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
             style={containerStyle}
         >
-            {themeResolved.backgroundImage?.url && (
+            {withBackground && themeResolved.backgroundImage?.url && (
                 <div className="absolute inset-0 pointer-events-none z-0" style={bgImageStyle} />
             )}
 

@@ -382,7 +382,7 @@ export function DesignDrawer({
                         
                     </div>
 
-                    <div className="relative flex-1 min-h-0 overflow-y-auto p-4 sm:p-8 bg-white">
+                    <div className="relative flex-1 min-h-0 overflow-y-auto bg-white">
                         {endPage ? (
                             <EndPageContentEditor
                                 endPage={endPage}

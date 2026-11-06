@@ -10,7 +10,6 @@ import {
     ShieldCheck,
     MousePointer,
     Settings as SettingsIcon,
-    ChevronDown,
 } from "lucide-react"
 import { Input } from "../../../components/ui/input"
 import {
@@ -479,7 +478,6 @@ export function SettingsPanel({
                                             placeholder="This page is required"
                                             className={cn(CONTROL_CLASS, "pr-8")}
                                         />
-                                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                                     </div>
                                 </SettingsSection>
 

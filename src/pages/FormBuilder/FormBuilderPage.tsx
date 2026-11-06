@@ -1,4 +1,11 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  type CSSProperties,
+} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ZoomIn,
@@ -30,6 +37,7 @@ import { useDebounce } from "../../shared/hooks/useDebounce";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
 import { useFormSettings } from "@/features/forms/hooks/useFormSettings";
 import { buildVariableItems } from "@/shared/components/pages";
+import { resolveFormTheme } from "@/shared/utils/theme";
 import { FormBuilderSidebar } from "./components/FormBuilderSidebar";
 import { PageContentEditor } from "./components/PageContentEditor/PageContentEditor";
 import { EndPageContentEditor } from "./components/EndPage/EndPageContentEditor";
@@ -65,6 +73,40 @@ export function FormBuilderPage() {
     () => buildVariableItems(settingsData?.settings.variables, form?.title),
     [settingsData?.settings.variables, form?.title],
   );
+
+  const themeResolved = useMemo(
+    () => resolveFormTheme(form?.theme),
+    [form?.theme],
+  );
+
+  // The theme's canvas background lives on the window content itself so the
+  // image spans the whole artboard (including its padding) instead of only the
+  // editable page surface.
+  const canvasBackgroundStyle = useMemo<CSSProperties>(() => {
+    const image = themeResolved.backgroundImage;
+    const brightness = image?.brightness ?? 0;
+    const brightnessLayer =
+      brightness > 0
+        ? `linear-gradient(rgba(255,255,255,${Math.min(brightness, 100) / 100}), rgba(255,255,255,${Math.min(brightness, 100) / 100}))`
+        : brightness < 0
+          ? `linear-gradient(rgba(0,0,0,${Math.min(-brightness, 100) / 100}), rgba(0,0,0,${Math.min(-brightness, 100) / 100}))`
+          : null;
+
+    return {
+      backgroundColor: themeResolved.backgroundColor,
+      color: themeResolved.textColor,
+      ...(image?.url
+        ? {
+            backgroundImage: brightnessLayer
+              ? `${brightnessLayer}, url(${image.url})`
+              : `url(${image.url})`,
+            backgroundRepeat: image.tile ? "repeat" : "no-repeat",
+            backgroundSize: image.tile ? "auto" : "cover",
+            backgroundPosition: "center",
+          }
+        : {}),
+    };
+  }, [themeResolved]);
 
   const [pages, setPages] = useState<FormPage[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
@@ -767,7 +809,10 @@ export function FormBuilderPage() {
           </div>
 
           {/* Window Canvas Content with Studio Bounding Box */}
-          <div className="flex-1 min-h-0 overflow-y-auto relative p-2 sm:p-4 bg-white">
+          <div
+            className="flex-1 min-h-0 overflow-y-auto relative p-2 sm:p-4 bg-white"
+            style={canvasBackgroundStyle}
+          >
             {isEndPageSelected ? (
               <div className="relative h-full w-full rounded-2xl  transition-all">
                 {/* Top-left tag badge */}
@@ -787,6 +832,7 @@ export function FormBuilderPage() {
                   isMobileView={isMobileView}
                   theme={form?.theme}
                   variables={variableItems}
+                  withBackground={false}
                 />
               </div>
             ) : selectedPage ? (
@@ -808,6 +854,7 @@ export function FormBuilderPage() {
                   isMobileView={isMobileView}
                   theme={form?.theme}
                   variables={variableItems}
+                  withBackground={false}
                 />
               </div>
             ) : (

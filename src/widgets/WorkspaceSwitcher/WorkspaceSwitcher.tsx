@@ -120,7 +120,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
                         </span>
                         <span className="block truncate text-xs text-[var(--editorial-subtle)]">
                             {activeWorkspace.currentUserRole
-                                ? WORKSPACE_ROLE_LABELS[activeWorkspace.currentUserRole]
+                                ? (WORKSPACE_ROLE_LABELS[activeWorkspace.currentUserRole] ?? (activeWorkspace.currentUserRole === ("editor" as any) ? "Editor" : activeWorkspace.currentUserRole))
                                 : "Member"}
                             {" · "}
                             {activeWorkspace.memberCount}

@@ -48,9 +48,10 @@ interface MembersPanelProps {
 }
 
 /** Rank used to decide whether the current user may act on a row. */
-const ROLE_RANK: Record<WorkspaceRole, number> = {
+const ROLE_RANK: Record<string, number> = {
     viewer: 1,
     member: 2,
+    editor: 2,
     admin: 3,
     owner: 4,
 }
@@ -85,6 +86,7 @@ function isPastDate(value: string | null): boolean {
 
 /** Role pill. Owner gets the one accent in the row; the rest stay neutral. */
 function RoleBadge({ role }: { role: WorkspaceRole }) {
+    const label = WORKSPACE_ROLE_LABELS[role] ?? (role === ("editor" as any) ? "Editor" : (role || "Member"))
     return (
         <span
             className={cn(
@@ -95,7 +97,7 @@ function RoleBadge({ role }: { role: WorkspaceRole }) {
             )}
         >
             {role === "owner" && <Crown className="h-3 w-3" />}
-            {WORKSPACE_ROLE_LABELS[role]}
+            {label}
         </span>
     )
 }
@@ -417,9 +419,9 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                 open={inviteOpen}
                 onOpenChange={setInviteOpen}
                 defaultRole={
-                    workspace.settings.defaultMemberRole === "owner"
+                    workspace.settings?.defaultMemberRole === "owner"
                         ? "member"
-                        : (workspace.settings.defaultMemberRole as AssignableWorkspaceRole)
+                        : ((workspace.settings?.defaultMemberRole as AssignableWorkspaceRole) || "member")
                 }
                 assignableRoles={assignableRoles}
             />

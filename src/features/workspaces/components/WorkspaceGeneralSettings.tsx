@@ -14,6 +14,7 @@ import {
 import { uploadFile } from "@/entities/upload/api/upload.api"
 import {
     ASSIGNABLE_WORKSPACE_ROLES,
+    DEFAULT_WORKSPACE_SETTINGS,
     WORKSPACE_ROLE_DESCRIPTIONS,
     WORKSPACE_ROLE_LABELS,
     WORKSPACE_VISIBILITY_DESCRIPTIONS,
@@ -70,12 +71,17 @@ function IdentityCard({
 }) {
     const updateWorkspace = useUpdateWorkspace(workspace.id)
 
-    const [name, setName] = useState(workspace.name)
-    const [slug, setSlug] = useState(workspace.slug)
-    const [description, setDescription] = useState(workspace.description)
-    const [logoUrl, setLogoUrl] = useState(workspace.logoUrl)
+    const currentName = workspace.name ?? ""
+    const currentSlug = workspace.slug ?? ""
+    const currentDescription = workspace.description ?? ""
+    const currentLogoUrl = workspace.logoUrl ?? ""
+
+    const [name, setName] = useState(currentName)
+    const [slug, setSlug] = useState(currentSlug)
+    const [description, setDescription] = useState(currentDescription)
+    const [logoUrl, setLogoUrl] = useState(currentLogoUrl)
     const [isUploading, setIsUploading] = useState(false)
-    const [debouncedSlug, setDebouncedSlug] = useState(workspace.slug)
+    const [debouncedSlug, setDebouncedSlug] = useState(currentSlug)
 
     useEffect(() => {
         const timer = window.setTimeout(() => setDebouncedSlug(slug), 400)
@@ -83,10 +89,10 @@ function IdentityCard({
     }, [slug])
 
     // Only ask the server about a slug that actually differs from the current one.
-    const slugChanged = slug !== workspace.slug
+    const slugChanged = slug !== currentSlug
     const { data: availability, isFetching: isCheckingSlug } = useSlugAvailability(
         debouncedSlug,
-        slugChanged && debouncedSlug !== workspace.slug,
+        slugChanged && debouncedSlug !== currentSlug && debouncedSlug.length >= 3,
     )
 
     const slugTaken =
@@ -96,15 +102,15 @@ function IdentityCard({
         availability?.available === false
 
     const isDirty =
-        name !== workspace.name ||
-        slug !== workspace.slug ||
-        description !== workspace.description ||
-        logoUrl !== workspace.logoUrl
+        name !== currentName ||
+        slug !== currentSlug ||
+        description !== currentDescription ||
+        logoUrl !== currentLogoUrl
 
     const canSave =
         isDirty &&
         name.trim().length >= 2 &&
-        slug.length >= 3 &&
+        (slug.length >= 3 || (!slug && !currentSlug)) &&
         !slugTaken &&
         !isUploading &&
         !updateWorkspace.isPending
@@ -128,18 +134,18 @@ function IdentityCard({
 
         // Send only what changed — the API treats every field as optional.
         updateWorkspace.mutate({
-            ...(name !== workspace.name ? { name: name.trim() } : {}),
-            ...(slug !== workspace.slug ? { slug } : {}),
-            ...(description !== workspace.description ? { description } : {}),
-            ...(logoUrl !== workspace.logoUrl ? { logoUrl } : {}),
+            ...(name !== currentName ? { name: name.trim() } : {}),
+            ...(slug !== currentSlug ? { slug } : {}),
+            ...(description !== currentDescription ? { description } : {}),
+            ...(logoUrl !== currentLogoUrl ? { logoUrl } : {}),
         })
     }
 
     const handleReset = () => {
-        setName(workspace.name)
-        setSlug(workspace.slug)
-        setDescription(workspace.description)
-        setLogoUrl(workspace.logoUrl)
+        setName(currentName)
+        setSlug(currentSlug)
+        setDescription(currentDescription)
+        setLogoUrl(currentLogoUrl)
     }
 
     return (
@@ -332,6 +338,10 @@ function DefaultsCard({
     canEdit: boolean
 }) {
     const updateSettings = useUpdateWorkspaceSettings(workspace.id)
+    const settings = {
+        ...DEFAULT_WORKSPACE_SETTINGS,
+        ...(workspace.settings ?? {}),
+    }
 
     return (
         <section className={cardClass}>
@@ -347,7 +357,7 @@ function DefaultsCard({
                         Workspace visibility
                     </Label>
                     <Select
-                        value={workspace.settings.visibility}
+                        value={settings.visibility}
                         onValueChange={(value) =>
                             updateSettings.mutate({
                                 visibility: value as WorkspaceVisibility,
@@ -381,7 +391,7 @@ function DefaultsCard({
                         Default role for new members
                     </Label>
                     <Select
-                        value={workspace.settings.defaultMemberRole}
+                        value={settings.defaultMemberRole}
                         onValueChange={(value) =>
                             updateSettings.mutate({
                                 defaultMemberRole: value as AssignableWorkspaceRole,
@@ -420,7 +430,7 @@ function DefaultsCard({
                         </p>
                     </div>
                     <Switch
-                        checked={workspace.settings.allowMemberInvites}
+                        checked={settings.allowMemberInvites}
                         disabled={!canEdit}
                         onCheckedChange={(checked) =>
                             updateSettings.mutate({ allowMemberInvites: checked })
@@ -439,7 +449,7 @@ function DefaultsCard({
                         </p>
                     </div>
                     <Switch
-                        checked={workspace.settings.requireInviteApproval}
+                        checked={settings.requireInviteApproval}
                         disabled={!canEdit}
                         onCheckedChange={(checked) =>
                             updateSettings.mutate({ requireInviteApproval: checked })
@@ -474,10 +484,10 @@ export function WorkspaceGeneralSettings({ workspace }: WorkspaceGeneralSettings
 
     const identityKey = [
         workspace.id,
-        workspace.name,
-        workspace.slug,
-        workspace.description,
-        workspace.logoUrl,
+        workspace.name ?? "",
+        workspace.slug ?? "",
+        workspace.description ?? "",
+        workspace.logoUrl ?? "",
     ].join("|")
 
     return (

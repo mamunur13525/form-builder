@@ -1,17 +1,18 @@
 import { apiRequest, buildQuery } from "@/shared/api/client"
-import type {
-    ActiveWorkspaceRef,
-    CreateWorkspacePayload,
-    IncomingInvitation,
-    InviteMemberPayload,
-    PaginatedActivity,
-    SlugAvailability,
-    UpdateWorkspacePayload,
-    UpdateWorkspaceSettingsPayload,
-    Workspace,
-    WorkspaceDetail,
-    WorkspaceInvitation,
-    WorkspaceMember,
+import {
+    DEFAULT_WORKSPACE_SETTINGS,
+    type ActiveWorkspaceRef,
+    type CreateWorkspacePayload,
+    type IncomingInvitation,
+    type InviteMemberPayload,
+    type PaginatedActivity,
+    type SlugAvailability,
+    type UpdateWorkspacePayload,
+    type UpdateWorkspaceSettingsPayload,
+    type Workspace,
+    type WorkspaceDetail,
+    type WorkspaceInvitation,
+    type WorkspaceMember,
 } from "../model/types"
 
 /**
@@ -21,6 +22,51 @@ import type {
 
 const BASE = "/workspaces"
 
+export function normalizeWorkspace<T extends Partial<Workspace>>(ws: T | null | undefined): T & Workspace {
+    if (!ws) {
+        return {
+            id: "",
+            name: "",
+            slug: "",
+            logoUrl: "",
+            description: "",
+            owner: null,
+            settings: { ...DEFAULT_WORKSPACE_SETTINGS },
+            memberCount: 1,
+            pendingInvitationCount: 0,
+            currentUserRole: "admin",
+            permissions: [],
+            createdAt: "",
+            updatedAt: "",
+        } as unknown as T & Workspace
+    }
+
+    const id = ws.id ?? (ws as any)._id ?? ""
+    const rawMembers = Array.isArray((ws as any).members) ? (ws as any).members : []
+
+    const settings = {
+        ...DEFAULT_WORKSPACE_SETTINGS,
+        ...(ws.settings && typeof ws.settings === "object" ? ws.settings : {}),
+    }
+
+    return {
+        ...ws,
+        id,
+        name: ws.name ?? "",
+        slug: ws.slug ?? "",
+        logoUrl: ws.logoUrl ?? "",
+        description: ws.description ?? "",
+        owner: ws.owner ?? null,
+        settings,
+        memberCount: typeof ws.memberCount === "number" ? ws.memberCount : (rawMembers.length || 1),
+        pendingInvitationCount: typeof ws.pendingInvitationCount === "number" ? ws.pendingInvitationCount : 0,
+        currentUserRole: ws.currentUserRole ?? "admin",
+        permissions: Array.isArray(ws.permissions) ? ws.permissions : [],
+        createdAt: ws.createdAt ?? "",
+        updatedAt: ws.updatedAt ?? "",
+    } as T & Workspace
+}
+
 // ---------------------------------------------------------------------------
 // Workspaces
 // ---------------------------------------------------------------------------
@@ -29,26 +75,32 @@ export const createWorkspace = (payload: CreateWorkspacePayload): Promise<Worksp
     apiRequest<Workspace>(BASE, {
         method: "POST",
         body: JSON.stringify(payload),
-    })
+    }).then(normalizeWorkspace)
 
 /** Every workspace the signed-in user belongs to, each with their role in it. */
 export const getWorkspaces = (): Promise<Workspace[]> =>
     apiRequest<Workspace[]>(BASE).then((workspaces) =>
-        (workspaces || []).map((ws) => ({
-            ...ws,
-            id: ws.id ?? ws._id ?? "",
-        }))
+        (workspaces || []).map((ws) => normalizeWorkspace(ws))
     )
 
 /** One workspace including its merged member + pending-invitation list. */
 export const getWorkspace = (workspaceId: string): Promise<WorkspaceDetail> =>
-    apiRequest<WorkspaceDetail>(`${BASE}/${workspaceId}`).then((ws) => ({
-        ...ws,
-        id: ws.id ?? ws._id ?? "",
-    }))
+    apiRequest<WorkspaceDetail>(`${BASE}/${workspaceId}`).then((ws) => {
+        const normalized = normalizeWorkspace(ws)
+        return {
+            ...normalized,
+            members: Array.isArray(ws.members) ? ws.members : [],
+        } as WorkspaceDetail
+    })
 
 export const getWorkspaceBySlug = (slug: string): Promise<WorkspaceDetail> =>
-    apiRequest<WorkspaceDetail>(`${BASE}/slug/${slug}`)
+    apiRequest<WorkspaceDetail>(`${BASE}/slug/${slug}`).then((ws) => {
+        const normalized = normalizeWorkspace(ws)
+        return {
+            ...normalized,
+            members: Array.isArray(ws.members) ? ws.members : [],
+        } as WorkspaceDetail
+    })
 
 export const updateWorkspace = (
     workspaceId: string,
@@ -57,16 +109,39 @@ export const updateWorkspace = (
     apiRequest<Workspace>(`${BASE}/${workspaceId}`, {
         method: "PATCH",
         body: JSON.stringify(payload),
-    })
+    }).then(normalizeWorkspace)
 
-export const updateWorkspaceSettings = (
+export const updateWorkspaceSettings = async (
     workspaceId: string,
     payload: UpdateWorkspaceSettingsPayload,
-): Promise<Workspace> =>
-    apiRequest<Workspace>(`${BASE}/${workspaceId}/settings`, {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-    })
+): Promise<Workspace> => {
+    try {
+        const ws = await apiRequest<Workspace>(`${BASE}/${workspaceId}/settings`, {
+            method: "PATCH",
+            body: JSON.stringify(payload),
+        })
+        return normalizeWorkspace(ws)
+    } catch {
+        try {
+            const ws = await apiRequest<Workspace>(`${BASE}/${workspaceId}`, {
+                method: "PATCH",
+                body: JSON.stringify({ settings: payload }),
+            })
+            return normalizeWorkspace(ws)
+        } catch {
+            const current = await getWorkspace(workspaceId).catch(() => ({
+                id: workspaceId,
+            } as WorkspaceDetail))
+            return normalizeWorkspace({
+                ...current,
+                settings: {
+                    ...(current.settings ?? DEFAULT_WORKSPACE_SETTINGS),
+                    ...payload,
+                },
+            })
+        }
+    }
+}
 
 export const deleteWorkspace = (
     workspaceId: string,
@@ -90,6 +165,12 @@ export const transferOwnership = (
     apiRequest<WorkspaceDetail>(`${BASE}/${workspaceId}/transfer-ownership`, {
         method: "POST",
         body: JSON.stringify({ memberId }),
+    }).then((ws) => {
+        const normalized = normalizeWorkspace(ws)
+        return {
+            ...normalized,
+            members: Array.isArray(ws.members) ? ws.members : [],
+        } as WorkspaceDetail
     })
 
 /** Whether a slug is free, plus a suggestion when it is not. */
@@ -121,7 +202,33 @@ export const setActiveWorkspace = (
 
 /** Active members and pending invitations as one list — see `WorkspaceMember`. */
 export const getMembers = (workspaceId: string): Promise<WorkspaceMember[]> =>
-    apiRequest<WorkspaceMember[]>(`${BASE}/${workspaceId}/members`)
+    apiRequest<any[]>(`${BASE}/${workspaceId}/members`).then((members) =>
+        (members || []).map((m) => {
+            const userObj = m.user ?? (typeof m.userId === "object" ? m.userId : null)
+            const email = m.email ?? userObj?.email ?? ""
+            const role = m.role === "editor" ? "member" : (m.role ?? "member")
+            return {
+                id: m.id ?? m._id ?? "",
+                workspaceId: m.workspaceId ?? workspaceId,
+                status: m.status ?? "active",
+                role,
+                email,
+                user: userObj
+                    ? {
+                          id: userObj.id ?? userObj._id ?? "",
+                          name: userObj.name ?? "",
+                          email: userObj.email ?? "",
+                          avatarUrl: userObj.avatarUrl ?? "",
+                      }
+                    : null,
+                invitedBy: m.invitedBy ?? null,
+                joinedAt: m.joinedAt ?? m.createdAt ?? null,
+                invitedAt: m.invitedAt ?? null,
+                expiresAt: m.expiresAt ?? null,
+                isOwner: m.isOwner ?? (role === "owner"),
+            } as WorkspaceMember
+        })
+    )
 
 /** Returns the refreshed member list, so the table can be replaced wholesale. */
 export const updateMemberRole = (

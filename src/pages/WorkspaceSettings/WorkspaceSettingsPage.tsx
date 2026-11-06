@@ -144,16 +144,16 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
                         />
                     ) : (
                         <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-lg font-semibold text-[var(--editorial-body)]">
-                            {workspace.name.slice(0, 2).toUpperCase()}
+                            {(workspace.name || "Workspace").slice(0, 2).toUpperCase()}
                         </span>
                     )}
                     <div className="min-w-0">
                         <h1 className="font-display truncate text-[28px] leading-[1.1] text-[var(--foreground)] sm:text-[40px]">
-                            {workspace.name}
+                            {workspace.name || "Workspace"}
                         </h1>
                         <p className="mt-1 text-sm text-[var(--editorial-body)]">
-                            /w/{workspace.slug}
-                            {role && ` · you are ${WORKSPACE_ROLE_LABELS[role]}`}
+                            {workspace.slug ? `/w/${workspace.slug}` : ""}
+                            {role && ` · you are ${WORKSPACE_ROLE_LABELS[role] ?? ((role as string) === "editor" ? "Editor" : role)}`}
                         </p>
                     </div>
                 </div>

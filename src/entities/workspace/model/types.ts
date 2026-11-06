@@ -78,6 +78,13 @@ export interface WorkspaceSettings {
   requireInviteApproval: boolean;
 }
 
+export const DEFAULT_WORKSPACE_SETTINGS: WorkspaceSettings = {
+  visibility: "private",
+  defaultMemberRole: "member",
+  allowMemberInvites: true,
+  requireInviteApproval: false,
+};
+
 /**
  * A row in the members table. Active members and pending invitations share this
  * shape, discriminated by `status`:

@@ -152,11 +152,11 @@ export function FormDialog({
                             Cancel
                         </Button>
                         <Button
-                type="submit"
-                disabled={isPending}
-                className="w-full sm:w-auto"
-            >
-                {isPending ? (isCreate ? "Creating..." : "Saving...") : isCreate ? "Create Form" : "Save"}
+                            type="submit"
+                            disabled={isPending}
+                            className="w-full sm:w-auto"
+                        >
+                            {isPending ? (isCreate ? "Creating..." : "Saving...") : isCreate ? "Create Form" : "Save"}
                             {isPending && <Spinner data-icon="inline-start" />}
                         </Button>
                     </DialogFooter>

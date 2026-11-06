@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "./primitives"
 
 
-const PRIMARY_BUTTON_CLASS = "h-11 gap-2 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] px-6 text-sm font-semibold text-white shadow-md shadow-[#FF5722]/20 transition-all cursor-pointer active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+const PRIMARY_BUTTON_CLASS = "h-11 gap-2 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-6 text-sm font-semibold text-white shadow-md shadow-[#FF5722]/20 transition-all cursor-pointer active:scale-95 disabled:pointer-events-none disabled:opacity-50"
 
 // ── Types ───────────────────────────────────────────────────────────────────
 interface ImagePickerDialogProps {
@@ -54,7 +54,7 @@ const MOCK_UNSPLASH: UnsplashImage[] = [
 function ImagePreview({ src, alt, className }: { src: string; alt?: string; className?: string }) {
     const [loaded, setLoaded] = useState(false)
     return (
-        <div className={cn("relative overflow-hidden rounded-2xl border border-slate-200 dark:border-zinc-800", className)}>
+        <div className={cn("relative overflow-hidden rounded-lg border border-slate-200 dark:border-zinc-800", className)}>
             <img
                 src={src}
                 alt={alt || "Cover"}
@@ -112,7 +112,7 @@ function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                 onDrop={handleDrop}
                 onClick={() => inputRef.current?.click()}
                 className={cn(
-                    "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed py-8 sm:py-12 text-center transition-all",
+                    "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed py-8 sm:py-12 text-center transition-all",
                     dragOver
                         ? "border-[#FF5722] bg-[#FF5722]/10"
                         : "border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 hover:border-[#FF5722]/60 hover:bg-slate-100/70 dark:hover:bg-zinc-900/70"
@@ -180,7 +180,7 @@ function LinkTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                             onChange={(e) => { setUrl(e.target.value); setError(null) }}
                             placeholder="https://example.com/photo.jpg"
                             onKeyDown={(e) => e.key === "Enter" && handlePaste()}
-                            className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] pl-10 pr-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
+                            className="h-11 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] pl-10 pr-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
                         />
                     </div>
                     <Button onClick={handlePaste} disabled={validating} className={PRIMARY_BUTTON_CLASS}>
@@ -228,7 +228,7 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                         onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={handleKey}
                         placeholder="Search Unsplash..."
-                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] pl-10 pr-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
+                        className="h-11 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] pl-10 pr-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
                     />
                 </div>
                 <Button onClick={doSearch} disabled={searching} className={PRIMARY_BUTTON_CLASS}>
@@ -243,7 +243,7 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                             key={img.id}
                             type="button"
                             onClick={() => pick(img)}
-                            className="relative aspect-[4/3] overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:border-[#FF5722]/60 cursor-pointer shadow-xs"
+                            className="relative aspect-[4/3] overflow-hidden rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:border-[#FF5722]/60 cursor-pointer shadow-xs"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
@@ -300,7 +300,7 @@ export function ImagePickerDialog({
         <Dialog
             open={open}
             onOpenChange={(next) => { if (!next) reset(); onOpenChange(next); }}
-            className="w-full max-w-3xl rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
+            className="w-full max-w-3xl rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
         >
             <DialogContent className="border-0 bg-transparent text-slate-900 dark:text-zinc-100">
                 <DialogHeader className="mb-6">
@@ -360,7 +360,7 @@ export function ImagePickerDialog({
                     <Button
                         variant="outline"
                         onClick={() => onOpenChange(false)}
-                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-8 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
+                        className="h-11 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-8 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
                     >
                         Cancel
                     </Button>

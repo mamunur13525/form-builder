@@ -54,7 +54,7 @@ export function StatementPage({ settings }: StatementPageProps) {
                 <img
                     src={src}
                     alt={embedTitle || "Embedded image"}
-                    className="w-full rounded-md border object-contain"
+                    className="w-full rounded-lg border object-contain"
                 />
                 {embedTitle && (
                     <figcaption className="text-xs text-muted-foreground">
@@ -71,7 +71,7 @@ export function StatementPage({ settings }: StatementPageProps) {
                 <object
                     data={src}
                     type="application/pdf"
-                    className="h-96 w-full rounded-md border"
+                    className="h-96 w-full rounded-lg border"
                     aria-label={embedTitle || "Embedded PDF"}
                 >
                     <a
@@ -107,7 +107,7 @@ export function StatementPage({ settings }: StatementPageProps) {
 
     return (
         <div className="space-y-2">
-            <div className="aspect-video w-full overflow-hidden rounded-md border">
+            <div className="aspect-video w-full overflow-hidden rounded-lg border">
                 <iframe
                     src={src}
                     title={embedTitle || "Embedded media"}

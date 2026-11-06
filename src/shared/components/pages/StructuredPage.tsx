@@ -46,7 +46,7 @@ export function AddressPage({ value, onChange, pages, disabled, color, fontSizeC
                             onChange?.({ ...current, [page.key]: e.target.value })
                         }
                         className={cn(
-                            "h-10 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+                            "h-10 w-full rounded-lg border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
                             fontSizeClass,
                         )}
                         style={color ? { color } : undefined}
@@ -88,7 +88,7 @@ export function OpinionScalePage({
                         disabled={disabled}
                         onClick={() => onChange?.(n)}
                         className={cn(
-                            "h-11 min-w-11 rounded-md border px-2 text-base transition-colors",
+                            "h-11 min-w-11 rounded-lg border px-2 text-base transition-colors",
                             value === n
                                 ? "border-primary bg-primary text-primary-foreground"
                                 : "hover:bg-muted/50",

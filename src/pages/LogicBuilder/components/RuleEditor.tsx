@@ -83,7 +83,7 @@ export const TRIGGER_CLASS =
 
 /** Portalled select popup — inherits the `.editorial` subtree styling. */
 const OVERLAY_CLASS =
-    "editorial rounded-xl border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
+    "editorial rounded-lg border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
 
 /** Editorial input field that matches the select trigger height/width. */
 const INPUT_CLASS =
@@ -121,7 +121,7 @@ const IF_LABEL_CLASS =
 
 /** Amber-ish chip shown inside page selectors — icon + page number. */
 const PAGE_CHIP_CLASS =
-    "flex shrink-0 items-center gap-1.5 rounded-md bg-[var(--editorial-primary-selected)] px-2 py-0.5 text-xs font-semibold text-[var(--editorial-primary)]"
+    "flex shrink-0 items-center gap-1.5 rounded-lg bg-[var(--editorial-primary-selected)] px-2 py-0.5 text-xs font-semibold text-[var(--editorial-primary)]"
 
 /** Page-type chip — tinted, shows the page-type icon + page number. */
 export function PageTypeChip({
@@ -134,7 +134,7 @@ export function PageTypeChip({
     const Icon = PAGE_TYPE_ICONS[page.type]
     return (
         <span
-            className={`flex shrink-0 items-center gap-1.5 rounded-md bg-gradient-to-br px-2 py-0.5 text-xs font-semibold ${PAGE_TYPE_COLORS[page.type]}`}
+            className={`flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-br px-2 py-0.5 text-xs font-semibold ${PAGE_TYPE_COLORS[page.type]}`}
         >
             {Icon && <Icon className="h-3.5 w-3.5" aria-hidden />}
             Q{pageNumber}
@@ -730,15 +730,15 @@ export function RuleEditor({
     }
 
     return (
-        <div className="editorial overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm">
+        <div className="editorial overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-sm">
             {/* Header — numbered badge, title, delete + collapse */}
             <header className="flex items-center gap-3 border-b border-[var(--border)] px-5 py-4">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-[var(--editorial-primary-selected)] text-sm font-semibold text-[var(--editorial-primary)]">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[var(--editorial-primary-selected)] text-sm font-semibold text-[var(--editorial-primary)]">
                     {index}
                 </span>
                 <h2 className="flex min-w-0 flex-1 items-center gap-2 truncate text-[15px] font-semibold text-[var(--foreground)]">
                     Rule #{index}
-                    <span className="inline-flex shrink-0 items-center rounded-md bg-[var(--editorial-primary-selected)] px-2 py-0.5 text-xs font-semibold text-[var(--editorial-primary)]">
+                    <span className="inline-flex shrink-0 items-center rounded-lg bg-[var(--editorial-primary-selected)] px-2 py-0.5 text-xs font-semibold text-[var(--editorial-primary)]">
                         {section.title}
                     </span>
                 </h2>
@@ -784,14 +784,14 @@ export function RuleEditor({
                         variant="outline"
                         size="lg"
                         onClick={onCancel}
-                        className="h-9 rounded-xl px-6 text-[15px]"
+                        className="h-9 rounded-lg px-6 text-[15px]"
                     >
                         Cancel
                     </Button>
                     <Button
                         size="lg"
                         onClick={() => onSave(rule)}
-                        className="h-9 rounded-xl px-6 text-[15px]"
+                        className="h-9 rounded-lg px-6 text-[15px]"
                     >
                         Save rule
                     </Button>

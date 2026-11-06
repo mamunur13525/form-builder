@@ -388,7 +388,7 @@ export function VariableEditable({
                         <div
                             role="listbox"
                             aria-label="Insert variable"
-                            className="max-h-60 w-60 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--popover)] p-1 text-[var(--popover-foreground)] editorial-shadow-md"
+                            className="max-h-60 w-60 overflow-y-auto rounded-lg border border-[var(--border)] bg-[var(--popover)] p-1 text-[var(--popover-foreground)] editorial-shadow-md"
                         >
                             {filtered.length === 0 ? (
                                 <p className="px-2.5 py-2 text-[13px] text-[var(--muted-foreground)]">

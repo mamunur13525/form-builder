@@ -84,7 +84,7 @@ export function FormsPage() {
                             type="button"
                             onClick={() => setStatus(filter.value)}
                             className={cn(
-                                "editorial-transition h-11 shrink-0 rounded-[16px] border px-4 text-sm",
+                                "editorial-transition h-11 shrink-0 rounded-lg border px-4 text-sm",
                                 status === filter.value
                                     ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)]"
                                     : "border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]",
@@ -101,7 +101,7 @@ export function FormsPage() {
                     Loading forms...
                 </p>
             ) : visibleForms.length === 0 ? (
-                <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
+                <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
                     <CardContent className="py-20 text-center">
                         <FileText className="mx-auto mb-4 h-8 w-8 text-[var(--editorial-disabled)]" />
                         <p className="text-base text-[var(--editorial-subtle)]">

@@ -48,7 +48,7 @@ export function SubscriptionBanner({
     const badge = STATUS_BADGES[subscription.status]
 
     return (
-        <div className="editorial-transition mx-auto mt-10 flex max-w-4xl flex-col items-start justify-between gap-4 rounded-2xl border border-[var(--editorial-primary-ring)] bg-[var(--card)] p-5 sm:flex-row sm:items-center">
+        <div className="editorial-transition mx-auto mt-10 flex max-w-4xl flex-col items-start justify-between gap-4 rounded-lg border border-[var(--editorial-primary-ring)] bg-[var(--card)] p-5 sm:flex-row sm:items-center">
             <div>
                 <div className="flex flex-wrap items-center gap-2">
                     <p className="font-display text-lg text-[var(--foreground)]">
@@ -65,7 +65,7 @@ export function SubscriptionBanner({
                 type="button"
                 onClick={onManageBilling}
                 disabled={portalPending}
-                className="editorial-transition h-11 shrink-0 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-5 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:scale-[.98]"
+                className="editorial-transition h-11 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-5 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:scale-[.98]"
             >
                 {portalPending ? (
                     <Spinner className="mr-2 h-4 w-4" />

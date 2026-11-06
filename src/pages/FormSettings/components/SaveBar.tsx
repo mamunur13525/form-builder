@@ -35,7 +35,7 @@ export function SaveBar({
     const canSave = dirty && !disabled && !isSaving
 
     return (
-        <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--card)]/95 px-5 py-3 shadow-[0_-1px_2px_rgba(0,0,0,0.04)] backdrop-blur dark:border-zinc-800 dark:bg-[#141418]/95 dark:shadow-[0_-1px_2px_rgba(0,0,0,0.5)]">
+        <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)]/95 px-5 py-3 shadow-[0_-1px_2px_rgba(0,0,0,0.04)] backdrop-blur dark:border-zinc-800 dark:bg-[#141418]/95 dark:shadow-[0_-1px_2px_rgba(0,0,0,0.5)]">
             <div className="flex min-w-0 items-center gap-1.5 text-[13px]">
                 {isSaving && (
                     <span className="flex items-center gap-1.5 text-[var(--editorial-subtle)]">

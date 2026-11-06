@@ -80,7 +80,7 @@ export function AddPageDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="w-full max-w-3xl rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
+            className="w-full max-w-3xl rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
         >
             <DialogContent className="border-0 bg-transparent text-slate-900 dark:text-zinc-100">
                 <DialogHeader className="mb-6">
@@ -99,7 +99,7 @@ export function AddPageDialog({
                         placeholder="Search page types..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
+                        className="h-11 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
                         autoFocus={true}
                     />
                 </div>
@@ -115,9 +115,9 @@ export function AddPageDialog({
                                 <button
                                     key={pt.type}
                                     onClick={() => addPage(pt.type)}
-                                    className="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-zinc-800/90 bg-slate-50/70 dark:bg-[#18181c] p-3 text-left hover:border-[#FF5722]/60 hover:bg-slate-100 dark:hover:bg-[#1e1e24] hover:shadow-md transition-all cursor-pointer shadow-xs"
+                                    className="group flex items-center gap-3 rounded-lg border border-slate-200 dark:border-zinc-800/90 bg-slate-50/70 dark:bg-[#18181c] p-3 text-left hover:border-[#FF5722]/60 hover:bg-slate-100 dark:hover:bg-[#1e1e24] hover:shadow-md transition-all cursor-pointer shadow-xs"
                                 >
-                                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 dark:border-zinc-700/50 bg-gradient-to-br ${PAGE_TYPE_COLORS[pt.type]} group-hover:scale-105 transition-transform`}>
+                                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200/80 dark:border-zinc-700/50 bg-gradient-to-br ${PAGE_TYPE_COLORS[pt.type]} group-hover:scale-105 transition-transform`}>
                                         <Icon className="h-5 w-5" />
                                     </div>
                                     <span className="text-sm font-medium leading-tight text-slate-800 dark:text-zinc-200 group-hover:text-slate-950 dark:group-hover:text-white">
@@ -142,7 +142,7 @@ export function AddPageDialog({
                     <Button
                         variant="outline"
                         onClick={() => onOpenChange(false)}
-                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-6 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
+                        className="h-11 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-6 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
                     >
                         Cancel
                     </Button>

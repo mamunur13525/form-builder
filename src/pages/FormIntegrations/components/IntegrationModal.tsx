@@ -145,11 +145,11 @@ export function IntegrationModal({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="editorial max-h-[90vh] overflow-y-auto sm:max-w-2xl bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-2xl p-6 sm:p-7 shadow-2xl">
+            <DialogContent className="editorial max-h-[90vh] overflow-y-auto sm:max-w-2xl bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-lg p-6 sm:p-7 shadow-2xl">
                 <DialogHeader>
                     <div className="flex items-center justify-between gap-4 pb-2 border-b border-[var(--editorial-border-light)]">
                         <div className="flex items-center gap-3.5">
-                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm">
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm">
                                 <Icon className="h-5 w-5" />
                             </div>
                             <div>
@@ -187,7 +187,7 @@ export function IntegrationModal({
                 </DialogHeader>
 
                 <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full mt-4">
-                    <TabsList className="grid w-full grid-cols-2 rounded-xl bg-[var(--editorial-canvas)] border border-[var(--border)] p-1">
+                    <TabsList className="grid w-full grid-cols-2 rounded-lg bg-[var(--editorial-canvas)] border border-[var(--border)] p-1">
                         <TabsTrigger value="setup" className="rounded-lg text-sm font-medium">
                             Configuration
                         </TabsTrigger>
@@ -209,7 +209,7 @@ export function IntegrationModal({
                                         placeholder="https://discord.com/api/webhooks/..."
                                         value={config.webhookUrl || ""}
                                         onChange={(e) => handleFieldChange("webhookUrl", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Find this in your Discord channel's <strong>Settings → Integrations → Webhooks</strong>.
@@ -225,7 +225,7 @@ export function IntegrationModal({
                                             placeholder="Form Submissions"
                                             value={config.botName || ""}
                                             onChange={(e) => handleFieldChange("botName", e.target.value)}
-                                            className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                            className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
@@ -236,7 +236,7 @@ export function IntegrationModal({
                                             placeholder="https://example.com/logo.png"
                                             value={config.avatarUrl || ""}
                                             onChange={(e) => handleFieldChange("avatarUrl", e.target.value)}
-                                            className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                            className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                         />
                                     </div>
                                 </div>
@@ -254,7 +254,7 @@ export function IntegrationModal({
                                         placeholder="https://hooks.slack.com/services/T.../B.../..."
                                         value={config.webhookUrl || ""}
                                         onChange={(e) => handleFieldChange("webhookUrl", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Generate an Incoming Webhook from your Slack Workspace App configuration.
@@ -269,7 +269,7 @@ export function IntegrationModal({
                                         placeholder="#general"
                                         value={config.channel || ""}
                                         onChange={(e) => handleFieldChange("channel", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                 </div>
                             </div>
@@ -286,7 +286,7 @@ export function IntegrationModal({
                                         placeholder="123456789:ABCDefGhIJKlmNoPQRsTUVwxyZ"
                                         value={config.botToken || ""}
                                         onChange={(e) => handleFieldChange("botToken", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)] font-mono text-sm"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)] font-mono text-sm"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Generated by Telegram's official <strong>@BotFather</strong> when creating your bot.
@@ -301,7 +301,7 @@ export function IntegrationModal({
                                         placeholder="e.g. 123456789 or -100123456789"
                                         value={config.chatId || ""}
                                         onChange={(e) => handleFieldChange("chatId", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)] font-mono text-sm"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)] font-mono text-sm"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Your Telegram account or group ID (obtainable by messaging <strong>@userinfobot</strong>).
@@ -321,7 +321,7 @@ export function IntegrationModal({
                                         placeholder="G-XXXXXXXXXX"
                                         value={config.measurementId || ""}
                                         onChange={(e) => handleFieldChange("measurementId", e.target.value.toUpperCase().trim())}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)] font-mono text-base tracking-wider"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)] font-mono text-base tracking-wider"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Located in <strong>Google Analytics → Admin → Data Streams → Web Stream Details</strong>.
@@ -375,7 +375,7 @@ export function IntegrationModal({
                                         placeholder="https://script.google.com/macros/s/.../exec"
                                         value={config.webhookUrl || ""}
                                         onChange={(e) => handleFieldChange("webhookUrl", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Web app URL from your Google Spreadsheet’s Apps Script (see Guide tab).
@@ -390,11 +390,11 @@ export function IntegrationModal({
                                         placeholder="Sheet1"
                                         value={config.sheetName || ""}
                                         onChange={(e) => handleFieldChange("sheetName", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                 </div>
 
-                                <div className="rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-3.5 flex items-center justify-between">
+                                <div className="rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-3.5 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <Info className="h-4 w-4 text-[var(--primary)] shrink-0" />
                                         <p className="text-xs text-[var(--editorial-subtle)]">
@@ -427,7 +427,7 @@ export function IntegrationModal({
                                         placeholder="secret_..."
                                         value={config.apiKey || ""}
                                         onChange={(e) => handleFieldChange("apiKey", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)] font-mono text-sm"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)] font-mono text-sm"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Create one at <strong>notion.so/my-integrations</strong>.
@@ -442,7 +442,7 @@ export function IntegrationModal({
                                         placeholder="e.g. 2b9821814e594d50993933c0cf..."
                                         value={config.databaseId || ""}
                                         onChange={(e) => handleFieldChange("databaseId", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)] font-mono text-sm"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)] font-mono text-sm"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Found in your Notion database link between the workspace name and the question mark.
@@ -462,7 +462,7 @@ export function IntegrationModal({
                                         placeholder="https://hooks.zapier.com/hooks/catch/123456/abcdef/"
                                         value={config.webhookUrl || ""}
                                         onChange={(e) => handleFieldChange("webhookUrl", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         In Zapier, choose <strong>Webhooks by Zapier → Catch Hook</strong> to copy your hook URL.
@@ -483,7 +483,7 @@ export function IntegrationModal({
                                         placeholder="you@gmail.com"
                                         value={config.notificationEmail || ""}
                                         onChange={(e) => handleFieldChange("notificationEmail", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                     <p className="text-xs text-[var(--editorial-subtle)]">
                                         Every new submission will trigger an email notification to this address.
@@ -509,7 +509,7 @@ export function IntegrationModal({
                                         placeholder={`New response for ${formTitle}`}
                                         value={config.subject || ""}
                                         onChange={(e) => handleFieldChange("subject", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                 </div>
                             </div>
@@ -526,7 +526,7 @@ export function IntegrationModal({
                                         placeholder="https://api.yourdomain.com/webhooks/typeform"
                                         value={config.url || ""}
                                         onChange={(e) => handleFieldChange("url", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -538,7 +538,7 @@ export function IntegrationModal({
                                         placeholder="Secret passed in X-Webhook-Secret header"
                                         value={config.secret || ""}
                                         onChange={(e) => handleFieldChange("secret", e.target.value)}
-                                        className="h-11 rounded-xl bg-[var(--card)] border-[var(--border)]"
+                                        className="h-11 rounded-lg bg-[var(--card)] border-[var(--border)]"
                                     />
                                 </div>
                             </div>
@@ -547,7 +547,7 @@ export function IntegrationModal({
                         {/* Test Status Feedback */}
                         {testResult && (
                             <div
-                                className={`flex items-start gap-3 rounded-xl p-3.5 text-xs sm:text-sm border ${
+                                className={`flex items-start gap-3 rounded-lg p-3.5 text-xs sm:text-sm border ${
                                     testResult.success
                                         ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
                                         : "bg-rose-500/10 border-rose-500/20 text-rose-700 dark:text-rose-400"
@@ -569,7 +569,7 @@ export function IntegrationModal({
                     {/* SETUP GUIDE TAB */}
                     <TabsContent value="guide" className="space-y-4 pt-4 text-xs sm:text-sm text-[var(--editorial-body)]">
                         {integration.id === "discord" && (
-                            <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
+                            <div className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
                                 <h4 className="font-semibold text-sm text-[var(--foreground)]">How to create a Discord Webhook:</h4>
                                 <ol className="list-decimal pl-5 space-y-1.5 leading-relaxed text-[var(--editorial-body)]">
                                     <li>Open Discord on your desktop or browser and go to your server.</li>
@@ -582,7 +582,7 @@ export function IntegrationModal({
                         )}
 
                         {integration.id === "slack" && (
-                            <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
+                            <div className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
                                 <h4 className="font-semibold text-sm text-[var(--foreground)]">How to configure Slack Webhooks:</h4>
                                 <ol className="list-decimal pl-5 space-y-1.5 leading-relaxed text-[var(--editorial-body)]">
                                     <li>Go to <strong>api.slack.com/apps</strong> and sign into your Slack account.</li>
@@ -595,7 +595,7 @@ export function IntegrationModal({
                         )}
 
                         {integration.id === "telegram" && (
-                            <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
+                            <div className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
                                 <h4 className="font-semibold text-sm text-[var(--foreground)]">How to create a Telegram Bot:</h4>
                                 <ol className="list-decimal pl-5 space-y-1.5 leading-relaxed text-[var(--editorial-body)]">
                                     <li>Open Telegram, search for <strong>@BotFather</strong>, and send <code>/newbot</code>.</li>
@@ -608,7 +608,7 @@ export function IntegrationModal({
                         )}
 
                         {integration.id === "google-analytics" && (
-                            <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
+                            <div className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
                                 <h4 className="font-semibold text-sm text-[var(--foreground)]">How to find your GA4 Measurement ID:</h4>
                                 <ol className="list-decimal pl-5 space-y-1.5 leading-relaxed text-[var(--editorial-body)]">
                                     <li>Log into your <strong>Google Analytics</strong> dashboard.</li>
@@ -621,7 +621,7 @@ export function IntegrationModal({
                         )}
 
                         {integration.id === "google-sheets" && (
-                            <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
+                            <div className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
                                 <h4 className="font-semibold text-sm text-[var(--foreground)]">How to sync with Google Sheets:</h4>
                                 <ol className="list-decimal pl-5 space-y-1.5 leading-relaxed text-[var(--editorial-body)]">
                                     <li>Open a new or existing Google Sheet.</li>
@@ -644,7 +644,7 @@ export function IntegrationModal({
                         )}
 
                         {integration.id === "notion" && (
-                            <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
+                            <div className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
                                 <h4 className="font-semibold text-sm text-[var(--foreground)]">How to connect Notion:</h4>
                                 <ol className="list-decimal pl-5 space-y-1.5 leading-relaxed text-[var(--editorial-body)]">
                                     <li>Go to <strong>notion.so/my-integrations</strong> and click <strong>+ New integration</strong>.</li>
@@ -657,7 +657,7 @@ export function IntegrationModal({
                         )}
 
                         {integration.id === "zapier" && (
-                            <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
+                            <div className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
                                 <h4 className="font-semibold text-sm text-[var(--foreground)]">How to connect Zapier:</h4>
                                 <ol className="list-decimal pl-5 space-y-1.5 leading-relaxed text-[var(--editorial-body)]">
                                     <li>In your Zapier dashboard, click <strong>Create Zap</strong>.</li>
@@ -670,7 +670,7 @@ export function IntegrationModal({
                         )}
 
                         {integration.id === "gmail" && (
-                            <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
+                            <div className="space-y-3 rounded-lg border border-[var(--border)] bg-[var(--editorial-canvas)] p-4">
                                 <h4 className="font-semibold text-sm text-[var(--foreground)]">Gmail & Email Notifications:</h4>
                                 <p className="leading-relaxed">
                                     When enabled, submissions immediately dispatch formatted HTML notifications directly to your Gmail inbox. You can also turn on "Send Thank-You to Respondent" to automatically send an instant confirmation email back to the respondent who filled out the form.

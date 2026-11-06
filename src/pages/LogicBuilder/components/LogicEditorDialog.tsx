@@ -82,7 +82,7 @@ function PageTypeChip({ page, pageNumber }: { page: FormPage; pageNumber: number
     if (!Icon) return null
     return (
         <span
-            className={`flex shrink-0 items-center gap-1.5 rounded-md bg-gradient-to-br px-2 py-0.5 text-xs font-semibold ${PAGE_TYPE_COLORS[page.type]}`}
+            className={`flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-br px-2 py-0.5 text-xs font-semibold ${PAGE_TYPE_COLORS[page.type]}`}
         >
             <Icon className="h-3.5 w-3.5" aria-hidden />
             Q{pageNumber}
@@ -333,7 +333,7 @@ function LogicEditorDialogComponent({
                 />
 
                 <motion.div
-                    className="editorial relative z-50 flex max-h-[94vh] min-h-[70vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:max-h-[88vh]"
+                    className="editorial relative z-50 flex max-h-[94vh] min-h-[70vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:max-h-[88vh]"
                     initial={{ opacity: 0, scale: 0.96, y: -12 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.96, y: 12 }}
@@ -451,7 +451,7 @@ function LogicEditorDialogComponent({
                                         )}
                                     </ul>
                                 ) : !editor ? (
-                                    <div className="rounded-xl border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] px-4 py-6 text-center text-[15px] text-[var(--editorial-subtle)]">
+                                    <div className="rounded-lg border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] px-4 py-6 text-center text-[15px] text-[var(--editorial-subtle)]">
                                         No rules on this page yet.
                                     </div>
                                 ) : null}
@@ -459,7 +459,7 @@ function LogicEditorDialogComponent({
                                 {/* Add flow — pick a rule type first, then edit the draft */}
                                 {editor && !editingRule &&
                                     (editor.rule === null ? (
-                                        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-3">
+                                        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-3">
                                             <span className="text-[15px] font-semibold text-[var(--foreground)]">
                                                 What you want
                                             </span>
@@ -470,7 +470,7 @@ function LogicEditorDialogComponent({
                                             >
                                                 <SelectTrigger
                                                     aria-label="Rule type"
-                                                    className="h-11 w-full rounded-xl border-[var(--input)] bg-[var(--card)] px-4 text-[15px] font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] sm:w-72 data-placeholder:text-[var(--editorial-subtle)]"
+                                                    className="h-11 w-full rounded-lg border-[var(--input)] bg-[var(--card)] px-4 text-[15px] font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] sm:w-72 data-placeholder:text-[var(--editorial-subtle)]"
                                                 >
                                                     <SelectValue placeholder="Select rule type…" />
                                                 </SelectTrigger>

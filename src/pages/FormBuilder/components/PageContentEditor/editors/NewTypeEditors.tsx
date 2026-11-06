@@ -34,7 +34,7 @@ export function StatementEditor({ page }: EditorProps) {
 
     if (!settings.embedUrl) {
         return (
-            <p className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
+            <p className="rounded-lg border border-dashed py-6 text-center text-sm text-muted-foreground">
                 Add an embed link in the settings panel to preview it here.
             </p>
         )
@@ -108,7 +108,7 @@ export function AddressEditor({ page, color, fontSizeClass }: EditorProps) {
 
     if (pages.length === 0) {
         return (
-            <p className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
+            <p className="rounded-lg border border-dashed py-6 text-center text-sm text-muted-foreground">
                 Configure the address pages in the settings panel.
             </p>
         )

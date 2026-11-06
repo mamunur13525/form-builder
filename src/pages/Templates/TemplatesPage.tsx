@@ -158,14 +158,14 @@ export function TemplatesPage() {
                 </div>
 
                 {/* Segmented control — inset track with a raised active item. */}
-                <div className="flex items-center gap-1 overflow-x-auto rounded-[18px] border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible shadow-xs">
+                <div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible shadow-xs">
                     {CATEGORIES.map((item) => (
                         <button
                             key={item}
                             type="button"
                             onClick={() => setCategory(item)}
                             className={cn(
-                                "editorial-transition shrink-0 rounded-[13px] border px-4 py-2 text-sm font-medium cursor-pointer",
+                                "editorial-transition shrink-0 rounded-lg border px-4 py-2 text-sm font-medium cursor-pointer",
                                 category === item
                                     ? "border-[#FF5722]/30 bg-[#FF5722]/15 text-[#FF5722] font-semibold shadow-sm"
                                     : "border-transparent text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800/60 hover:text-slate-900 dark:hover:text-zinc-100",
@@ -181,7 +181,7 @@ export function TemplatesPage() {
             {visibleTemplates.length === 0 ? (
                 <Card className="editorial-shadow-sm mt-8 border-[var(--border)] bg-[var(--card)] sm:mt-10">
                     <CardContent className="flex flex-col items-center py-20 text-center">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
                             <FileSearch className="h-6 w-6" />
                         </div>
                         <h2 className="font-display mt-5 text-2xl text-[var(--foreground)]">
@@ -218,7 +218,7 @@ export function TemplatesPage() {
                             >
                                 {/* Featured ribbon */}
                                 {isFeatured && (
-                                    <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-[16px] bg-[var(--editorial-primary-selected)] px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] text-[var(--primary)] uppercase">
+                                    <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg bg-[var(--editorial-primary-selected)] px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] text-[var(--primary)] uppercase">
                                         <Sparkles className="h-3.5 w-3.5" />
                                         Featured
                                     </div>
@@ -228,7 +228,7 @@ export function TemplatesPage() {
                                     {/* Icon tile — soft tinted square, not a generic circle */}
                                     <div
                                         className={cn(
-                                            "flex h-14 w-14 items-center justify-center rounded-[18px]",
+                                            "flex h-14 w-14 items-center justify-center rounded-lg",
                                             template.tint,
                                         )}
                                     >

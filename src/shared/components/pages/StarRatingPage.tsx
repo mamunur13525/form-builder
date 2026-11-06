@@ -29,7 +29,7 @@ export function StarRatingPage({
                         disabled={disabled}
                         onClick={() => onChange?.(n)}
                         className={cn(
-                            "h-12 min-w-12 rounded-md border px-2 text-lg transition-colors",
+                            "h-12 min-w-12 rounded-lg border px-2 text-lg transition-colors",
                             value === n
                                 ? "border-primary bg-primary text-primary-foreground"
                                 : "hover:bg-muted/50",

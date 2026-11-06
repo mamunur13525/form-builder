@@ -15,7 +15,7 @@ export function HomePage() {
 
             <div className="relative z-10 text-center max-w-2xl">
                 <div className="flex justify-center mb-6">
-                    <img src="/flogo.png" alt="FormFlow logo" className="h-16 w-16 object-contain rounded-2xl shadow-xl shadow-[#FF5722]/20" />
+                    <img src="/flogo.png" alt="FormFlow logo" className="h-16 w-16 object-contain rounded-lg shadow-xl shadow-[#FF5722]/20" />
                 </div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-[#FF5722]/30 bg-[#FF5722]/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-[#FF5722] mb-6">
                     Forms, Reimagined

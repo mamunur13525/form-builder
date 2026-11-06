@@ -50,7 +50,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
                         onClick={() => setDrawerOpen(true)}
                         aria-label="Open menu"
                         aria-expanded={drawerOpen}
-                        className="editorial-transition flex h-11 w-11 items-center justify-center rounded-[16px] border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:scale-[.98]"
+                        className="editorial-transition flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:scale-[.98]"
                     >
                         <Menu className="h-5 w-5" />
                     </button>

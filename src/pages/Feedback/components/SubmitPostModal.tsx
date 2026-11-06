@@ -137,7 +137,7 @@ export function SubmitPostModal({
           : "Create"
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange} className="max-w-xl rounded-2xl border-gray-200 bg-white p-0 text-left">
+        <Dialog open={open} onOpenChange={onOpenChange} className="max-w-xl rounded-lg border-gray-200 bg-white p-0 text-left">
             {isAuthed ? (
                 <div className="flex flex-col">
                     {/* Header: author › board selector › close */}
@@ -191,7 +191,7 @@ export function SubmitPostModal({
                                 <img
                                     src={imagePreview}
                                     alt="Attachment preview"
-                                    className="max-h-64 w-auto rounded-xl border border-gray-200 object-contain"
+                                    className="max-h-64 w-auto rounded-lg border border-gray-200 object-contain"
                                 />
                                 <button
                                     type="button"

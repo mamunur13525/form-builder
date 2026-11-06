@@ -81,7 +81,7 @@ export function FormSettingsPage() {
                 </div>
             </nav>
 
-            <div className="mx-auto flex max-w-[1160px] gap-8 px-4 py-6 md:px-8 md:py-10 bg-white dark:bg-[#141418] border border-slate-200/90 dark:border-zinc-800/90 rounded-2xl md:mt-10 shadow-xl dark:shadow-2xl">
+            <div className="mx-auto flex max-w-[1160px] gap-8 px-4 py-6 md:px-8 md:py-10 bg-white dark:bg-[#141418] border border-slate-200/90 dark:border-zinc-800/90 rounded-lg md:mt-10 shadow-xl dark:shadow-2xl">
                 {/* Desktop: sticky vertical section nav. */}
                 <aside className="hidden md:block md:w-64 md:shrink-0">
                     <div className="sticky top-10 flex flex-col gap-1.5">
@@ -92,7 +92,7 @@ export function FormSettingsPage() {
                                     to={`${base}/${slug}`}
                                     className={({ isActive }) =>
                                         cn(
-                                            "editorial-transition group flex items-start gap-3 rounded-xl border px-3.5 py-3 text-left",
+                                            "editorial-transition group flex items-start gap-3 rounded-lg border px-3.5 py-3 text-left",
                                             isActive
                                                 ? "border-[#FF5722]/40 bg-[#FF5722]/15 shadow-sm"
                                                 : "border-transparent hover:bg-slate-100 dark:hover:bg-zinc-800/60",

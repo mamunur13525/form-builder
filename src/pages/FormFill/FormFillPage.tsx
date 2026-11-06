@@ -34,7 +34,7 @@ export function FormFillPage() {
         <div className={cn("w-full flex-1 grid place-items-center")}>
           <div
             style={{ width: "100%", height: "100%" }}
-            className="w-full flex-1  bg-background transition-all duration-500 ease-in-out overflow-hidden rounded-md border shadow-sm"
+            className="w-full flex-1  bg-background transition-all duration-500 ease-in-out overflow-hidden rounded-lg border shadow-sm"
           >
             <FormView form={form} mode="published" />
           </div>

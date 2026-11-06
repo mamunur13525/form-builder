@@ -667,7 +667,7 @@ export function FormBuilderPage() {
   if (formError) {
     return (
       <div className="editorial h-screen flex items-center justify-center bg-[var(--editorial-canvas)] px-8">
-        <div className="editorial-shadow-md flex max-w-md flex-col items-center rounded-xl border border-[var(--border)] bg-[var(--card)] px-10 py-12 text-center">
+        <div className="editorial-shadow-md flex max-w-md flex-col items-center rounded-lg border border-[var(--border)] bg-[var(--card)] px-10 py-12 text-center">
           <h2 className="font-display text-[32px] leading-tight text-[var(--foreground)]">
             Something went wrong
           </h2>
@@ -676,7 +676,7 @@ export function FormBuilderPage() {
           </p>
           <button
             onClick={() => navigate("/dashboard")}
-            className="editorial-transition mt-8 h-[52px] rounded-[16px] bg-[var(--primary)] px-8 text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            className="editorial-transition mt-8 h-[52px] rounded-lg bg-[var(--primary)] px-8 text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
           >
             Back to Dashboard
           </button>
@@ -789,7 +789,7 @@ export function FormBuilderPage() {
       <div className="relative z-10 flex min-h-0 w-full flex-1 items-center justify-center overflow-auto p-1 sm:p-3">
         <div
           className={cn(
-            "light relative flex flex-col h-full max-h-[78vh] w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
+            "light relative flex flex-col h-full max-h-[78vh] w-full overflow-hidden rounded-lg border border-slate-200/90 bg-white shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
           )}
           style={{
             width: isMobileView ? "min(420px, 100%)" : "100%",
@@ -814,16 +814,16 @@ export function FormBuilderPage() {
             style={canvasBackgroundStyle}
           >
             {isEndPageSelected ? (
-              <div className="relative h-full w-full rounded-2xl  transition-all">
+              <div className="relative h-full w-full rounded-lg  transition-all">
                 {/* Top-left tag badge */}
-                <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-md bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
+                <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-lg bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
                   <span>End Page</span>
                 </div>
                 {/* 4 Corner pip handles */}
-                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
-                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
-                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
-                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
 
                 <EndPageContentEditor
                   endPage={selectedEndPage}
@@ -838,14 +838,14 @@ export function FormBuilderPage() {
             ) : selectedPage ? (
               <div className="relative h-full w-full transition-all">
                 {/* Top-left tag badge */}
-                <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-md bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
+                <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-lg bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
                   <span>{selectedPageIndex + 1}. {PAGE_TYPE_LABELS[selectedPage.type] || selectedPage.label || "Page"}</span>
                 </div>
                 {/* 4 Corner pip handles */}
-                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
-                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
-                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
-                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-xs border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -top-1 -left-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -left-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
+                <div className="absolute -bottom-1 -right-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
 
                 <PageContentEditor
                   page={selectedPage}
@@ -874,7 +874,7 @@ export function FormBuilderPage() {
       </div>
 
       {/* Floating Zoom Controls at Bottom Right */}
-      <div className="absolute bottom-5 right-5 z-20 flex items-center gap-3 rounded-2xl border border-slate-200/90 dark:border-zinc-800/90 bg-white/95 dark:bg-[#16161a]/95 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xl dark:shadow-2xl backdrop-blur-md">
+      <div className="absolute bottom-5 right-5 z-20 flex items-center gap-3 rounded-lg border border-slate-200/90 dark:border-zinc-800/90 bg-white/95 dark:bg-[#16161a]/95 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xl dark:shadow-2xl backdrop-blur-md">
         <button
           type="button"
           onClick={handleZoomOut}

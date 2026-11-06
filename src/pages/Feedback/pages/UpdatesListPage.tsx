@@ -3,7 +3,7 @@ import { ProductActivity, UpdateCard } from "../components"
 
 function UpdateSkeleton() {
     return (
-        <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-[#141418]">
+        <div className="overflow-hidden rounded-lg border border-zinc-800 bg-[#141418]">
             <div className="h-44 w-full animate-pulse bg-zinc-800" />
             <div className="space-y-2 p-5">
                 <div className="h-4 w-24 animate-pulse rounded bg-zinc-800" />
@@ -33,11 +33,11 @@ export function UpdatesListPage() {
                                 <UpdateSkeleton />
                             </>
                         ) : isError ? (
-                            <div className="rounded-2xl border border-zinc-800 bg-[#141418] p-10 text-center text-sm text-zinc-400">
+                            <div className="rounded-lg border border-zinc-800 bg-[#141418] p-10 text-center text-sm text-zinc-400">
                                 Something went wrong loading updates. Please try again.
                             </div>
                         ) : (updates ?? []).length === 0 ? (
-                            <div className="rounded-2xl border border-dashed border-zinc-800 bg-[#141418] p-12 text-center">
+                            <div className="rounded-lg border border-dashed border-zinc-800 bg-[#141418] p-12 text-center">
                                 <p className="text-sm font-medium text-zinc-200">No updates yet</p>
                                 <p className="mt-1 text-sm text-zinc-400">
                                     Check back soon for product news and improvements.

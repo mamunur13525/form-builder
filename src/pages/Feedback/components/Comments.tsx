@@ -18,7 +18,7 @@ export function CommentItem({ comment }: { comment: Comment }) {
         <div
             className={
                 comment.pinned
-                    ? "rounded-2xl border border-[#f9d9cc] bg-[#fff8f5] p-4"
+                    ? "rounded-lg border border-[#f9d9cc] bg-[#fff8f5] p-4"
                     : "px-1 py-2"
             }
         >
@@ -68,7 +68,7 @@ export function CommentComposer({ postId }: { postId: string }) {
 
     if (!isAuthed) {
         return (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-8 text-center">
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-8 text-center">
                 <p className="text-sm font-medium text-gray-700">Log in to join the conversation</p>
                 <p className="text-xs text-gray-500">You need an account to comment on this post.</p>
                 <Link to={ROUTES.LOGIN}>
@@ -95,7 +95,7 @@ export function CommentComposer({ postId }: { postId: string }) {
                     onChange={(e) => setBody(e.target.value)}
                     placeholder="Write a comment…"
                     rows={3}
-                    className="w-full resize-none rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#f2542d] focus:outline-none focus:ring-2 focus:ring-[#f2542d]/20"
+                    className="w-full resize-none rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#f2542d] focus:outline-none focus:ring-2 focus:ring-[#f2542d]/20"
                 />
                 <div className="mt-2 flex justify-end">
                     <Button

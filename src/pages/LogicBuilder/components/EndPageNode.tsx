@@ -50,7 +50,7 @@ function EndPageNodeComponent({ data, selected }: NodeProps<EndPageNodeType>) {
     <div
       aria-current={selected ? "true" : undefined}
       className={`
-        editorial group relative flex w-[240px] flex-col overflow-hidden rounded-xl border
+        editorial group relative flex w-[240px] flex-col overflow-hidden rounded-lg border
         editorial-transition cursor-pointer select-none
         ${
           selected
@@ -102,7 +102,7 @@ function EndPageNodeComponent({ data, selected }: NodeProps<EndPageNodeType>) {
 
       {/* Footer: "Shown on submit" badge pinned bottom-left. */}
       <div className="flex items-center justify-between gap-2 border-t border-slate-200 dark:border-zinc-800/80 bg-slate-50 dark:bg-[#121215] px-3 py-2">
-        <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-[#FF5722]/30 bg-[#FF5722]/10 px-1.5 py-0.5 text-[11px] font-medium text-[#FF5722]">
+        <span className="inline-flex min-w-0 items-center gap-1 rounded-lg border border-[#FF5722]/30 bg-[#FF5722]/10 px-1.5 py-0.5 text-[11px] font-medium text-[#FF5722]">
           <CheckCircle2 className="h-3 w-3 shrink-0" />
           <span className="truncate">Shown on submit</span>
         </span>

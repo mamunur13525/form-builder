@@ -31,7 +31,7 @@ export function CancelDialog({
 }: CancelDialogProps) {
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="editorial editorial-shadow rounded-2xl bg-[var(--popover)] p-6 ring-0 sm:p-10">
+            <AlertDialogContent className="editorial editorial-shadow rounded-lg bg-[var(--popover)] p-6 ring-0 sm:p-10">
                 <AlertDialogHeader>
                     <AlertDialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
                         Downgrade to Free

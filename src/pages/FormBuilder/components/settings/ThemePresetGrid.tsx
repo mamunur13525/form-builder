@@ -26,7 +26,7 @@ function ThemePresetCard({ preset, selected, onSelect }: ThemePresetCardProps) {
             aria-pressed={selected}
             title={`${name} — ${mood}`}
             className={cn(
-                "group overflow-hidden rounded-xl border text-left transition-all cursor-pointer",
+                "group overflow-hidden rounded-lg border text-left transition-all cursor-pointer",
                 selected
                     ? "border-2 border-[#FF5722] ring-4 ring-[#FF5722]/15 shadow-sm"
                     : "border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 hover:shadow-xs hover:-translate-y-0.5"

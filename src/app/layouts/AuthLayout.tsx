@@ -30,7 +30,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           to={ROUTES.HOME}
           className="editorial-transition relative flex w-fit items-center gap-3 text-[var(--foreground)] hover:text-[var(--primary)]"
         >
-          <img src="/flogo.png" alt="FormFlow logo" className="h-10 w-10 rounded-[14px] object-contain shadow-sm" />
+          <img src="/flogo.png" alt="FormFlow logo" className="h-10 w-10 rounded-lg object-contain shadow-sm" />
           <span className="font-display text-2xl font-bold">FormFlow</span>
         </Link>
 
@@ -67,7 +67,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           to={ROUTES.HOME}
           className="editorial-transition mb-8 flex items-center gap-2.5 text-[var(--foreground)] hover:text-[var(--primary)] lg:hidden"
         >
-          <img src="/flogo.png" alt="FormFlow logo" className="h-9 w-9 rounded-[12px] object-contain shadow-sm" />
+          <img src="/flogo.png" alt="FormFlow logo" className="h-9 w-9 rounded-lg object-contain shadow-sm" />
           <span className="font-display text-xl font-bold">FormFlow</span>
         </Link>
 

@@ -30,10 +30,10 @@ function SettingsCard({
     children: React.ReactNode
 }) {
     return (
-        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
+        <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
             <CardContent className="p-5 sm:p-8">
                 <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
                         <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">

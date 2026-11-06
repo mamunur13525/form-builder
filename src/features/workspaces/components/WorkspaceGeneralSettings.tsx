@@ -37,7 +37,7 @@ interface WorkspaceGeneralSettingsProps {
 const inputClass =
     "h-[52px] rounded-lg border-[var(--input)] bg-[var(--secondary)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
 
-const cardClass = "rounded-[24px] border border-[var(--border)] bg-[var(--card)] p-8"
+const cardClass = "rounded-lg border border-[var(--border)] bg-[var(--card)] p-8"
 
 /** Mirrors the server's slug rules so the field can never submit something invalid. */
 function slugify(value: string): string {
@@ -159,7 +159,7 @@ function IdentityCard({
                                 <img
                                     src={logoUrl}
                                     alt=""
-                                    className="h-16 w-16 rounded-[16px] border border-[var(--editorial-border-light)] object-cover"
+                                    className="h-16 w-16 rounded-lg border border-[var(--editorial-border-light)] object-cover"
                                 />
                                 {canEdit && (
                                     <button
@@ -173,7 +173,7 @@ function IdentityCard({
                                 )}
                             </div>
                         ) : (
-                            <span className="flex h-16 w-16 items-center justify-center rounded-[16px] border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-subtle)]">
+                            <span className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-subtle)]">
                                 {isUploading ? (
                                     <Loader2 className="h-5 w-5 animate-spin" />
                                 ) : (
@@ -183,7 +183,7 @@ function IdentityCard({
                         )}
 
                         {canEdit && (
-                            <label className="editorial-transition inline-flex h-11 cursor-pointer items-center rounded-[16px] border border-[var(--border)] bg-[var(--card)] px-5 text-sm text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]">
+                            <label className="editorial-transition inline-flex h-11 cursor-pointer items-center rounded-lg border border-[var(--border)] bg-[var(--card)] px-5 text-sm text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]">
                                 {logoUrl ? "Replace" : "Upload image"}
                                 <input
                                     type="file"
@@ -292,7 +292,7 @@ function IdentityCard({
                         variant="ghost"
                         onClick={handleReset}
                         disabled={!isDirty || updateWorkspace.isPending}
-                        className="h-11 rounded-[16px] px-5 text-[var(--editorial-body)]"
+                        className="h-11 rounded-lg px-5 text-[var(--editorial-body)]"
                     >
                         Discard
                     </Button>
@@ -300,7 +300,7 @@ function IdentityCard({
                         type="button"
                         onClick={handleSave}
                         disabled={!canSave}
-                        className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                        className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                     >
                         {updateWorkspace.isPending ? (
                             <>
@@ -410,7 +410,7 @@ function DefaultsCard({
                 </div>
 
                 {/* Toggles */}
-                <div className="flex items-start justify-between gap-6 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-6">
+                <div className="flex items-start justify-between gap-6 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-6">
                     <div>
                         <p className="text-sm text-[var(--foreground)]">
                             Let members invite people
@@ -428,7 +428,7 @@ function DefaultsCard({
                     />
                 </div>
 
-                <div className="flex items-start justify-between gap-6 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-6">
+                <div className="flex items-start justify-between gap-6 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-6">
                     <div>
                         <p className="text-sm text-[var(--foreground)]">
                             Require approval for invitations

@@ -24,7 +24,7 @@ export function FeedbackCard({ post }: { post: FeedbackPost }) {
     return (
         <Link
             to={`${ROUTES.FEEDBACK}/${post.slug}`}
-            className="group flex items-start gap-4 rounded-2xl border border-zinc-800 bg-[#141418] p-5 transition-all hover:border-[#FF5722]/50 hover:shadow-[0_4px_20px_rgba(255,87,34,0.08)]"
+            className="group flex items-start gap-4 rounded-lg border border-zinc-800 bg-[#141418] p-5 transition-all hover:border-[#FF5722]/50 hover:shadow-[0_4px_20px_rgba(255,87,34,0.08)]"
         >
             {/* Left: who created this */}
             <Avatar author={post.author} size="md" className="mt-0.5" />
@@ -67,7 +67,7 @@ export function FeedbackCard({ post }: { post: FeedbackPost }) {
                 }}
                 aria-pressed={post.hasUpvoted}
                 className={cn(
-                    "flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-xl border font-semibold transition-colors",
+                    "flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-lg border font-semibold transition-colors",
                     post.hasUpvoted
                         ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
                         : "border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800 hover:text-white",

@@ -172,7 +172,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
   const renderPageQuestion = (page: FormPage) => (
     <CoverImageBlock
       coverImage={page.coverImage}
-      imageClassName="rounded-md border"
+      imageClassName="rounded-lg border"
       contentClassName={alignClass}
     >
       {renderPageContent(page)}

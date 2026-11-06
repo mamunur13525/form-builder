@@ -32,7 +32,7 @@ export function PlanCard({
     return (
         <Card
             className={cn(
-                "editorial-transition flex flex-col rounded-2xl p-8 transition-all",
+                "editorial-transition flex flex-col rounded-lg p-8 transition-all",
                 plan.featured
                     ? "border-[#FF5722] ring-2 ring-[#FF5722]/20 bg-white dark:bg-[#181820] shadow-md dark:shadow-[0_8px_30px_rgba(255,87,34,0.12)]"
                     : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] hover:border-slate-300 dark:hover:border-zinc-700",
@@ -92,7 +92,7 @@ export function PlanCard({
                         if (cta.action) onSelect(plan, cta.action)
                     }}
                     className={cn(
-                        "editorial-transition mt-8 h-[52px] w-full rounded-[16px] text-sm font-medium active:scale-[.98]",
+                        "editorial-transition mt-8 h-[52px] w-full rounded-lg text-sm font-medium active:scale-[.98]",
                         plan.featured
                             ? "bg-[#FF5722] hover:bg-[#F4511E] text-white shadow-md shadow-[#FF5722]/20"
                             : "border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-[#FF5722]/40 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white",

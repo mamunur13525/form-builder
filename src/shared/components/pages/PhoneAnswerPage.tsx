@@ -107,7 +107,7 @@ export function PhoneAnswerPage({
                     placeholder={placeholder || "Phone number"}
                     onChange={(e) => emit(dialCode, e.target.value)}
                     className={cn(
-                        "h-11 flex-1 rounded-md border bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+                        "h-11 flex-1 rounded-lg border bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
                         fontSizeClass,
                         error ? "border-destructive" : "border-input",
                     )}

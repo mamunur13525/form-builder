@@ -75,14 +75,14 @@ export function FormPreviewDialog({
               transition={{ type: "spring", stiffness: 260, damping: 24 }}
               className="absolute inset-x-3 top-4 z-50 flex justify-center duration-100 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2"
             >
-              <div className="flex w-full max-w-md items-center justify-center gap-x-1 gap-y-2 rounded-2xl border border-slate-200/90 dark:border-zinc-800/90 bg-white/95 dark:bg-[#16161a]/95 px-3 py-2 shadow-xl backdrop-blur-md sm:w-auto sm:max-w-none sm:rounded-full sm:px-3 sm:py-1.5 text-slate-700 dark:text-zinc-200">
+              <div className="flex w-full max-w-md items-center justify-center gap-x-1 gap-y-2 rounded-lg border border-slate-200/90 dark:border-zinc-800/90 bg-white/95 dark:bg-[#16161a]/95 px-3 py-2 shadow-xl backdrop-blur-md sm:w-auto sm:max-w-none sm:rounded-lg sm:px-3 sm:py-1.5 text-slate-700 dark:text-zinc-200">
                 <Tooltip >
                   <TooltipTrigger delay={200} render={<span className="flex size-10 items-center justify-center sm:size-10 sm:size-12" />}>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={handleClose}
-                      className="size-10 sm:size-10 sm:size-12 text-slate-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl sm:rounded-full transition-colors"
+                      className="size-10 sm:size-10 sm:size-12 text-slate-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg sm:rounded-lg transition-colors"
                       title="Close Preview"
                     >
                       <X className="size-4 sm:size-5" />
@@ -98,7 +98,7 @@ export function FormPreviewDialog({
                       variant="ghost"
                       size="icon"
                       onClick={() => setIsMobileView((prev) => !prev)}
-                      className="size-10 sm:size-10 sm:size-12 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white rounded-xl sm:rounded-full transition-colors"
+                      className="size-10 sm:size-10 sm:size-12 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white rounded-lg sm:rounded-lg transition-colors"
                     >
                       {isMobileView ? (
                         <Monitor className="size-5" />
@@ -120,7 +120,7 @@ export function FormPreviewDialog({
                       variant="ghost"
                       size="icon"
                       onClick={toggleFullscreen}
-                      className="size-10 sm:size-10 sm:size-12 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white rounded-xl sm:rounded-full transition-colors"
+                      className="size-10 sm:size-10 sm:size-12 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white rounded-lg sm:rounded-lg transition-colors"
                     >
                       <Maximize2 className="size-4 sm:size-5" />
                     </Button>
@@ -136,7 +136,7 @@ export function FormPreviewDialog({
                       variant="ghost"
                       size="icon"
                       onClick={handleRestart}
-                      className="size-10 sm:size-10 sm:size-12 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white rounded-xl sm:rounded-full transition-colors"
+                      className="size-10 sm:size-10 sm:size-12 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white rounded-lg sm:rounded-lg transition-colors"
                     >
                       <RotateCcw className="size-4 sm:size-5" />
                     </Button>
@@ -185,7 +185,7 @@ export function FormPreviewDialog({
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsFullscreen(false)}
-                    className="size-10 rounded-full border border-slate-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 text-slate-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-400 shadow-xl backdrop-blur-md sm:size-10 sm:size-12 transition-colors"
+                    className="size-10 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 text-slate-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-400 shadow-xl backdrop-blur-md sm:size-10 sm:size-12 transition-colors"
                   >
                     <X className="size-4 sm:size-5" />
                   </Button>
@@ -214,7 +214,7 @@ export function FormPreviewDialog({
               }}
               className={cn(
                 "w-full flex-1 bg-white dark:bg-[#141418] transition-all duration-500 ease-in-out overflow-hidden",
-                isFullscreen ? "rounded-none border-0" : "rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-xl",
+                isFullscreen ? "rounded-none border-0" : "rounded-lg border border-slate-200 dark:border-zinc-800 shadow-xl",
               )}
             >
               {form && <FormView key={`${formKey}-${restartCount}`} form={form} mode="preview" />}

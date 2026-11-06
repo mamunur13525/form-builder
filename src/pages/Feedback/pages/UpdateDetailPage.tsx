@@ -61,7 +61,7 @@ export function UpdateDetailPage() {
         return (
             <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
                 <div className="h-6 w-32 animate-pulse rounded bg-zinc-800" />
-                <div className="mt-6 h-56 animate-pulse rounded-2xl bg-zinc-800" />
+                <div className="mt-6 h-56 animate-pulse rounded-lg bg-zinc-800" />
             </div>
         )
     }
@@ -88,7 +88,7 @@ export function UpdateDetailPage() {
             </Link>
 
             {update.cover && (
-                <UpdateCover cover={update.cover} className="mt-4 h-60 w-full rounded-2xl" />
+                <UpdateCover cover={update.cover} className="mt-4 h-60 w-full rounded-lg" />
             )}
 
             <div className="mt-6 flex flex-wrap items-center gap-2">

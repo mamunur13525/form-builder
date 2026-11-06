@@ -18,7 +18,7 @@ export function CheckboxPage({ value, onChange, options, disabled }: CheckboxPag
                     <label
                         key={opt.value}
                         className={cn(
-                            "flex items-center gap-2 p-2.5 rounded-md border cursor-pointer transition-colors",
+                            "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors",
                             isChecked ? "bg-primary/5 border-primary" : "hover:bg-muted/50",
                             disabled && "opacity-50 pointer-events-none",
                         )}

@@ -29,7 +29,7 @@ export function CategoryTabs({
     return (
         <>
             {/* Mobile: horizontally scrollable pill strip pinned to the top. */}
-            <nav className="sticky top-0 z-20 border border-[var(--border)] bg-[var(--card)]/95 backdrop-blur supports-backdrop-filter:bg-[var(--card)]/80 lg:hidden rounded-xl">
+            <nav className="sticky top-0 z-20 border border-[var(--border)] bg-[var(--card)]/95 backdrop-blur supports-backdrop-filter:bg-[var(--card)]/80 lg:hidden rounded-lg">
                 <div className="flex items-center gap-3 overflow-x-auto py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <Button
                         size="sm"
@@ -55,7 +55,7 @@ export function CategoryTabs({
             </nav>
 
             {/* Desktop: sticky vertical sidebar. */}
-            <aside className="hidden lg:block lg:w-60 lg:shrink-0 bg-[var(--card)] px-5 py-6 rounded-xl border border-[var(--border)] h-fit sticky top-6">
+            <aside className="hidden lg:block lg:w-60 lg:shrink-0 bg-[var(--card)] px-5 py-6 rounded-lg border border-[var(--border)] h-fit sticky top-6">
                 <div className="sticky top-6 flex flex-col gap-1">
                     <Button
                         size="sm"
@@ -150,7 +150,7 @@ function CategoryNavRow({
             onClick={() => onSelect(category)}
             aria-pressed={active}
             className={cn(
-                "editorial-transition flex w-full items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm font-medium",
+                "editorial-transition flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm font-medium",
                 "focus-visible:ring-2 focus-visible:ring-[var(--ring)]/40 focus-visible:outline-none",
                 active
                     ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)]"

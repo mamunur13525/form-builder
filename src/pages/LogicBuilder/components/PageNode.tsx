@@ -64,7 +64,7 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
     <div
       aria-current={selected ? "true" : undefined}
       className={`
-        editorial group relative flex w-[240px] flex-col overflow-hidden rounded-xl border
+        editorial group relative flex w-[240px] flex-col overflow-hidden rounded-lg border
         editorial-transition cursor-pointer select-none
         ${
           selected
@@ -131,13 +131,13 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
 
       {/* Footer: page type pinned bottom-left, rule count on the right. */}
       <div className="flex items-center justify-between gap-2 border-t border-slate-200 dark:border-zinc-800/80 bg-slate-50 dark:bg-[#121215] px-3 py-2">
-        <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/80 px-1.5 py-0.5 text-[11px] font-medium text-slate-700 dark:text-zinc-300">
+        <span className="inline-flex min-w-0 items-center gap-1 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/80 px-1.5 py-0.5 text-[11px] font-medium text-slate-700 dark:text-zinc-300">
           <TypeIcon className="h-3 w-3 shrink-0" />
           <span className="truncate">{typeLabel}</span>
         </span>
 
         {data.ruleCount > 0 && (
-          <span className="shrink-0 rounded-md bg-[#FF5722]/15 border border-[#FF5722]/30 px-1.5 py-0.5 text-[11px] font-medium text-[#FF5722]">
+          <span className="shrink-0 rounded-lg bg-[#FF5722]/15 border border-[#FF5722]/30 px-1.5 py-0.5 text-[11px] font-medium text-[#FF5722]">
             {data.ruleCount} rule{data.ruleCount === 1 ? "" : "s"}
           </span>
         )}

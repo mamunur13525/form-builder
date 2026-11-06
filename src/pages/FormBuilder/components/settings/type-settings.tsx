@@ -15,7 +15,7 @@ import { Eye, EyeOff, Plus, X, Shield, Link2, Type } from "lucide-react"
 
 // Provider brand badges
 const YoutubeBadge = () => (
-    <span className="flex h-3.5 w-4.5 items-center justify-center rounded-xs bg-[#FF0000] text-white shrink-0">
+    <span className="flex h-3.5 w-4.5 items-center justify-center rounded-lg bg-[#FF0000] text-white shrink-0">
         <svg viewBox="0 0 24 24" fill="currentColor" className="h-2 w-2">
             <path d="M8 5v14l11-7z" />
         </svg>

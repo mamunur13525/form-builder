@@ -130,7 +130,7 @@ export function CreateWorkspaceDialog({
         <Dialog
             open={open}
             onOpenChange={handleOpenChange}
-            className="editorial max-w-lg rounded-[24px] border-[var(--border)] bg-[var(--card)] p-8"
+            className="editorial max-w-lg rounded-lg border-[var(--border)] bg-[var(--card)] p-8"
         >
             <DialogHeader>
                 <DialogTitle className="font-display text-2xl text-[var(--foreground)]">
@@ -157,7 +157,7 @@ export function CreateWorkspaceDialog({
                                 <img
                                     src={logoUrl}
                                     alt=""
-                                    className="h-16 w-16 rounded-[16px] border border-[var(--editorial-border-light)] object-cover"
+                                    className="h-16 w-16 rounded-lg border border-[var(--editorial-border-light)] object-cover"
                                 />
                                 <button
                                     type="button"
@@ -169,7 +169,7 @@ export function CreateWorkspaceDialog({
                                 </button>
                             </div>
                         ) : (
-                            <span className="flex h-16 w-16 items-center justify-center rounded-[16px] border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-subtle)]">
+                            <span className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-subtle)]">
                                 {isUploading ? (
                                     <Loader2 className="h-5 w-5 animate-spin" />
                                 ) : (
@@ -178,7 +178,7 @@ export function CreateWorkspaceDialog({
                             </span>
                         )}
 
-                        <label className="editorial-transition inline-flex h-11 cursor-pointer items-center rounded-[16px] border border-[var(--border)] bg-[var(--card)] px-5 text-sm text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]">
+                        <label className="editorial-transition inline-flex h-11 cursor-pointer items-center rounded-lg border border-[var(--border)] bg-[var(--card)] px-5 text-sm text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]">
                             {logoUrl ? "Replace" : "Upload image"}
                             <input
                                 type="file"
@@ -271,7 +271,7 @@ export function CreateWorkspaceDialog({
                     type="button"
                     variant="outline"
                     onClick={() => handleOpenChange(false)}
-                    className="h-11 rounded-[16px] border-[var(--border)] px-6"
+                    className="h-11 rounded-lg border-[var(--border)] px-6"
                 >
                     Cancel
                 </Button>
@@ -279,7 +279,7 @@ export function CreateWorkspaceDialog({
                     type="button"
                     onClick={handleSubmit}
                     disabled={!canSubmit}
-                    className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                    className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                 >
                     {createWorkspace.isPending ? (
                         <>

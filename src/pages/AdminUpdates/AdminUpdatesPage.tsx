@@ -232,7 +232,7 @@ function UpdateEditor({ entry, onClose }: { entry: UpdateEntry | null; onClose: 
 
             <form
                 onSubmit={handleSubmit}
-                className="editorial-shadow-sm mt-6 flex flex-col gap-5 rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 sm:p-8"
+                className="editorial-shadow-sm mt-6 flex flex-col gap-5 rounded-lg border border-[var(--border)] bg-[var(--card)] p-5 sm:p-8"
             >
                 <Field label="Title" htmlFor="update-title">
                     <Input
@@ -376,7 +376,7 @@ function DeleteUpdateDialog({
 
     return (
         <AlertDialog open={!!entry} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="editorial editorial-shadow rounded-2xl bg-[var(--popover)] p-6 ring-0 sm:p-10">
+            <AlertDialogContent className="editorial editorial-shadow rounded-lg bg-[var(--popover)] p-6 ring-0 sm:p-10">
                 <AlertDialogHeader>
                     <AlertDialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
                         Delete update
@@ -525,7 +525,7 @@ export function AdminUpdatesPage() {
                         </Button>
                     </div>
 
-                    <div className="editorial-shadow-sm mt-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
+                    <div className="editorial-shadow-sm mt-6 rounded-lg border border-[var(--border)] bg-[var(--card)]">
                         {isLoading ? (
                             <div className="flex items-center justify-center gap-2 px-5 py-16 text-sm text-[var(--editorial-subtle)]">
                                 <Spinner /> Loading updates…

@@ -56,7 +56,7 @@ export function SubmissionsToolbar({
                                     render={
                                         <TabsTrigger
                                             value={value}
-                                            className="editorial-transition h-9 gap-1.5 rounded-xl px-2.5 text-xs whitespace-nowrap text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 data-[selected]:border data-[selected]:border-[#FF5722]/40 data-[selected]:bg-[#FF5722]/15 data-[selected]:text-[#FF5722] data-[selected]:font-semibold sm:gap-2 sm:px-4 sm:text-sm"
+                                            className="editorial-transition h-9 gap-1.5 rounded-lg px-2.5 text-xs whitespace-nowrap text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 data-[selected]:border data-[selected]:border-[#FF5722]/40 data-[selected]:bg-[#FF5722]/15 data-[selected]:text-[#FF5722] data-[selected]:font-semibold sm:gap-2 sm:px-4 sm:text-sm"
                                         >
                                             {label}
                                             <span className="text-xs tabular-nums text-slate-400 dark:text-zinc-500">
@@ -66,7 +66,7 @@ export function SubmissionsToolbar({
                                     }
                                 />
                                 <TooltipContent
-                                    className="editorial max-w-none rounded-[12px] border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
+                                    className="editorial max-w-none rounded-lg border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
                                     side="bottom"
                                 >
                                     {hint}
@@ -115,16 +115,16 @@ export function SubmissionsToolbar({
                     />
                     <DropdownMenuContent
                         align="end"
-                        className="editorial min-w-44 rounded-[18px] border-[var(--border)] bg-[var(--popover)] p-2"
+                        className="editorial min-w-44 rounded-lg border-[var(--border)] bg-[var(--popover)] p-2"
                     >
                         <DropdownMenuItem
-                            className="rounded-[12px] px-3 py-2"
+                            className="rounded-lg px-3 py-2"
                             onClick={() => onExport("csv")}
                         >
                             Download as CSV
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            className="rounded-[12px] px-3 py-2"
+                            className="rounded-lg px-3 py-2"
                             onClick={() => onExport("json")}
                         >
                             Download as JSON

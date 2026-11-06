@@ -63,7 +63,7 @@ export function UpdateCard({ update }: { update: UpdateEntry }) {
     return (
         <Link
             to={`${ROUTES.UPDATES}/${update.slug}`}
-            className="group block overflow-hidden rounded-2xl border border-zinc-800 bg-[#141418] transition-all hover:border-[#FF5722]/50 hover:shadow-[0_4px_20px_rgba(255,87,34,0.08)]"
+            className="group block overflow-hidden rounded-lg border border-zinc-800 bg-[#141418] transition-all hover:border-[#FF5722]/50 hover:shadow-[0_4px_20px_rgba(255,87,34,0.08)]"
         >
             {update.cover && <UpdateCover cover={update.cover} className="h-44 w-full" />}
             <div className="p-5">

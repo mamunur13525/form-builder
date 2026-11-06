@@ -30,7 +30,7 @@ export function FeedbackDetailPage() {
         return (
             <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
                 <div className="h-6 w-40 animate-pulse rounded bg-zinc-800" />
-                <div className="mt-6 h-40 animate-pulse rounded-2xl bg-zinc-800" />
+                <div className="mt-6 h-40 animate-pulse rounded-lg bg-zinc-800" />
             </div>
         )
     }
@@ -75,7 +75,7 @@ export function FeedbackDetailPage() {
                             onClick={onUpvote}
                             aria-pressed={post.hasUpvoted}
                             className={cn(
-                                "flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-xl border font-semibold transition-colors",
+                                "flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-lg border font-semibold transition-colors",
                                 post.hasUpvoted
                                     ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
                                     : "border-zinc-800 bg-[#16161a] text-zinc-300 hover:border-zinc-700 hover:text-white",
@@ -117,7 +117,7 @@ export function FeedbackDetailPage() {
 
                     <div className="mt-6 flex flex-col gap-4">
                         {commentsLoading ? (
-                            <div className="h-16 animate-pulse rounded-2xl bg-zinc-800" />
+                            <div className="h-16 animate-pulse rounded-lg bg-zinc-800" />
                         ) : comments.length === 0 ? (
                             <p className="py-6 text-center text-sm text-zinc-500">
                                 No comments yet — be the first to share your thoughts.
@@ -129,7 +129,7 @@ export function FeedbackDetailPage() {
                 </main>
 
                 <aside className="w-full shrink-0 lg:w-64">
-                    <div className="rounded-2xl border border-zinc-800 bg-[#141418] p-4">
+                    <div className="rounded-lg border border-zinc-800 bg-[#141418] p-4">
                         <dl className="flex flex-col gap-4 text-sm">
                             <div>
                                 <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">

@@ -54,7 +54,7 @@ export function SettingsModal() {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="settings-modal-title"
-                className="editorial relative z-50 flex h-dvh max-h-dvh w-full flex-col overflow-hidden border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] shadow-2xl max-md:border-0 max-md:rounded-none md:h-[min(880px,92vh)] md:max-w-[1120px] md:rounded-2xl"
+                className="editorial relative z-50 flex h-dvh max-h-dvh w-full flex-col overflow-hidden border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] shadow-2xl max-md:border-0 max-md:rounded-none md:h-[min(880px,92vh)] md:max-w-[1120px] md:rounded-lg"
             >
                 <h2 id="settings-modal-title" className="sr-only">
                     Settings

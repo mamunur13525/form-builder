@@ -93,7 +93,7 @@ export function UploadPage({ value, onChange, settings, disabled }: UploadPagePr
                 disabled={disabled || uploading}
                 onClick={() => inputRef.current?.click()}
                 className={cn(
-                    "flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed py-8 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground",
+                    "flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-8 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground",
                     (disabled || uploading) && "pointer-events-none opacity-50",
                 )}
             >
@@ -118,7 +118,7 @@ export function UploadPage({ value, onChange, settings, disabled }: UploadPagePr
                     {files.map((file) => (
                         <li
                             key={file.fileId}
-                            className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
+                            className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
                         >
                             <FileIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
                             <span className="flex-1 truncate">{file.filename}</span>

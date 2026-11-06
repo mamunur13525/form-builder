@@ -8,7 +8,7 @@ export function ProductActivity() {
     const weeks = data?.weeks ?? []
 
     return (
-        <div className="rounded-2xl border border-zinc-800 bg-[#141418] p-4">
+        <div className="rounded-lg border border-zinc-800 bg-[#141418] p-4">
             <p className="text-sm font-semibold text-zinc-100">Product activity</p>
             <p className="mt-0.5 text-xs text-zinc-400">
                 {data ? `${data.completed} shipped in the last 3 months` : "Loading…"}
@@ -18,7 +18,7 @@ export function ProductActivity() {
                 {weeks.map((v, i) => (
                     <span
                         key={i}
-                        className={cn("aspect-square rounded-[4px]", INTENSITY[Math.min(v, 3)])}
+                        className={cn("aspect-square rounded-lg", INTENSITY[Math.min(v, 3)])}
                         title={`Week ${i + 1}: ${v} update${v === 1 ? "" : "s"}`}
                     />
                 ))}
@@ -27,7 +27,7 @@ export function ProductActivity() {
             <div className="mt-3 flex items-center justify-end gap-1.5 text-[10px] text-zinc-500">
                 <span>Less</span>
                 {INTENSITY.map((c) => (
-                    <span key={c} className={cn("h-2.5 w-2.5 rounded-[3px]", c)} />
+                    <span key={c} className={cn("h-2.5 w-2.5 rounded-lg", c)} />
                 ))}
                 <span>More</span>
             </div>

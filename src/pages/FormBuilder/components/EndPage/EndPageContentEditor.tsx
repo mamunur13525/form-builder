@@ -106,7 +106,7 @@ export function EndPageContentEditor({
             />
 
             {endPage.embed?.url && (
-                <div className="mt-8 w-full overflow-hidden rounded-xl border border-[var(--editorial-border-light)] aspect-video">
+                <div className="mt-8 w-full overflow-hidden rounded-lg border border-[var(--editorial-border-light)] aspect-video">
                     <iframe
                         src={endPage.embed.url}
                         title={endPage.embed.title || "Embedded media"}
@@ -185,7 +185,7 @@ export function EndPageContentEditor({
                     >
                         <CoverImageBlock
                             coverImage={endPage.coverImage}
-                            imageClassName="rounded-[22px] border border-[var(--editorial-border-light)]"
+                            imageClassName="rounded-lg border border-[var(--editorial-border-light)]"
                             contentClassName={alignClass}
                         >
                             {content}

@@ -373,7 +373,7 @@ export function DesignDrawer({
                 <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-purple-200/25 dark:bg-purple-900/10 blur-3xl" />
                 <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-indigo-200/25 dark:bg-[#FF5722]/10 blur-3xl" />
 
-                <div className="light relative z-10 flex flex-col h-full max-h-[85vh] w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] dark:shadow-2xl">
+                <div className="light relative z-10 flex flex-col h-full max-h-[85vh] w-full max-w-4xl overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] dark:shadow-2xl">
                     {/* Mockup Window Header */}
                     <div className="flex h-11 shrink-0 items-center justify-between border-b border-slate-100 bg-white/95 px-4 backdrop-blur-xs select-none">
                         <div className="mx-auto flex items-center gap-1.5 rounded-full bg-slate-100/80 px-4 py-1 text-xs font-medium text-slate-500">
@@ -436,7 +436,7 @@ export function DesignDrawer({
                     className="flex min-h-0 flex-1 flex-col"
                 >
                     <div className="shrink-0 px-6 pt-3 pb-1 bg-white dark:bg-[#141418]">
-                        <TabsList className="flex w-full h-auto rounded-xl bg-slate-100 dark:bg-zinc-900 p-1 group-data-horizontal/tabs:h-auto border border-transparent dark:border-zinc-800 gap-1">
+                        <TabsList className="flex w-full h-auto rounded-lg bg-slate-100 dark:bg-zinc-900 p-1 group-data-horizontal/tabs:h-auto border border-transparent dark:border-zinc-800 gap-1">
                             <TabsTrigger
                                 value="settings"
                                 className={cn(
@@ -562,7 +562,7 @@ export function DesignDrawer({
                                                 size="icon"
                                                 aria-label="Remove background image"
                                                 onClick={() => patchTheme({ backgroundImage: null })}
-                                                className="h-[42px] w-[42px] shrink-0 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
+                                                className="h-[42px] w-[42px] shrink-0 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
@@ -639,7 +639,7 @@ export function DesignDrawer({
                             <Button
                                 variant="outline"
                                 className={cn(
-                                    "flex-1 h-10 rounded-xl border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white shadow-xs cursor-pointer",
+                                    "flex-1 h-10 rounded-lg border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white shadow-xs cursor-pointer",
                                     vibratingButton === "cancel" && "editorial-vibrate"
                                 )}
                             >
@@ -661,7 +661,7 @@ export function DesignDrawer({
                             <Button
                                 disabled={isSaving}
                                 className={cn(
-                                    "flex-1 h-10 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] text-sm font-medium text-white shadow-xs cursor-pointer transition-colors",
+                                    "flex-1 h-10 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] text-sm font-medium text-white shadow-xs cursor-pointer transition-colors",
                                     vibratingButton === "save" && "editorial-vibrate"
                                 )}
                             >

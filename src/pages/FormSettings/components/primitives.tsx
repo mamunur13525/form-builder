@@ -22,7 +22,7 @@ export function SettingsSection({
     children: ReactNode
 }) {
     return (
-        <section className="editorial-shadow-sm overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] dark:border-zinc-800 dark:bg-[#141418] dark:shadow-[0_4px_14px_rgba(0,0,0,0.45)]">
+        <section className="editorial-shadow-sm overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] dark:border-zinc-800 dark:bg-[#141418] dark:shadow-[0_4px_14px_rgba(0,0,0,0.45)]">
             <header className="border-b border-[var(--editorial-border-light)] px-5 py-4 dark:border-zinc-800/80">
                 <h2 className="text-[15px] font-semibold text-[var(--foreground)] dark:text-zinc-100">
                     {title}
@@ -122,7 +122,7 @@ export function ToggleRow({
  */
 export function NestedPanel({ children }: { children: ReactNode }) {
     return (
-        <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-4 dark:border-zinc-800 dark:border-l-[var(--editorial-primary-ring)] dark:bg-[#1a1a20]">
+        <div className="rounded-lg border border-[var(--border)] border-l-2 border-l-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-4 dark:border-zinc-800 dark:border-l-[var(--editorial-primary-ring)] dark:bg-[#1a1a20]">
             {children}
         </div>
     )

@@ -115,7 +115,7 @@ export function InviteMemberDialog({
         <Dialog
             open={open}
             onOpenChange={handleOpenChange}
-            className="editorial max-w-lg rounded-[24px] border-[var(--border)] bg-[var(--card)] p-8"
+            className="editorial max-w-lg rounded-lg border-[var(--border)] bg-[var(--card)] p-8"
         >
             <DialogHeader>
                 <DialogTitle className="font-display text-2xl text-[var(--foreground)]">
@@ -173,7 +173,7 @@ export function InviteMemberDialog({
 
                 {/* Shown after a successful invite, while no mailer is wired. */}
                 {inviteUrl && (
-                    <div className="rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-5">
+                    <div className="rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-5">
                         <p className="text-sm text-[var(--foreground)]">
                             Invitation created
                         </p>
@@ -182,14 +182,14 @@ export function InviteMemberDialog({
                             configured yet.
                         </p>
                         <div className="mt-3 flex items-center gap-2">
-                            <code className="min-w-0 flex-1 truncate rounded-[12px] border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 text-xs text-[var(--editorial-body)]">
+                            <code className="min-w-0 flex-1 truncate rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 text-xs text-[var(--editorial-body)]">
                                 {inviteUrl}
                             </code>
                             <Button
                                 type="button"
                                 variant="outline"
                                 onClick={handleCopy}
-                                className="h-11 shrink-0 rounded-[16px] border-[var(--border)] px-4"
+                                className="h-11 shrink-0 rounded-lg border-[var(--border)] px-4"
                             >
                                 {copied ? (
                                     <Check className="h-4 w-4" />
@@ -208,7 +208,7 @@ export function InviteMemberDialog({
                     type="button"
                     variant="outline"
                     onClick={() => handleOpenChange(false)}
-                    className="h-11 rounded-[16px] border-[var(--border)] px-6"
+                    className="h-11 rounded-lg border-[var(--border)] px-6"
                 >
                     {inviteUrl ? "Done" : "Cancel"}
                 </Button>
@@ -216,7 +216,7 @@ export function InviteMemberDialog({
                     type="button"
                     onClick={handleSubmit}
                     disabled={!canSubmit}
-                    className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                    className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                 >
                     {inviteMember.isPending ? (
                         <>

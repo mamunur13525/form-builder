@@ -182,7 +182,7 @@ export function FormSharePage() {
         <div className="editorial mx-auto max-w-[1160px] space-y-5 px-4 pt-6 pb-12 sm:space-y-6 sm:px-6 sm:pt-10 lg:px-8 lg:pb-16">
             {hasUnpublishedChanges && (
                 <div
-                    className="flex flex-col items-start justify-between gap-3 rounded-xl border border-[#FF5722]/30 bg-[#FF5722]/10 p-4 sm:flex-row sm:items-center sm:gap-4"
+                    className="flex flex-col items-start justify-between gap-3 rounded-lg border border-[#FF5722]/30 bg-[#FF5722]/10 p-4 sm:flex-row sm:items-center sm:gap-4"
                 >
                     <div className="flex items-center gap-2.5 sm:gap-3">
                         <Info className="h-5 w-5 shrink-0 text-[#FF5722]" />
@@ -200,7 +200,7 @@ export function FormSharePage() {
                 </div>
             )}
 
-            <Card className="editorial-shadow-sm rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
+            <Card className="editorial-shadow-sm rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
                 <CardContent className="p-5 sm:p-8">
                     <Tabs defaultValue="share" className="w-full">
                         <TabsList className={cn(TAB_LIST_CLASS, "mb-6 sm:mb-8")}>
@@ -237,12 +237,12 @@ export function FormSharePage() {
                                         value={formUrl}
                                         readOnly
                                         onFocus={(e) => e.currentTarget.select()}
-                                        className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 text-center text-sm sm:px-6 sm:text-base text-slate-800 dark:text-zinc-100"
+                                        className="flex-1 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 text-center text-sm sm:px-6 sm:text-base text-slate-800 dark:text-zinc-100"
                                     />
                                     <Button
                                         size="lg"
                                         onClick={() => copy("link", formUrl)}
-                                        className="rounded-xl shrink-0 justify-center"
+                                        className="rounded-lg shrink-0 justify-center"
                                     >
                                         {copiedKey === "link" ? <Check className="h-4! w-4!" /> : <Copy className="h-4! w-4!" />}
                                         {copiedKey === "link" ? "Copied" : "Copy Link"}
@@ -269,7 +269,7 @@ export function FormSharePage() {
                                             title={label}
                                             onClick={action}
                                             className={cn(
-                                                "editorial-transition rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-700 dark:text-zinc-300 shadow-xs",
+                                                "editorial-transition rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-700 dark:text-zinc-300 shadow-xs",
                                                 hover,
                                             )}
                                         >
@@ -285,7 +285,7 @@ export function FormSharePage() {
                                 <p className="text-sm text-slate-700 dark:text-zinc-300 sm:text-base">
                                     Paste this snippet into your site's HTML to embed the form inline.
                                 </p>
-                                <pre className="mt-4 w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 py-3.5 text-left text-xs text-slate-800 dark:text-zinc-100 sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
+                                <pre className="mt-4 w-full overflow-x-auto rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 py-3.5 text-left text-xs text-slate-800 dark:text-zinc-100 sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
                                     <code>{iframeCode}</code>
                                 </pre>
                                 <Button
@@ -304,7 +304,7 @@ export function FormSharePage() {
                                 <p className="text-sm text-slate-700 dark:text-zinc-300 sm:text-base">
                                     Add this button link to an email so recipients can open the form.
                                 </p>
-                                <pre className="mt-4 w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 py-3.5 text-left text-xs text-slate-800 dark:text-zinc-100 sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
+                                <pre className="mt-4 w-full overflow-x-auto rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 py-3.5 text-left text-xs text-slate-800 dark:text-zinc-100 sm:mt-5 sm:px-5 sm:py-4 sm:text-sm">
                                     <code>{emailCode}</code>
                                 </pre>
                                 <Button
@@ -321,7 +321,7 @@ export function FormSharePage() {
                 </CardContent>
             </Card>
 
-            <Card className="editorial-shadow-sm rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
+            <Card className="editorial-shadow-sm rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
                 <CardHeader className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-8">
                     <div>
                         <CardTitle className="font-display text-xl text-slate-900 dark:text-white sm:text-2xl">
@@ -339,7 +339,7 @@ export function FormSharePage() {
                 </CardHeader>
             </Card>
 
-            <Card className="editorial-shadow-sm rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
+            <Card className="editorial-shadow-sm rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418]">
                 <CardHeader className="flex flex-col items-start justify-between p-5 sm:flex-row sm:items-center sm:p-8"
                 onClick={()=> showWarning("Feature not available yet. Please check back later.")}>
                     <div>
@@ -359,7 +359,7 @@ export function FormSharePage() {
             <Dialog
                 open={qrOpen}
                 onOpenChange={setQrOpen}
-                className="editorial editorial-shadow-md w-[calc(100%-2rem)] max-w-md rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] p-5 sm:p-8 text-slate-900 dark:text-zinc-100"
+                className="editorial editorial-shadow-md w-[calc(100%-2rem)] max-w-md rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] p-5 sm:p-8 text-slate-900 dark:text-zinc-100"
             >
                 <button
                     type="button"
@@ -379,7 +379,7 @@ export function FormSharePage() {
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="mx-auto flex w-fit items-center justify-center rounded-2xl border border-[var(--editorial-border-light)] bg-white p-3 sm:p-4">
+                <div className="mx-auto flex w-fit items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-white p-3 sm:p-4">
                     <div className="relative h-44 w-44 sm:h-56 sm:w-56">
                         {!qrLoaded && (
                             <div className="absolute inset-0 animate-pulse rounded-lg bg-[var(--secondary)]" />

@@ -198,7 +198,7 @@ export function PublishDialog({
         if (!next) setConfirming(null);
         onOpenChange(next);
       }}
-      className="editorial editorial-shadow max-w-xl overflow-hidden rounded-2xl border-[var(--border)] bg-[var(--popover)] p-0"
+      className="editorial editorial-shadow max-w-xl overflow-hidden rounded-lg border-[var(--border)] bg-[var(--popover)] p-0"
     >
       <DialogContent>
         <div className="px-6 pt-6 sm:px-10 sm:pt-10">
@@ -248,7 +248,7 @@ export function PublishDialog({
         {!confirming && (
           <div className="space-y-6 px-6 pt-6 sm:px-10 sm:pt-8">
             {state === "pending" && (
-              <Alert className="rounded-[18px] border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)]">
+              <Alert className="rounded-lg border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)]">
                 <AlertCircle className="text-[var(--editorial-purple)]" />
                 <AlertTitle className="text-[var(--foreground)]">
                   Respondents still see the old version
@@ -260,7 +260,7 @@ export function PublishDialog({
             )}
 
             {state === "draft" ? (
-              <ul className="overflow-hidden rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--card)] text-sm">
+              <ul className="overflow-hidden rounded-lg border border-[var(--editorial-border-light)] bg-[var(--card)] text-sm">
                 <li className="flex items-center gap-3 px-5 py-4">
                   <Globe className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
                   <span className="text-[var(--editorial-body)]">
@@ -282,7 +282,7 @@ export function PublishDialog({
                 >
                   Public link
                 </Label>
-                <div className="editorial-transition flex items-center gap-2 rounded-xl border border-[var(--input)] bg-[var(--card)] pl-5 pr-2 focus-within:border-[var(--primary)]">
+                <div className="editorial-transition flex items-center gap-2 rounded-lg border border-[var(--input)] bg-[var(--card)] pl-5 pr-2 focus-within:border-[var(--primary)]">
                   <Globe className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
                   <input
                     id="published-form-url"

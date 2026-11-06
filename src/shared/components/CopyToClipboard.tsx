@@ -29,7 +29,7 @@ export function CopyToClipboard({
       variant={"outline"}
       type="button"
       onClick={handleCopy}
-      className={'border-0 py-3 rounded-md cursor-pointer'}
+      className={'border-0 py-3 rounded-lg cursor-pointer'}
     >
       <span className="relative h-4 w-4">
         <Copy

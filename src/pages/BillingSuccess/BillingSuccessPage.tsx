@@ -60,7 +60,7 @@ export function BillingSuccessPage() {
     return (
         <div className="editorial relative flex min-h-dvh items-center justify-center overflow-hidden bg-[var(--editorial-canvas)] px-4 py-16">
             {paid && <ConfettiBurst count={140} originY="18%" />}
-            <div className="editorial-shadow relative w-full max-w-xl rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 text-center sm:p-12">
+            <div className="editorial-shadow relative w-full max-w-xl rounded-lg border border-[var(--border)] bg-[var(--card)] p-8 text-center sm:p-12">
                 {isLoading ? (
                     <div className="flex flex-col items-center gap-4 py-8">
                         <Spinner className="h-8 w-8 text-[var(--primary)]" />
@@ -84,7 +84,7 @@ export function BillingSuccessPage() {
                             <Button
                                 onClick={() => void refetch()}
                                 disabled={isRefetching}
-                                className="editorial-transition h-12 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                                className="editorial-transition h-12 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                             >
                                 {isRefetching ? (
                                     <Spinner className="mr-2 h-4 w-4" />
@@ -95,7 +95,7 @@ export function BillingSuccessPage() {
                             </Button>
                             <Button
                                 onClick={() => navigate(ROUTES.PRICING)}
-                                className="editorial-transition h-12 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-6 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                                className="editorial-transition h-12 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-6 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
                             >
                                 Back to pricing
                             </Button>
@@ -129,14 +129,14 @@ export function BillingSuccessPage() {
                         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                             <Button
                                 onClick={() => navigate(ROUTES.DASHBOARD)}
-                                className="editorial-transition h-12 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                                className="editorial-transition h-12 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                             >
                                 Go to dashboard
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                             <Button
                                 onClick={() => navigate(ROUTES.PRICING)}
-                                className="editorial-transition h-12 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-6 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                                className="editorial-transition h-12 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-6 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
                             >
                                 View plans
                             </Button>
@@ -164,7 +164,7 @@ export function BillingSuccessPage() {
                             <Button
                                 onClick={() => void refetch()}
                                 disabled={isRefetching}
-                                className="editorial-transition h-12 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                                className="editorial-transition h-12 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                             >
                                 {isRefetching ? (
                                     <Spinner className="mr-2 h-4 w-4" />
@@ -175,7 +175,7 @@ export function BillingSuccessPage() {
                             </Button>
                             <Button
                                 onClick={() => navigate(ROUTES.PRICING)}
-                                className="editorial-transition h-12 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-6 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                                className="editorial-transition h-12 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-6 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
                             >
                                 Back to pricing
                             </Button>

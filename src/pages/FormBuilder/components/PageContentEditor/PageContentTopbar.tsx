@@ -92,7 +92,7 @@ const PageContentTopbar = ({
               type="button"
               onClick={() => isMobileView && onToggleView()}
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-md transition-all cursor-pointer",
+                "flex h-8 w-8 items-center justify-center rounded-lg transition-all cursor-pointer",
                 !isMobileView
                   ? "bg-[#FF5722] text-white shadow-xs"
                   : "text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:text-white dark:hover:bg-zinc-800",
@@ -105,7 +105,7 @@ const PageContentTopbar = ({
               type="button"
               onClick={() => !isMobileView && onToggleView()}
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-md transition-all cursor-pointer",
+                "flex h-8 w-8 items-center justify-center rounded-lg transition-all cursor-pointer",
                 isMobileView
                   ? "bg-[#FF5722] text-white shadow-xs"
                   : "text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:text-white dark:hover:bg-zinc-800",

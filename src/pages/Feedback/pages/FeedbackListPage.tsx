@@ -10,8 +10,8 @@ import {
 
 function CardSkeleton() {
     return (
-        <div className="flex gap-4 rounded-2xl border border-zinc-800 bg-[#141418] p-4">
-            <div className="h-14 w-12 shrink-0 animate-pulse rounded-xl bg-zinc-800" />
+        <div className="flex gap-4 rounded-lg border border-zinc-800 bg-[#141418] p-4">
+            <div className="h-14 w-12 shrink-0 animate-pulse rounded-lg bg-zinc-800" />
             <div className="flex-1 space-y-2 py-1">
                 <div className="h-4 w-2/3 animate-pulse rounded bg-zinc-800" />
                 <div className="h-3 w-1/3 animate-pulse rounded bg-zinc-800" />
@@ -71,11 +71,11 @@ export function FeedbackListPage() {
                             <CardSkeleton />
                         </>
                     ) : isError ? (
-                        <div className="rounded-2xl border border-zinc-800 bg-[#141418] p-10 text-center text-sm text-zinc-400">
+                        <div className="rounded-lg border border-zinc-800 bg-[#141418] p-10 text-center text-sm text-zinc-400">
                             Something went wrong loading feedback. Please try again.
                         </div>
                     ) : posts.length === 0 ? (
-                        <div className="rounded-2xl border border-dashed border-zinc-800 bg-[#141418] p-12 text-center">
+                        <div className="rounded-lg border border-dashed border-zinc-800 bg-[#141418] p-12 text-center">
                             <p className="text-sm font-medium text-zinc-200">No posts found</p>
                             <p className="mt-1 text-sm text-zinc-400">
                                 Try clearing filters or searching for something else.

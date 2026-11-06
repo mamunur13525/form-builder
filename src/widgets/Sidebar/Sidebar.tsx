@@ -106,7 +106,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 <div className="editorial-shadow-md flex min-h-0 flex-1 flex-col bg-[var(--card)]">
                     {/* Brand header */}
                     <div className="flex items-center gap-3 px-5 pt-5 pb-2">
-                        <img src="/flogo.png" alt="FormFlow" className="h-8 w-8 rounded-xl object-contain shadow-xs" />
+                        <img src="/flogo.png" alt="FormFlow" className="h-8 w-8 rounded-lg object-contain shadow-xs" />
                         <span className="font-display text-xl font-bold tracking-tight text-[var(--foreground)]">FormFlow</span>
                     </div>
 
@@ -139,7 +139,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
                     {/* Upgrade card — sits directly above the account section */}
                     <div className="px-4 pb-4">
-                        <div className="rounded-[18px] border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] p-5">
+                        <div className="rounded-lg border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] p-5">
                             <div className="flex items-center gap-2">
                                 <Sparkles className="h-5 w-5 text-[var(--primary)]" />
                                 <p className="font-display text-xl text-[var(--foreground)]">
@@ -152,7 +152,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                             <Button
                                 type="button"
                                 onClick={() => openSettingsPanel("pricing")}
-                                className="editorial-transition mt-4 h-11 w-full rounded-[16px] bg-[var(--primary)] text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
+                                className="editorial-transition mt-4 h-11 w-full rounded-lg bg-[var(--primary)] text-sm font-medium text-white  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)]"
                             >
                                 Upgrade now
                             </Button>
@@ -163,7 +163,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                     <div className="border-t border-[var(--editorial-border-light)] p-4 flex items-center gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger
-                                className="editorial-transition flex min-w-0 flex-1 items-center gap-3 rounded-[16px] border border-transparent px-3 py-2 text-left hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)] cursor-pointer"
+                                className="editorial-transition flex min-w-0 flex-1 items-center gap-3 rounded-lg border border-transparent px-3 py-2 text-left hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)] cursor-pointer"
                                 aria-label="Account menu"
                             >
                                 <Avatar size="lg">
@@ -188,17 +188,17 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                                 side="top"
                                 align="center"
                                 sideOffset={12}
-                                className="editorial min-w-[200px] rounded-[18px] border border-[var(--border)] bg-[var(--popover)] p-2 shadow-xl"
+                                className="editorial min-w-[200px] rounded-lg border border-[var(--border)] bg-[var(--popover)] p-2 shadow-xl"
                             >
                                 <DropdownMenuItem
-                                    className="rounded-[12px] px-3 py-2.5 cursor-pointer"
+                                    className="rounded-lg px-3 py-2.5 cursor-pointer"
                                     onClick={() => openSettingsPanel("account")}
                                 >
                                     <Settings className="h-4 w-4" />
                                     Settings
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    className="rounded-[12px] px-3 py-2.5 cursor-pointer justify-between"
+                                    className="rounded-lg px-3 py-2.5 cursor-pointer justify-between"
                                     onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                                 >
                                     <div className="flex items-center gap-2">
@@ -209,7 +209,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                                 <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
                                 <DropdownMenuItem
                                     variant="destructive"
-                                    className="rounded-[12px] px-3 py-2.5 cursor-pointer"
+                                    className="rounded-lg px-3 py-2.5 cursor-pointer"
                                     onClick={handleLogout}
                                 >
                                     <LogOut className="h-4 w-4" />
@@ -222,7 +222,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                         <button
                             type="button"
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                            className="editorial-transition flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--primary)] hover:text-[var(--primary)] cursor-pointer shadow-xs active:scale-95"
+                            className="editorial-transition flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--primary)] hover:text-[var(--primary)] cursor-pointer shadow-xs active:scale-95"
                             title={theme === "dark" ? "Switch to Light mode" : "Switch to Dark mode"}
                             aria-label="Toggle theme"
                         >

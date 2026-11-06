@@ -126,7 +126,7 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
             )}
 
             {endPage.embed?.url && (
-                <div className="mt-6 w-full overflow-hidden rounded-xl border aspect-video">
+                <div className="mt-6 w-full overflow-hidden rounded-lg border aspect-video">
                     <iframe
                         src={endPage.embed.url}
                         title={endPage.embed.title || "Embedded media"}
@@ -222,7 +222,7 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
                     <div className={cn("flex w-full flex-col", alignClass)}>
                         <CoverImageBlock
                             coverImage={endPage.coverImage}
-                            imageClassName="rounded-xl border"
+                            imageClassName="rounded-lg border"
                             contentClassName={alignClass}
                             gapClassName="gap-6"
                         >

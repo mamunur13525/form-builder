@@ -104,7 +104,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
 
   return (
     <Card
-      className="editorial editorial-transition cursor-pointer border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:border-[#FF5722]/50 hover:shadow-[0_12px_32px_rgba(255,87,34,0.08)] transition-all flex flex-col justify-between rounded-2xl"
+      className="editorial editorial-transition cursor-pointer border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:border-[#FF5722]/50 hover:shadow-[0_12px_32px_rgba(255,87,34,0.08)] transition-all flex flex-col justify-between rounded-lg"
       onClick={() => navigate(`/form-builder/${form.id}`)}
     >
       <CardHeader className="p-0">
@@ -144,7 +144,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
           />
           <DropdownMenuContent
             align="end"
-            className="editorial rounded-[18px] border-[var(--border)] bg-[var(--popover)] p-2"
+            className="editorial rounded-lg border-[var(--border)] bg-[var(--popover)] p-2"
             onClick={(e) => e.stopPropagation()}
           >
             {menuItems.map((item, index) => {
@@ -162,7 +162,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
               return (
                 <DropdownMenuItem
                   key={index}
-                  className="rounded-[12px] px-3 py-2 cursor-pointer"
+                  className="rounded-lg px-3 py-2 cursor-pointer"
                   variant={item.variant}
                   onClick={item.onClick}
                 >

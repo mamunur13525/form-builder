@@ -175,7 +175,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
     const invitedCount = members.length - activeCount
 
     return (
-        <div className="rounded-[24px] border border-[var(--border)] bg-[var(--card)] p-8">
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                     <h2 className="font-display text-2xl text-[var(--foreground)]">
@@ -191,7 +191,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                     <Button
                         type="button"
                         onClick={() => setInviteOpen(true)}
-                        className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-5 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                        className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-5 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                     >
                         <UserPlus className="h-4 w-4" />
                         Invite member
@@ -205,7 +205,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                     {[0, 1, 2].map((row) => (
                         <div
                             key={row}
-                            className="h-[72px] animate-pulse rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)]"
+                            className="h-[72px] animate-pulse rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)]"
                         />
                     ))}
                 </div>
@@ -213,7 +213,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
 
             {/* Empty — only reachable for a workspace whose owner has left, but handled. */}
             {!isLoading && members.length === 0 && (
-                <div className="mt-6 rounded-[18px] border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] p-10 text-center">
+                <div className="mt-6 rounded-lg border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] p-10 text-center">
                     <p className="text-sm text-[var(--editorial-body)]">
                         No members yet. Invite someone to get started.
                     </p>
@@ -281,14 +281,14 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger
                                                 aria-label={`Actions for ${displayName}`}
-                                                className="editorial-transition flex h-11 w-11 items-center justify-center rounded-[16px] border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]"
+                                                className="editorial-transition flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]"
                                             >
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent
                                                 align="end"
                                                 sideOffset={8}
-                                                className="editorial w-[15rem] rounded-[18px] border border-[var(--border)] bg-[var(--popover)] p-2"
+                                                className="editorial w-[15rem] rounded-lg border border-[var(--border)] bg-[var(--popover)] p-2"
                                             >
                                                 {member.status === "active" ? (
                                                     <>
@@ -302,7 +302,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                                                                         (role) => (
                                                                             <DropdownMenuItem
                                                                                 key={role}
-                                                                                className="rounded-[12px] px-3 py-2.5"
+                                                                                className="rounded-lg px-3 py-2.5"
                                                                                 disabled={
                                                                                     role ===
                                                                                     member.role
@@ -334,7 +334,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                                                                 <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
                                                                 <DropdownMenuItem
                                                                     variant="destructive"
-                                                                    className="rounded-[12px] px-3 py-2.5"
+                                                                    className="rounded-lg px-3 py-2.5"
                                                                     onClick={() =>
                                                                         setPendingRemoval(
                                                                             member,
@@ -350,7 +350,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                                                 ) : (
                                                     <>
                                                         <DropdownMenuItem
-                                                            className="rounded-[12px] px-3 py-2.5"
+                                                            className="rounded-lg px-3 py-2.5"
                                                             onClick={() =>
                                                                 resendInvitation.mutate(
                                                                     member.id,
@@ -363,7 +363,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                                                         <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
                                                         <DropdownMenuItem
                                                             variant="destructive"
-                                                            className="rounded-[12px] px-3 py-2.5"
+                                                            className="rounded-lg px-3 py-2.5"
                                                             onClick={() =>
                                                                 setPendingCancel(member)
                                                             }
@@ -389,7 +389,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
 
             {/* Ownership — owner only, and only when there is somebody to hand it to. */}
             {canTransfer && activeCount > 1 && (
-                <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-6">
+                <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-6">
                     <div>
                         <p className="text-sm text-[var(--foreground)]">
                             Transfer ownership
@@ -403,7 +403,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                         type="button"
                         variant="outline"
                         onClick={() => setTransferOpen(true)}
-                        className="h-11 shrink-0 rounded-[16px] border-[var(--border)] px-5"
+                        className="h-11 shrink-0 rounded-lg border-[var(--border)] px-5"
                     >
                         <Send className="h-4 w-4" />
                         Transfer

@@ -12,7 +12,7 @@ import { ROUTES } from "@/shared/constants/routes"
 const pageClass =
     "editorial mx-auto flex min-h-dvh w-full max-w-[560px] flex-col justify-center px-4 py-16 sm:px-6"
 
-const cardClass = "rounded-[24px] border border-[var(--border)] bg-[var(--card)] p-8 sm:p-10"
+const cardClass = "rounded-lg border border-[var(--border)] bg-[var(--card)] p-8 sm:p-10"
 
 function formatDate(value: string | null | undefined): string {
     if (!value) return "—"
@@ -71,7 +71,7 @@ export function AcceptInvitationPage() {
         return (
             <div className={pageClass}>
                 <div className={cardClass}>
-                    <span className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/8 text-[var(--destructive)]">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-lg border border-[var(--destructive)]/25 bg-[var(--destructive)]/8 text-[var(--destructive)]">
                         <XCircle className="h-6 w-6" />
                     </span>
                     <h1 className="font-display mt-6 text-3xl text-[var(--foreground)]">
@@ -85,7 +85,7 @@ export function AcceptInvitationPage() {
                     <Button
                         type="button"
                         onClick={() => navigate(ROUTES.DASHBOARD)}
-                        className="editorial-transition mt-8 h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                        className="editorial-transition mt-8 h-11 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                     >
                         Go to dashboard
                     </Button>
@@ -107,10 +107,10 @@ export function AcceptInvitationPage() {
                         <img
                             src={invitation.workspace.logoUrl}
                             alt=""
-                            className="h-14 w-14 shrink-0 rounded-[18px] border border-[var(--editorial-border-light)] object-cover"
+                            className="h-14 w-14 shrink-0 rounded-lg border border-[var(--editorial-border-light)] object-cover"
                         />
                     ) : (
-                        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
+                        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
                             <Building2 className="h-6 w-6" />
                         </span>
                     )}
@@ -147,7 +147,7 @@ export function AcceptInvitationPage() {
                         Valid until {formatDate(invitation.expiresAt)}
                     </p>
                 ) : (
-                    <div className="mt-6 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-5">
+                    <div className="mt-6 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-5">
                         <p className="text-sm text-[var(--foreground)]">
                             {isExpired
                                 ? "This invitation has expired"
@@ -175,7 +175,7 @@ export function AcceptInvitationPage() {
                                         onSuccess: () => navigate(ROUTES.DASHBOARD),
                                     })
                                 }
-                                className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                                className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                             >
                                 {acceptInvitation.isPending ? (
                                     <>
@@ -198,7 +198,7 @@ export function AcceptInvitationPage() {
                                         onSuccess: () => navigate(ROUTES.DASHBOARD),
                                     })
                                 }
-                                className="h-11 rounded-[16px] border-[var(--border)] px-6"
+                                className="h-11 rounded-lg border-[var(--border)] px-6"
                             >
                                 {rejectInvitation.isPending ? (
                                     <>
@@ -217,7 +217,7 @@ export function AcceptInvitationPage() {
                         <Button
                             type="button"
                             onClick={() => navigate(ROUTES.DASHBOARD)}
-                            className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                            className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                         >
                             Go to dashboard
                         </Button>

@@ -88,7 +88,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
     // Loading — a skeleton rather than an empty box, so the sidebar does not jump.
     if (isLoading) {
         return (
-            <div className="h-[52px] w-full animate-pulse rounded-[16px] border border-[var(--editorial-border-light)] bg-[var(--secondary)]" />
+            <div className="h-[52px] w-full animate-pulse rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)]" />
         )
     }
 
@@ -98,7 +98,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
             <button
                 type="button"
                 onClick={handleCreateWorkspace}
-                className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-[16px] border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] px-4 text-left text-sm text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)]"
+                className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-lg border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] px-4 text-left text-sm text-[var(--primary)] hover:bg-[var(--editorial-primary-selected)]"
             >
                 <Plus className="h-4 w-4 shrink-0" />
                 Create a workspace
@@ -110,7 +110,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger
-                    className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-[16px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] px-3 text-left hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                    className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] px-3 text-left hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
                     aria-label="Switch workspace"
                 >
                     <WorkspaceAvatar workspace={activeWorkspace} />
@@ -135,7 +135,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
                     side="bottom"
                     align="start"
                     sideOffset={8}
-                    className="editorial w-[17rem] rounded-[18px] border border-[var(--border)] bg-[var(--popover)] p-2"
+                    className="editorial w-[17rem] rounded-lg border border-[var(--border)] bg-[var(--popover)] p-2"
                 >
                     {/* Base UI requires labels to live inside a group — a bare
                         DropdownMenuLabel outside one throws on render. */}
@@ -150,7 +150,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
                                 return (
                                     <DropdownMenuItem
                                         key={workspace.id}
-                                        className="rounded-[12px] px-3 py-2.5"
+                                        className="rounded-lg px-3 py-2.5"
                                         onClick={() => handleSelect(workspace.id)}
                                     >
                                         <WorkspaceAvatar
@@ -177,7 +177,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
                     <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
 
                     <DropdownMenuItem
-                        className="rounded-[12px] px-3 py-2.5"
+                        className="rounded-lg px-3 py-2.5"
                         onClick={() => {
                             openSettings("workspace")
                             onNavigate?.()
@@ -187,7 +187,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
                         Workspace settings
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                        className="rounded-[12px] px-3 py-2.5"
+                        className="rounded-lg px-3 py-2.5"
                         onClick={handleCreateWorkspace}
                     >
                         <Plus className="h-4 w-4" />

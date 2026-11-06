@@ -88,7 +88,7 @@ export function FeedbackSidebar({
                 Give feedback
             </Button>
 
-            <div className="rounded-2xl border border-zinc-800 bg-[#141418] p-2">
+            <div className="rounded-lg border border-zinc-800 bg-[#141418] p-2">
                 <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
                     Boards
                 </p>

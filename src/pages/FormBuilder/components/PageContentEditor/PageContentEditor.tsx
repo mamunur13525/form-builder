@@ -217,7 +217,7 @@ export function PageContentEditor({
           >
             <CoverImageBlock
               coverImage={page.coverImage}
-              imageClassName="rounded-[22px] border border-[var(--editorial-border-light)]"
+              imageClassName="rounded-lg border border-[var(--editorial-border-light)]"
               contentClassName={alignClass}
             >
               {content}

@@ -258,6 +258,7 @@ export interface PageCoverImage {
     url: string
     fileId?: string
     alt?: string
+    layout?: "top" | "bottom" | "left" | "right"
 }
 
 export interface PageEmailSettings {

@@ -47,6 +47,7 @@ import {
     CONTROL_CLASS,
 } from "./settings/primitives"
 import { ImagePickerDialog } from "./settings/ImagePickerDialog"
+import { CoverImageLayoutSetting } from "./settings/cover-image-layout"
 import {
     HideLabelsSetting,
     HorizontalAlignSetting,
@@ -135,15 +136,15 @@ export function SettingsPanel({
                 <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
                     {/* Pill tabs: Settings (active) | Design */}
                     <div className="px-6 py-2">
-                        <div className="flex rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1">
-                            <div className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#1e1e24] py-2 text-sm font-medium text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-zinc-700/60">
+                        <div className="flex h-10 rounded-lg bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1">
+                            <div className="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#1e1e24] text-sm font-medium text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-zinc-700/60">
                                 <SettingsIcon className="h-4 w-4 text-[#FF5722]" />
                                 Settings
                             </div>
                             <button
                                 type="button"
                                 onClick={onOpenDesignDrawer}
-                                className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                className="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                             >
                                 <Palette className="h-4 w-4 text-slate-400 dark:text-zinc-400" />
                                 Design
@@ -168,7 +169,7 @@ export function SettingsPanel({
                                         if (open) setTypeQuery("")
                                     }}
                                 >
-                                    <ComboboxTrigger className="flex h-[42px] w-full items-center justify-between rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#1a1a20] px-3.5 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500 transition-colors cursor-pointer">
+                                    <ComboboxTrigger className="flex h-10 w-full items-center justify-between rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#1a1a20] px-3.5 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500 transition-colors cursor-pointer">
                                         {page.type && PAGE_TYPE_ICONS[page.type] ? (
                                             (() => {
                                                 const Icon = PAGE_TYPE_ICONS[page.type]
@@ -183,7 +184,7 @@ export function SettingsPanel({
                                             <span className="text-slate-400 dark:text-zinc-500">Select page type</span>
                                         )}
                                     </ComboboxTrigger>
-                                    <ComboboxContent className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
+                                    <ComboboxContent className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
                                         <ComboboxEmpty className="py-3 text-center text-sm text-slate-400 dark:text-zinc-500">No items found.</ComboboxEmpty>
                                         <ComboboxList className="space-y-0.5">
                                             {(item: PageType) => {
@@ -422,7 +423,7 @@ export function SettingsPanel({
                                 >
                                     {page.coverImage?.url ? (
                                         <div className="space-y-3">
-                                            <div className="relative overflow-hidden rounded-2xl border border-zinc-800 shadow-xs">
+                                            <div className="relative overflow-hidden rounded-lg border border-zinc-800 shadow-xs">
                                                 <img
                                                     src={page.coverImage.url}
                                                     alt={page.coverImage.alt || "Cover"}
@@ -433,26 +434,34 @@ export function SettingsPanel({
                                                 <button
                                                     type="button"
                                                     onClick={() => setCoverDialogOpen(true)}
-                                                    className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                                    className="flex h-10 flex-1 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                                 >
                                                     Replace
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => onUpdate(pageIndex, { coverImage: null })}
-                                                    className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                                                    className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
                                                     Remove
                                                 </button>
                                             </div>
+                                            <CoverImageLayoutSetting
+                                                value={page.coverImage.layout}
+                                                onChange={(layout) =>
+                                                    onUpdate(pageIndex, {
+                                                        coverImage: { ...page.coverImage!, layout },
+                                                    })
+                                                }
+                                            />
                                         </div>
                                     ) : (
                                         <div
                                             onClick={() => setCoverDialogOpen(true)}
-                                            className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group"
+                                            className="flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group"
                                         >
-                                            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
+                                            <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
                                                 <ImagePlus className="h-5 w-5" />
                                             </div>
                                             <p className="mt-3 text-sm font-medium text-slate-800 dark:text-zinc-200">
@@ -508,7 +517,14 @@ export function SettingsPanel({
                 <ImagePickerDialog
                     open={coverDialogOpen}
                     onOpenChange={setCoverDialogOpen}
-                    onSelect={(coverImage) => onUpdate(pageIndex, { coverImage })}
+                    onSelect={(coverImage) =>
+                        onUpdate(pageIndex, {
+                            coverImage: {
+                                ...coverImage,
+                                layout: page.coverImage?.layout ?? "top",
+                            },
+                        })
+                    }
                     currentImage={page.coverImage}
                 />
             </div>

@@ -9,6 +9,7 @@ import { FormPageRenderer } from "./FormPageRenderer";
 import { FormProgressBar } from "./FormProgressBar";
 import { FormSubmittedView } from "./FormSubmittedView";
 import { EndPageView } from "./EndPageView";
+import { CoverImageBlock, CoverImageSide } from "./CoverImageBlock";
 import { FormNavigationFooter } from "./FormNavigationFooter";
 import { PageLabel, PageHelperText, PageSubmitButton, buildVariableItems, extractFormVariables } from "./pages";
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "../utils/theme";
@@ -111,16 +112,8 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
     }
     : {};
 
-  const renderPageQuestion = (page: FormPage) => (
-    <div className={cn("w-full flex flex-col", alignClass)}>
-      {page.coverImage?.url && (
-        <img
-          src={page.coverImage.url}
-          alt={page.coverImage.alt || ""}
-          className="mb-5 max-h-56 w-full rounded-md border object-cover"
-        />
-      )}
-
+  const renderPageContent = (page: FormPage) => (
+    <>
       <PageLabel
         label={page.label}
         pageNumber={currentStep + 1}
@@ -173,8 +166,23 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
         onClick={handleNext}
         disabled={isSubmitting}
       />
-    </div>
+    </>
   );
+
+  const renderPageQuestion = (page: FormPage) => (
+    <CoverImageBlock
+      coverImage={page.coverImage}
+      imageClassName="rounded-md border"
+      contentClassName={alignClass}
+    >
+      {renderPageContent(page)}
+    </CoverImageBlock>
+  );
+
+  const coverLayout = currentPage?.coverImage?.layout ?? "top";
+  const isSideCover =
+    Boolean(currentPage?.coverImage?.url) &&
+    (coverLayout === "left" || coverLayout === "right");
 
   if (submitted) {
     // Only the FIRST end page is shown to respondents on submit. Other end
@@ -225,24 +233,42 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
                 x: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 },
               }}
-              className="absolute inset-0 overflow-y-auto px-6 py-10 flex items-center"
+              className={cn(
+                "absolute inset-0",
+                isSideCover
+                  ? "flex overflow-hidden"
+                  : "overflow-y-auto px-6 py-10 flex items-center",
+              )}
             >
-              <div className="mx-auto max-w-2xl w-full">
-                {activePages.length === 0 ? (
-                  <div className="text-center py-20 text-muted-foreground">
-                    <p className="text-lg">No pages in this form yet.</p>
-                    <p className="text-base mt-2">
-                      Add pages in the form builder to see them here.
-                    </p>
+              {isSideCover && currentPage ? (
+                /* Left/right: split the page in half — image on one side,
+                   all content (including the submit button) on the other. */
+                <div className="flex h-full w-full flex-col sm:flex-row">
+                  <CoverImageSide coverImage={currentPage.coverImage} side={coverLayout} />
+                  <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto px-6 py-10 sm:h-full sm:w-1/2">
+                    <div className={cn("mx-auto my-auto flex w-full max-w-2xl flex-col", alignClass)}>
+                      {renderPageContent(currentPage)}
+                    </div>
                   </div>
-                ) : currentPage ? (
-                  renderPageQuestion(currentPage)
-                ) : (
-                  <div className="text-center py-20 text-muted-foreground">
-                    <p>Loading page...</p>
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="mx-auto max-w-2xl w-full">
+                  {activePages.length === 0 ? (
+                    <div className="text-center py-20 text-muted-foreground">
+                      <p className="text-lg">No pages in this form yet.</p>
+                      <p className="text-base mt-2">
+                        Add pages in the form builder to see them here.
+                      </p>
+                    </div>
+                  ) : currentPage ? (
+                    renderPageQuestion(currentPage)
+                  ) : (
+                    <div className="text-center py-20 text-muted-foreground">
+                      <p>Loading page...</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -67,7 +67,7 @@ export function HorizontalAlignSetting({
             </div>
 
             {settings.horizontalAlign && (
-                <div className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-3">
+                <div className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
                     <Label className="text-sm font-medium text-zinc-200">
                         Number of options per row
                     </Label>

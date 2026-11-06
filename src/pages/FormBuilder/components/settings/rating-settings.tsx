@@ -78,7 +78,7 @@ function StyleButton({
         <button
             type="button"
             onClick={onClick}
-            className={`flex h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl border px-4 text-xs font-medium transition-all cursor-pointer ${
+            className={`flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border px-4 text-xs font-medium transition-all cursor-pointer ${
                 active
                     ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
                     : "border-zinc-800 bg-[#1a1a20] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"

@@ -73,7 +73,7 @@ export function StatementSettingsWidget({
                             <VimeoBadge />
                         </div>
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl border border-zinc-800 bg-[#18181c] text-zinc-100 shadow-2xl p-1.5 z-50">
+                    <SelectContent className="rounded-lg border border-zinc-800 bg-[#18181c] text-zinc-100 shadow-2xl p-1.5 z-50">
                         {STATEMENT_PROVIDERS.map((p) => (
                             <SelectItem
                                 key={p.value}
@@ -191,7 +191,7 @@ export function UploadSettingsWidget({
                 <p className="text-xs leading-5 text-zinc-400">
                     Leave all unchecked to allow every file type.
                 </p>
-                <div className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-3">
+                <div className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
                     {UPLOAD_FILE_GROUPS.map((group) => (
                         <label
                             key={group.value}
@@ -251,7 +251,7 @@ export function AddressSettingsWidget({
             {sorted.map((page) => (
                 <div
                     key={page.key}
-                    className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-3"
+                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3"
                     data-hidden={page.hidden}
                 >
                     <div className="flex items-center gap-2">
@@ -265,7 +265,7 @@ export function AddressSettingsWidget({
                             type="button"
                             onClick={() => updatePage(page.key, { hidden: !page.hidden })}
                             title={page.hidden ? "Show page" : "Hide page"}
-                            className="rounded-xl border border-zinc-800 bg-[#1a1a20] p-2 text-zinc-400 hover:border-zinc-700 hover:text-white transition-colors cursor-pointer"
+                            className="rounded-lg border border-zinc-800 bg-[#1a1a20] p-2 text-zinc-400 hover:border-zinc-700 hover:text-white transition-colors cursor-pointer"
                         >
                             {page.hidden ? (
                                 <EyeOff className="h-3.5 w-3.5" />
@@ -446,7 +446,7 @@ function MatrixList({
                             type="button"
                             onClick={() => onRemove(item.key)}
                             disabled={items.length <= 1}
-                            className="rounded-xl border border-zinc-800 bg-[#1a1a20] p-2 text-zinc-400 hover:border-rose-500/30 hover:text-rose-400 disabled:pointer-events-none disabled:opacity-40 transition-colors cursor-pointer"
+                            className="rounded-lg border border-zinc-800 bg-[#1a1a20] p-2 text-zinc-400 hover:border-rose-500/30 hover:text-rose-400 disabled:pointer-events-none disabled:opacity-40 transition-colors cursor-pointer"
                         >
                             <X className="h-3.5 w-3.5" />
                         </button>
@@ -456,7 +456,7 @@ function MatrixList({
                 type="button"
                 onClick={onAdd}
                 disabled={items.length >= max}
-                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-zinc-800 bg-[#1a1a20] py-2.5 text-xs font-medium text-zinc-300 hover:border-[#FF5722] hover:text-[#FF5722] hover:bg-zinc-800/60 disabled:pointer-events-none disabled:opacity-40 transition-all cursor-pointer"
+                className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-800 bg-[#1a1a20] text-xs font-medium text-zinc-300 hover:border-[#FF5722] hover:text-[#FF5722] hover:bg-zinc-800/60 disabled:pointer-events-none disabled:opacity-40 transition-all cursor-pointer"
             >
                 <Plus className="h-4 w-4" />
                 Add {title === "Rows" ? "row" : "column"}

@@ -136,7 +136,7 @@ export function FormBuilderSidebar({
                       type="button"
                       onClick={onAddPage}
                       aria-label="Add page"
-                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-700/80 bg-slate-100 dark:bg-zinc-800/90 text-slate-600 dark:text-zinc-300 hover:text-white hover:border-[#FF5722] hover:bg-[#FF5722] transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-700/80 bg-slate-100 dark:bg-zinc-800/90 text-slate-600 dark:text-zinc-300 hover:text-white hover:border-[#FF5722] hover:bg-[#FF5722] transition-all shadow-xs cursor-pointer active:scale-95"
                     >
                       <Plus className="h-4 w-4" />
                     </button>

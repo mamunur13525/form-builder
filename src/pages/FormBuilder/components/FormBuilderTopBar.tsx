@@ -69,7 +69,7 @@ export function FormBuilderTopBar({
     navLinks.find(({ to }) => pathname.startsWith(tabPrefix(to))) ?? navLinks[0];
   const ActiveTabIcon = activeTab.icon;
   const baseNavLinkClass =
-    "transition-all flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-zinc-800/50 border border-transparent";
+    "transition-all flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-zinc-800/50 border border-transparent";
   const activeNavLinkClass =
     "border-[#FF5722] text-[#FF5722] bg-transparent font-semibold shadow-xs hover:text-[#FF5722] hover:bg-transparent";
   const navLabelClass = "text-sm font-medium";
@@ -95,7 +95,7 @@ export function FormBuilderTopBar({
         {/* App Logo */}
         <div
           onClick={() => navigate("/dashboard")}
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl hover:opacity-90 transition-opacity p-1 active:scale-95"
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg hover:opacity-90 transition-opacity p-1 active:scale-95"
           title="Dashboard"
         >
           <img src="/flogo.png" alt="FormFlow logo" className="h-full w-full object-contain" />
@@ -120,7 +120,7 @@ export function FormBuilderTopBar({
       </div>
 
       {/* Section nav */}
-      <nav className="hidden shrink-0 items-center gap-1 md:flex rounded-2xl bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800/80 p-1">
+      <nav className="hidden shrink-0 items-center gap-1 md:flex rounded-lg bg-slate-100 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800/80 p-1">
         {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={label}
@@ -157,13 +157,13 @@ export function FormBuilderTopBar({
         />
         <DropdownMenuContent
           align="center"
-          className="w-52 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-2 shadow-xl text-slate-900 dark:text-zinc-100"
+          className="w-52 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-2 shadow-xl text-slate-900 dark:text-zinc-100"
         >
           {navLinks.map(({ to, icon: Icon, label }) => (
             <DropdownMenuItem
               key={label}
               className={cn(
-                "cursor-pointer rounded-xl px-3 py-2 text-sm font-medium",
+                "cursor-pointer rounded-lg px-3 py-2 text-sm font-medium",
                 activeTab.label === label
                   ? "border border-[#FF5722] text-[#FF5722] font-semibold bg-transparent"
                   : "text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white",
@@ -207,7 +207,7 @@ export function FormBuilderTopBar({
           aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
         >
           {theme === "dark" ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-600" />}
         </button>
@@ -216,7 +216,7 @@ export function FormBuilderTopBar({
           type="button"
           aria-label="Preview"
           onClick={() => openPreview()}
-          className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] px-3.5 py-2 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+          className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] px-3.5 py-2 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
         >
           <Play className="h-4 w-4 text-slate-500 dark:text-zinc-400" />
           <span className="hidden sm:inline">Preview</span>
@@ -226,7 +226,7 @@ export function FormBuilderTopBar({
           <button
             type="button"
             aria-label="Publish"
-            className="flex items-center gap-2 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] px-4 py-2 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
+            className="flex items-center gap-2 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-4 py-2 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
             onClick={onPublish}
           >
             <Send className="h-4 w-4" />
@@ -236,7 +236,7 @@ export function FormBuilderTopBar({
           <button
             type="button"
             aria-label="Publish changes"
-            className="flex items-center gap-2 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] px-4 py-2 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
+            className="flex items-center gap-2 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-4 py-2 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
             onClick={onPublishedClick}
           >
             <AlertCircle className="h-4 w-4" />
@@ -246,7 +246,7 @@ export function FormBuilderTopBar({
           <button
             type="button"
             aria-label="Published"
-            className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm font-medium text-white shadow-xs transition-colors cursor-pointer"
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-sm font-medium text-white shadow-xs transition-colors cursor-pointer"
             onClick={onPublishedClick}
           >
             <CheckCircle className="h-4 w-4" />

@@ -67,7 +67,7 @@ export function EndPageList({
                                 disabled={isAdding}
                                 aria-label="Add end page"
                                 aria-busy={isAdding}
-                                className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-700/80 bg-slate-100 dark:bg-zinc-800/90 text-slate-600 dark:text-zinc-300 hover:text-white hover:border-[#FF5722] hover:bg-[#FF5722] transition-all shadow-xs cursor-pointer active:scale-95 disabled:pointer-events-none disabled:opacity-60"
+                                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-700/80 bg-slate-100 dark:bg-zinc-800/90 text-slate-600 dark:text-zinc-300 hover:text-white hover:border-[#FF5722] hover:bg-[#FF5722] transition-all shadow-xs cursor-pointer active:scale-95 disabled:pointer-events-none disabled:opacity-60"
                             >
                                 {isAdding ? (
                                     <Loader2 className="h-4 w-4 animate-spin text-[#FF5722]" />
@@ -105,7 +105,7 @@ export function EndPageList({
                 {isAdding && (
                     <div
                         aria-busy="true"
-                        className="flex flex-col gap-2 rounded-2xl border border-dashed border-[#FF5722]/40 bg-[#FF5722]/5 p-3.5"
+                        className="flex flex-col gap-2 rounded-lg border border-dashed border-[#FF5722]/40 bg-[#FF5722]/5 p-3.5"
                     >
                         <div className="flex items-center gap-2 text-sm text-zinc-300 font-medium">
                             <Loader2 className="h-4 w-4 animate-spin text-[#FF5722]" />
@@ -145,7 +145,7 @@ function EndPageItem({
         <div
             onClick={() => onSelect(index)}
             aria-current={isSelected ? "true" : undefined}
-            className={`group relative flex flex-col gap-3 rounded-2xl border p-3.5 cursor-pointer select-none transition-all ${
+            className={`group relative flex flex-col gap-3 rounded-lg border p-3.5 cursor-pointer select-none transition-all ${
                 isSelected
                     ? "border-2 border-[#FF5722] bg-white dark:bg-[#1e1e24] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
                     : "border-slate-200/90 dark:border-zinc-800/80 bg-slate-50/70 dark:bg-[#17171c] hover:border-slate-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-[#1a1a20]"
@@ -173,7 +173,7 @@ function EndPageItem({
                             </button>
                         }
                     />
-                    <DropdownMenuContent align="end" className="w-48 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-1.5 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-200">
+                    <DropdownMenuContent align="end" className="w-48 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-1.5 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-200">
                         {!isFirst && (
                             <DropdownMenuItem
                                 className="cursor-pointer rounded-lg text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white"
@@ -228,7 +228,7 @@ function EndPageItem({
                             align="end"
                             sideOffset={8}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-64 gap-3 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
+                            className="w-64 gap-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
                         >
                             <div className="flex flex-col gap-1">
                                 <p className="text-sm font-semibold text-slate-900 dark:text-white">

@@ -35,20 +35,21 @@ import { cn } from "@/lib/utils"
  * type-specific widget files (choice/phone/rating/type-settings) so ad-hoc
  * controls stay pixel-identical to the primitives. */
 export const CONTROL_CLASS =
-    "transition-colors h-[40px] rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
+    "transition-colors h-10 data-[size=default]:h-10! rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
 
 /** Portalled surfaces escape the container, so they get standard popover styling. */
 export const OVERLAY_CLASS =
-    "rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-900 dark:text-zinc-100 shadow-2xl p-1.5 z-50"
+    "rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-900 dark:text-zinc-100 shadow-2xl p-1.5 z-50"
 
 /**
  * Segmented pill tabs: the list is an inset track, the active tab a raised card.
+ * `h-10` matches the height of inputs and selects in the settings sidebar.
  */
 export const TAB_LIST_CLASS =
-    "h-auto w-full gap-1 rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 p-1 text-slate-600 dark:text-zinc-400 group-data-horizontal/tabs:h-auto"
+    "h-10 w-full gap-1 rounded-lg bg-slate-100 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 p-1 text-slate-600 dark:text-zinc-400 group-data-horizontal/tabs:h-10"
 
 export const TAB_TRIGGER_CLASS =
-    "transition-all flex-1 gap-2 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white data-active:border-slate-200 dark:data-active:border-zinc-700 data-active:bg-white dark:data-active:bg-[#1e1e24] data-active:text-slate-900 dark:data-active:text-white data-active:shadow-xs focus-visible:outline-none cursor-pointer"
+    "transition-all flex h-8 flex-1 items-center justify-center gap-2 rounded-lg border border-transparent px-3 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white data-active:border-slate-200 dark:data-active:border-zinc-700 data-active:bg-white dark:data-active:bg-[#1e1e24] data-active:text-slate-900 dark:data-active:text-white data-active:shadow-xs focus-visible:outline-none cursor-pointer"
 
 const PAGE_LABEL_CLASS = "text-xs font-medium text-slate-700 dark:text-zinc-400"
 
@@ -344,6 +345,7 @@ export function IconChoiceSetting<T extends string>({
     onChange,
     columns,
     hideLabels,
+    disabled,
 }: {
     label: string
     hint?: string
@@ -354,6 +356,7 @@ export function IconChoiceSetting<T extends string>({
     columns?: number
     /** Show icons only, with the text moved to each tile's tooltip. */
     hideLabels?: boolean
+    disabled?: boolean
 }) {
     return (
         <Page label={label} hint={hint}>
@@ -364,7 +367,8 @@ export function IconChoiceSetting<T extends string>({
                     onChange(next as T)
                 }}
                 aria-label={label}
-                className="gap-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/90 p-1"
+                disabled={disabled}
+                className="gap-1 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/90 p-1"
                 style={{
                     gridTemplateColumns: `repeat(${columns ?? options.length}, minmax(0, 1fr))`,
                 }}
@@ -451,7 +455,7 @@ export function ColorSetting({
                     placeholder={fallback}
                     className={cn(CONTROL_CLASS, "font-mono uppercase w-24 border-r-transparent rounded-r-none text-slate-900 dark:text-zinc-100")}
                 />
-                <span className="relative h-[40px] w-[40px] shrink-0 overflow-hidden rounded-xl rounded-l-none border border-l-transparent border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] p-1 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors">
+                <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg rounded-l-none border border-l-transparent border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] p-1 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors">
                     <input
                         type="color"
                         aria-label={label}
@@ -556,7 +560,7 @@ export function ConfirmPopover({
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 rounded-xl border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 px-4 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white shadow-xs cursor-pointer"
+                        className="h-10 rounded-lg border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 px-4 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white shadow-xs cursor-pointer"
                         onClick={() => onOpenChange(false)}
                     >
                         {cancelLabel}
@@ -566,8 +570,8 @@ export function ConfirmPopover({
                         onClick={onConfirm}
                         disabled={confirmDisabled}
                         className={destructive ?
-                            "h-9 rounded-xl bg-red-600 hover:bg-red-700 px-4 text-xs font-medium text-white shadow-xs cursor-pointer transition-colors"
-                            : "h-9 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] px-4 text-xs font-medium text-white shadow-xs cursor-pointer transition-colors"}
+                            "h-10 rounded-lg bg-red-600 hover:bg-red-700 px-4 text-xs font-medium text-white shadow-xs cursor-pointer transition-colors"
+                            : "h-10 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-4 text-xs font-medium text-white shadow-xs cursor-pointer transition-colors"}
                     >
                         {confirmLabel}
                     </Button>
@@ -616,7 +620,7 @@ export function CoverImagePage({
             />
             {value?.url ? (
                 <div className="space-y-3">
-                    <div className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-xs">
+                    <div className="relative overflow-hidden rounded-lg border border-slate-200 dark:border-zinc-800 shadow-xs">
                         <img
                             src={value.url}
                             alt={value.alt || "Cover"}
@@ -633,7 +637,7 @@ export function CoverImagePage({
                             type="button"
                             onClick={() => inputRef.current?.click()}
                             disabled={uploading}
-                            className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                            className="flex-1 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                         >
                             Replace
                         </button>
@@ -641,7 +645,7 @@ export function CoverImagePage({
                             type="button"
                             onClick={() => onChange(null)}
                             disabled={uploading}
-                            className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                            className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                         >
                             <Trash2 className="h-3.5 w-3.5" />
                             Remove
@@ -653,9 +657,9 @@ export function CoverImagePage({
                     type="button"
                     onClick={() => inputRef.current?.click()}
                     disabled={uploading}
-                    className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group disabled:pointer-events-none disabled:opacity-50"
+                    className="flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group disabled:pointer-events-none disabled:opacity-50"
                 >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
                         {uploading ? (
                             <Loader2 className="h-5 w-5 animate-spin" />
                         ) : (

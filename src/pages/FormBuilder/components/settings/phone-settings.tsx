@@ -33,7 +33,7 @@ export function PhoneSettingsWidget({
                     <button
                         type="button"
                         onClick={() => onChange({ ...settings, countryCodeMode: "auto" })}
-                        className={`flex h-[40px] flex-1 items-center justify-center rounded-xl border px-4 text-xs font-medium transition-all cursor-pointer ${
+                        className={`flex h-10 flex-1 items-center justify-center rounded-lg border px-4 text-xs font-medium transition-all cursor-pointer ${
                             settings.countryCodeMode === "auto"
                                 ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
                                 : "border-zinc-800 bg-[#1a1a20] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
@@ -54,7 +54,7 @@ export function PhoneSettingsWidget({
                                 },
                             })
                         }
-                        className={`flex h-[40px] flex-1 items-center justify-center rounded-xl border px-4 text-xs font-medium transition-all cursor-pointer ${
+                        className={`flex h-10 flex-1 items-center justify-center rounded-lg border px-4 text-xs font-medium transition-all cursor-pointer ${
                             settings.countryCodeMode === "specific"
                                 ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
                                 : "border-zinc-800 bg-[#1a1a20] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"

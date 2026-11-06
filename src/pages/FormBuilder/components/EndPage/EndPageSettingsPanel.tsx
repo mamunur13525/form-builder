@@ -26,6 +26,7 @@ import {
 } from "../settings/primitives"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { ImagePickerDialog } from "../settings/ImagePickerDialog"
+import { CoverImageLayoutSetting } from "../settings/cover-image-layout"
 
 interface EndPageSettingsPanelProps {
     endPage: EndPage
@@ -83,15 +84,15 @@ export function EndPageSettingsPanel({
                 <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
                     {/* Pill tabs: Settings (active) | Design */}
                     <div className="px-6 py-2">
-                        <div className="flex rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1">
-                            <div className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#1e1e24] py-2 text-sm font-medium text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-zinc-700/60">
+                        <div className="flex h-10 rounded-lg bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1">
+                            <div className="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#1e1e24] text-sm font-medium text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-zinc-700/60">
                                 <SettingsIcon className="h-4 w-4 text-[#FF5722]" />
                                 Settings
                             </div>
                             <button
                                 type="button"
                                 onClick={onOpenDesignDrawer}
-                                className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                className="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                             >
                                 <Palette className="h-4 w-4 text-slate-400 dark:text-zinc-400" />
                                 Design
@@ -191,7 +192,7 @@ export function EndPageSettingsPanel({
                     <SettingsSection title="Cover image">
                         {endPage.coverImage?.url ? (
                             <div className="space-y-3">
-                                <div className="relative overflow-hidden rounded-2xl border border-zinc-800 shadow-xs">
+                                <div className="relative overflow-hidden rounded-lg border border-zinc-800 shadow-xs">
                                     <img
                                         src={endPage.coverImage.url}
                                         alt={endPage.coverImage.alt || "Cover"}
@@ -202,26 +203,34 @@ export function EndPageSettingsPanel({
                                     <button
                                         type="button"
                                         onClick={() => setCoverDialogOpen(true)}
-                                        className="flex-1 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                        className="flex h-10 flex-1 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     >
                                         Replace
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => patch({ coverImage: null })}
-                                        className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                                        className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                                     >
                                         <Trash2 className="h-3.5 w-3.5" />
                                         Remove
                                     </button>
                                 </div>
+                                <CoverImageLayoutSetting
+                                    value={endPage.coverImage.layout}
+                                    onChange={(layout) =>
+                                        patch({
+                                            coverImage: { ...endPage.coverImage!, layout },
+                                        })
+                                    }
+                                />
                             </div>
                         ) : (
                             <div
                                 onClick={() => setCoverDialogOpen(true)}
-                                className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group"
+                                className="flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group"
                             >
-                                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
                                     <ImagePlus className="h-5 w-5" />
                                 </div>
                                 <p className="mt-3 text-sm font-medium text-slate-800 dark:text-zinc-200">
@@ -257,7 +266,14 @@ export function EndPageSettingsPanel({
         <ImagePickerDialog
                 open={coverDialogOpen}
                 onOpenChange={setCoverDialogOpen}
-                onSelect={(coverImage) => patch({ coverImage })}
+                onSelect={(coverImage) =>
+                    patch({
+                        coverImage: {
+                            ...coverImage,
+                            layout: endPage.coverImage?.layout ?? "top",
+                        },
+                    })
+                }
                 currentImage={endPage.coverImage}
             />
         </div>

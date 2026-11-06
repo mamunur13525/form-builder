@@ -90,7 +90,7 @@ export function SortablePageItem({
       onClick={() => onSelect(index)}
       aria-current={isSelected ? "true" : undefined}
       className={`
-        group relative flex flex-col gap-3 rounded-2xl border p-3.5
+        group relative flex flex-col gap-3 rounded-lg border p-3.5
         cursor-pointer select-none transition-all
         ${isSelected
           ? "border-2 border-[#FF5722] bg-white dark:bg-[#1e1e24] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
@@ -135,7 +135,7 @@ export function SortablePageItem({
               </button>
             }
           />
-          <DropdownMenuContent align="end" className="w-40 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-1.5 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-200">
+          <DropdownMenuContent align="end" className="w-40 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-1.5 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-200">
             {onDuplicate && (
               <DropdownMenuItem
                 className="cursor-pointer rounded-lg text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white"
@@ -242,7 +242,7 @@ export function SortablePageItem({
               align="end"
               sideOffset={8}
               onClick={(e) => e.stopPropagation()}
-              className="w-64 gap-3 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
+              className="w-64 gap-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
             >
               <div className="flex flex-col gap-1">
                 <p className="text-sm font-semibold text-slate-900 dark:text-white">

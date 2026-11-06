@@ -5,6 +5,7 @@ import type { EndPage, IFormTheme } from "../types/common"
 import { cn } from "@/lib/utils"
 import { resolveFormTheme, getFontSizeClasses, getCornerRadiusCss, loadThemeFont } from "../utils/theme"
 import { ConfettiBurst } from "./ConfettiBurst"
+import { CoverImageBlock, CoverImageSide } from "./CoverImageBlock"
 
 interface EndPageViewProps {
     endPage: EndPage
@@ -80,6 +81,11 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
         (k) => endPage.socialShareMedia?.[k],
     )
 
+    const coverLayout = endPage.coverImage?.layout ?? "top"
+    const isSideCover =
+        Boolean(endPage.coverImage?.url) &&
+        (coverLayout === "left" || coverLayout === "right")
+
     const containerStyle: React.CSSProperties = {
         backgroundColor: themeResolved.backgroundColor,
         color: themeResolved.textColor,
@@ -101,6 +107,84 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
         }
         : {}
 
+    const content = (
+        <>
+            <h2
+                className={cn(fontSizes.question, "font-semibold")}
+                style={{ color: themeResolved.questionColor }}
+            >
+                {endPage.title || "Thank you!"}
+            </h2>
+
+            {message && (
+                <p
+                    className={cn(fontSizes.helper, "mt-3 leading-relaxed opacity-90")}
+                    style={{ color: themeResolved.textColor }}
+                >
+                    {message}
+                </p>
+            )}
+
+            {endPage.embed?.url && (
+                <div className="mt-6 w-full overflow-hidden rounded-xl border aspect-video">
+                    <iframe
+                        src={endPage.embed.url}
+                        title={endPage.embed.title || "Embedded media"}
+                        className="h-full w-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    />
+                </div>
+            )}
+
+            {endPage.socialShareButtons && enabledShares.length > 0 && (
+                <div className="mt-8 flex flex-wrap gap-2.5">
+                    {enabledShares.map((key) => (
+                        <a
+                            key={key}
+                            href={shareLinks[key]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-full border border-current/20 px-4 py-2 text-sm font-medium opacity-90 transition-opacity hover:opacity-100"
+                            style={{ color: themeResolved.textColor }}
+                        >
+                            <Share2 className="h-3.5 w-3.5" />
+                            {SHARE_LABELS[key]}
+                        </a>
+                    ))}
+                </div>
+            )}
+
+            {endPage.button?.text && (
+                <a
+                    href={endPage.button.link || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                        "mt-8 inline-flex items-center justify-center gap-2 px-8 py-3 font-medium transition-transform hover:-translate-y-0.5",
+                        fontSizes.button,
+                    )}
+                    style={{
+                        backgroundColor: themeResolved.buttonColor,
+                        color: themeResolved.buttonTextColor,
+                        borderRadius: getCornerRadiusCss(themeResolved.roundCorners),
+                    }}
+                >
+                    {endPage.button.text}
+                    <ExternalLink className="h-4 w-4" />
+                </a>
+            )}
+
+            {mode === "published" &&
+                endPage.redirect?.isRedirect &&
+                endPage.redirect?.link && (
+                    <p className="mt-6 text-sm opacity-60">
+                        Redirecting you shortly…
+                    </p>
+                )}
+        </>
+    )
+
     return (
         <div
             className="relative flex h-full w-full items-center justify-center overflow-hidden"
@@ -116,91 +200,36 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="relative z-10 w-full max-w-xl overflow-y-auto px-6 py-10"
+                className={cn(
+                    "relative z-10 w-full",
+                    isSideCover
+                        ? "h-full overflow-hidden"
+                        : "max-w-xl overflow-y-auto px-6 py-10",
+                )}
             >
-                <div className={cn("flex w-full flex-col", alignClass)}>
-                    {endPage.coverImage?.url && (
-                        <img
-                            src={endPage.coverImage.url}
-                            alt={endPage.coverImage.alt || ""}
-                            className="mb-6 max-h-56 w-full rounded-xl border object-cover"
-                        />
-                    )}
-
-                    <h2
-                        className={cn(fontSizes.question, "font-semibold")}
-                        style={{ color: themeResolved.questionColor }}
-                    >
-                        {endPage.title || "Thank you!"}
-                    </h2>
-
-                    {message && (
-                        <p
-                            className={cn(fontSizes.helper, "mt-3 leading-relaxed opacity-90")}
-                            style={{ color: themeResolved.textColor }}
-                        >
-                            {message}
-                        </p>
-                    )}
-
-                    {endPage.embed?.url && (
-                        <div className="mt-6 w-full overflow-hidden rounded-xl border aspect-video">
-                            <iframe
-                                src={endPage.embed.url}
-                                title={endPage.embed.title || "Embedded media"}
-                                className="h-full w-full"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                            />
+                {isSideCover ? (
+                    /* Left/right: split the page in half — image on one side,
+                       all content (including the button) on the other. */
+                    <div className="flex h-full w-full flex-col sm:flex-row">
+                        <CoverImageSide coverImage={endPage.coverImage} side={coverLayout} />
+                        <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto px-6 py-10 sm:h-full sm:w-1/2">
+                            <div className={cn("mx-auto my-auto flex w-full max-w-xl flex-col", alignClass)}>
+                                {content}
+                            </div>
                         </div>
-                    )}
-
-                    {endPage.socialShareButtons && enabledShares.length > 0 && (
-                        <div className="mt-8 flex flex-wrap gap-2.5">
-                            {enabledShares.map((key) => (
-                                <a
-                                    key={key}
-                                    href={shareLinks[key]}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 rounded-full border border-current/20 px-4 py-2 text-sm font-medium opacity-90 transition-opacity hover:opacity-100"
-                                    style={{ color: themeResolved.textColor }}
-                                >
-                                    <Share2 className="h-3.5 w-3.5" />
-                                    {SHARE_LABELS[key]}
-                                </a>
-                            ))}
-                        </div>
-                    )}
-
-                    {endPage.button?.text && (
-                        <a
-                            href={endPage.button.link || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={cn(
-                                "mt-8 inline-flex items-center justify-center gap-2 px-8 py-3 font-medium transition-transform hover:-translate-y-0.5",
-                                fontSizes.button,
-                            )}
-                            style={{
-                                backgroundColor: themeResolved.buttonColor,
-                                color: themeResolved.buttonTextColor,
-                                borderRadius: getCornerRadiusCss(themeResolved.roundCorners),
-                            }}
+                    </div>
+                ) : (
+                    <div className={cn("flex w-full flex-col", alignClass)}>
+                        <CoverImageBlock
+                            coverImage={endPage.coverImage}
+                            imageClassName="rounded-xl border"
+                            contentClassName={alignClass}
+                            gapClassName="gap-6"
                         >
-                            {endPage.button.text}
-                            <ExternalLink className="h-4 w-4" />
-                        </a>
-                    )}
-
-                    {mode === "published" &&
-                        endPage.redirect?.isRedirect &&
-                        endPage.redirect?.link && (
-                            <p className="mt-6 text-sm opacity-60">
-                                Redirecting you shortly…
-                            </p>
-                        )}
-                </div>
+                            {content}
+                        </CoverImageBlock>
+                    </div>
+                )}
             </motion.div>
         </div>
     )

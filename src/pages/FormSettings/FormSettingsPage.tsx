@@ -57,7 +57,7 @@ export function FormSettingsPage() {
     const base = `/form-settings/${formId ?? "new"}`
 
     return (
-        <div className="editorial h-full w-full overflow-y-auto bg-[var(--editorial-canvas)] pb-12">
+        <div className="editorial h-full w-full overflow-y-auto bg-[var(--editorial-canvas)] pb-12 dark:bg-[#0c0c0f] dark:text-zinc-100">
             {/* Mobile: horizontally scrollable pill nav pinned to the top. */}
             <nav className="sticky top-0 z-20 border-b border-slate-200 dark:border-zinc-800 px-4 py-3 md:hidden bg-white/95 dark:bg-[#141418]/95 backdrop-blur-md">
                 <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

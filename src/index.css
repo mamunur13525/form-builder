@@ -116,6 +116,7 @@
     --sidebar-accent-foreground: #f4f4f5;
     --sidebar-border: #27272a;
     --sidebar-ring: #FF5722;
+    color-scheme: dark;
 }
 
 .light,

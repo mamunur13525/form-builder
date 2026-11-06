@@ -704,10 +704,9 @@ export function FormBuilderPage() {
   );
 
   const editorColumn = (
-    <div className="relative flex h-full min-h-0 w-full flex-col gap-3 p-3 bg-[#f4f6fb] dark:bg-[#0c0c0f] bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#22222a_1px,transparent_1px)] [background-size:24px_24px] overflow-hidden">
-      {/* Ambient radiant spotlight glow behind canvas artboard */}
-      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[650px] rounded-full bg-gradient-to-tr from-purple-400/10 via-indigo-300/10 to-orange-400/10 dark:from-purple-600/25 dark:via-indigo-500/20 dark:to-purple-800/25 blur-[140px]" />
-      <div className="pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full bg-[#FF5722]/5 dark:bg-[#FF5722]/10 blur-[100px]" />
+    <div className="relative flex h-full min-h-0 w-full flex-col gap-3 p-3 bg-slate-200/80 dark:bg-[#08080b] bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#1a1a22_1px,transparent_1px)] [background-size:24px_24px] overflow-hidden">
+      {/* Neutral vignette: darkens the edges so the floating toolbar, artboard and controls stand out */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(100,116,139,0.28)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_15%,rgba(0,0,0,0.7)_100%)]" />
 
       <div className="relative z-10 w-full">
         <PageContentTopbar
@@ -748,7 +747,7 @@ export function FormBuilderPage() {
       <div className="relative z-10 flex min-h-0 w-full flex-1 items-center justify-center overflow-auto p-1 sm:p-3">
         <div
           className={cn(
-            "light relative flex flex-col h-full max-h-[85vh] w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
+            "light relative flex flex-col h-full max-h-[78vh] w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
           )}
           style={{
             width: isMobileView ? "min(420px, 100%)" : "100%",
@@ -874,13 +873,13 @@ export function FormBuilderPage() {
               {sidebarPanel}
             </ResizablePanel>
 
-            <ResizableHandle className="w-1.5 bg-transparent hover:bg-slate-200 dark:hover:bg-zinc-800 transition-colors after:hidden" />
+            <ResizableHandle className="w-1.5 bg-transparent hover:bg-slate-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 transition-colors after:hidden" />
 
             <ResizablePanel defaultSize={600} minSize={300} className="bg-transparent">
               {editorColumn}
             </ResizablePanel>
 
-            <ResizableHandle className="w-1.5 bg-transparent hover:bg-slate-200 dark:hover:bg-zinc-800 transition-colors after:hidden" />
+            <ResizableHandle className="w-1.5 bg-transparent hover:bg-slate-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 transition-colors after:hidden" />
 
             <ResizablePanel defaultSize={340} minSize={300} maxSize={420}>
               {settingsPanel}

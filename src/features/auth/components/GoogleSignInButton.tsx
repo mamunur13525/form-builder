@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useGoogleAuth } from "@/features/auth/hooks/useAuth";
 import { ROUTES } from "@/shared/constants/routes";
 import { Spinner } from "@/components/ui/spinner";
+import { useTheme } from "@/app/providers/ThemeProvider";
 
 interface GoogleSignInButtonProps {
   /** Where to navigate after successful auth. */
@@ -27,6 +28,7 @@ export function GoogleSignInButton({
 }: GoogleSignInButtonProps) {
   const navigate = useNavigate();
   const googleAuthMutation = useGoogleAuth();
+  const { theme } = useTheme();
   const [isPending, setIsPending] = useState(false);
 
   const handleSuccess = useCallback(
@@ -70,7 +72,7 @@ export function GoogleSignInButton({
         role="status"
         aria-live="polite"
         aria-busy="true"
-        className="editorial-transition h-9.5 w-full rounded-full border border-[var(--input)] bg-[var(--background)] text-sm font-medium text-gray-600 disabled:cursor-not-allowed  flex items-center justify-center gap-2.5"
+        className="editorial-transition flex h-9.5 w-full items-center justify-center gap-2.5 rounded-full border border-[var(--input)] bg-[var(--background)] text-sm font-medium text-gray-600 disabled:cursor-not-allowed dark:text-zinc-300"
         disabled={isPending}
       >
         <Spinner data-icon="inline-start" />
@@ -85,7 +87,7 @@ export function GoogleSignInButton({
         onSuccess={handleSuccess}
         onError={handleError}
         type="standard"
-        theme="outline"
+        theme={theme === "dark" ? "filled_black" : "outline"}
         size="large"
         text="signin_with"
         shape="pill"

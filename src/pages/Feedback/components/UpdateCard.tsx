@@ -40,10 +40,10 @@ export function UpdateCover({
 }
 
 const TAG_STYLE: Record<string, string> = {
-    "new feature": "bg-[#fff1ec] text-[#f2542d]",
-    announcement: "bg-purple-50 text-purple-600",
-    improvement: "bg-blue-50 text-blue-600",
-    fix: "bg-green-50 text-green-600",
+    "new feature": "bg-[#FF5722]/15 text-[#FF5722] border border-[#FF5722]/30",
+    announcement: "bg-purple-500/15 text-purple-400 border border-purple-500/30",
+    improvement: "bg-blue-500/15 text-blue-400 border border-blue-500/30",
+    fix: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30",
 }
 
 export function UpdateTag({ tag }: { tag: string }) {
@@ -51,7 +51,7 @@ export function UpdateTag({ tag }: { tag: string }) {
         <span
             className={cn(
                 "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
-                TAG_STYLE[tag] ?? "bg-gray-100 text-gray-600",
+                TAG_STYLE[tag] ?? "bg-zinc-800 text-zinc-300 border border-zinc-700",
             )}
         >
             {tag}
@@ -63,7 +63,7 @@ export function UpdateCard({ update }: { update: UpdateEntry }) {
     return (
         <Link
             to={`${ROUTES.UPDATES}/${update.slug}`}
-            className="group block overflow-hidden rounded-2xl border border-gray-200 bg-white transition-shadow hover:shadow-sm"
+            className="group block overflow-hidden rounded-2xl border border-zinc-800 bg-[#141418] transition-all hover:border-[#FF5722]/50 hover:shadow-[0_4px_20px_rgba(255,87,34,0.08)]"
         >
             {update.cover && <UpdateCover cover={update.cover} className="h-44 w-full" />}
             <div className="p-5">
@@ -71,12 +71,12 @@ export function UpdateCard({ update }: { update: UpdateEntry }) {
                     {update.tags.map((t) => (
                         <UpdateTag key={t} tag={t} />
                     ))}
-                    <span className="text-xs text-gray-400">{formatMedium(update.date)}</span>
+                    <span className="text-xs text-zinc-400">{formatMedium(update.date)}</span>
                 </div>
-                <h3 className="mt-2 text-lg font-semibold text-gray-900 group-hover:text-[#f2542d]">
+                <h3 className="mt-2 text-lg font-semibold text-zinc-100 group-hover:text-[#FF5722] transition-colors">
                     {update.title}
                 </h3>
-                <p className="mt-1 line-clamp-2 text-sm text-gray-500">{update.excerpt}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-zinc-400">{update.excerpt}</p>
             </div>
         </Link>
     )

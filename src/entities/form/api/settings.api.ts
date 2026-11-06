@@ -20,6 +20,7 @@ import type {
     UpdateGeneralSettingsRequest,
     UpdateHiddenFieldsRequest,
     UpdateVariablesRequest,
+    UpdateIntegrationsRequest,
 } from "@/entities/form/model/types"
 
 /**
@@ -119,6 +120,18 @@ export async function updateVariables(
 ): Promise<FormSettingsResponse> {
     const res = await apiRequest<FormSettingsResponse>(
         `/forms/${formId}/settings/variables`,
+        { method: "PATCH", body: cleanBody(data) },
+    )
+    return stripMongooseInternals(res)
+}
+
+/** PATCH /forms/:formId/settings/integrations — update integrations config. */
+export async function updateIntegrationsSettings(
+    formId: string,
+    data: UpdateIntegrationsRequest,
+): Promise<FormSettingsResponse> {
+    const res = await apiRequest<FormSettingsResponse>(
+        `/forms/${formId}/settings/integrations`,
         { method: "PATCH", body: cleanBody(data) },
     )
     return stripMongooseInternals(res)

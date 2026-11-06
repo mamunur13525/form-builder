@@ -71,11 +71,11 @@ export function ResponsePageShell({
     }
 
     return (
-        <div className="editorial editorial-shadow-md m-4 flex h-[calc(100%-2rem)] flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] sm:m-8 sm:h-[calc(100%-4rem)]">
+        <div className="editorial m-4 flex h-[calc(100%-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] shadow-xl dark:shadow-2xl sm:m-8 sm:h-[calc(100%-4rem)]">
             {/* Navigation Tabs — controlled by the active route.
                 The tab strip scrolls horizontally on narrow screens so the three
                 labels never overflow or squash the actions on the right. */}
-            <div className="flex items-center justify-between gap-2 border-b border-[var(--editorial-border-light)] px-3 py-2.5 sm:gap-4 sm:px-6 sm:py-3">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-200/90 dark:border-zinc-800/90 px-3 py-2.5 sm:gap-4 sm:px-6 sm:py-3 bg-slate-50 dark:bg-[#111114]">
                 <Tabs
                     value={activeTab}
                     onValueChange={(value) => handleTabChange(value as ResponseTabValue)}
@@ -86,7 +86,7 @@ export function ResponsePageShell({
                             <TabsTrigger
                                 key={value}
                                 value={value}
-                                className="editorial-transition h-9 gap-1.5 rounded-xl px-2.5 text-xs whitespace-nowrap text-[var(--editorial-body)] data-[selected]:border data-[selected]:border-[var(--editorial-primary-ring)] data-[selected]:bg-[var(--editorial-primary-selected)] data-[selected]:text-[var(--primary)] sm:h-10 sm:gap-2 sm:px-4 sm:text-sm"
+                                className="editorial-transition h-9 gap-1.5 rounded-xl px-2.5 text-xs whitespace-nowrap text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 data-[selected]:border data-[selected]:border-[#FF5722]/40 data-[selected]:bg-[#FF5722]/15 data-[selected]:text-[#FF5722] data-[selected]:font-semibold sm:h-10 sm:gap-2 sm:px-4 sm:text-sm"
                             >
                                 <Icon className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
                                 {label}

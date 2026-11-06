@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
 import { ROUTES } from "@/shared/constants/routes";
 
 const highlights = [
@@ -29,12 +28,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
         <Link
           to={ROUTES.HOME}
-          className="editorial-transition relative flex w-fit items-center gap-2 text-[var(--foreground)] hover:text-[var(--primary)]"
+          className="editorial-transition relative flex w-fit items-center gap-3 text-[var(--foreground)] hover:text-[var(--primary)]"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--primary)] text-white">
-            <Sparkles className="h-5 w-5" />
-          </span>
-          <span className="font-display text-2xl">FormFlow</span>
+          <img src="/flogo.png" alt="FormFlow logo" className="h-10 w-10 rounded-[14px] object-contain shadow-sm" />
+          <span className="font-display text-2xl font-bold">FormFlow</span>
         </Link>
 
         <div className="relative max-w-lg">
@@ -68,12 +65,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       <main className="flex min-h-screen flex-col items-center justify-center px-4 py-10 sm:px-8 sm:py-14">
         <Link
           to={ROUTES.HOME}
-          className="editorial-transition mb-8 flex items-center gap-2 text-[var(--foreground)] hover:text-[var(--primary)] lg:hidden"
+          className="editorial-transition mb-8 flex items-center gap-2.5 text-[var(--foreground)] hover:text-[var(--primary)] lg:hidden"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[var(--primary)] text-white">
-            <Sparkles className="h-4 w-4" />
-          </span>
-          <span className="font-display text-xl">FormFlow</span>
+          <img src="/flogo.png" alt="FormFlow logo" className="h-9 w-9 rounded-[12px] object-contain shadow-sm" />
+          <span className="font-display text-xl font-bold">FormFlow</span>
         </Link>
 
         <div className="w-full max-w-[460px]">{children}</div>

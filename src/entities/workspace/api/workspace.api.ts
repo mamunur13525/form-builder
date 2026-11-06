@@ -33,11 +33,19 @@ export const createWorkspace = (payload: CreateWorkspacePayload): Promise<Worksp
 
 /** Every workspace the signed-in user belongs to, each with their role in it. */
 export const getWorkspaces = (): Promise<Workspace[]> =>
-    apiRequest<Workspace[]>(BASE)
+    apiRequest<Workspace[]>(BASE).then((workspaces) =>
+        (workspaces || []).map((ws) => ({
+            ...ws,
+            id: ws.id ?? ws._id ?? "",
+        }))
+    )
 
 /** One workspace including its merged member + pending-invitation list. */
 export const getWorkspace = (workspaceId: string): Promise<WorkspaceDetail> =>
-    apiRequest<WorkspaceDetail>(`${BASE}/${workspaceId}`)
+    apiRequest<WorkspaceDetail>(`${BASE}/${workspaceId}`).then((ws) => ({
+        ...ws,
+        id: ws.id ?? ws._id ?? "",
+    }))
 
 export const getWorkspaceBySlug = (slug: string): Promise<WorkspaceDetail> =>
     apiRequest<WorkspaceDetail>(`${BASE}/slug/${slug}`)

@@ -1,10 +1,16 @@
 import { useState } from "react"
-import { Plus, Trash2, Flag, CheckCircle2, ArrowUpToLine, Loader2 } from "lucide-react"
+import { Plus, Trash2, Flag, ArrowUpToLine, Loader2, MoreVertical, Eye } from "lucide-react"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "../../../../components/ui/popover"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Button } from "../../../../components/ui/button"
 import {
     Tooltip,
@@ -44,12 +50,12 @@ export function EndPageList({
     isAdding = false,
 }: EndPageListProps) {
     return (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-[var(--card)]">
-            {/* Header — "End pages" with a count and an add button. */}
-            <div className="flex items-center justify-between gap-2 px-4 py-4">
-                <div className="flex items-center gap-2 text-[var(--foreground)]">
-                    <Flag className="h-4 w-4 text-[var(--editorial-subtle)]" />
-                    <span className="text-[15px] font-semibold">End pages</span>
+        <div className="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-[#141418] text-slate-800 dark:text-zinc-100">
+            {/* Header — "End page" with an add button */}
+            <div className="flex items-center justify-between gap-2 px-5 py-4 border-b border-slate-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#141418]">
+                <div className="flex items-center gap-2">
+                    <Flag className="h-4 w-4 text-slate-400 dark:text-zinc-400" />
+                    <span className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">End page</span>
                 </div>
 
                 <Tooltip>
@@ -61,12 +67,12 @@ export function EndPageList({
                                 disabled={isAdding}
                                 aria-label="Add end page"
                                 aria-busy={isAdding}
-                                className="editorial-transition flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] disabled:pointer-events-none disabled:opacity-60"
+                                className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 dark:border-zinc-700/80 bg-slate-100 dark:bg-zinc-800/90 text-slate-600 dark:text-zinc-300 hover:text-white hover:border-[#FF5722] hover:bg-[#FF5722] transition-all shadow-xs cursor-pointer active:scale-95 disabled:pointer-events-none disabled:opacity-60"
                             >
                                 {isAdding ? (
-                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    <Loader2 className="h-4 w-4 animate-spin text-[#FF5722]" />
                                 ) : (
-                                    <Plus className="h-5 w-5" />
+                                    <Plus className="h-4 w-4" />
                                 )}
                             </button>
                         }
@@ -75,9 +81,9 @@ export function EndPageList({
                 </Tooltip>
             </div>
 
-            <div className="flex-1 space-y-2.5 overflow-y-auto overflow-x-hidden px-3 pb-4">
+            <div className="flex-1 space-y-2.5 overflow-y-auto overflow-x-hidden p-3">
                 {endPages.length === 0 && !isAdding ? (
-                    <div className="px-2 py-6 text-center text-sm text-[var(--editorial-subtle)]">
+                    <div className="px-2 py-6 text-center text-sm text-slate-400 dark:text-zinc-500">
                         No end pages yet.
                     </div>
                 ) : (
@@ -96,19 +102,15 @@ export function EndPageList({
                     ))
                 )}
 
-                {/* Loading placeholder — shown while the new end page is being
-                    created on the backend, replaced by the real card once the
-                    POST response arrives. */}
                 {isAdding && (
                     <div
                         aria-busy="true"
-                        className="flex flex-col gap-3 rounded-xl border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-3.5"
+                        className="flex flex-col gap-2 rounded-2xl border border-dashed border-[#FF5722]/40 bg-[#FF5722]/5 p-3.5"
                     >
-                        <div className="flex items-center gap-2 text-sm text-[var(--editorial-body)]">
-                            <Loader2 className="h-4 w-4 animate-spin text-[var(--primary)]" />
+                        <div className="flex items-center gap-2 text-sm text-zinc-300 font-medium">
+                            <Loader2 className="h-4 w-4 animate-spin text-[#FF5722]" />
                             <span>Creating end page…</span>
                         </div>
-                        <div className="h-5 w-28 animate-pulse rounded-md bg-[var(--border)]" />
                     </div>
                 )}
             </div>
@@ -143,102 +145,116 @@ function EndPageItem({
         <div
             onClick={() => onSelect(index)}
             aria-current={isSelected ? "true" : undefined}
-            className={`editorial group relative flex flex-col gap-2 rounded-xl border px-4 py-3.5 cursor-pointer select-none editorial-transition ${
+            className={`group relative flex flex-col gap-3 rounded-2xl border p-3.5 cursor-pointer select-none transition-all ${
                 isSelected
-                    ? "border-green-900/50 bg-green-700/5! shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
-                    : "border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--editorial-primary-ring)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
+                    ? "border-2 border-[#FF5722] bg-white dark:bg-[#1e1e24] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
+                    : "border-slate-200/90 dark:border-zinc-800/80 bg-slate-50/70 dark:bg-[#17171c] hover:border-slate-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-[#1a1a20]"
             }`}
         >
-            <p className="line-clamp-2 text-sm leading-snug text-[var(--foreground)]">
-                <span className="text-[var(--editorial-body)]">{index + 1}.</span>{" "}
-                {endPage.title || (
-                    <span className="italic text-[var(--editorial-disabled)]">
-                        Untitled end page
-                    </span>
-                )}
-            </p>
-
             <div className="flex items-center justify-between gap-2">
+                <p className="truncate text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                    <span className="text-slate-400 dark:text-zinc-400 font-normal">{index + 1}.</span>{" "}
+                    {endPage.title || (
+                        <span className="font-normal italic text-slate-400 dark:text-zinc-500">
+                            Thank you!
+                        </span>
+                    )}
+                </p>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        render={
+                            <button
+                                type="button"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors"
+                            >
+                                <MoreVertical className="h-4 w-4" />
+                            </button>
+                        }
+                    />
+                    <DropdownMenuContent align="end" className="w-48 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-1.5 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-200">
+                        {!isFirst && (
+                            <DropdownMenuItem
+                                className="cursor-pointer rounded-lg text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    onReorderToFirst(index)
+                                }}
+                            >
+                                <ArrowUpToLine className="h-3.5 w-3.5 mr-2 text-slate-400 dark:text-zinc-400" />
+                                Show on submit
+                            </DropdownMenuItem>
+                        )}
+                        {canDelete && (
+                            <DropdownMenuItem
+                                className="cursor-pointer rounded-lg text-xs font-medium text-rose-500 hover:bg-rose-500/10 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    setConfirmOpen(true)
+                                }}
+                            >
+                                <Trash2 className="h-3.5 w-3.5 mr-2" />
+                                Delete
+                            </DropdownMenuItem>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 pt-0.5">
                 {isFirst ? (
-                    <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-green-900/30 bg-green-700/10 px-1.5 py-0.5 text-[11px] font-medium text-green-800">
-                        <CheckCircle2 className="h-3 w-3 shrink-0" />
+                    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-lg border border-slate-200 dark:border-zinc-700/60 bg-slate-100 dark:bg-zinc-800/90 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-zinc-200">
+                        <Eye className="h-3.5 w-3.5 text-slate-500 dark:text-zinc-400 shrink-0" />
                         <span className="truncate">Shown on submit</span>
                     </span>
                 ) : (
-                    <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-[var(--border)] bg-[var(--card)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--editorial-body)]">
-                        <Flag className="h-3 w-3 shrink-0" />
+                    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100/70 dark:bg-zinc-800/60 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-zinc-400">
+                        <Flag className="h-3.5 w-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
                         <span className="truncate">End page</span>
-                     
                     </span>
                 )}
 
-                <div className="flex items-center gap-1">
-                    {!isFirst && (
-                        <Tooltip>
-                            <TooltipTrigger
-                                render={
-                                    <button
-                                        type="button"
-                                        aria-label="Set this end page to show on submit"
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            onReorderToFirst(index)
-                                        }}
-                                        className="editorial-transition flex h-7 w-7 items-center justify-center rounded-md text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
-                                    >
-                                        <ArrowUpToLine className="h-4 w-4" />
-                                    </button>
-                                }
-                            />
-                            <TooltipContent>Set this end page to Show on submit</TooltipContent>
-                        </Tooltip>
-                    )}
-                    {canDelete && (
+                {canDelete && (
                     <Popover open={confirmOpen} onOpenChange={setConfirmOpen}>
-                        <Tooltip>
-                            <TooltipTrigger
-                                render={
-                                    <PopoverTrigger
-                                        type="button"
-                                        aria-label="Delete end page"
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="editorial-transition flex h-7 w-7 items-center justify-center rounded-md text-[var(--editorial-subtle)] hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)] data-[popup-open]:bg-[var(--destructive)]/10 data-[popup-open]:text-[var(--destructive)]"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </PopoverTrigger>
-                                }
-                            />
-                            <TooltipContent>Delete</TooltipContent>
-                        </Tooltip>
+                        <PopoverTrigger
+                            type="button"
+                            aria-label="Delete end page"
+                            onClick={(e) => e.stopPropagation()}
+                            className="hidden"
+                        />
                         <PopoverContent
                             side="top"
                             align="end"
                             sideOffset={8}
                             onClick={(e) => e.stopPropagation()}
-                            className="editorial w-64 gap-3 rounded-2xl p-4"
+                            className="w-64 gap-3 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
                         >
                             <div className="flex flex-col gap-1">
-                                <p className="text-sm font-semibold text-[var(--foreground)]">
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
                                     Delete this end page?
                                 </p>
-                                <p className="text-[13px] leading-snug text-[var(--muted-foreground)]">
-                                    This can't be undone.
+                                <p className="text-xs leading-snug text-slate-500 dark:text-zinc-400">
+                                    This action cannot be undone.
                                 </p>
                             </div>
-                            <div className="flex justify-end gap-2">
+                            <div className="flex justify-end gap-2 mt-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={() => setConfirmOpen(false)}
+                                    className="border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     size="sm"
+                                    variant="destructive"
                                     onClick={() => {
                                         setConfirmOpen(false)
                                         onDelete(index)
                                     }}
+                                    className="bg-rose-600 hover:bg-rose-700 text-white"
                                 >
                                     Delete
                                 </Button>
@@ -246,7 +262,6 @@ function EndPageItem({
                         </PopoverContent>
                     </Popover>
                 )}
-                </div>
             </div>
         </div>
     )

@@ -186,12 +186,12 @@ export function useActiveWorkspace() {
         if (!workspaces.length) return null
 
         const isMember = (id: string | null | undefined) =>
-            Boolean(id) && workspaces.some((workspace) => workspace.id === id)
+            Boolean(id) && workspaces.some((workspace) => (workspace.id ?? workspace._id) === id)
 
         if (isMember(activeWorkspaceId)) return activeWorkspaceId
         if (isMember(serverActive?.workspaceId)) return serverActive?.workspaceId ?? null
 
-        return workspaces[0].id
+        return workspaces[0]?.id ?? workspaces[0]?._id ?? null
     }, [workspaces, activeWorkspaceId, serverActive?.workspaceId])
 
     // Write the reconciled value back so the next reload starts correct.
@@ -202,7 +202,7 @@ export function useActiveWorkspace() {
     }, [resolvedId, activeWorkspaceId, setActiveWorkspaceId])
 
     const activeWorkspace = useMemo(
-        () => workspaces.find((workspace) => workspace.id === resolvedId) ?? null,
+        () => workspaces.find((workspace) => (workspace.id ?? workspace._id) === resolvedId) ?? null,
         [workspaces, resolvedId],
     )
 

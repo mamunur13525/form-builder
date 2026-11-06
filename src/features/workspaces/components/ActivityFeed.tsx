@@ -5,7 +5,6 @@ import {
     ChevronRight,
     Crown,
     FilePlus2,
-    FileText,
     LogOut,
     MailX,
     Pencil,

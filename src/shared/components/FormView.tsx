@@ -4,6 +4,7 @@ import { AlertTriangle } from "lucide-react";
 import type { Form, FormPage } from "../../shared/types/common";
 import { cn } from "@/lib/utils";
 import { useFormNavigation } from "../hooks/useFormNavigation";
+import { useGoogleAnalytics } from "../hooks/useGoogleAnalytics";
 import { FormPageRenderer } from "./FormPageRenderer";
 import { FormProgressBar } from "./FormProgressBar";
 import { FormSubmittedView } from "./FormSubmittedView";
@@ -51,6 +52,13 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
     handleNavNext,
     computedVariables,
   } = useFormNavigation({ form, mode, onSubmit });
+
+  useGoogleAnalytics({
+    form,
+    step: currentStep,
+    currentPageKey: currentPage?.pageKey,
+    currentPageLabel: currentPage?.label,
+  });
 
   const themeResolved = resolveFormTheme(form.theme);
 

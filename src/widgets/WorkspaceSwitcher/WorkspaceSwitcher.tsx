@@ -38,17 +38,19 @@ function initialsOf(name: string): string {
 
 function WorkspaceAvatar({
     workspace,
+    className,
 }: {
     workspace: Pick<Workspace, "name" | "logoUrl">
+    className?: string
 }) {
 
     return (
-        <Avatar size="lg" >
+        <Avatar size="lg" className={className}>
             {
                 workspace?.logoUrl ? (
                     <AvatarImage src={workspace.logoUrl} />
                 ) : (
-                    <AvatarFallback className="bg-[#efefef]">{initialsOf(workspace?.name)}</AvatarFallback>
+                    <AvatarFallback className="bg-[var(--secondary)] text-[var(--foreground)] font-semibold">{initialsOf(workspace?.name)}</AvatarFallback>
                 )
             }
         </Avatar >

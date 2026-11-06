@@ -2,7 +2,7 @@ import { Star, Hash } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { RatingSettings as RatingSettingsType } from "@/shared/types/common"
-import { CONTROL_CLASS } from "./primitives"
+import { CONTROL_CLASS, OVERLAY_CLASS } from "./primitives"
 
 /** Rating settings: star vs number style + max rating (2–10). */
 export function RatingSettingsWidget({
@@ -17,7 +17,7 @@ export function RatingSettingsWidget({
     return (
         <div className="space-y-3">
             <div className="space-y-1.5">
-                <Label className="text-base text-[var(--editorial-body)]">Rating style</Label>
+                <Label className="text-sm font-medium text-zinc-200">Rating style</Label>
                 <div className="flex items-center gap-2">
                     <StyleButton
                         active={settings.style === "star"}
@@ -35,23 +35,27 @@ export function RatingSettingsWidget({
             </div>
 
             <div className="space-y-1.5">
-                <Label className="text-base text-[var(--editorial-body)]">Max rating</Label>
+                <Label className="text-sm font-medium text-zinc-200">Max rating</Label>
                 <Select
                     value={String(settings.max)}
                     onValueChange={(v) => onChange({ ...settings, max: Number(v) })}
                 >
-                    <SelectTrigger className={CONTROL_CLASS + " w-full"}>
+                    <SelectTrigger className={CONTROL_CLASS + " w-full [&>svg:last-child]:text-zinc-400"}>
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className={OVERLAY_CLASS}>
                         {maxOptions.map((v) => (
-                            <SelectItem key={v} value={v}>
-                                {v}
+                            <SelectItem
+                                key={v}
+                                value={v}
+                                className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                            >
+                                <span className="font-medium">{v}</span>
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
-                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                <p className="text-xs leading-5 text-zinc-400">
                     Respondents will rate from 1 to {settings.max}.
                 </p>
             </div>
@@ -74,10 +78,10 @@ function StyleButton({
         <button
             type="button"
             onClick={onClick}
-            className={`editorial-transition flex h-[44px] flex-1 items-center justify-center gap-1.5 rounded-[12px] border px-4 text-sm ${
+            className={`flex h-[40px] flex-1 items-center justify-center gap-1.5 rounded-xl border px-4 text-xs font-medium transition-all cursor-pointer ${
                 active
-                    ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] font-medium text-[var(--foreground)]"
-                    : "border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                    ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
+                    : "border-zinc-800 bg-[#1a1a20] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
             }`}
         >
             {icon}

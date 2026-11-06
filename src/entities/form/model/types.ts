@@ -200,6 +200,7 @@ export interface GroupedFormSettings extends FormSettings {
     access?: AccessSettingsValues
     hiddenFields?: HiddenFieldsSettings
     variables?: FormVariable[]
+    integrations?: Record<string, any>
 }
 
 /** Envelope `data` for GET /forms/:id/settings. */
@@ -219,6 +220,7 @@ export type UpdateHiddenFieldsRequest = HiddenFieldsSettings
 export interface UpdateVariablesRequest {
     variables: FormVariable[]
 }
+export type UpdateIntegrationsRequest = Record<string, any>
 
 // ---------------------------------------------------------------------------
 // Pages

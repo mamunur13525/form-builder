@@ -68,8 +68,8 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
         editorial-transition cursor-pointer select-none
         ${
           selected
-            ? "border-green-900/50 bg-green-700/5! shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
-            : "border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--editorial-primary-ring)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
+            ? "border-[#FF5722] ring-2 ring-[#FF5722]/30 bg-white dark:bg-[#1e1e24] shadow-md dark:shadow-[0_4px_20px_rgba(255,87,34,0.15)]"
+            : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#16161a] hover:border-slate-300 dark:hover:border-zinc-700 hover:shadow-md dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         }
       `}
     >
@@ -92,7 +92,7 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
         className={`flex flex-col gap-2 px-4 pb-3 pt-3.5 ${BODY_MAX_HEIGHT} overflow-y-auto`}
       >
         {/* Page number — the small dark chip used by PageLabel in the editor. */}
-        <span className="w-fit rounded bg-gray-900 px-1 text-[10px] font-bold leading-4 text-white select-none">
+        <span className="w-fit rounded bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 px-1.5 text-[10px] font-bold leading-4 text-slate-700 dark:text-zinc-200 select-none">
           {pageNumber}
         </span>
 
@@ -130,14 +130,14 @@ function PageNodeComponent({ data, selected }: NodeProps<PageNodeType>) {
       </div>
 
       {/* Footer: page type pinned bottom-left, rule count on the right. */}
-      <div className="flex items-center justify-between gap-2 border-t border-[var(--border)] bg-[var(--card)] px-3 py-2">
-        <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-[var(--border)] bg-[var(--secondary)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--editorial-body)]">
+      <div className="flex items-center justify-between gap-2 border-t border-slate-200 dark:border-zinc-800/80 bg-slate-50 dark:bg-[#121215] px-3 py-2">
+        <span className="inline-flex min-w-0 items-center gap-1 rounded-md border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/80 px-1.5 py-0.5 text-[11px] font-medium text-slate-700 dark:text-zinc-300">
           <TypeIcon className="h-3 w-3 shrink-0" />
           <span className="truncate">{typeLabel}</span>
         </span>
 
         {data.ruleCount > 0 && (
-          <span className="shrink-0 rounded-md bg-[var(--editorial-primary-selected)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--primary)]">
+          <span className="shrink-0 rounded-md bg-[#FF5722]/15 border border-[#FF5722]/30 px-1.5 py-0.5 text-[11px] font-medium text-[#FF5722]">
             {data.ruleCount} rule{data.ruleCount === 1 ? "" : "s"}
           </span>
         )}

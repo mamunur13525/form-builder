@@ -8,6 +8,8 @@ import {
     ChevronsUpDown,
     Sparkles,
     Megaphone,
+    Sun,
+    Moon,
 } from "lucide-react"
 import { ROUTES } from "../../shared/constants/routes"
 import { cn } from "../../shared/utils/cn"
@@ -23,6 +25,7 @@ import { useLogout, useCurrentUser } from "../../features/auth/hooks/useAuth"
 import { WorkspaceSwitcher } from "../WorkspaceSwitcher"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useTheme } from "@/app/providers/ThemeProvider"
 
 interface SidebarProps {
     /** Drawer visibility on small screens. The sidebar is always shown from `lg` up. */
@@ -54,6 +57,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     const logout = useLogout()
     const { data: user } = useCurrentUser()
     const openSettings = useSettingsModalStore((state) => state.openSettings)
+    const { theme, setTheme } = useTheme()
 
     const handleLogout = () => {
         logout.mutate()
@@ -100,7 +104,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 )}
             >
                 <div className="editorial-shadow-md flex min-h-0 flex-1 flex-col bg-[var(--card)]">
-                
+                    {/* Brand header */}
+                    <div className="flex items-center gap-3 px-5 pt-5 pb-2">
+                        <img src="/flogo.png" alt="FormFlow" className="h-8 w-8 rounded-xl object-contain shadow-xs" />
+                        <span className="font-display text-xl font-bold tracking-tight text-[var(--foreground)]">FormFlow</span>
+                    </div>
 
                     {/* Active workspace + switcher */}
                     <div className="border-b border-[var(--editorial-border-light)] p-4">
@@ -152,10 +160,10 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                     </div>
 
                     {/* Account — the menu opens upward so it stays on screen */}
-                    <div className="border-t border-[var(--editorial-border-light)] p-4">
+                    <div className="border-t border-[var(--editorial-border-light)] p-4 flex items-center gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger
-                                className="editorial-transition flex w-full items-center gap-3 rounded-[16px] border border-transparent px-3 py-2.5 text-left hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)]"
+                                className="editorial-transition flex min-w-0 flex-1 items-center gap-3 rounded-[16px] border border-transparent px-3 py-2 text-left hover:border-[var(--editorial-border-light)] hover:bg-[var(--secondary)] cursor-pointer"
                                 aria-label="Account menu"
                             >
                                 <Avatar size="lg">
@@ -167,7 +175,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                                 </Avatar>
 
                                 <span className="min-w-0 flex-1">
-                                    <span className="block truncate text-sm text-[var(--foreground)]">
+                                    <span className="block truncate text-sm font-medium text-[var(--foreground)]">
                                         {displayName}
                                     </span>
                                     <span className="block truncate text-xs text-[var(--editorial-subtle)]">
@@ -180,19 +188,28 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                                 side="top"
                                 align="center"
                                 sideOffset={12}
-                                className="editorial rounded-[18px] border border-[var(--border)] bg-[var(--popover)] p-2"
+                                className="editorial min-w-[200px] rounded-[18px] border border-[var(--border)] bg-[var(--popover)] p-2 shadow-xl"
                             >
                                 <DropdownMenuItem
-                                    className="rounded-[12px] px-3 py-2.5"
+                                    className="rounded-[12px] px-3 py-2.5 cursor-pointer"
                                     onClick={() => openSettingsPanel("account")}
                                 >
                                     <Settings className="h-4 w-4" />
                                     Settings
                                 </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="rounded-[12px] px-3 py-2.5 cursor-pointer justify-between"
+                                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        {theme === "dark" ? <Sun className="h-4 w-4 text-[#FF5722]" /> : <Moon className="h-4 w-4 text-[#FF5722]" />}
+                                        <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+                                    </div>
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
                                 <DropdownMenuItem
                                     variant="destructive"
-                                    className="rounded-[12px] px-3 py-2.5"
+                                    className="rounded-[12px] px-3 py-2.5 cursor-pointer"
                                     onClick={handleLogout}
                                 >
                                     <LogOut className="h-4 w-4" />
@@ -200,6 +217,17 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+
+                        {/* Quick Theme Toggle button */}
+                        <button
+                            type="button"
+                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            className="editorial-transition flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--primary)] hover:text-[var(--primary)] cursor-pointer shadow-xs active:scale-95"
+                            title={theme === "dark" ? "Switch to Light mode" : "Switch to Dark mode"}
+                            aria-label="Toggle theme"
+                        >
+                            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                        </button>
                     </div>
                 </div>
             </aside>

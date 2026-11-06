@@ -102,7 +102,7 @@ export function ConditionRow({
             {condition.sourceType === "variable" && (
                 <Select
                     value={condition.sourceKey}
-                    onValueChange={(value) => onUpdate(index, { sourceKey: value, value: "" })}
+                    onValueChange={(value) => onUpdate(index, { sourceKey: value ?? "", value: "" })}
                 >
                     <SelectTrigger className="h-8 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-[13px] text-[#374151] min-w-[150px]">
                         <SelectValue placeholder="Select variable" />
@@ -120,7 +120,7 @@ export function ConditionRow({
             {condition.sourceType === "page" && (
                 <Select
                     value={condition.sourceKey}
-                    onValueChange={(value) => onUpdate(index, { sourceKey: value, value: "" })}
+                    onValueChange={(value) => onUpdate(index, { sourceKey: value ?? "", value: "" })}
                 >
                     <SelectTrigger className="h-8 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-[13px] text-[#374151] min-w-[150px]">
                         <SelectValue placeholder="Select question" />

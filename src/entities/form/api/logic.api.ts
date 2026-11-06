@@ -22,14 +22,14 @@ function normalizeLogic(raw: RawLogic): FormLogic {
         id: raw.id ?? raw._id ?? "",
         combinator: raw.combinator ?? "and",
         enabled: raw.enabled ?? true,
-        conditions: (raw.conditions ?? []).map((c) => ({
+        conditions: (raw.conditions ?? []).map((c: any) => ({
             sourceType: c.sourceType ?? "page",
             sourceKey: c.sourceKey ?? c.pageKey ?? "",
             operator: c.operator ?? "equals",
             value: c.value,
             combinator: c.combinator,
         })),
-        actions: (raw.actions ?? []).map((a) => ({
+        actions: (raw.actions ?? []).map((a: any) => ({
             action: a.action,
             targetPageKey: a.targetPageKey ?? a.target,
             variableName: a.variableName,

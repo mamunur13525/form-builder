@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "./primitives"
 
 
-const PRIMARY_BUTTON_CLASS = "editorial-transition h-11 gap-2 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-[var(--primary-foreground)]  hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:pointer-events-none disabled:opacity-50"
+const PRIMARY_BUTTON_CLASS = "h-11 gap-2 rounded-xl bg-[#FF5722] hover:bg-[#F4511E] px-6 text-sm font-semibold text-white shadow-md shadow-[#FF5722]/20 transition-all cursor-pointer active:scale-95 disabled:pointer-events-none disabled:opacity-50"
 
 // ── Types ───────────────────────────────────────────────────────────────────
 interface ImagePickerDialogProps {
@@ -54,7 +54,7 @@ const MOCK_UNSPLASH: UnsplashImage[] = [
 function ImagePreview({ src, alt, className }: { src: string; alt?: string; className?: string }) {
     const [loaded, setLoaded] = useState(false)
     return (
-        <div className={cn("relative overflow-hidden rounded-[22px] border border-[var(--editorial-border-light)]", className)}>
+        <div className={cn("relative overflow-hidden rounded-2xl border border-slate-200 dark:border-zinc-800", className)}>
             <img
                 src={src}
                 alt={alt || "Cover"}
@@ -62,8 +62,8 @@ function ImagePreview({ src, alt, className }: { src: string; alt?: string; clas
                 onLoad={() => setLoaded(true)}
             />
             {!loaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[var(--card)]">
-                    <Loader2 className="h-5 w-5 animate-spin text-[var(--primary)]" />
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-zinc-900">
+                    <Loader2 className="h-5 w-5 animate-spin text-[#FF5722]" />
                 </div>
             )}
         </div>
@@ -112,21 +112,21 @@ function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                 onDrop={handleDrop}
                 onClick={() => inputRef.current?.click()}
                 className={cn(
-                    "editorial-transition flex cursor-pointer flex-col items-center justify-center gap-3 rounded-[22px] border border-dashed py-8 sm:py-12 text-center transition-colors",
+                    "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed py-8 sm:py-12 text-center transition-all",
                     dragOver
-                        ? "border-[var(--primary)] bg-[var(--editorial-primary-light)]"
-                        : "border-[var(--input)] bg-[var(--secondary)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                        ? "border-[#FF5722] bg-[#FF5722]/10"
+                        : "border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 hover:border-[#FF5722]/60 hover:bg-slate-100/70 dark:hover:bg-zinc-900/70"
                 )}
             >
                 {uploading ? (
-                    <Loader2 className="h-6 w-6 animate-spin text-[var(--primary)]" />
+                    <Loader2 className="h-6 w-6 animate-spin text-[#FF5722]" />
                 ) : (
-                    <Upload className="h-6 w-6 text-[var(--editorial-subtle)]" />
+                    <Upload className="h-6 w-6 text-[#FF5722]" />
                 )}
-                <div className="text-sm text-[var(--editorial-subtle)]">
+                <div className="text-sm text-slate-800 dark:text-zinc-200 font-medium">
                     {uploading ? "Uploading..." : "Drag & drop an image here, or click to browse"}
                 </div>
-                <p className="text-xs text-[var(--editorial-subtle)]">JPG, PNG, WebP, GIF up to 10MB</p>
+                <p className="text-xs text-slate-500 dark:text-zinc-500">JPG, PNG, WebP, GIF up to 10MB</p>
             </div>
 
             <input
@@ -171,23 +171,23 @@ function LinkTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
     return (
         <div className="space-y-4">
             <div className="space-y-1.5">
-                <label className="text-sm font-medium text-[var(--editorial-body)]">Image URL</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-zinc-200">Image URL</label>
                 <div className="flex items-center gap-2">
                     <div className="relative flex-1">
-                        <Link2 className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--editorial-subtle)]" />
+                        <Link2 className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-zinc-500" />
                         <Input
                             value={url}
                             onChange={(e) => { setUrl(e.target.value); setError(null) }}
                             placeholder="https://example.com/photo.jpg"
                             onKeyDown={(e) => e.key === "Enter" && handlePaste()}
-                            className="h-12 rounded-2xl border-[var(--input)] bg-[var(--secondary)] pl-10 pr-4 text-sm sm:h-[52px] sm:text-base"
+                            className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] pl-10 pr-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
                         />
                     </div>
-                    <Button onClick={handlePaste} disabled={validating} className={cn("rounded-2xl", PRIMARY_BUTTON_CLASS)}>
+                    <Button onClick={handlePaste} disabled={validating} className={PRIMARY_BUTTON_CLASS}>
                         {validating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
                     </Button>
                 </div>
-                {error && <p className="text-xs leading-5 text-[var(--destructive)]">{error}</p>}
+                {error && <p className="text-xs leading-5 text-rose-500 dark:text-rose-400">{error}</p>}
             </div>
         </div>
     )
@@ -203,8 +203,6 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
         const q = query.trim()
         if (!q) return
         setSearching(true)
-        // Mock API: replace with Unsplash Search API call if an access key is added.
-        // Example: fetch(`https://api.unsplash.com/search/photos?query=${q}&client_id=...`)
         await new Promise((r) => setTimeout(r, 500))
         const filtered = MOCK_UNSPLASH.filter((img) => img.alt.toLowerCase().includes(q.toLowerCase()))
         setResults(filtered.length ? filtered : MOCK_UNSPLASH)
@@ -224,16 +222,16 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
         <div className="space-y-4">
             <div className="flex items-center gap-2">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--editorial-subtle)]" />
+                    <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-zinc-500" />
                     <Input
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={handleKey}
                         placeholder="Search Unsplash..."
-                        className="h-12 rounded-2xl border-[var(--input)] bg-[var(--secondary)] pl-10 pr-4 text-sm sm:h-[52px] sm:text-base"
+                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] pl-10 pr-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
                     />
                 </div>
-                <Button onClick={doSearch} disabled={searching} className={cn("rounded-2xl", PRIMARY_BUTTON_CLASS)}>
+                <Button onClick={doSearch} disabled={searching} className={PRIMARY_BUTTON_CLASS}>
                     {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
                 </Button>
             </div>
@@ -245,14 +243,14 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                             key={img.id}
                             type="button"
                             onClick={() => pick(img)}
-                            className="editorial-transition relative aspect-[4/3] overflow-hidden rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] hover:border-[var(--editorial-primary-ring)] hover:-translate-y-0.5"
+                            className="relative aspect-[4/3] overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900 hover:border-[#FF5722]/60 cursor-pointer shadow-xs"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
                             <img src={img.thumb} alt={img.alt} className="h-full w-full object-cover" loading="lazy" />
                             {selectedId === img.id && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-[var(--primary)]/20">
-                                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--primary)] text-white">
+                                <div className="absolute inset-0 flex items-center justify-center bg-[#FF5722]/30">
+                                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FF5722] text-white shadow-md">
                                         <Check className="h-4 w-4" />
                                     </span>
                                 </div>
@@ -261,7 +259,7 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                     ))}
                 </AnimatePresence>
                 {!searching && results.length === 0 && (
-                    <div className="col-span-3 py-10 text-center text-sm text-[var(--editorial-subtle)]">
+                    <div className="col-span-3 py-10 text-center text-sm text-slate-500 dark:text-zinc-500">
                         Type a keyword and press Search to find images.
                     </div>
                 )}
@@ -302,14 +300,14 @@ export function ImagePickerDialog({
         <Dialog
             open={open}
             onOpenChange={(next) => { if (!next) reset(); onOpenChange(next); }}
-            className="editorial editorial-shadow w-full max-w-3xl rounded-2xl border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
+            className="w-full max-w-3xl rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
         >
-            <DialogContent>
+            <DialogContent className="border-0 bg-transparent text-slate-900 dark:text-zinc-100">
                 <DialogHeader className="mb-6">
-                    <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
+                    <DialogTitle className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white">
                         {title}
                     </DialogTitle>
-                    <DialogDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
+                    <DialogDescription className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
                         {description}
                     </DialogDescription>
                 </DialogHeader>
@@ -351,7 +349,7 @@ export function ImagePickerDialog({
                             variant="outline"
                             size="icon"
                             onClick={clearSelection}
-                            className="shrink-0 rounded-full border-[var(--border)] text-[var(--editorial-subtle)] hover:text-[var(--destructive)] hover:border-[var(--destructive)]/30"
+                            className="shrink-0 rounded-full border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-rose-500 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-500/40 cursor-pointer shadow-xs"
                         >
                             <X className="h-4 w-4" />
                         </Button>
@@ -362,7 +360,7 @@ export function ImagePickerDialog({
                     <Button
                         variant="outline"
                         onClick={() => onOpenChange(false)}
-                        className="editorial-transition h-12 rounded-[16px] border-[var(--border)] bg-[var(--card)] px-8 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98] w-full sm:w-auto sm:h-[52px]"
+                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-8 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
                     >
                         Cancel
                     </Button>

@@ -144,22 +144,22 @@ export function PricingPage({ embedded = false }: { embedded?: boolean }) {
 
             {/* Billing cycle toggle */}
             <div className={cn("flex justify-center", embedded ? "mt-6 sm:mt-10" : "mt-12")}>
-                <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-[var(--border)] bg-[var(--card)] p-1.5">
+                <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#16161a] p-1.5 shadow-xs">
                     {(["monthly", "yearly"] as BillingCycle[]).map((value) => (
                         <button
                             key={value}
                             type="button"
                             onClick={() => setCycle(value)}
                             className={cn(
-                                "editorial-transition h-10 rounded-full px-4 text-sm capitalize sm:h-11 sm:px-6",
+                                "editorial-transition h-10 rounded-full px-4 text-sm font-medium capitalize sm:h-11 sm:px-6 cursor-pointer",
                                 cycle === value
-                                    ? "bg-[var(--primary)] text-white "
-                                    : "text-[var(--editorial-body)] hover:text-[var(--foreground)]",
+                                    ? "bg-[#FF5722] text-white shadow-md shadow-[#FF5722]/20 font-semibold"
+                                    : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
                             )}
                         >
                             {value}
                             {value === "yearly" && (
-                                <span className="ml-2 hidden text-xs opacity-80 sm:inline">2 months free</span>
+                                <span className="ml-2 hidden text-xs opacity-90 sm:inline bg-black/20 px-2 py-0.5 rounded-full">2 months free</span>
                             )}
                         </button>
                     ))}

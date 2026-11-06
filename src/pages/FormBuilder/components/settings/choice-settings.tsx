@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import type { ChoiceSettings, OptionsPerRow } from "@/shared/types/common"
-import { CONTROL_CLASS } from "./primitives"
+import { CONTROL_CLASS, OVERLAY_CLASS } from "./primitives"
 
 /** "Other" option toggle (choice group). */
 export function OtherOptionSetting({
@@ -16,7 +16,7 @@ export function OtherOptionSetting({
         <div className="flex items-center justify-between gap-3">
             <Label
                 htmlFor="allow-other"
-                className="cursor-pointer text-base text-[var(--editorial-body)]"
+                className="cursor-pointer text-sm font-medium text-zinc-200"
             >
                 "Other" option
             </Label>
@@ -27,7 +27,7 @@ export function OtherOptionSetting({
                         value={settings.otherLabel}
                         onChange={(e) => onChange({ ...settings, otherLabel: e.target.value })}
                         placeholder="Other"
-                        className={CONTROL_CLASS + " w-28 border px-3 outline-none"}
+                        className={CONTROL_CLASS + " w-28 px-3"}
                     />
                 )}
                 <Switch
@@ -53,7 +53,7 @@ export function HorizontalAlignSetting({
             <div className="flex items-center justify-between gap-3">
                 <Label
                     htmlFor="horiz-align"
-                    className="cursor-pointer text-base text-[var(--editorial-body)]"
+                    className="cursor-pointer text-sm font-medium text-zinc-200"
                 >
                     Horizontally align options
                 </Label>
@@ -67,8 +67,8 @@ export function HorizontalAlignSetting({
             </div>
 
             {settings.horizontalAlign && (
-                <div className="space-y-3 rounded-[14px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-3">
-                    <Label className="text-base text-[var(--editorial-body)]">
+                <div className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-3">
+                    <Label className="text-sm font-medium text-zinc-200">
                         Number of options per row
                     </Label>
                     <OptionsPerRowSetting
@@ -96,36 +96,44 @@ function OptionsPerRowSetting({
     return (
         <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-                <Label className="text-xs text-[var(--editorial-subtle)]">Desktop</Label>
+                <Label className="text-xs text-zinc-400">Desktop</Label>
                 <Select
                     value={String(value.desktop)}
                     onValueChange={(v) => onChange({ ...value, desktop: Number(v) })}
                 >
-                    <SelectTrigger className={CONTROL_CLASS + " w-full"}>
+                    <SelectTrigger className={CONTROL_CLASS + " w-full [&>svg:last-child]:text-zinc-400"}>
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className={OVERLAY_CLASS}>
                         {perRowOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
+                            <SelectItem
+                                key={opt.value}
+                                value={opt.value}
+                                className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                            >
+                                <span className="font-medium">{opt.label}</span>
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
             </div>
             <div className="space-y-1.5">
-                <Label className="text-xs text-[var(--editorial-subtle)]">Mobile</Label>
+                <Label className="text-xs text-zinc-400">Mobile</Label>
                 <Select
                     value={String(value.mobile)}
                     onValueChange={(v) => onChange({ ...value, mobile: Number(v) })}
                 >
-                    <SelectTrigger className={CONTROL_CLASS + " w-full"}>
+                    <SelectTrigger className={CONTROL_CLASS + " w-full [&>svg:last-child]:text-zinc-400"}>
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className={OVERLAY_CLASS}>
                         {perRowOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
+                            <SelectItem
+                                key={opt.value}
+                                value={opt.value}
+                                className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                            >
+                                <span className="font-medium">{opt.label}</span>
                             </SelectItem>
                         ))}
                     </SelectContent>
@@ -147,7 +155,7 @@ export function HideLabelsSetting({
         <div className="flex items-center justify-between gap-3">
             <Label
                 htmlFor="hide-labels"
-                className="cursor-pointer text-base text-[var(--editorial-body)]"
+                className="cursor-pointer text-sm font-medium text-zinc-200"
             >
                 Hide labels
             </Label>
@@ -177,7 +185,7 @@ export function SelectionLimitSetting({
 
     return (
         <div className="space-y-3">
-            <Label className="text-base text-[var(--editorial-body)]">Selection limit</Label>
+            <Label className="text-sm font-medium text-zinc-200">Selection limit</Label>
             <Select
                 value={mode}
                 onValueChange={(v: "none" | "exact" | "range" | null) => {
@@ -188,13 +196,28 @@ export function SelectionLimitSetting({
                     })
                 }}
             >
-                <SelectTrigger className={CONTROL_CLASS + " w-full"}>
+                <SelectTrigger className={CONTROL_CLASS + " w-full [&>svg:last-child]:text-zinc-400"}>
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="none">No limit</SelectItem>
-                    <SelectItem value="exact">Exact number</SelectItem>
-                    <SelectItem value="range">Range</SelectItem>
+                <SelectContent className={OVERLAY_CLASS}>
+                    <SelectItem
+                        value="none"
+                        className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                    >
+                        <span className="font-medium">No limit</span>
+                    </SelectItem>
+                    <SelectItem
+                        value="exact"
+                        className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                    >
+                        <span className="font-medium">Exact number</span>
+                    </SelectItem>
+                    <SelectItem
+                        value="range"
+                        className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                    >
+                        <span className="font-medium">Range</span>
+                    </SelectItem>
                 </SelectContent>
             </Select>
 
@@ -246,7 +269,7 @@ function NumberInput({
 }) {
     return (
         <div className="space-y-1.5">
-            <Label className="text-base text-[var(--editorial-body)]">{label}</Label>
+            <Label className="text-sm font-medium text-zinc-200">{label}</Label>
             <input
                 type="number"
                 value={value ?? ""}
@@ -258,7 +281,7 @@ function NumberInput({
                     onChange(Number(e.target.value))
                 }}
                 placeholder={placeholder}
-                className={CONTROL_CLASS + " w-full border px-4 outline-none"}
+                className={CONTROL_CLASS + " w-full px-4 outline-none"}
             />
         </div>
     )

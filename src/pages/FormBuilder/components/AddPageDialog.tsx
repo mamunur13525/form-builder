@@ -80,14 +80,14 @@ export function AddPageDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="editorial editorial-shadow w-full max-w-3xl rounded-2xl border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
+            className="w-full max-w-3xl rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
         >
-            <DialogContent>
+            <DialogContent className="border-0 bg-transparent text-slate-900 dark:text-zinc-100">
                 <DialogHeader className="mb-6">
-                    <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
+                    <DialogTitle className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white">
                         Add a Page
                     </DialogTitle>
-                    <DialogDescription className="mt-2 text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
+                    <DialogDescription className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
                         Choose the type of page you want to add to your form.
                     </DialogDescription>
                 </DialogHeader>
@@ -96,10 +96,10 @@ export function AddPageDialog({
                 <div className="pb-6" key="search-input">
                     <Input
                         ref={searchInputRef}
-                        placeholder="Search..."
+                        placeholder="Search page types..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-12 rounded-lg border-[var(--input)] bg-[var(--card)] px-6 text-sm placeholder:text-[var(--editorial-subtle)] sm:h-[52px] sm:text-base"
+                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
                         autoFocus={true}
                     />
                 </div>
@@ -115,12 +115,12 @@ export function AddPageDialog({
                                 <button
                                     key={pt.type}
                                     onClick={() => addPage(pt.type)}
-                                    className="editorial-transition group flex items-center gap-3 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--card)] p-3 text-left hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-selected)] hover:shadow-[0_4px_10px_rgba(0,0,0,.04)] active:translate-y-0 active:scale-[.98]"
+                                    className="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-zinc-800/90 bg-slate-50/70 dark:bg-[#18181c] p-3 text-left hover:border-[#FF5722]/60 hover:bg-slate-100 dark:hover:bg-[#1e1e24] hover:shadow-md transition-all cursor-pointer shadow-xs"
                                 >
-                                    <div className={`editorial-transition flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] border border-[var(--editorial-border-light)] bg-gradient-to-br ${PAGE_TYPE_COLORS[pt.type]} group-hover:brightness-110`}>
+                                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 dark:border-zinc-700/50 bg-gradient-to-br ${PAGE_TYPE_COLORS[pt.type]} group-hover:scale-105 transition-transform`}>
                                         <Icon className="h-5 w-5" />
                                     </div>
-                                    <span className="text-base leading-tight text-[var(--foreground)]">
+                                    <span className="text-sm font-medium leading-tight text-slate-800 dark:text-zinc-200 group-hover:text-slate-950 dark:group-hover:text-white">
                                         {pt.label}
                                     </span>
                                 </button>
@@ -128,11 +128,11 @@ export function AddPageDialog({
                         })
                     ) : (
                         <div className="col-span-3 flex flex-col items-center justify-center py-12 text-center">
-                            <FileText className="mb-3 h-8 w-8 text-[var(--editorial-disabled)]" />
-                            <p className="text-base text-[var(--editorial-body)]">
+                            <FileText className="mb-3 h-8 w-8 text-slate-400 dark:text-zinc-600" />
+                            <p className="text-base text-slate-700 dark:text-zinc-300 font-medium">
                                 No page types found
                             </p>
-                            <p className="mt-1 text-xs text-[var(--editorial-subtle)]">
+                            <p className="mt-1 text-xs text-slate-400 dark:text-zinc-500">
                                 Try a different search term
                             </p>
                         </div>
@@ -142,7 +142,7 @@ export function AddPageDialog({
                     <Button
                         variant="outline"
                         onClick={() => onOpenChange(false)}
-                        className="border-[var(--border)] bg-[var(--card)] w-full sm:w-auto"
+                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-6 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
                     >
                         Cancel
                     </Button>

@@ -26,17 +26,17 @@ function BoardRow({
             onClick={onClick}
             className={cn(
                 "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-                active ? "bg-[#fff1ec] font-semibold text-[#f2542d]" : "text-gray-700 hover:bg-gray-50",
+                active ? "bg-[#FF5722]/15 font-semibold text-[#FF5722] border border-[#FF5722]/30" : "border border-transparent text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200",
             )}
         >
             {color ? (
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
             ) : (
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full border-2 border-gray-300" />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full border-2 border-zinc-600" />
             )}
             <span className="flex-1 text-left">{label}</span>
             {count != null && (
-                <span className={cn("text-xs", active ? "text-[#f2542d]" : "text-gray-400")}>{count}</span>
+                <span className={cn("text-xs", active ? "text-[#FF5722]" : "text-zinc-500")}>{count}</span>
             )}
         </button>
     )
@@ -88,8 +88,8 @@ export function FeedbackSidebar({
                 Give feedback
             </Button>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-2">
-                <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <div className="rounded-2xl border border-zinc-800 bg-[#141418] p-2">
+                <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
                     Boards
                 </p>
                 <BoardRow
@@ -113,16 +113,16 @@ export function FeedbackSidebar({
                 <button
                     type="button"
                     onClick={copyLink}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200"
                 >
                     {copied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
                     {copied ? "Copied" : "Copy link"}
                 </button>
-                <span className="text-gray-300">·</span>
+                <span className="text-zinc-700">·</span>
                 <button
                     type="button"
                     onClick={share}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200"
                 >
                     <Share2 className="h-3.5 w-3.5" />
                     Share

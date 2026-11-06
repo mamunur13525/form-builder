@@ -5,8 +5,8 @@ import type { SaveStatus } from "@/features/forms/hooks/form-context"
 
 /**
  * Per-section save controls: a status message on the left and a Save button on
- * the right. Sticky to the bottom of the settings content column so it stays
- * reachable while a long section scrolls.
+ * the right. Absolutely positioned to the bottom of its positioning context so
+ * it stays reachable while a long section scrolls.
  *
  * It is presentational — the owning section decides when it is `dirty`, drives
  * the mutation, and feeds the resulting `status` back in.
@@ -35,7 +35,7 @@ export function SaveBar({
     const canSave = dirty && !disabled && !isSaving
 
     return (
-        <div className="sticky bottom-0 z-10 mt-6 flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--card)]/95 px-5 py-3 shadow-[0_-1px_2px_rgba(0,0,0,0.04)] backdrop-blur">
+        <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--card)]/95 px-5 py-3 shadow-[0_-1px_2px_rgba(0,0,0,0.04)] backdrop-blur">
             <div className="flex min-w-0 items-center gap-1.5 text-[13px]">
                 {isSaving && (
                     <span className="flex items-center gap-1.5 text-[var(--editorial-subtle)]">

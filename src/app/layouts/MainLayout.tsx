@@ -54,7 +54,10 @@ export function MainLayout({ children }: { children: ReactNode }) {
                     >
                         <Menu className="h-5 w-5" />
                     </button>
-                    <span className="font-display text-xl text-[var(--foreground)]">FormFlow</span>
+                    <div className="flex items-center gap-2">
+                        <img src="/flogo.png" alt="FormFlow logo" className="h-7 w-7 rounded-lg object-contain" />
+                        <span className="font-display text-xl font-bold text-[var(--foreground)]">FormFlow</span>
+                    </div>
                 </header>
 
                 <main>{children}</main>

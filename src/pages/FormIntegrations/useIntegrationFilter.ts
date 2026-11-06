@@ -27,10 +27,11 @@ export interface IntegrationFilter {
 export function useIntegrationFilter(
     category: string,
     search: string,
+    items: Integration[] = INTEGRATIONS,
 ): IntegrationFilter {
     const visible = useMemo(() => {
         const term = search.trim().toLowerCase()
-        return INTEGRATIONS.filter((integration) => {
+        return items.filter((integration) => {
             const matchesCategory =
                 category === "All" || integration.category === category
             const matchesQuery =
@@ -39,7 +40,7 @@ export function useIntegrationFilter(
                 integration.description.toLowerCase().includes(term)
             return matchesCategory && matchesQuery
         })
-    }, [category, search])
+    }, [category, search, items])
 
     const groups = useMemo<IntegrationGroup[]>(() => {
         const order = CATEGORIES.filter((c) => c !== "All")
@@ -53,13 +54,13 @@ export function useIntegrationFilter(
     }, [visible])
 
     const counts = useMemo(() => {
-        const result: Record<string, number> = { All: INTEGRATIONS.length }
-        for (const integration of INTEGRATIONS) {
+        const result: Record<string, number> = { All: items.length }
+        for (const integration of items) {
             result[integration.category] =
                 (result[integration.category] ?? 0) + 1
         }
         return result
-    }, [])
+    }, [items])
 
     return { visible, groups, counts }
 }

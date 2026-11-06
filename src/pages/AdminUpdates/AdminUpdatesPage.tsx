@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { Navigate } from "react-router-dom"
 import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -24,7 +23,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { ROUTES } from "@/shared/constants/routes"
 import { showError, showSuccess } from "@/shared/hooks/useToast"
 import { useCurrentUser } from "@/features/auth/hooks/useAuth"
 import {

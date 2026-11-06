@@ -118,7 +118,7 @@ export function PageContentEditor({
   
   return (
     <div
-      className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
+      className="light relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
       style={containerStyle}
     >
       {/* Background Image Layer */}

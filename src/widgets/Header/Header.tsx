@@ -26,10 +26,11 @@ export function Header({ onMenuClick }: HeaderProps) {
                     <Menu className="h-5 w-5" />
                 </Button>
                 <div
-                    className="font-bold text-lg cursor-pointer"
+                    className="flex items-center gap-2.5 font-bold text-lg cursor-pointer"
                     onClick={() => navigate(ROUTES.DASHBOARD)}
                 >
-                    FormFlow
+                    <img src="/flogo.png" alt="FormFlow logo" className="h-7 w-7 rounded-lg object-contain" />
+                    <span>FormFlow</span>
                 </div>
                 <div className="flex-1" />
                 <Button

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Plus, Trash2, Flag, ArrowUpToLine, Loader2, MoreVertical, Eye } from "lucide-react"
+import { Plus, Trash2, Flag, ArrowUpToLine, Loader2, MoreVertical, Check } from "lucide-react"
 import {
     Popover,
     PopoverContent,
@@ -145,21 +145,89 @@ function EndPageItem({
         <div
             onClick={() => onSelect(index)}
             aria-current={isSelected ? "true" : undefined}
-            className={`group relative flex flex-col gap-3 rounded-lg border p-3.5 cursor-pointer select-none transition-all ${
+            className={`group relative flex items-center gap-2.5 rounded-2xl border p-3 cursor-pointer select-none transition-all ${
                 isSelected
-                    ? "border-2 border-[#FF5722] bg-white dark:bg-[#1e1e24] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
-                    : "border-slate-200/90 dark:border-zinc-800/80 bg-slate-50/70 dark:bg-[#17171c] hover:border-slate-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-[#1a1a20]"
+                    ? "border-2 border-[#FF5722] bg-white dark:bg-[#18181c] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
+                    : "border-neutral-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-md"
             }`}
         >
-            <div className="flex items-center justify-between gap-2">
-                <p className="truncate text-sm font-semibold text-slate-800 dark:text-zinc-100">
-                    <span className="text-slate-400 dark:text-zinc-400 font-normal">{index + 1}.</span>{" "}
+            {/* Left Icon box matching EndPageNode */}
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#8de4b0] text-[#16442b] dark:bg-[#224c36] dark:text-[#8de4b0] shadow-xs">
+                <Check className="h-5 w-5 stroke-[2.5]" />
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col justify-center text-left">
+                <span className="mb-0.5 truncate text-xs font-normal text-neutral-400 dark:text-zinc-500">
+                    {index + 1} · {isFirst ? "Shown on submit" : "End Page"}
+                </span>
+                <p className="line-clamp-2 text-sm font-semibold leading-snug text-neutral-900 dark:text-zinc-100">
                     {endPage.title || (
-                        <span className="font-normal italic text-slate-400 dark:text-zinc-500">
+                        <span className="font-normal italic text-neutral-400 dark:text-zinc-500">
                             Thank you!
                         </span>
                     )}
                 </p>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-0.5">
+                {canDelete && (
+                    <Popover open={confirmOpen} onOpenChange={setConfirmOpen}>
+                        <Tooltip>
+                            <TooltipTrigger
+                                render={
+                                    <PopoverTrigger
+                                        type="button"
+                                        aria-label="Delete end page"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className={`flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-400 cursor-pointer transition-opacity duration-200 ${
+                                            confirmOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                        }`}
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </PopoverTrigger>
+                                }
+                            />
+                            <TooltipContent>Delete</TooltipContent>
+                        </Tooltip>
+                        <PopoverContent
+                            side="top"
+                            align="end"
+                            sideOffset={8}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-64 gap-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
+                        >
+                            <div className="flex flex-col gap-1">
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                    Delete this end page?
+                                </p>
+                                <p className="text-xs leading-snug text-slate-500 dark:text-zinc-400">
+                                    This action cannot be undone.
+                                </p>
+                            </div>
+                            <div className="flex justify-end gap-2 mt-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setConfirmOpen(false)}
+                                    className="border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 cursor-pointer"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => {
+                                        setConfirmOpen(false)
+                                        onDelete(index)
+                                    }}
+                                    className="bg-rose-600 hover:bg-rose-700 text-white cursor-pointer"
+                                >
+                                    Delete
+                                </Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                )}
 
                 <DropdownMenu>
                     <DropdownMenuTrigger
@@ -167,7 +235,7 @@ function EndPageItem({
                             <button
                                 type="button"
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors"
+                                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                             >
                                 <MoreVertical className="h-4 w-4" />
                             </button>
@@ -200,68 +268,6 @@ function EndPageItem({
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
-            </div>
-
-            <div className="flex items-center justify-between gap-2 pt-0.5">
-                {isFirst ? (
-                    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-lg border border-slate-200 dark:border-zinc-700/60 bg-slate-100 dark:bg-zinc-800/90 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-zinc-200">
-                        <Eye className="h-3.5 w-3.5 text-slate-500 dark:text-zinc-400 shrink-0" />
-                        <span className="truncate">Shown on submit</span>
-                    </span>
-                ) : (
-                    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100/70 dark:bg-zinc-800/60 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-zinc-400">
-                        <Flag className="h-3.5 w-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
-                        <span className="truncate">End page</span>
-                    </span>
-                )}
-
-                {canDelete && (
-                    <Popover open={confirmOpen} onOpenChange={setConfirmOpen}>
-                        <PopoverTrigger
-                            type="button"
-                            aria-label="Delete end page"
-                            onClick={(e) => e.stopPropagation()}
-                            className="hidden"
-                        />
-                        <PopoverContent
-                            side="top"
-                            align="end"
-                            sideOffset={8}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-64 gap-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
-                        >
-                            <div className="flex flex-col gap-1">
-                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                                    Delete this end page?
-                                </p>
-                                <p className="text-xs leading-snug text-slate-500 dark:text-zinc-400">
-                                    This action cannot be undone.
-                                </p>
-                            </div>
-                            <div className="flex justify-end gap-2 mt-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setConfirmOpen(false)}
-                                    className="border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="destructive"
-                                    onClick={() => {
-                                        setConfirmOpen(false)
-                                        onDelete(index)
-                                    }}
-                                    className="bg-rose-600 hover:bg-rose-700 text-white"
-                                >
-                                    Delete
-                                </Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                )}
             </div>
         </div>
     )

@@ -3,7 +3,7 @@ import { FileText } from "lucide-react"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "../../../components/ui/input"
-import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, PAGE_TYPE_COLORS, type PageType } from "../../../shared/constants/form-types"
+import { PAGE_TYPE_LABELS, PAGE_TYPE_VISUALS, type PageType } from "../../../shared/constants/form-types"
 import type { FormPage } from "../../../shared/types/common"
 import { defaultOptionsForType, defaultSettingsForType } from "@/features/forms/model/page-defaults"
 import type { LucideIcon } from "lucide-react"
@@ -17,11 +17,15 @@ interface AddPageDialogProps {
     onShowSaveStatus: (status: "saving" | "saved" | "error") => void
 }
 
-const PAGE_TYPES = (Object.entries(PAGE_TYPE_LABELS) as [PageType, string][]).map(([type, label]) => ({
-    type,
-    label,
-    icon: PAGE_TYPE_ICONS[type],
-}))
+const PAGE_TYPES = (Object.entries(PAGE_TYPE_LABELS) as [PageType, string][]).map(([type, label]) => {
+    const visual = PAGE_TYPE_VISUALS[type]
+    return {
+        type,
+        label: visual?.displayName ?? label,
+        icon: visual?.icon ?? FileText,
+        bgColor: visual?.bgColor ?? "bg-[#64748b]",
+    }
+})
 
 export function AddPageDialog({
     open,
@@ -80,7 +84,7 @@ export function AddPageDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="w-full max-w-3xl rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
+            className="w-full max-w-3xl rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
         >
             <DialogContent className="border-0 bg-transparent text-slate-900 dark:text-zinc-100">
                 <DialogHeader className="mb-6">
@@ -99,7 +103,7 @@ export function AddPageDialog({
                         placeholder="Search page types..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-11 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
+                        className="h-11 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#1a1a20] px-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
                         autoFocus={true}
                     />
                 </div>
@@ -115,12 +119,12 @@ export function AddPageDialog({
                                 <button
                                     key={pt.type}
                                     onClick={() => addPage(pt.type)}
-                                    className="group flex items-center gap-3 rounded-lg border border-slate-200 dark:border-zinc-800/90 bg-slate-50/70 dark:bg-[#18181c] p-3 text-left hover:border-[#FF5722]/60 hover:bg-slate-100 dark:hover:bg-[#1e1e24] hover:shadow-md transition-all cursor-pointer shadow-xs"
+                                    className="group flex items-center gap-3 rounded-2xl border border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#18181c] p-3 text-left hover:border-[#FF5722]/60 hover:shadow-md transition-all cursor-pointer shadow-xs"
                                 >
-                                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200/80 dark:border-zinc-700/50 bg-gradient-to-br ${PAGE_TYPE_COLORS[pt.type]} group-hover:scale-105 transition-transform`}>
-                                        <Icon className="h-5 w-5" />
+                                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-xs ${pt.bgColor} group-hover:scale-105 transition-transform`}>
+                                        <Icon className="h-5 w-5 stroke-[2]" />
                                     </div>
-                                    <span className="text-sm font-medium leading-tight text-slate-800 dark:text-zinc-200 group-hover:text-slate-950 dark:group-hover:text-white">
+                                    <span className="text-sm font-semibold leading-tight text-slate-800 dark:text-zinc-200 group-hover:text-slate-950 dark:group-hover:text-white">
                                         {pt.label}
                                     </span>
                                 </button>

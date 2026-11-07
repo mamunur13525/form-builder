@@ -39,6 +39,8 @@ export function pageId(page: FormPage, index: number): string {
 export const HANDLE = {
     in: "in",
     out: "out",
+    jumpIn: "jump-in",
+    jumpOut: "jump-out",
     srcTop: "b-src-top",
     tgtTop: "b-tgt-top",
     srcBottom: "b-src-bottom",
@@ -60,6 +62,12 @@ export interface BranchLink {
     direction: BranchDirection
     /** Compact trigger label shown on the arc, e.g. "if > 18" or a rule name. */
     label: string
+    /** Short badge text (e.g. "2" or rule index) shown on the jump line */
+    badge?: string
+    /** Alternating side for same page logic: "bottom" (1st, 3rd...) or "top" (2nd, 4th...) */
+    side?: "bottom" | "top"
+    /** Index of logic rule on this source page (0, 1, 2...) */
+    ruleRank?: number
 }
 
 /** Which branch handles a given node needs rendered. */
@@ -83,28 +91,30 @@ const OPERATOR_SYMBOLS: Record<LogicOperator, string> = {
     isNotEmpty: "is filled",
 }
 
-const truncate = (text: string, max = 14): string =>
+const truncate = (text: string, max = 18): string =>
     text.length > max ? `${text.slice(0, max - 1)}…` : text
 
-/** One compact condition, e.g. `= Yes`, `> 18`, `is empty`. */
+/** One compact condition, e.g. `= "Yes"`, `> 18`, `is filled`. */
 function describeCondition(c: LogicCondition): string {
     const symbol = OPERATOR_SYMBOLS[c.operator] ?? String(c.operator)
     if (c.operator === "isEmpty" || c.operator === "isNotEmpty") return symbol
-    const value = truncate(String(c.value ?? "").trim())
-    return value ? `${symbol} ${value}` : symbol
+    const rawVal = c.value !== undefined && c.value !== null ? String(c.value).trim() : ""
+    const value = truncate(rawVal)
+    if (!value) return symbol
+    // Add space for =, >, < or words
+    return symbol === "=" ? `is ${value}` : `${symbol} ${value}`
 }
 
 /**
- * A short label for a branch arc. Prefers the rule's own name; otherwise
- * summarizes the first condition (with `+N` when more conditions follow). The
- * arc starts at the page the condition reads, so the source is left implicit.
+ * A short label for a branch arc. Formats condition and value in a clean, smart way:
+ * e.g. "If is Yes", "If > 18", "If is filled".
  */
 export function shortConditionLabel(rule: FormLogicRule): string {
-    if (rule.name && rule.name.trim()) return truncate(rule.name.trim(), 22)
+    if (rule.name && rule.name.trim()) return truncate(rule.name.trim(), 24)
     const conditions = (rule.conditions ?? []).filter((c) => c && c.sourceKey)
-    if (conditions.length === 0) return "always"
-    const first = `if ${describeCondition(conditions[0])}`
-    return conditions.length > 1 ? `${first} +${conditions.length - 1}` : first
+    if (conditions.length === 0) return "Always"
+    const first = `If ${describeCondition(conditions[0])}`
+    return conditions.length > 1 ? `${first} (+${conditions.length - 1})` : first
 }
 
 /**
@@ -125,6 +135,7 @@ export function computeBranchLinks(
     const idFor = (index: number) => pageId(pages[index], index)
 
     const links: BranchLink[] = []
+    const ruleCountByOwner = new Map<string, number>()
     let seq = 0
 
     for (const rule of rules) {
@@ -161,6 +172,20 @@ export function computeBranchLinks(
             targetId = idFor(targetIndex)
         }
 
+        const condVal = rule.conditions?.[0]?.value
+        const badge =
+            condVal !== undefined &&
+            condVal !== null &&
+            String(condVal).trim().length > 0 &&
+            String(condVal).trim().length <= 4
+                ? String(condVal).trim()
+                : String(seq + 1)
+
+        const ruleRank = ruleCountByOwner.get(ownerKey) ?? 0
+        ruleCountByOwner.set(ownerKey, ruleRank + 1)
+        // 1st logic is bottom, 2nd logic is top, then 1 bottom, 1 top, continuing on
+        const side: "bottom" | "top" = ruleRank % 2 === 0 ? "bottom" : "top"
+
         links.push({
             id: `branch-${rule.id ?? "rule"}-${seq}`,
             ruleId: rule.id ?? "",
@@ -171,6 +196,9 @@ export function computeBranchLinks(
             targetIndex,
             direction: targetIndex > sourceIndex ? "forward" : "backward",
             label: shortConditionLabel(rule),
+            badge,
+            side,
+            ruleRank,
         })
         seq += 1
     }

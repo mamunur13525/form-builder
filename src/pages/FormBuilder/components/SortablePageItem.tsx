@@ -6,7 +6,7 @@ import {
   ChevronDown,
   Copy,
   MoreVertical,
-  FileText,
+  Type,
 } from "lucide-react";
 import {
   Popover,
@@ -26,8 +26,8 @@ import {
   TooltipTrigger,
 } from "../../../components/ui/tooltip";
 import {
-  PAGE_TYPE_ICONS,
   PAGE_TYPE_LABELS,
+  PAGE_TYPE_VISUALS,
 } from "../../../shared/constants/form-types";
 import type { FormPage } from "../../../shared/types/common";
 import type { IItemProps } from "react-movable";
@@ -66,8 +66,12 @@ export function SortablePageItem({
 }: SortablePageItemProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const TypeIcon = PAGE_TYPE_ICONS[page.type] || FileText;
-  const typeLabel = PAGE_TYPE_LABELS[page.type] || "Page";
+  const visual = PAGE_TYPE_VISUALS[page.type] ?? {
+    icon: Type,
+    bgColor: "bg-[#64748b]",
+  };
+  const Icon = visual.icon;
+  const typeLabel = visual.displayName ?? PAGE_TYPE_LABELS[page.type] ?? page.type;
 
   const isFirst = index === 0;
   const isLast = index === pagesCount - 1;
@@ -80,9 +84,6 @@ export function SortablePageItem({
     transition: isDragged ? "none" : itemStyle?.transition,
   };
 
-  const actionBtn =
-    "flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-800 dark:hover:text-zinc-100 disabled:pointer-events-none disabled:opacity-30 transition-colors";
-
   return (
     <div
       {...restItemProps}
@@ -90,52 +91,138 @@ export function SortablePageItem({
       onClick={() => onSelect(index)}
       aria-current={isSelected ? "true" : undefined}
       className={`
-        group relative flex flex-col gap-3 rounded-lg border p-3.5
+        group relative flex items-center gap-2.5 rounded-2xl border p-3
         cursor-pointer select-none transition-all
         ${isSelected
-          ? "border-2 border-[#FF5722] bg-white dark:bg-[#1e1e24] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
-          : "border-slate-200/90 dark:border-zinc-800/80 bg-slate-50/70 dark:bg-[#17171c] hover:border-slate-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-[#1a1a20] hover:shadow-xs"
+          ? "border-2 border-[#FF5722] bg-white dark:bg-[#18181c] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
+          : "border-neutral-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-md"
         }
-        ${isDragged ? "border-[#FF5722] bg-white dark:bg-[#1e1e24] shadow-2xl scale-[1.02] cursor-grabbing" : ""}
-        ${isLifted && !isDragged ? "border-[#FF5722] bg-white dark:bg-[#1e1e24] shadow-xl" : ""}
+        ${isDragged ? "border-[#FF5722] bg-white dark:bg-[#18181c] shadow-2xl scale-[1.02] cursor-grabbing z-50" : ""}
+        ${isLifted && !isDragged ? "border-[#FF5722] bg-white dark:bg-[#18181c] shadow-xl" : ""}
       `}
     >
-      {/* Top Row: File icon + Numbered page title + MoreVertical menu */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <FileText className="h-4 w-4 text-slate-400 dark:text-zinc-400 shrink-0" />
-          <p className="truncate text-sm font-semibold text-slate-800 dark:text-zinc-100">
-            <span className="text-slate-400 dark:text-zinc-400 font-normal">{index + 1}.</span>{" "}
-            {page.label || (
-              <span className="font-normal italic text-slate-400 dark:text-zinc-500">
-                {typeLabel}
-              </span>
-            )}
-            {page.required && (
-              <span
-                aria-label="Required"
-                className="ml-0.5 font-bold text-[#FF5722]"
-              >
-                *
-              </span>
-            )}
-          </p>
-        </div>
+      {/* 1. Drag handle on far left (left of icon) */}
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <span
+              data-movable-handle
+              aria-hidden="true"
+              tabIndex={-1}
+              onClick={(e) => e.stopPropagation()}
+              className="flex h-7 w-5 shrink-0 items-center justify-center -ml-0.5 text-slate-300 dark:text-zinc-600 hover:text-slate-600 dark:hover:text-zinc-300 touch-none select-none cursor-grab active:cursor-grabbing transition-colors"
+            >
+              <GripVertical className="h-4 w-4" />
+            </span>
+          }
+        />
+        <TooltipContent>Drag to reorder</TooltipContent>
+      </Tooltip>
 
-        {/* Top-right menu */}
+      {/* 2. Icon box with solid vibrant background */}
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-xs ${visual.bgColor}`}
+      >
+        <Icon className="h-5 w-5 stroke-[2]" />
+      </div>
+
+      {/* 3. Text block: Subtitle and Question Title */}
+      <div className="flex min-w-0 flex-1 flex-col justify-center text-left">
+        <span className="mb-0.5 truncate text-xs font-normal text-neutral-400 dark:text-zinc-500">
+          {index + 1} · {typeLabel}
+        </span>
+        <p className="line-clamp-2 text-sm font-semibold leading-snug text-neutral-900 dark:text-zinc-100">
+          {page.label || (
+            <span className="font-normal italic text-neutral-400 dark:text-zinc-500">
+              Untitled question
+            </span>
+          )}
+          {page.required && (
+            <span
+              aria-label="Required"
+              className="ml-0.5 font-bold text-[#FF5722]"
+            >
+              *
+            </span>
+          )}
+        </p>
+      </div>
+
+      {/* 4. Delete icon (hover reveal) + Three dot menu */}
+      <div className="flex shrink-0 items-center gap-0.5">
+        <Popover open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <PopoverTrigger
+                  type="button"
+                  aria-label="Delete page"
+                  onClick={(e) => e.stopPropagation()}
+                  className={`flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-400 cursor-pointer transition-opacity duration-200 ${
+                    confirmOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </PopoverTrigger>
+              }
+            />
+            <TooltipContent>Delete</TooltipContent>
+          </Tooltip>
+          <PopoverContent
+            side="top"
+            align="end"
+            sideOffset={8}
+            onClick={(e) => e.stopPropagation()}
+            className="w-64 gap-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
+          >
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                Delete this page?
+              </p>
+              <p className="text-xs leading-snug text-slate-500 dark:text-zinc-400">
+                This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex justify-end gap-2 mt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirmOpen(false)}
+                className="border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 cursor-pointer"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => {
+                  setConfirmOpen(false);
+                  onDelete(index);
+                }}
+                className="bg-rose-600 hover:bg-rose-700 text-white cursor-pointer"
+              >
+                Delete
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
               <button
                 type="button"
                 onClick={(e) => e.stopPropagation()}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
               >
                 <MoreVertical className="h-4 w-4" />
               </button>
             }
           />
-          <DropdownMenuContent align="end" className="w-40 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-1.5 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-200">
+          <DropdownMenuContent
+            align="end"
+            className="w-40 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-1.5 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-200"
+          >
             {onDuplicate && (
               <DropdownMenuItem
                 className="cursor-pointer rounded-lg text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white"
@@ -182,118 +269,6 @@ export function SortablePageItem({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-
-      {/* Bottom Row: Type badge on left, Duplicate / Delete / Grip on right */}
-      <div className="flex items-center justify-between gap-2 pt-0.5">
-        {/* Left: type badge */}
-        <span
-          className={`inline-flex min-w-0 items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-            isSelected
-              ? "border-[#FF5722]/40 bg-[#FF5722]/10 text-[#FF5722]"
-              : "border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/80 text-slate-600 dark:text-zinc-400"
-          }`}
-        >
-          <TypeIcon className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{typeLabel}</span>
-        </span>
-
-        {/* Right: Quick actions */}
-        <div className="flex shrink-0 items-center gap-1">
-          {onDuplicate && (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <button
-                    type="button"
-                    aria-label="Duplicate page"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDuplicate(index);
-                    }}
-                    className={actionBtn}
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </button>
-                }
-              />
-              <TooltipContent>Duplicate</TooltipContent>
-            </Tooltip>
-          )}
-
-          <Popover open={confirmOpen} onOpenChange={setConfirmOpen}>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <PopoverTrigger
-                    type="button"
-                    aria-label="Delete page"
-                    onClick={(e) => e.stopPropagation()}
-                    className={`${actionBtn} hover:bg-rose-500/10 hover:text-rose-400`}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </PopoverTrigger>
-                }
-              />
-              <TooltipContent>Delete</TooltipContent>
-            </Tooltip>
-            <PopoverContent
-              side="top"
-              align="end"
-              sideOffset={8}
-              onClick={(e) => e.stopPropagation()}
-              className="w-64 gap-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-4 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-100"
-            >
-              <div className="flex flex-col gap-1">
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Delete this page?
-                </p>
-                <p className="text-xs leading-snug text-slate-500 dark:text-zinc-400">
-                  This action cannot be undone.
-                </p>
-              </div>
-              <div className="flex justify-end gap-2 mt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setConfirmOpen(false)}
-                  className="border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => {
-                    setConfirmOpen(false);
-                    onDelete(index);
-                  }}
-                  className="bg-rose-600 hover:bg-rose-700 text-white"
-                >
-                  Delete
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Drag handle */}
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <span
-                  data-movable-handle
-                  aria-hidden="true"
-                  tabIndex={-1}
-                  onClick={(e) => e.stopPropagation()}
-                  className={`${actionBtn} touch-none select-none cursor-grab active:cursor-grabbing`}
-                >
-                  <GripVertical className="h-4 w-4" />
-                </span>
-              }
-            />
-            <TooltipContent>Drag to reorder</TooltipContent>
-          </Tooltip>
-        </div>
       </div>
     </div>
   );

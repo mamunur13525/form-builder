@@ -24,6 +24,7 @@ import {
     Minimize2,
     Plus,
     Slash,
+    Trash2,
     X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -72,13 +73,15 @@ interface RuleEditorProps {
     onUpdate: (rule: FormLogicRule) => void
     /** Save button — persists the rule through the logic API. */
     onSave: (rule: FormLogicRule) => void
+    /** Delete button — deletes the rule through the logic API. */
+    onDelete?: () => void
     /** API error from the last save attempt, shown next to the Save button. */
     error?: string | null
     onCancel: () => void
 }
 
 /** Editorial select trigger — styled like the reference design's pill buttons. */
-export const TRIGGER_CLASS =
+const TRIGGER_CLASS =
     "h-9 rounded-lg border-[var(--input)] bg-[var(--card)] px-3.5 text-[15px] text-[var(--foreground)] shadow-sm hover:border-[var(--editorial-primary-ring)] focus-visible:border-[var(--ring)] data-[placeholder]:text-[var(--editorial-subtle)]"
 
 /** Portalled select popup — inherits the `.editorial` subtree styling. */
@@ -102,7 +105,7 @@ const COMBINATOR_CLASS =
     "h-9 rounded-lg border-none bg-[var(--secondary)] px-3.5 text-[15px] font-medium text-[var(--foreground)] shadow-none hover:bg-[var(--accent)]"
 
 /** Icon per comparison operator — shown in the operator trigger and items. */
-export const OPERATOR_ICONS: Record<LogicOperator, LucideIcon> = {
+const OPERATOR_ICONS: Record<LogicOperator, LucideIcon> = {
     equals: Equal,
     notEquals: Slash,
     contains: Maximize2,
@@ -189,6 +192,7 @@ export function RuleEditor({
     index,
     onUpdate,
     onSave,
+    onDelete,
     error,
     onCancel,
 }: RuleEditorProps) {
@@ -742,16 +746,31 @@ export function RuleEditor({
                         {section.title}
                     </span>
                 </h2>
-                <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-[15px] font-medium text-[var(--editorial-body)]">
-                        Enabled
-                    </span>
-                    <Switch
-                        size="sm"
-                        checked={ruleEnabled}
-                        onCheckedChange={(checked) => onUpdate({ ...rule, enabled: checked })}
-                        aria-label="Toggle rule enabled"
-                    />
+                <div className="flex shrink-0 items-center gap-3">
+                    <div className="flex items-center gap-2">
+                        <span className="text-[15px] font-medium text-[var(--editorial-body)]">
+                            Enabled
+                        </span>
+                        <Switch
+                            size="sm"
+                            checked={ruleEnabled}
+                            onCheckedChange={(checked) => onUpdate({ ...rule, enabled: checked })}
+                            aria-label="Toggle rule enabled"
+                        />
+                    </div>
+                    {onDelete && (
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon-sm"
+                            aria-label="Delete rule"
+                            title="Delete rule"
+                            onClick={onDelete}
+                            className="size-8 rounded-lg cursor-pointer transition-colors"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    )}
                 </div>
             </header>
 
@@ -775,6 +794,18 @@ export function RuleEditor({
                 </span>
                 {renderThenControls()}
                 <div className="w-full ml-auto flex items-center justify-end gap-3">
+                    {onDelete && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="lg"
+                            onClick={onDelete}
+                            className="mr-auto h-9 rounded-lg px-4 text-[15px] text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                        >
+                            <Trash2 className="mr-1.5 h-4 w-4" />
+                            Delete rule
+                        </Button>
+                    )}
                     {error && (
                         <span className="text-sm font-medium text-[var(--destructive)]">
                             {error}

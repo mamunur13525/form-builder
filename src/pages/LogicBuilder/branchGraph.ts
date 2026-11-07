@@ -95,25 +95,36 @@ const truncate = (text: string, max = 18): string =>
     text.length > max ? `${text.slice(0, max - 1)}…` : text
 
 /** One compact condition, e.g. `= "Yes"`, `> 18`, `is filled`. */
-function describeCondition(c: LogicCondition): string {
+function describeCondition(c: LogicCondition, pages?: FormPage[]): string {
     const symbol = OPERATOR_SYMBOLS[c.operator] ?? String(c.operator)
     if (c.operator === "isEmpty" || c.operator === "isNotEmpty") return symbol
-    const rawVal = c.value !== undefined && c.value !== null ? String(c.value).trim() : ""
-    const value = truncate(rawVal)
+    let rawVal = c.value !== undefined && c.value !== null ? String(c.value).trim() : ""
+    if (pages && c.sourceKey) {
+        const sourcePage = pages.find((p) => p.pageKey === c.sourceKey)
+        const matchedOption = sourcePage?.options?.find(
+            (o) => String(o.value).trim() === rawVal || String(o.label).trim() === rawVal,
+        )
+        if (matchedOption?.label) {
+            rawVal = matchedOption.label
+        }
+    }
+    const value = truncate(rawVal, 16)
     if (!value) return symbol
     // Add space for =, >, < or words
-    return symbol === "=" ? `is ${value}` : `${symbol} ${value}`
+    return symbol === "=" ? `is "${value}"` : `${symbol} ${value}`
 }
 
 /**
  * A short label for a branch arc. Formats condition and value in a clean, smart way:
- * e.g. "If is Yes", "If > 18", "If is filled".
+ * e.g. "If is \"Yes\"", "If > 18", "If is filled".
  */
-export function shortConditionLabel(rule: FormLogicRule): string {
-    if (rule.name && rule.name.trim()) return truncate(rule.name.trim(), 24)
+export function shortConditionLabel(rule: FormLogicRule, pages?: FormPage[]): string {
     const conditions = (rule.conditions ?? []).filter((c) => c && c.sourceKey)
-    if (conditions.length === 0) return "Always"
-    const first = `If ${describeCondition(conditions[0])}`
+    if (conditions.length === 0) {
+        if (rule.name && rule.name.trim()) return truncate(rule.name.trim(), 24)
+        return "Always"
+    }
+    const first = `If ${describeCondition(conditions[0], pages)}`
     return conditions.length > 1 ? `${first} (+${conditions.length - 1})` : first
 }
 
@@ -183,8 +194,13 @@ export function computeBranchLinks(
 
         const ruleRank = ruleCountByOwner.get(ownerKey) ?? 0
         ruleCountByOwner.set(ownerKey, ruleRank + 1)
-        // 1st logic is bottom, 2nd logic is top, then 1 bottom, 1 top, continuing on
-        const side: "bottom" | "top" = ruleRank % 2 === 0 ? "bottom" : "top"
+        // Jumps to end page always arch over the top; standard jumps alternate: 1st bottom, 2nd top...
+        const side: "bottom" | "top" =
+            action.action === "goToEnd"
+                ? "top"
+                : ruleRank % 2 === 0
+                  ? "bottom"
+                  : "top"
 
         links.push({
             id: `branch-${rule.id ?? "rule"}-${seq}`,
@@ -195,7 +211,7 @@ export function computeBranchLinks(
             sourceIndex,
             targetIndex,
             direction: targetIndex > sourceIndex ? "forward" : "backward",
-            label: shortConditionLabel(rule),
+            label: shortConditionLabel(rule, pages),
             badge,
             side,
             ruleRank,

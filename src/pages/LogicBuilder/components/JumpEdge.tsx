@@ -16,12 +16,18 @@ export function JumpEdge({
 
   const dx = Math.abs(targetX - sourceX);
   const isForward = targetX >= sourceX;
+  const isLongJump = Boolean(data?.isLongJump || dx > 480);
 
-  // Stagger lane depth so multiple jumps on same side don't collide
-  const depthOffset = Math.floor(jumpIndex / 2) * 26;
+  // Stagger lane depth so multiple jumps on same side don't collide.
+  // Adjacent inner jumps use base offset 52px.
+  // Long jumps that span over intermediate nodes use base offset 88px to arch comfortably over cards.
+  const baseOffset = isLongJump ? 88 : 52;
+  const depthOffset = jumpIndex * 26;
+  const totalOffset = baseOffset + depthOffset;
+
   const laneY = isBottom
-    ? Math.max(sourceY, targetY) + 56 + depthOffset
-    : Math.min(sourceY, targetY) - 58 - depthOffset;
+    ? Math.max(sourceY, targetY) + totalOffset
+    : Math.min(sourceY, targetY) - totalOffset;
 
   let path: string;
   let badgeX: number;
@@ -29,9 +35,9 @@ export function JumpEdge({
 
   if (isForward) {
     // Forward jump (e.g. Page 1 -> Page 3, or Page 1 -> Thank you)
-    const dx1 = Math.min(40, Math.max(22, dx * 0.12));
-    const dx2 = Math.min(40, Math.max(22, dx * 0.12));
-    const r = Math.min(32, Math.max(16, (dx - dx1 - dx2) * 0.25));
+    const dx1 = Math.min(36, Math.max(26, dx * 0.08));
+    const dx2 = Math.min(36, Math.max(26, dx * 0.08));
+    const r = Math.min(28, Math.max(18, (dx - dx1 - dx2) * 0.2));
 
     const p1X = sourceX + dx1;
     const p1Y = sourceY;
@@ -54,7 +60,7 @@ export function JumpEdge({
         `C ${p3X + r * 0.45} ${p3Y}, ${p4X - r * 0.55} ${p4Y}, ${p4X} ${p4Y} ` +
         `L ${targetX} ${targetY}`;
 
-      badgeX = (p2X + p3X) / 2;
+      badgeX = isLongJump ? p2X + (p3X - p2X) * 0.38 : (p2X + p3X) / 2;
       badgeY = laneY;
     } else {
       path =
@@ -79,8 +85,14 @@ export function JumpEdge({
     badgeY = laneY;
   }
 
-  const badgeText = data?.badge ? String(data.badge) : "";
-  const labelText = data?.label ? String(data.label) : "";
+  const labelText = data?.label ? String(data.label) : "Logic jump";
+
+  const handleBadgeClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (typeof data?.onSelect === "function") {
+      data.onSelect();
+    }
+  };
 
   return (
     <>
@@ -96,20 +108,16 @@ export function JumpEdge({
       />
       <EdgeLabelRenderer>
         <div
+          onClick={handleBadgeClick}
           style={{
             position: "absolute",
             transform: `translate(-50%, -50%) translate(${badgeX}px, ${badgeY}px)`,
             pointerEvents: "all",
           }}
-          className="group/badge flex items-center gap-1.5 rounded-full border border-[#b8cef8] bg-[#eef4ff] px-2.5 py-0.5 text-xs font-medium text-[#2d5fc2] shadow-xs transition-all hover:scale-105 hover:shadow-md select-none dark:border-[#33569c] dark:bg-[#1a294c] dark:text-[#9bc2ff]"
+          className="group/badge cursor-pointer flex items-center justify-center rounded-full border border-[#b8cef8] bg-[#eef4ff] px-3 py-1 text-xs font-semibold text-[#2d5fc2] shadow-xs select-none dark:border-[#33569c] dark:bg-[#1a294c] dark:text-[#9bc2ff] hover:border-[#4b72c4] hover:bg-[#e4eeff] dark:hover:border-[#608ee8] dark:hover:bg-[#213460] transition-colors"
         >
-          {badgeText && (
-            <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#d0e1fd] px-1 text-[10px] font-bold text-[#1d4bb0] dark:bg-[#253d73] dark:text-[#b4d2ff]">
-              {badgeText}
-            </span>
-          )}
-          <span className="max-w-[160px] truncate font-semibold tracking-tight">
-            {labelText || "Logic jump"}
+          <span className="max-w-[200px] truncate tracking-tight font-semibold">
+            {labelText}
           </span>
         </div>
       </EdgeLabelRenderer>

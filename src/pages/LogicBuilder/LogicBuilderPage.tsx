@@ -88,18 +88,9 @@ function buildGraph(
   pages: FormPage[],
   endPage: EndPage | null,
   rules: FormLogicRule[],
+  onSelectRule?: (ownerKey: string, ruleId?: string) => void,
 ): { nodes: FlowNode[]; edges: Edge[] } {
   const links = computeBranchLinks(pages, endPage, rules);
-
-  // Identify intermediate pages that are bypassed by forward jumps
-  const bypassedIndices = new Set<number>();
-  for (const link of links) {
-    if (link.direction === "forward" && link.targetIndex - link.sourceIndex > 1) {
-      for (let i = link.sourceIndex + 1; i < link.targetIndex && i < pages.length; i++) {
-        bypassedIndices.add(i);
-      }
-    }
-  }
 
   // --- Nodes -----------------------------------------------------------------
   const nodes: FlowNode[] = [];
@@ -125,7 +116,6 @@ function buildGraph(
   // Question pages
   pages.forEach((page, index) => {
     const id = pageId(page, index);
-    const isBypassed = bypassedIndices.has(index);
     const ruleCount = countRulesForPage(rules, page.pageKey);
 
     nodes.push({
@@ -133,7 +123,7 @@ function buildGraph(
       type: "pageNode",
       position: {
         x: currentX,
-        y: isBypassed ? -55 : 0,
+        y: 0,
       },
       data: {
         index,
@@ -219,11 +209,21 @@ function buildGraph(
   }
 
   // Branch arcs (logic jumps)
-  const jumpCountBySource = new Map<string, number>();
+  const topCountBySource = new Map<string, number>();
+  const bottomCountBySource = new Map<string, number>();
 
   for (const link of links) {
-    const jumpIndex = jumpCountBySource.get(link.sourceId) ?? 0;
-    jumpCountBySource.set(link.sourceId, jumpIndex + 1);
+    const isLongJump = Math.abs(link.targetIndex - link.sourceIndex) > 1;
+    const side = link.side ?? "bottom";
+
+    let laneIndex: number;
+    if (side === "top") {
+      laneIndex = topCountBySource.get(link.sourceId) ?? 0;
+      topCountBySource.set(link.sourceId, laneIndex + 1);
+    } else {
+      laneIndex = bottomCountBySource.get(link.sourceId) ?? 0;
+      bottomCountBySource.set(link.sourceId, laneIndex + 1);
+    }
 
     edges.push({
       id: link.id,
@@ -238,9 +238,11 @@ function buildGraph(
         ownerKey: link.ownerKey,
         badge: link.badge ?? "2",
         label: link.label,
-        jumpIndex,
-        side: link.side ?? "bottom",
-        ruleRank: link.ruleRank ?? jumpIndex,
+        jumpIndex: laneIndex,
+        side,
+        isLongJump,
+        ruleRank: link.ruleRank ?? laneIndex,
+        onSelect: () => onSelectRule?.(link.ownerKey, link.ruleId),
       },
     });
   }
@@ -361,6 +363,7 @@ function LogicFlow() {
   const [selected, setSelected] = useState<{
     page: FormPage;
     index: number;
+    initialRuleId?: string;
   } | null>(null);
 
   const [aiPrompt, setAiPrompt] = useState("");
@@ -369,16 +372,31 @@ function LogicFlow() {
   const nodesInitialized = useNodesInitialized();
   const didInitialFit = useRef(false);
 
+  const handleRuleSelect = useCallback(
+    (ownerKey: string, ruleId?: string) => {
+      const pageIndex = pages.findIndex((p) => p.pageKey === ownerKey);
+      if (pageIndex !== -1) {
+        setSelected({
+          page: pages[pageIndex],
+          index: pageIndex,
+          initialRuleId: ruleId,
+        });
+      }
+    },
+    [pages],
+  );
+
   useEffect(() => {
     const { nodes: nextNodes, edges: nextEdges } = buildGraph(
       pages,
       endPage,
       adaptedRules,
+      handleRuleSelect,
     );
     setNodes(nextNodes);
     setEdges(nextEdges);
     didInitialFit.current = false;
-  }, [pages, endPage, adaptedRules, setNodes, setEdges]);
+  }, [pages, endPage, adaptedRules, handleRuleSelect, setNodes, setEdges]);
 
   useEffect(() => {
     if (nodesInitialized && nodes.length > 0 && !didInitialFit.current) {
@@ -398,6 +416,17 @@ function LogicFlow() {
       if (page) setSelected({ page, index });
     },
     [pages],
+  );
+
+  const handleEdgeClick = useCallback(
+    (_event: React.MouseEvent, edge: Edge) => {
+      const ownerKey = edge.data?.ownerKey as string | undefined;
+      const ruleId = edge.data?.ruleId as string | undefined;
+      if (ownerKey) {
+        handleRuleSelect(ownerKey, ruleId);
+      }
+    },
+    [handleRuleSelect],
   );
 
   const handleAiSubmit = () => {
@@ -426,7 +455,7 @@ function LogicFlow() {
   }
 
   return (
-    <div className="editorial relative flex h-full w-full flex-col overflow-hidden bg-[var(--editorial-canvas)] dark:bg-[#0c0c0f]">
+    <div className="editorial relative flex h-full w-full flex-col overflow-hidden bg-[var(--editorial-canvas)] dark:bg-[#0c0c0f] p-8">
       {/* Top Header matching Image #1 */}
       <LogicTopBar onBack={() => navigate(`/form-builder/${formId}`)} />
 
@@ -440,6 +469,7 @@ function LogicFlow() {
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           onNodeClick={handleNodeClick}
+          onEdgeClick={handleEdgeClick}
           fitView
           fitViewOptions={{ padding: 0.25 }}
           minZoom={0.2}
@@ -459,14 +489,14 @@ function LogicFlow() {
         <div className="pointer-events-none absolute bottom-5 left-5 z-10 flex items-center gap-4 rounded-xl border border-neutral-200/80 bg-white/95 px-3.5 py-2 shadow-xs backdrop-blur-xs select-none dark:border-zinc-800 dark:bg-[#18181c]/95">
           <div className="flex items-center gap-2 text-xs font-normal text-neutral-600 dark:text-zinc-400">
             <span className="flex items-center text-[#8f95a0]">
-              <span className="h-[2px] w-3.5 bg-[#8f95a0]" />
+              <span className="h-[2px] w-3.5 bg-[#8f95a0] text-[#8f95a0]" />
               <span className="inline-block border-y-[3px] border-y-transparent border-l-[5px] border-l-[#8f95a0]" />
             </span>
             <span>Next block</span>
           </div>
           <div className="flex items-center gap-2 text-xs font-normal text-neutral-600 dark:text-zinc-400">
             <span className="flex items-center text-[#4b72c4]">
-              <span className="h-[2px] w-3.5 bg-[#4b72c4]" />
+              <span className="h-[2px] w-3.5 bg-[#4b72c4] text-[#4b72c4]" />
               <span className="inline-block border-y-[3px] border-y-transparent border-l-[5px] border-l-[#4b72c4]" />
             </span>
             <span>Jump (logic)</span>
@@ -500,6 +530,7 @@ function LogicFlow() {
       {/* Logic Editor Dialog for editing rules */}
       <LogicEditorDialog
         page={selected?.page ?? null}
+        initialRuleId={selected?.initialRuleId}
         allPages={pages}
         variables={rawVariables}
         onClose={() => setSelected(null)}

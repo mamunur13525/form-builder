@@ -58,6 +58,8 @@ interface LogicEditorDialogProps {
      * dropdown at the top of the dialog.
      */
     page: FormPage | null
+    /** Optional rule ID to immediately open for editing when the dialog launches. */
+    initialRuleId?: string | null
     /** All form pages (for source / target picks), in form order. */
     allPages: FormPage[]
     /** Form variables (from settings), shown in condition/calculation picks. */
@@ -92,6 +94,7 @@ function PageTypeChip({ page, pageNumber }: { page: FormPage; pageNumber: number
 
 function LogicEditorDialogComponent({
     page,
+    initialRuleId,
     allPages,
     variables,
     onClose,
@@ -126,11 +129,27 @@ function LogicEditorDialogComponent({
     // the dialog opens on a page (prop identity changes). Adjusted during
     // render — the React-recommended alternative to a prop-syncing effect.
     const [prevPage, setPrevPage] = useState<FormPage | null>(page)
-    if (page !== prevPage) {
+    const [prevInitialRuleId, setPrevInitialRuleId] = useState<string | null | undefined>(initialRuleId)
+    const [prevRules, setPrevRules] = useState(rules)
+    if (page !== prevPage || initialRuleId !== prevInitialRuleId || rules !== prevRules) {
         setPrevPage(page)
-        setEditor(null)
+        setPrevInitialRuleId(initialRuleId)
+        setPrevRules(rules)
         setSaveError(null)
         if (page) setSelectedPageKey(page.pageKey)
+        if (initialRuleId && rules.length > 0) {
+            const ruleToEdit = rules.map(normalizeApiRule).find((r) => r.id === initialRuleId)
+            if (ruleToEdit) {
+                setEditor({
+                    category: ruleToEdit.category,
+                    rule: ruleToEdit,
+                })
+            } else if (page !== prevPage || initialRuleId !== prevInitialRuleId) {
+                setEditor(null)
+            }
+        } else if (page !== prevPage || initialRuleId !== prevInitialRuleId) {
+            setEditor(null)
+        }
     }
 
     const selectedPage = useMemo<FormPage | null>(
@@ -434,6 +453,7 @@ function LogicEditorDialogComponent({
                                                             })
                                                         }
                                                         onSave={saveRule}
+                                                        onDelete={() => deleteRule(editingRule.id)}
                                                         error={saveError}
                                                         onCancel={cancelEditor}
                                                     />
@@ -505,6 +525,7 @@ function LogicEditorDialogComponent({
                                                 setEditor({ category: next.category, rule: next })
                                             }
                                             onSave={saveRule}
+                                            onDelete={cancelEditor}
                                             error={saveError}
                                             onCancel={cancelEditor}
                                         />

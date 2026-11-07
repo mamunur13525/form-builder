@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Trash2,
   GripVertical,
@@ -65,6 +65,18 @@ export function SortablePageItem({
   onMoveDown,
 }: SortablePageItemProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const wasDraggedRef = useRef(false);
+
+  useEffect(() => {
+    if (isDragged) {
+      wasDraggedRef.current = true;
+    } else if (wasDraggedRef.current) {
+      const timer = setTimeout(() => {
+        wasDraggedRef.current = false;
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isDragged]);
 
   const visual = PAGE_TYPE_VISUALS[page.type] ?? {
     icon: Type,
@@ -88,17 +100,20 @@ export function SortablePageItem({
     <div
       {...restItemProps}
       style={combinedStyle}
-      onClick={() => onSelect(index)}
+      onClick={() => {
+        if (isDragged || wasDraggedRef.current) return;
+        onSelect(index);
+      }}
       aria-current={isSelected ? "true" : undefined}
       className={`
-        group relative flex items-center gap-2.5 rounded-2xl border p-3
+        group relative flex items-center gap-2.5 rounded-lg border p-3
         cursor-pointer select-none transition-all
         ${isSelected
-          ? "border-2 border-[#FF5722] bg-white dark:bg-[#18181c] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
-          : "border-neutral-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-md"
+          ? "border-[#D84315] bg-white dark:bg-[#18181c] ring-2 ring-[#FF5722]/20 shadow-xs"
+          : "border-neutral-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-xs"
         }
-        ${isDragged ? "border-[#FF5722] bg-white dark:bg-[#18181c] shadow-2xl scale-[1.02] cursor-grabbing z-50" : ""}
-        ${isLifted && !isDragged ? "border-[#FF5722] bg-white dark:bg-[#18181c] shadow-xl" : ""}
+        ${isDragged ? "border-[#D84315] bg-white dark:bg-[#18181c] shadow-2xl scale-[1.02] cursor-grabbing z-50" : ""}
+        ${isLifted && !isDragged ? "border-[#D84315] bg-white dark:bg-[#18181c] shadow-xl" : ""}
       `}
     >
       {/* 1. Drag handle on far left (left of icon) */}
@@ -121,16 +136,21 @@ export function SortablePageItem({
 
       {/* 2. Icon box with solid vibrant background */}
       <div
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-xs ${visual.bgColor}`}
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white shadow-xs ${visual.bgColor}`}
       >
         <Icon className="h-5 w-5 stroke-[2]" />
       </div>
 
       {/* 3. Text block: Subtitle and Question Title */}
       <div className="flex min-w-0 flex-1 flex-col justify-center text-left">
-        <span className="mb-0.5 truncate text-xs font-normal text-neutral-400 dark:text-zinc-500">
-          {index + 1} · {typeLabel}
-        </span>
+        <div className="mb-0.5 flex items-center gap-1.5 min-w-0">
+          <span className="inline-flex shrink-0 items-center justify-center rounded px-1.5 py-0.5 text-[10.5px] font-semibold leading-none border border-sky-400/60 dark:border-sky-500/50 bg-sky-50/80 dark:bg-sky-500/10 text-sky-600 dark:text-sky-300">
+            Q{index + 1}
+          </span>
+          <span className="truncate text-xs font-normal text-neutral-400 dark:text-zinc-500">
+            {typeLabel}
+          </span>
+        </div>
         <p className="line-clamp-2 text-sm font-semibold leading-snug text-neutral-900 dark:text-zinc-100">
           {page.label || (
             <span className="font-normal italic text-neutral-400 dark:text-zinc-500">
@@ -256,16 +276,6 @@ export function SortablePageItem({
             >
               <ChevronDown className="h-3.5 w-3.5 mr-2 text-slate-400 dark:text-zinc-400" />
               Move Down
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer rounded-lg text-xs font-medium text-rose-500 hover:bg-rose-500/10 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300"
-              onClick={(e) => {
-                e.stopPropagation();
-                setConfirmOpen(true);
-              }}
-            >
-              <Trash2 className="h-3.5 w-3.5 mr-2" />
-              Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

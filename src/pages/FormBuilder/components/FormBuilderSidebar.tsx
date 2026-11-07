@@ -98,10 +98,24 @@ export function FormBuilderSidebar({
       }));
       onReorderPages(reordered);
 
-      // Keep the moved page selected after the reorder settles.
-      onSelectPage(to);
+      // Do NOT activate the moved page as selected; track existing selection instead
+      if (isPageSelected) {
+        if (selectedPageIndex === from) {
+          onSelectPage(to);
+        } else {
+          let newSelected = selectedPageIndex;
+          if (from < selectedPageIndex && to >= selectedPageIndex) {
+            newSelected = selectedPageIndex - 1;
+          } else if (from > selectedPageIndex && to <= selectedPageIndex) {
+            newSelected = selectedPageIndex + 1;
+          }
+          if (newSelected !== selectedPageIndex) {
+            onSelectPage(newSelected);
+          }
+        }
+      }
     },
-    [pages, onReorderPages, onSelectPage],
+    [pages, onReorderPages, onSelectPage, isPageSelected, selectedPageIndex],
   );
 
   const movePageUp = useCallback(

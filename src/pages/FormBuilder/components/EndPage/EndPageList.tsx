@@ -145,14 +145,14 @@ function EndPageItem({
         <div
             onClick={() => onSelect(index)}
             aria-current={isSelected ? "true" : undefined}
-            className={`group relative flex items-center gap-2.5 rounded-2xl border p-3 cursor-pointer select-none transition-all ${
+            className={`group relative flex items-center gap-2.5 rounded-lg border p-3 cursor-pointer select-none transition-all ${
                 isSelected
-                    ? "border-2 border-[#FF5722] bg-white dark:bg-[#18181c] ring-4 ring-[#FF5722]/15 shadow-md dark:shadow-lg dark:shadow-[#FF5722]/5"
-                    : "border-neutral-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-md"
+                    ? "border-[#D84315] bg-white dark:bg-[#18181c] ring-2 ring-[#FF5722]/20 shadow-xs"
+                    : "border-neutral-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-xs"
             }`}
         >
             {/* Left Icon box matching EndPageNode */}
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#8de4b0] text-[#16442b] dark:bg-[#224c36] dark:text-[#8de4b0] shadow-xs">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#8de4b0] text-[#16442b] dark:bg-[#224c36] dark:text-[#8de4b0] shadow-xs">
                 <Check className="h-5 w-5 stroke-[2.5]" />
             </div>
 

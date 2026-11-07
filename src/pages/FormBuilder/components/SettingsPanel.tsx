@@ -169,18 +169,18 @@ export function SettingsPanel({
                                         if (open) setTypeQuery("")
                                     }}
                                 >
-                                    <ComboboxTrigger className="flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#1a1a20] px-3 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500 transition-colors cursor-pointer">
+                                    <ComboboxTrigger className="flex h-14 w-full items-center justify-between rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500 transition-colors cursor-pointer">
                                         {page.type && PAGE_TYPE_VISUALS[page.type] ? (
                                             (() => {
                                                 const visual = PAGE_TYPE_VISUALS[page.type]
                                                 const Icon = visual.icon
                                                 const label = visual.displayName ?? PAGE_TYPE_LABELS[page.type] ?? page.type
                                                 return (
-                                                    <div className="flex items-center gap-2.5 text-slate-800 dark:text-zinc-100 min-w-0">
-                                                        <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-white shadow-xs ${visual.bgColor}`}>
-                                                            <Icon className="h-3.5 w-3.5 stroke-[2]" />
+                                                    <div className="flex items-center gap-3 text-slate-800 dark:text-zinc-100 min-w-0">
+                                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white shadow-xs ${visual.bgColor}`}>
+                                                            <Icon className="h-4.5 w-4.5 stroke-[2]" />
                                                         </div>
-                                                        <span className="font-medium truncate">{label}</span>
+                                                        <span className="font-semibold truncate text-[14.5px]">{label}</span>
                                                     </div>
                                                 )
                                             })()
@@ -188,9 +188,9 @@ export function SettingsPanel({
                                             <span className="text-slate-400 dark:text-zinc-500">Select page type</span>
                                         )}
                                     </ComboboxTrigger>
-                                    <ComboboxContent className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
+                                    <ComboboxContent className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
                                         <ComboboxEmpty className="py-3 text-center text-sm text-slate-400 dark:text-zinc-500">No items found.</ComboboxEmpty>
-                                        <ComboboxList className="space-y-0.5 max-h-64 overflow-y-auto">
+                                        <ComboboxList className="space-y-1 max-h-[460px] overflow-y-auto p-1.5">
                                             {(item: PageType) => {
                                                 const visual = PAGE_TYPE_VISUALS[item]
                                                 const Icon = visual?.icon ?? FileText
@@ -200,10 +200,10 @@ export function SettingsPanel({
                                                     <ComboboxItem
                                                         key={item}
                                                         value={item}
-                                                        className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 data-highlighted:bg-slate-100 dark:data-highlighted:bg-zinc-800 data-highlighted:text-slate-900 dark:data-highlighted:text-white cursor-pointer transition-colors"
+                                                        className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 min-h-[46px] text-sm font-medium text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 data-highlighted:bg-slate-100 dark:data-highlighted:bg-zinc-800 data-highlighted:text-slate-900 dark:data-highlighted:text-white cursor-pointer transition-colors"
                                                     >
-                                                        <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-white shadow-xs ${bgColor}`}>
-                                                            <Icon className="h-3.5 w-3.5 stroke-[2]" />
+                                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white shadow-xs ${bgColor}`}>
+                                                            <Icon className="h-4.5 w-4.5 stroke-[2]" />
                                                         </div>
                                                         <span className="font-medium truncate">{label}</span>
                                                     </ComboboxItem>

@@ -11,28 +11,61 @@ import type {
 import { STATEMENT_PROVIDERS, UPLOAD_FILE_GROUPS } from "@/features/forms/model/page-defaults"
 import { ToggleRow, NumberSetting, TextSetting, CONTROL_CLASS } from "./primitives"
 import { Switch } from "@/components/ui/switch"
-import { Eye, EyeOff, Plus, X, Shield, Link2, Type } from "lucide-react"
+import { Eye, EyeOff, Plus, X, Shield, Link2, Type, FileText, Image as ImageIcon, Globe } from "lucide-react"
 
 // Provider brand badges
-const YoutubeBadge = () => (
-    <span className="flex h-3.5 w-4.5 items-center justify-center rounded-lg bg-[#FF0000] text-white shrink-0">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="h-2 w-2">
-            <path d="M8 5v14l11-7z" />
-        </svg>
-    </span>
-)
-
-const LoomBadge = () => (
-    <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#625DF5] text-white shrink-0 font-bold text-[8px]">
-        ✻
-    </span>
-)
-
-const VimeoBadge = () => (
-    <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1AB7EA] text-white font-bold text-[8px] italic shrink-0">
-        v
-    </span>
-)
+const PROVIDER_ICONS: Record<string, { label: string; badge: React.ReactNode }> = {
+    youtube: {
+        label: "YouTube",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#FF0000] text-white shrink-0 shadow-xs">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+            </span>
+        ),
+    },
+    loom: {
+        label: "Loom",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#625DF5] text-white shrink-0 font-bold text-xs shadow-xs">
+                ✻
+            </span>
+        ),
+    },
+    vimeo: {
+        label: "Vimeo",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#1AB7EA] text-white font-bold text-xs italic shrink-0 shadow-xs">
+                v
+            </span>
+        ),
+    },
+    pdf: {
+        label: "PDF",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#E11D48] text-white shrink-0 shadow-xs">
+                <FileText className="h-3 w-3 stroke-[2.5]" />
+            </span>
+        ),
+    },
+    image: {
+        label: "Image",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#10B981] text-white shrink-0 shadow-xs">
+                <ImageIcon className="h-3 w-3 stroke-[2.5]" />
+            </span>
+        ),
+    },
+    other: {
+        label: "Other",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-500 text-white shrink-0 shadow-xs">
+                <Globe className="h-3 w-3 stroke-[2.5]" />
+            </span>
+        ),
+    },
+}
 
 // ---------------------------------------------------------------------------
 // Statement
@@ -47,12 +80,12 @@ export function StatementSettingsWidget({
 }) {
     return (
         <div className="space-y-3.5">
-            <p className="text-xs leading-4 text-zinc-400">
+            <p className="text-xs leading-4 text-slate-500 dark:text-zinc-400">
                 Embed any link: YouTube, Loom, Vimeo, PDF etc.
             </p>
 
             <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-zinc-300">Provider</Label>
+                <Label className="text-xs font-medium text-slate-700 dark:text-zinc-300">Provider</Label>
                 <Select
                     value={settings.embedProvider}
                     onValueChange={(v) =>
@@ -62,27 +95,30 @@ export function StatementSettingsWidget({
                         })
                     }
                 >
-                    <SelectTrigger className={CONTROL_CLASS + " w-full flex items-center justify-between [&>svg:last-child]:text-zinc-400"}>
-                        <div className="flex items-center gap-2 text-zinc-200">
-                            <Shield className="h-4 w-4 text-zinc-400 shrink-0" />
-                            <SelectValue placeholder="Select provider" className="font-medium" />
-                        </div>
-                        <div className="flex items-center gap-1.5 mr-2 pointer-events-none">
-                            <YoutubeBadge />
-                            <LoomBadge />
-                            <VimeoBadge />
+                    <SelectTrigger className="transition-colors h-11 w-full rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] px-3 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs flex items-center justify-between cursor-pointer [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                            {PROVIDER_ICONS[settings.embedProvider]?.badge ?? (
+                                <Shield className="h-4 w-4 text-slate-400 dark:text-zinc-400 shrink-0" />
+                            )}
+                            <SelectValue placeholder="Select provider" className="font-medium text-slate-800 dark:text-zinc-100" />
                         </div>
                     </SelectTrigger>
-                    <SelectContent className="rounded-lg border border-zinc-800 bg-[#18181c] text-zinc-100 shadow-2xl p-1.5 z-50">
-                        {STATEMENT_PROVIDERS.map((p) => (
-                            <SelectItem
-                                key={p.value}
-                                value={p.value}
-                                className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
-                            >
-                                <span className="font-medium">{p.label}</span>
-                            </SelectItem>
-                        ))}
+                    <SelectContent className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
+                        {STATEMENT_PROVIDERS.map((p) => {
+                            const item = PROVIDER_ICONS[p.value]
+                            return (
+                                <SelectItem
+                                    key={p.value}
+                                    value={p.value}
+                                    className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 focus:bg-slate-100 dark:focus:bg-zinc-800 focus:text-slate-900 dark:focus:text-white data-highlighted:bg-slate-100 dark:data-highlighted:bg-zinc-800 data-highlighted:text-slate-900 dark:data-highlighted:text-white transition-colors"
+                                >
+                                    <div className="flex items-center gap-2.5">
+                                        {item?.badge}
+                                        <span className="font-medium">{p.label}</span>
+                                    </div>
+                                </SelectItem>
+                            )
+                        })}
                     </SelectContent>
                 </Select>
             </div>

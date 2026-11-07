@@ -746,9 +746,9 @@ export function FormBuilderPage() {
   );
 
   const editorColumn = (
-    <div className="relative flex h-full min-h-0 w-full flex-col gap-3 p-3 bg-slate-200/80 dark:bg-[#08080b] bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#1a1a22_1px,transparent_1px)] [background-size:24px_24px] overflow-hidden">
-      {/* Neutral vignette: darkens the edges so the floating toolbar, artboard and controls stand out */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(100,116,139,0.28)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_15%,rgba(0,0,0,0.7)_100%)]" />
+    <div className="relative flex h-full min-h-0 w-full flex-col gap-3 p-3 bg-slate-200/80 dark:bg-[#3f4255] bg-[radial-gradient(#94a3b8_1.2px,transparent_1.2px)] dark:bg-[radial-gradient(#5d617a_1.2px,transparent_1.2px)] [background-size:24px_24px] overflow-hidden">
+      {/* Neutral vignette: softly frames the canvas in light mode without muddying dots; hidden in dark mode */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(100,116,139,0.12)_100%)] dark:hidden" />
 
       <div className="relative z-10 w-full">
         <PageContentTopbar

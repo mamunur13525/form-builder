@@ -197,10 +197,21 @@ export type PageType =
 // Cover image (available on every page type)
 // ---------------------------------------------------------------------------
 
+/**
+ * Where the cover image sits relative to the question:
+ * - `top`    image above the question (default)
+ * - `bottom` image below the question
+ * - `left`   image on the left, question on the right
+ * - `right`  image on the right, question on the left
+ */
+export type CoverImageLayout = "top" | "bottom" | "left" | "right"
+
 export interface CoverImage {
     url: string
     fileId?: string
     alt?: string
+    /** Placement of the image relative to the question. Defaults to `top`. */
+    layout?: CoverImageLayout
 }
 
 // ---------------------------------------------------------------------------

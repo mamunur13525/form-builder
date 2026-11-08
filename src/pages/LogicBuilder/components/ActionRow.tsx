@@ -32,7 +32,7 @@ export function ActionRow({
 
     if (sectionCategory === "branching") {
         return (
-            <div className="flex items-center gap-2 rounded-xl bg-[#06b6d4]/5 border border-[#06b6d4]/15 px-3 py-2.5">
+            <div className="flex items-center gap-2 rounded-lg bg-[#06b6d4]/5 border border-[#06b6d4]/15 px-3 py-2.5">
                 <span className="flex items-center gap-1.5 text-[12px] font-semibold text-[#06b6d4] uppercase tracking-wide">
                     Then
                 </span>
@@ -63,7 +63,7 @@ export function ActionRow({
                         <span className="text-[#9ca3af] text-[12px]">to</span>
                         <Select
                             value={action.targetPageKey ?? ""}
-                            onValueChange={(value) => onUpdateAction({ targetPageKey: value })}
+                            onValueChange={(value) => onUpdateAction({ targetPageKey: value ?? undefined })}
                         >
                             <SelectTrigger className="h-8 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-[13px] text-[#374151] min-w-[180px]">
                                 <SelectValue placeholder="Select destination" />
@@ -74,7 +74,7 @@ export function ActionRow({
                                     .map((p) => (
                                         <SelectItem key={p.pageKey} value={p.pageKey}>
                                             <span className="flex items-center gap-2">
-                                                <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-[#e0f2fe] text-[#06b6d4] text-[10px] font-semibold">
+                                                <span className="inline-flex h-5 w-5 items-center justify-center rounded-lg bg-[#e0f2fe] text-[#06b6d4] text-[10px] font-semibold">
                                                     Q{p.label}
                                                 </span>
                                                 {p.label || p.pageKey}
@@ -91,10 +91,10 @@ export function ActionRow({
 
     if (sectionCategory === "calculation") {
         return (
-            <div className="flex flex-wrap items-center gap-2.5 rounded-xl bg-[#06b6d4]/5 border border-[#06b6d4]/15 px-3 py-2.5">
+            <div className="flex flex-wrap items-center gap-2.5 rounded-lg bg-[#06b6d4]/5 border border-[#06b6d4]/15 px-3 py-2.5">
                 <Select
                     value={action?.variableName ?? ""}
-                    onValueChange={(value) => onUpdateAction({ variableName: value })}
+                    onValueChange={(value) => onUpdateAction({ variableName: value ?? undefined })}
                 >
                     <SelectTrigger className="h-8 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-[13px] text-[#374151] min-w-[140px]">
                         <SelectValue placeholder="Select variable" />
@@ -160,7 +160,7 @@ export function ActionRow({
     }
 
     return (
-        <div className="flex items-center gap-2 rounded-xl bg-[#06b6d4]/5 border border-[#06b6d4]/15 px-3 py-2.5">
+        <div className="flex items-center gap-2 rounded-lg bg-[#06b6d4]/5 border border-[#06b6d4]/15 px-3 py-2.5">
             <span className="text-[12px] font-semibold text-[#06b6d4] uppercase tracking-wide">
                 {sectionCategory === "display" ? "Display this page" : "Hide this page"}
             </span>

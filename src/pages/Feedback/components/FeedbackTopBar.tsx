@@ -17,9 +17,9 @@ function Tab({ to, children }: { to: string; children: React.ReactNode }) {
             className={({ isActive }) =>
                 cn(
                     "relative py-4 text-sm font-medium transition-colors",
-                    isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-800",
+                    isActive ? "text-white font-semibold" : "text-zinc-400 hover:text-zinc-200",
                     isActive &&
-                    "after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:rounded-full after:bg-[#f2542d]",
+                    "after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:rounded-full after:bg-[#FF5722]",
                 )
             }
         >
@@ -33,12 +33,12 @@ export function FeedbackTopBar() {
     const isAuthed = useIsAuthenticated()
 
     return (
-        <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur">
+        <header className="sticky top-0 z-30 border-b border-zinc-800 bg-[#111114]/90 backdrop-blur">
             <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
                 {/* Brand */}
                 <NavLink to={ROUTES.FEEDBACK} className="flex items-center gap-2">
                     <TypeFormLogo />
-                    <span className="text-[15px] font-bold tracking-tight text-gray-900">TypeForm</span>
+                    <span className="text-[15px] font-bold tracking-tight text-white">TypeForm</span>
                 </NavLink>
 
                 {/* Section tabs */}
@@ -52,7 +52,7 @@ export function FeedbackTopBar() {
                     <button
                         type="button"
                         onClick={openSearch}
-                        className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 outline-none hover:bg-gray-100 hover:text-gray-700 focus-visible:ring-2 focus-visible:ring-[#f2542d]/40"
+                        className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 outline-none hover:bg-zinc-800 hover:text-white focus-visible:ring-2 focus-visible:ring-[#FF5722]/40"
                         aria-label="Search"
                     >
                         <Search className="h-5 w-5" />

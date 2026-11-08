@@ -26,7 +26,7 @@ export function RuleCardV2({
 
     return (
         <motion.div
-            className="relative rounded-[12px] border border-[#e5e7eb] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_6px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08),0_8px_16px_rgba(0,0,0,0.06)]"
+            className="relative rounded-lg border border-[#e5e7eb] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_6px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08),0_8px_16px_rgba(0,0,0,0.06)]"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}

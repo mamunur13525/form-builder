@@ -63,7 +63,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
     const goHome = () => navigate(ROUTES.DASHBOARD)
 
     return (
-        <section className="rounded-[24px] border border-[var(--destructive)]/25 bg-[var(--card)] p-8">
+        <section className="rounded-lg border border-[var(--destructive)]/25 bg-[var(--card)] p-8">
             <h2 className="font-display text-2xl text-[var(--foreground)]">
                 Danger zone
             </h2>
@@ -73,7 +73,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
 
             <div className="mt-8 space-y-4">
                 {/* Leave */}
-                <div className="flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-6">
+                <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] p-6">
                     <div className="min-w-0">
                         <p className="text-sm text-[var(--foreground)]">
                             Leave this workspace
@@ -89,7 +89,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
                         variant="outline"
                         onClick={() => setLeaveOpen(true)}
                         disabled={isOwner}
-                        className="h-11 shrink-0 rounded-[16px] border-[var(--border)] px-5"
+                        className="h-11 shrink-0 rounded-lg border-[var(--border)] px-5"
                     >
                         <LogOut className="h-4 w-4" />
                         Leave
@@ -98,7 +98,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
 
                 {/* Delete — owner only */}
                 {canDelete && (
-                    <div className="flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/8 p-6">
+                    <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[var(--destructive)]/25 bg-[var(--destructive)]/8 p-6">
                         <div className="min-w-0">
                             <p className="text-sm text-[var(--foreground)]">
                                 Delete this workspace
@@ -111,7 +111,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
                         <Button
                             type="button"
                             onClick={() => setDeleteOpen(true)}
-                            className="editorial-transition h-11 shrink-0 rounded-[16px] bg-[var(--destructive)] px-5 text-sm font-medium text-white hover:opacity-90 active:scale-[.98]"
+                            className="editorial-transition h-11 shrink-0 rounded-lg bg-[var(--destructive)] px-5 text-sm font-medium text-white hover:opacity-90 active:scale-[.98]"
                         >
                             <Trash2 className="h-4 w-4" />
                             Delete workspace
@@ -154,7 +154,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
             <Dialog
                 open={deleteOpen}
                 onOpenChange={handleDeleteOpenChange}
-                className="editorial max-w-lg rounded-[24px] border-[var(--border)] bg-[var(--card)] p-8"
+                className="editorial max-w-lg rounded-lg border-[var(--border)] bg-[var(--card)] p-8"
             >
                 <DialogHeader>
                     <DialogTitle className="font-display text-2xl text-[var(--foreground)]">
@@ -170,7 +170,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
                 </DialogHeader>
 
                 <div className="space-y-6">
-                    <div className="flex gap-3 rounded-[18px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/8 p-5">
+                    <div className="flex gap-3 rounded-lg border border-[var(--destructive)]/25 bg-[var(--destructive)]/8 p-5">
                         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--destructive)]" />
                         <p className="text-xs leading-5 text-[var(--editorial-body)]">
                             There is no undo and no export. If you only want to step away,
@@ -205,7 +205,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
                         type="button"
                         variant="outline"
                         onClick={() => handleDeleteOpenChange(false)}
-                        className="h-11 rounded-[16px] border-[var(--border)] px-6"
+                        className="h-11 rounded-lg border-[var(--border)] px-6"
                     >
                         Keep workspace
                     </Button>
@@ -223,7 +223,7 @@ export function DangerZone({ workspace, activeMemberCount }: DangerZoneProps) {
                                 },
                             })
                         }
-                        className="editorial-transition h-11 rounded-[16px] bg-[var(--destructive)] px-6 text-sm font-medium text-white hover:opacity-90 active:scale-[.98]"
+                        className="editorial-transition h-11 rounded-lg bg-[var(--destructive)] px-6 text-sm font-medium text-white hover:opacity-90 active:scale-[.98]"
                     >
                         {deleteWorkspace.isPending ? (
                             <>

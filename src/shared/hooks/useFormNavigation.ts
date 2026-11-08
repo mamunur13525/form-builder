@@ -4,6 +4,7 @@ import { validatePage } from "./useFormValidation"
 import { submitPublicForm } from "@/entities/response/api/public-form.api"
 import { resolveFormLogic, JUMP_TO_END } from "../utils/formLogic"
 import { useFormStore } from "@/app/store/formStore"
+import { dispatchClientIntegrations } from "@/pages/FormIntegrations/services/integrationService"
 
 interface UseFormNavigationOptions {
     form: Form
@@ -107,6 +108,7 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
                 }
             })
             await submitPublicForm(form.slug, { answers: answerList })
+            dispatchClientIntegrations(form, answerList, computedVariables).catch(() => {})
             setSubmitted(true)
             onSubmit?.(answers)
         } catch (error) {

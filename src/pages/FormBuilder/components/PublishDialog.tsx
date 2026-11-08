@@ -198,98 +198,96 @@ export function PublishDialog({
         if (!next) setConfirming(null);
         onOpenChange(next);
       }}
-      className="editorial editorial-shadow max-w-xl overflow-hidden rounded-2xl border-[var(--border)] bg-[var(--popover)] p-0"
+      className="w-full max-w-lg overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 shadow-2xl p-0"
     >
-      <DialogContent>
-        <div className="px-6 pt-6 sm:px-10 sm:pt-10">
-          {/* Status pill. Muted, warm tints keep the palette calm — the coral
-              accent stays reserved for the primary action. */}
+      <DialogContent className="border-0 bg-transparent p-0 text-slate-900 dark:text-zinc-100">
+        <div className="px-6 pt-6 sm:px-8 sm:pt-8">
+          {/* Status pill */}
           <span
             className={cn(
-              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-semibold uppercase tracking-[0.08em]",
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider",
               state === "live" &&
-              "border-[var(--editorial-success)]/30 bg-[var(--editorial-success)]/12 text-[#4E7F62]",
+                "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
               state === "pending" &&
-              "border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
+                "border-[#FF5722]/30 bg-[#FF5722]/10 text-[#FF5722]",
               state === "draft" &&
-              "border-[var(--border)] bg-[var(--secondary)] text-[var(--editorial-subtle)]",
+                "border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-800/80 text-slate-600 dark:text-zinc-400",
             )}
           >
             {state === "live" ? (
               <span className="relative flex size-1.5">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-[var(--editorial-success)] opacity-75" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-[var(--editorial-success)]" />
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
               </span>
             ) : (
               <span
                 className={cn(
                   "size-1.5 rounded-full",
                   state === "pending"
-                    ? "bg-[var(--editorial-purple)]"
-                    : "bg-[var(--editorial-disabled)]",
+                    ? "bg-[#FF5722]"
+                    : "bg-slate-400 dark:bg-zinc-600",
                 )}
               />
             )}
             {copy.badge}
           </span>
 
-          <DialogHeader className="mt-6 mb-0 space-y-2">
-            <DialogTitle className="font-display text-2xl leading-tight text-[var(--foreground)] sm:text-[32px]">
+          <DialogHeader className="mt-4 mb-0 space-y-1.5">
+            <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               {confirmCopy?.title ?? title ?? copy.title}
             </DialogTitle>
-            <DialogDescription className="text-sm leading-6 text-[var(--editorial-body)] sm:text-base">
+            <DialogDescription className="text-sm leading-relaxed text-slate-500 dark:text-zinc-400">
               {confirmCopy?.body ?? description ?? copy.body}
             </DialogDescription>
           </DialogHeader>
         </div>
 
-        {/* The confirmation step replaces the body entirely to keep focus on
-            the decision being made. */}
+        {/* The confirmation step replaces the body entirely */}
         {!confirming && (
-          <div className="space-y-6 px-6 pt-6 sm:px-10 sm:pt-8">
+          <div className="space-y-5 px-6 pt-5 sm:px-8 sm:pt-6">
             {state === "pending" && (
-              <Alert className="rounded-[18px] border-[var(--editorial-purple)]/25 bg-[var(--editorial-purple-light)]">
-                <AlertCircle className="text-[var(--editorial-purple)]" />
-                <AlertTitle className="text-[var(--foreground)]">
+              <Alert className="rounded-lg border border-[#FF5722]/30 bg-[#FF5722]/10 text-slate-900 dark:text-zinc-100">
+                <AlertCircle className="text-[#FF5722] h-4 w-4" />
+                <AlertTitle className="text-sm font-semibold text-slate-900 dark:text-white">
                   Respondents still see the old version
                 </AlertTitle>
-                <AlertDescription className="text-xs leading-5 text-[var(--editorial-body)]">
+                <AlertDescription className="text-xs leading-relaxed text-slate-600 dark:text-zinc-400">
                   Publishing replaces the live form with your current draft.
                 </AlertDescription>
               </Alert>
             )}
 
             {state === "draft" ? (
-              <ul className="overflow-hidden rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--card)] text-sm">
-                <li className="flex items-center gap-3 px-5 py-4">
-                  <Globe className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
-                  <span className="text-[var(--editorial-body)]">
+              <ul className="overflow-hidden rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#18181c] text-sm divide-y divide-slate-200 dark:divide-zinc-800">
+                <li className="flex items-center gap-3 px-4 py-3">
+                  <Globe className="size-4 shrink-0 text-slate-400 dark:text-zinc-500" />
+                  <span className="text-slate-700 dark:text-zinc-300 font-medium">
                     Reachable at a public link
                   </span>
                 </li>
-                <li className="flex items-center gap-3 border-t border-[var(--editorial-border-light)] px-5 py-4">
-                  <Inbox className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
-                  <span className="text-[var(--editorial-body)]">
+                <li className="flex items-center gap-3 px-4 py-3">
+                  <Inbox className="size-4 shrink-0 text-slate-400 dark:text-zinc-500" />
+                  <span className="text-slate-700 dark:text-zinc-300 font-medium">
                     Starts collecting responses
                   </span>
                 </li>
               </ul>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label
                   htmlFor="published-form-url"
-                  className="editorial-eyebrow text-[var(--editorial-subtle)]"
+                  className="text-xs font-semibold text-slate-700 dark:text-zinc-300"
                 >
                   Public link
                 </Label>
-                <div className="editorial-transition flex items-center gap-2 rounded-xl border border-[var(--input)] bg-[var(--card)] pl-5 pr-2 focus-within:border-[var(--primary)]">
-                  <Globe className="size-5 shrink-0 text-[var(--editorial-subtle)]" />
+                <div className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#1a1a20] pl-3.5 pr-1.5 py-1 focus-within:border-[#FF5722] shadow-xs">
+                  <Globe className="size-4 shrink-0 text-slate-400 dark:text-zinc-500" />
                   <input
                     id="published-form-url"
                     readOnly
                     value={publishedFormUrl}
                     onFocus={(event) => event.currentTarget.select()}
-                    className="min-w-0 flex-1 bg-transparent py-3.5 font-mono text-xs text-[var(--foreground)] outline-none"
+                    className="min-w-0 flex-1 bg-transparent py-1 font-mono text-xs text-slate-800 dark:text-zinc-200 outline-none"
                   />
                   <CopyToClipboard text={publishedFormUrl} />
                 </div>
@@ -300,17 +298,17 @@ export function PublishDialog({
 
         <DialogFooter
           className={cn(
-            "mt-10 flex flex-col gap-3 border-t border-[var(--editorial-border-light)] bg-[var(--secondary)] px-4 py-5 sm:flex-row sm:items-center sm:gap-3 sm:px-10 sm:py-6",
-            !confirming && state !== "draft" && "sm:justify-between",
+            "mt-8 flex flex-col gap-2.5 border-t border-slate-200/90 dark:border-zinc-800/90 bg-slate-50/80 dark:bg-[#18181c]/80 px-6 py-4 sm:flex-row sm:items-center sm:gap-2.5",
+            !confirming && state !== "draft" ? "sm:justify-between" : "sm:justify-end",
           )}
         >
           {confirming ? (
             <>
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => setConfirming(null)}
                 disabled={isBusy}
-                className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)]"
+                className="h-10 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
               >
                 Keep it
               </Button>
@@ -320,28 +318,28 @@ export function PublishDialog({
                   confirming === "unpublish" ? handleUnpublish : handleDiscard
                 }
                 disabled={isBusy}
-                className="w-full sm:w-auto border border-[var(--destructive)]/25 bg-[var(--destructive)]/10"
+                className="h-10 rounded-lg bg-rose-600 hover:bg-rose-700 text-white px-5 text-sm font-semibold shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto"
               >
-                {isBusy && <Loader2 className="animate-spin" />}
+                {isBusy && <Loader2 className="animate-spin h-4 w-4" />}
                 {isBusy ? "Working…" : confirmCopy?.action}
               </Button>
             </>
           ) : state === "draft" ? (
             <>
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={closeDialog}
                 disabled={isBusy}
-                className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)]"
+                className="h-10 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handlePublish}
                 disabled={isBusy}
-                className="w-full sm:w-auto bg-gradient-to-b from-[#4a7f11] to-[#355b0c] text-white"
+                className="h-10 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-5 text-sm font-semibold text-white shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto active:scale-[0.98]"
               >
-                {busy === "publish" && <Loader2 className="animate-spin" />}
+                {busy === "publish" && <Loader2 className="animate-spin h-4 w-4" />}
                 {busy === "publish" ? "Publishing…" : "Publish form"}
               </Button>
             </>
@@ -349,29 +347,29 @@ export function PublishDialog({
             <>
               <Button
                 variant="ghost"
-                className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)] hover:text-[var(--destructive)]"
+                className="h-10 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3.5 text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto"
                 onClick={() => setConfirming("discard")}
                 disabled={isBusy}
               >
-                <Undo2 />
+                <Undo2 className="h-4 w-4" />
                 Discard changes
               </Button>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5">
                 <Button
                   variant="outline"
                   onClick={onOpenForm}
                   disabled={isBusy}
-                  className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)]"
+                  className="h-10 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto shadow-xs"
                 >
-                  <ExternalLink />
+                  <ExternalLink className="h-4 w-4" />
                   Open form
                 </Button>
                 <Button
                   onClick={handlePublish}
                   disabled={isBusy}
-                  className="w-full sm:w-auto bg-gradient-to-b from-[#4a7f11] to-[#355b0c] text-white"
+                  className="h-10 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-5 text-sm font-semibold text-white shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto active:scale-[0.98]"
                 >
-                  {busy === "publish" && <Loader2 className="animate-spin" />}
+                  {busy === "publish" && <Loader2 className="animate-spin h-4 w-4" />}
                   {busy === "publish" ? "Publishing…" : "Publish changes"}
                 </Button>
               </div>
@@ -380,27 +378,27 @@ export function PublishDialog({
             <>
               <Button
                 variant="ghost"
-                className="w-full sm:w-auto border border-[var(--border)] bg-[var(--card)] hover:text-[var(--destructive)]"
+                className="h-10 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3.5 text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto"
                 onClick={() => setConfirming("unpublish")}
                 disabled={isBusy}
               >
                 Unpublish
               </Button>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   onClick={closeDialog}
                   disabled={isBusy}
-                  className="w-full sm:w-auto"
+                  className="h-10 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={onOpenForm}
                   disabled={isBusy}
-                  className="w-full sm:w-auto bg-[var(--primary)] text-white"
+                  className="h-10 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-5 text-sm font-semibold text-white shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto active:scale-[0.98]"
                 >
-                  <ExternalLink />
+                  <ExternalLink className="h-4 w-4" />
                   Open form
                 </Button>
               </div>

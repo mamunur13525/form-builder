@@ -36,14 +36,14 @@ function FormLayoutContent() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="editorial flex flex-col h-screen bg-[var(--editorial-canvas)] text-[var(--foreground)]">
       <FormBuilderTopBar
         onPublish={onPublish}
         onPublishedClick={onPublishedClick}
         isPublished={isPublished}
         initialTitle={form?.title ?? ""}
       />
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <Outlet />
       </div>
 

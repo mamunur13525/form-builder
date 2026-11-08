@@ -58,7 +58,7 @@ export function SummaryPage() {
                     className="space-y-8 sm:space-y-12"
                 >
                     <div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-5 sm:p-6">
+                        <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)] p-5 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -70,7 +70,7 @@ export function SummaryPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-5 sm:p-6">
+                        <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)] p-5 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -82,7 +82,7 @@ export function SummaryPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-5 sm:p-6">
+                        <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)] p-5 sm:p-6">
                             <CardContent className="p-0">
                                 <div className="space-y-3">
                                     <p className="editorial-eyebrow text-[var(--editorial-subtle)]">
@@ -117,7 +117,7 @@ export function SummaryPage() {
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.05 }}
                                         >
-                                            <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)] p-5 sm:p-6">
+                                            <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)] p-5 sm:p-6">
                                                 <CardContent className="p-0">
                                                     <div className="space-y-4">
                                                         <div className="flex items-start justify-between gap-3 sm:items-center sm:gap-4">

@@ -8,16 +8,15 @@ import {
     Clock,
     CircleDot,
     CheckSquare,
-    List,
+    ChevronDown,
     ListChecks,
-    ChevronDownSquare,
     Upload,
     Star,
     ThumbsUp,
     Link,
     MessageSquareText,
     MapPin,
-    Gauge,
+    SlidersHorizontal,
     PenLine,
     Grid3x3,
 } from "lucide-react"
@@ -73,6 +72,36 @@ export const PAGE_TYPE_LABELS: Record<PageType, string> = {
     matrix: "Matrix",
 }
 
+export interface TypeVisual {
+    icon: LucideIcon
+    bgColor: string
+    displayName?: string
+}
+
+export const PAGE_TYPE_VISUALS: Record<PageType, TypeVisual> = {
+    opinionScale: { icon: SlidersHorizontal, bgColor: "bg-[#7480ee]" },
+    url: { icon: Link, bgColor: "bg-[#48bca3]", displayName: "Website URL" },
+    shortText: { icon: Type, bgColor: "bg-[#5da2f6]" },
+    longText: { icon: AlignLeft, bgColor: "bg-[#38bdf8]" },
+    email: { icon: Mail, bgColor: "bg-[#a78bfa]" },
+    phone: { icon: Phone, bgColor: "bg-[#34d399]" },
+    number: { icon: Hash, bgColor: "bg-[#f59e0b]" },
+    date: { icon: Calendar, bgColor: "bg-[#fb7185]" },
+    time: { icon: Clock, bgColor: "bg-[#06b6d4]" },
+    radio: { icon: CircleDot, bgColor: "bg-[#fb923c]" },
+    checkbox: { icon: CheckSquare, bgColor: "bg-[#818cf8]" },
+    select: { icon: ChevronDown, bgColor: "bg-[#14b8a6]" },
+    dropdown: { icon: ChevronDown, bgColor: "bg-[#14b8a6]" },
+    multiSelect: { icon: ListChecks, bgColor: "bg-[#8b5cf6]" },
+    file: { icon: Upload, bgColor: "bg-[#ec4899]" },
+    rating: { icon: Star, bgColor: "bg-[#eab308]" },
+    yesNo: { icon: ThumbsUp, bgColor: "bg-[#22c55e]" },
+    statement: { icon: MessageSquareText, bgColor: "bg-[#d946ef]" },
+    address: { icon: MapPin, bgColor: "bg-[#84cc16]" },
+    signature: { icon: PenLine, bgColor: "bg-[#78716c]" },
+    matrix: { icon: Grid3x3, bgColor: "bg-[#3b82f6]" },
+}
+
 export const PAGE_TYPE_ICONS: Record<PageType, LucideIcon> = {
     shortText: Type,
     longText: AlignLeft,
@@ -83,16 +112,16 @@ export const PAGE_TYPE_ICONS: Record<PageType, LucideIcon> = {
     time: Clock,
     radio: CircleDot,
     checkbox: CheckSquare,
-    select: List,
+    select: ChevronDown,
     multiSelect: ListChecks,
-    dropdown: ChevronDownSquare,
+    dropdown: ChevronDown,
     file: Upload,
     rating: Star,
     yesNo: ThumbsUp,
     url: Link,
     statement: MessageSquareText,
     address: MapPin,
-    opinionScale: Gauge,
+    opinionScale: SlidersHorizontal,
     signature: PenLine,
     matrix: Grid3x3,
 }

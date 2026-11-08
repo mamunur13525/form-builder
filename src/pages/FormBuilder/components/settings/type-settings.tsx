@@ -11,7 +11,61 @@ import type {
 import { STATEMENT_PROVIDERS, UPLOAD_FILE_GROUPS } from "@/features/forms/model/page-defaults"
 import { ToggleRow, NumberSetting, TextSetting, CONTROL_CLASS } from "./primitives"
 import { Switch } from "@/components/ui/switch"
-import { Eye, EyeOff, Plus, X } from "lucide-react"
+import { Eye, EyeOff, Plus, X, Shield, Link2, Type, FileText, Image as ImageIcon, Globe } from "lucide-react"
+
+// Provider brand badges
+const PROVIDER_ICONS: Record<string, { label: string; badge: React.ReactNode }> = {
+    youtube: {
+        label: "YouTube",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#FF0000] text-white shrink-0 shadow-xs">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+            </span>
+        ),
+    },
+    loom: {
+        label: "Loom",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#625DF5] text-white shrink-0 font-bold text-xs shadow-xs">
+                ✻
+            </span>
+        ),
+    },
+    vimeo: {
+        label: "Vimeo",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#1AB7EA] text-white font-bold text-xs italic shrink-0 shadow-xs">
+                v
+            </span>
+        ),
+    },
+    pdf: {
+        label: "PDF",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#E11D48] text-white shrink-0 shadow-xs">
+                <FileText className="h-3 w-3 stroke-[2.5]" />
+            </span>
+        ),
+    },
+    image: {
+        label: "Image",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#10B981] text-white shrink-0 shadow-xs">
+                <ImageIcon className="h-3 w-3 stroke-[2.5]" />
+            </span>
+        ),
+    },
+    other: {
+        label: "Other",
+        badge: (
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-500 text-white shrink-0 shadow-xs">
+                <Globe className="h-3 w-3 stroke-[2.5]" />
+            </span>
+        ),
+    },
+}
 
 // ---------------------------------------------------------------------------
 // Statement
@@ -25,13 +79,13 @@ export function StatementSettingsWidget({
     onChange: (next: StatementSettingsType) => void
 }) {
     return (
-        <div className="space-y-3">
-            <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+        <div className="space-y-3.5">
+            <p className="text-xs leading-4 text-slate-500 dark:text-zinc-400">
                 Embed any link: YouTube, Loom, Vimeo, PDF etc.
             </p>
 
             <div className="space-y-1.5">
-                <Label className="text-base text-[var(--editorial-body)]">Provider</Label>
+                <Label className="text-xs font-medium text-slate-700 dark:text-zinc-300">Provider</Label>
                 <Select
                     value={settings.embedProvider}
                     onValueChange={(v) =>
@@ -41,15 +95,30 @@ export function StatementSettingsWidget({
                         })
                     }
                 >
-                    <SelectTrigger className={CONTROL_CLASS + " w-full"}>
-                        <SelectValue placeholder="Select provider" />
+                    <SelectTrigger className="transition-colors h-11 w-full rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] px-3 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs flex items-center justify-between cursor-pointer [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                            {PROVIDER_ICONS[settings.embedProvider]?.badge ?? (
+                                <Shield className="h-4 w-4 text-slate-400 dark:text-zinc-400 shrink-0" />
+                            )}
+                            <SelectValue placeholder="Select provider" className="font-medium text-slate-800 dark:text-zinc-100" />
+                        </div>
                     </SelectTrigger>
-                    <SelectContent>
-                        {STATEMENT_PROVIDERS.map((p) => (
-                            <SelectItem key={p.value} value={p.value}>
-                                {p.label}
-                            </SelectItem>
-                        ))}
+                    <SelectContent className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
+                        {STATEMENT_PROVIDERS.map((p) => {
+                            const item = PROVIDER_ICONS[p.value]
+                            return (
+                                <SelectItem
+                                    key={p.value}
+                                    value={p.value}
+                                    className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 focus:bg-slate-100 dark:focus:bg-zinc-800 focus:text-slate-900 dark:focus:text-white data-highlighted:bg-slate-100 dark:data-highlighted:bg-zinc-800 data-highlighted:text-slate-900 dark:data-highlighted:text-white transition-colors"
+                                >
+                                    <div className="flex items-center gap-2.5">
+                                        {item?.badge}
+                                        <span className="font-medium">{p.label}</span>
+                                    </div>
+                                </SelectItem>
+                            )
+                        })}
                     </SelectContent>
                 </Select>
             </div>
@@ -59,6 +128,7 @@ export function StatementSettingsWidget({
                 value={settings.embedUrl}
                 onChange={(embedUrl) => onChange({ ...settings, embedUrl })}
                 placeholder="https://youtube.com/watch?v=..."
+                icon={<Link2 className="h-4 w-4" />}
             />
 
             <TextSetting
@@ -66,6 +136,7 @@ export function StatementSettingsWidget({
                 value={settings.embedTitle}
                 onChange={(embedTitle) => onChange({ ...settings, embedTitle })}
                 placeholder="Optional title"
+                icon={<Type className="h-4 w-4" />}
             />
         </div>
     )
@@ -152,15 +223,15 @@ export function UploadSettingsWidget({
             />
 
             <div className="space-y-1.5">
-                <Label className="text-base text-[var(--editorial-body)]">Allowed file types</Label>
-                <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+                <Label className="text-sm font-medium text-zinc-200">Allowed file types</Label>
+                <p className="text-xs leading-5 text-zinc-400">
                     Leave all unchecked to allow every file type.
                 </p>
-                <div className="space-y-3 rounded-[14px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-3">
+                <div className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
                     {UPLOAD_FILE_GROUPS.map((group) => (
                         <label
                             key={group.value}
-                            className="flex cursor-pointer items-center justify-between text-sm"
+                            className="flex cursor-pointer items-center justify-between text-sm text-zinc-300 hover:text-white"
                         >
                             <span>{group.label}</span>
                             <Switch
@@ -210,13 +281,13 @@ export function AddressSettingsWidget({
 
     return (
         <div className="space-y-3">
-            <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
+            <p className="text-xs leading-5 text-zinc-400">
                 Rename labels, set placeholders, and choose which parts are required or hidden.
             </p>
             {sorted.map((page) => (
                 <div
                     key={page.key}
-                    className="space-y-3 rounded-[14px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-3"
+                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3"
                     data-hidden={page.hidden}
                 >
                     <div className="flex items-center gap-2">
@@ -230,7 +301,7 @@ export function AddressSettingsWidget({
                             type="button"
                             onClick={() => updatePage(page.key, { hidden: !page.hidden })}
                             title={page.hidden ? "Show page" : "Hide page"}
-                            className="editorial-transition rounded-[10px] border border-[var(--border)] bg-[var(--secondary)] p-2 text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]"
+                            className="rounded-lg border border-zinc-800 bg-[#1a1a20] p-2 text-zinc-400 hover:border-zinc-700 hover:text-white transition-colors cursor-pointer"
                         >
                             {page.hidden ? (
                                 <EyeOff className="h-3.5 w-3.5" />
@@ -253,7 +324,7 @@ export function AddressSettingsWidget({
                             <div className="flex items-center justify-between gap-3">
                                 <Label
                                     htmlFor={`address-required-${page.key}`}
-                                    className="cursor-pointer text-xs text-[var(--editorial-subtle)]"
+                                    className="cursor-pointer text-xs text-zinc-400"
                                 >
                                     Required
                                 </Label>
@@ -391,8 +462,8 @@ function MatrixList({
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between">
-                <Label className="text-base text-[var(--editorial-body)]">{title}</Label>
-                <span className="text-xs text-[var(--editorial-subtle)]">
+                <Label className="text-sm font-medium text-zinc-200">{title}</Label>
+                <span className="text-xs text-zinc-500">
                     {items.length} / {max}
                 </span>
             </div>
@@ -411,7 +482,7 @@ function MatrixList({
                             type="button"
                             onClick={() => onRemove(item.key)}
                             disabled={items.length <= 1}
-                            className="editorial-transition rounded-[10px] border border-[var(--border)] bg-[var(--secondary)] p-2 text-[var(--editorial-subtle)] hover:border-[var(--destructive)]/30 hover:text-[var(--destructive)] disabled:pointer-events-none disabled:opacity-40"
+                            className="rounded-lg border border-zinc-800 bg-[#1a1a20] p-2 text-zinc-400 hover:border-rose-500/30 hover:text-rose-400 disabled:pointer-events-none disabled:opacity-40 transition-colors cursor-pointer"
                         >
                             <X className="h-3.5 w-3.5" />
                         </button>
@@ -421,7 +492,7 @@ function MatrixList({
                 type="button"
                 onClick={onAdd}
                 disabled={items.length >= max}
-                className="editorial-transition flex w-full items-center justify-center gap-1.5 rounded-[12px] border border-[var(--border)] bg-[var(--secondary)] py-2.5 text-sm text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] disabled:pointer-events-none disabled:opacity-40"
+                className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-800 bg-[#1a1a20] text-xs font-medium text-zinc-300 hover:border-[#FF5722] hover:text-[#FF5722] hover:bg-zinc-800/60 disabled:pointer-events-none disabled:opacity-40 transition-all cursor-pointer"
             >
                 <Plus className="h-4 w-4" />
                 Add {title === "Rows" ? "row" : "column"}

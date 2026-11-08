@@ -28,10 +28,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../../../components/ui/select";
-import {
-    PAGE_TYPE_COLORS,
-    PAGE_TYPE_ICONS,
-} from "../../../shared/constants/form-types";
 import type {
     FormPage,
     FormVariable,
@@ -48,7 +44,7 @@ import { getLogicRules } from "@/entities/form/api/logic.api";
 import { useFormStore } from "@/app/store/formStore";
 import { SECTIONS } from "./logicEditorConfig";
 import { normalizeApiRule, emptyRule } from "./ruleUtils";
-import { RuleEditor } from "./RuleEditor";
+import { RuleEditor, PageTypeChip } from "./RuleEditor";
 import { RuleCard } from "./RuleCard";
 
 interface LogicEditorDialogProps {
@@ -58,6 +54,8 @@ interface LogicEditorDialogProps {
      * dropdown at the top of the dialog.
      */
     page: FormPage | null
+    /** Optional rule ID to immediately open for editing when the dialog launches. */
+    initialRuleId?: string | null
     /** All form pages (for source / target picks), in form order. */
     allPages: FormPage[]
     /** Form variables (from settings), shown in condition/calculation picks. */
@@ -76,22 +74,9 @@ interface EditorState {
     rule: FormLogicRule | null
 }
 
-/** Tinted page-type chip — icon + page number, used in page select items. */
-function PageTypeChip({ page, pageNumber }: { page: FormPage; pageNumber: number }) {
-    const Icon = PAGE_TYPE_ICONS[page.type]
-    if (!Icon) return null
-    return (
-        <span
-            className={`flex shrink-0 items-center gap-1.5 rounded-md bg-gradient-to-br px-2 py-0.5 text-xs font-semibold ${PAGE_TYPE_COLORS[page.type]}`}
-        >
-            <Icon className="h-3.5 w-3.5" aria-hidden />
-            Q{pageNumber}
-        </span>
-    )
-}
-
 function LogicEditorDialogComponent({
     page,
+    initialRuleId,
     allPages,
     variables,
     onClose,
@@ -126,11 +111,27 @@ function LogicEditorDialogComponent({
     // the dialog opens on a page (prop identity changes). Adjusted during
     // render — the React-recommended alternative to a prop-syncing effect.
     const [prevPage, setPrevPage] = useState<FormPage | null>(page)
-    if (page !== prevPage) {
+    const [prevInitialRuleId, setPrevInitialRuleId] = useState<string | null | undefined>(initialRuleId)
+    const [prevRules, setPrevRules] = useState(rules)
+    if (page !== prevPage || initialRuleId !== prevInitialRuleId || rules !== prevRules) {
         setPrevPage(page)
-        setEditor(null)
+        setPrevInitialRuleId(initialRuleId)
+        setPrevRules(rules)
         setSaveError(null)
         if (page) setSelectedPageKey(page.pageKey)
+        if (initialRuleId && rules.length > 0) {
+            const ruleToEdit = rules.map(normalizeApiRule).find((r) => r.id === initialRuleId)
+            if (ruleToEdit) {
+                setEditor({
+                    category: ruleToEdit.category,
+                    rule: ruleToEdit,
+                })
+            } else if (page !== prevPage || initialRuleId !== prevInitialRuleId) {
+                setEditor(null)
+            }
+        } else if (page !== prevPage || initialRuleId !== prevInitialRuleId) {
+            setEditor(null)
+        }
     }
 
     const selectedPage = useMemo<FormPage | null>(
@@ -333,7 +334,7 @@ function LogicEditorDialogComponent({
                 />
 
                 <motion.div
-                    className="editorial relative z-50 flex max-h-[94vh] min-h-[70vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:max-h-[88vh]"
+                    className="editorial relative z-50 flex max-h-[94vh] min-h-[70vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:max-h-[88vh]"
                     initial={{ opacity: 0, scale: 0.96, y: -12 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.96, y: 12 }}
@@ -434,6 +435,7 @@ function LogicEditorDialogComponent({
                                                             })
                                                         }
                                                         onSave={saveRule}
+                                                        onDelete={() => deleteRule(editingRule.id)}
                                                         error={saveError}
                                                         onCancel={cancelEditor}
                                                     />
@@ -451,7 +453,7 @@ function LogicEditorDialogComponent({
                                         )}
                                     </ul>
                                 ) : !editor ? (
-                                    <div className="rounded-xl border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] px-4 py-6 text-center text-[15px] text-[var(--editorial-subtle)]">
+                                    <div className="rounded-lg border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] px-4 py-6 text-center text-[15px] text-[var(--editorial-subtle)]">
                                         No rules on this page yet.
                                     </div>
                                 ) : null}
@@ -459,7 +461,7 @@ function LogicEditorDialogComponent({
                                 {/* Add flow — pick a rule type first, then edit the draft */}
                                 {editor && !editingRule &&
                                     (editor.rule === null ? (
-                                        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-3">
+                                        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-3">
                                             <span className="text-[15px] font-semibold text-[var(--foreground)]">
                                                 What you want
                                             </span>
@@ -470,7 +472,7 @@ function LogicEditorDialogComponent({
                                             >
                                                 <SelectTrigger
                                                     aria-label="Rule type"
-                                                    className="h-11 w-full rounded-xl border-[var(--input)] bg-[var(--card)] px-4 text-[15px] font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] sm:w-72 data-placeholder:text-[var(--editorial-subtle)]"
+                                                    className="h-11 w-full rounded-lg border-[var(--input)] bg-[var(--card)] px-4 text-[15px] font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] sm:w-72 data-placeholder:text-[var(--editorial-subtle)]"
                                                 >
                                                     <SelectValue placeholder="Select rule type…" />
                                                 </SelectTrigger>
@@ -505,6 +507,7 @@ function LogicEditorDialogComponent({
                                                 setEditor({ category: next.category, rule: next })
                                             }
                                             onSave={saveRule}
+                                            onDelete={cancelEditor}
                                             error={saveError}
                                             onCancel={cancelEditor}
                                         />

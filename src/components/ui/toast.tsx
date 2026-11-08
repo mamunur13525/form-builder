@@ -96,7 +96,7 @@ function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
         // Surface: status-tinted card — a wash of the accent colour over the
         // card, edged with a hairline of the same hue, matching the reference
         // design (green/blue/amber/red/neutral cards).
-        "rounded-2xl border border-[var(--toast-accent-border)] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--toast-accent)_16%,var(--card))_0%,color-mix(in_oklab,var(--toast-accent)_7%,var(--card))_100%)] text-[var(--foreground)] shadow-[0_24px_70px_rgba(110,80,60,0.14),0_2px_8px_rgba(110,80,60,0.05)]",
+        "rounded-lg border border-[var(--toast-accent-border)] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--toast-accent)_16%,var(--card))_0%,color-mix(in_oklab,var(--toast-accent)_7%,var(--card))_100%)] text-[var(--foreground)] shadow-[0_24px_70px_rgba(110,80,60,0.14),0_2px_8px_rgba(110,80,60,0.05)]",
         "focus-visible:border-[var(--primary)] focus-visible:ring-[3px] focus-visible:ring-[var(--editorial-primary-ring)]/45",
         // Accent fallbacks; `ToastList` overrides these per toast type.
         "[--toast-accent:var(--editorial-disabled)] [--toast-accent-border:color-mix(in_oklab,var(--editorial-disabled)_45%,transparent)]",
@@ -177,7 +177,7 @@ function ToastAction({
       data-slot="toast-action"
       render={render}
       className={cn(
-        "editorial-transition mt-1 h-10 w-fit rounded-[14px] border-[var(--border)] bg-[var(--card)] px-4 text-[13px] font-medium text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98]",
+        "editorial-transition mt-1 h-10 w-fit rounded-lg border-[var(--border)] bg-[var(--card)] px-4 text-[13px] font-medium text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)] active:translate-y-0 active:scale-[.98]",
         className
       )}
       {...props}

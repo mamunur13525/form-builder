@@ -22,18 +22,18 @@ export function SettingsSection({
     children: ReactNode
 }) {
     return (
-        <section className="editorial-shadow-sm overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
-            <header className="border-b border-[var(--editorial-border-light)] px-5 py-4">
-                <h2 className="text-[15px] font-semibold text-[var(--foreground)]">
+        <section className="editorial-shadow-sm overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] dark:border-zinc-800 dark:bg-[#141418] dark:shadow-[0_4px_14px_rgba(0,0,0,0.45)]">
+            <header className="border-b border-[var(--editorial-border-light)] px-5 py-4 dark:border-zinc-800/80">
+                <h2 className="text-[15px] font-semibold text-[var(--foreground)] dark:text-zinc-100">
                     {title}
                 </h2>
                 {description && (
-                    <p className="mt-1 text-[13px] leading-snug text-[var(--muted-foreground)]">
+                    <p className="mt-1 text-[13px] leading-snug text-[var(--muted-foreground)] dark:text-zinc-500">
                         {description}
                     </p>
                 )}
             </header>
-            <div className="divide-y divide-[var(--editorial-border-light)]">
+            <div className="divide-y divide-[var(--editorial-border-light)] dark:divide-zinc-800/80">
                 {children}
             </div>
         </section>
@@ -64,12 +64,12 @@ export function SettingRow({
                 <div className="min-w-0 flex-1">
                     <label
                         htmlFor={htmlFor}
-                        className="block text-sm font-medium text-[var(--foreground)]"
+                        className="block text-sm font-medium text-[var(--foreground)] dark:text-zinc-100"
                     >
                         {label}
                     </label>
                     {description && (
-                        <p className="mt-1 text-[13px] leading-snug text-[var(--muted-foreground)]">
+                        <p className="mt-1 text-[13px] leading-snug text-[var(--muted-foreground)] dark:text-zinc-500">
                             {description}
                         </p>
                     )}
@@ -122,7 +122,7 @@ export function ToggleRow({
  */
 export function NestedPanel({ children }: { children: ReactNode }) {
     return (
-        <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-4">
+        <div className="rounded-lg border border-[var(--border)] border-l-2 border-l-[var(--editorial-primary-ring)] bg-[var(--secondary)] px-4 py-4 dark:border-zinc-800 dark:border-l-[var(--editorial-primary-ring)] dark:bg-[#1a1a20]">
             {children}
         </div>
     )
@@ -139,7 +139,7 @@ export function FieldLabel({
     return (
         <label
             htmlFor={htmlFor}
-            className="mb-1.5 block text-xs font-medium text-[var(--editorial-body)]"
+            className="mb-1.5 block text-xs font-medium text-[var(--editorial-body)] dark:text-zinc-400"
         >
             {children}
         </label>

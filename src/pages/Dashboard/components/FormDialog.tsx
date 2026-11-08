@@ -108,7 +108,7 @@ export function FormDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="editorial editorial-shadow rounded-2xl border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
+            className="editorial editorial-shadow rounded-lg border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
         >
             <DialogContent>
                 <DialogHeader className="mb-6">
@@ -134,7 +134,7 @@ export function FormDialog({
                                 id="form-title"
                                 placeholder={isCreate ? "e.g. Customer Feedback Survey" : "Enter form title"}
                                 autoFocus
-                                className="h-12 rounded-xl border-[var(--input)] bg-[var(--card)] px-6 text-sm placeholder:text-[var(--editorial-subtle)] sm:h-[52px] sm:text-base"
+                                className="h-12 rounded-lg border-[var(--input)] bg-[var(--card)] px-6 text-sm placeholder:text-[var(--editorial-subtle)] sm:h-[52px] sm:text-base"
                                 {...register("title")}
                             />
                             {errors.title && (
@@ -152,11 +152,11 @@ export function FormDialog({
                             Cancel
                         </Button>
                         <Button
-                type="submit"
-                disabled={isPending}
-                className="w-full sm:w-auto"
-            >
-                {isPending ? (isCreate ? "Creating..." : "Saving...") : isCreate ? "Create Form" : "Save"}
+                            type="submit"
+                            disabled={isPending}
+                            className="w-full sm:w-auto"
+                        >
+                            {isPending ? (isCreate ? "Creating..." : "Saving...") : isCreate ? "Create Form" : "Save"}
                             {isPending && <Spinner data-icon="inline-start" />}
                         </Button>
                     </DialogFooter>

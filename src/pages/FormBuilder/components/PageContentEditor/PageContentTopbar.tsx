@@ -1,10 +1,3 @@
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   GitBranch,
   Paintbrush,
@@ -15,8 +8,8 @@ import {
   PanelLeft,
   SlidersHorizontal,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface PageContentTopbarProps {
   onAddPage: () => void;
@@ -30,28 +23,6 @@ interface PageContentTopbarProps {
   onOpenDesignDrawer: () => void;
 }
 
-interface LeftButton {
-  icon: LucideIcon;
-  label: string;
-  variant?: "default" | "ghost";
-  type: string;
-}
-
-interface RightButton {
-  icon: LucideIcon;
-  tooltip: string;
-  type: string;
-}
-
-const leftButtons: LeftButton[] = [
-  { icon: Plus, label: "Add Page", variant: "default", type: "add_page" },
-  { icon: Paintbrush, label: "Design", variant: "ghost", type: "design" },
-  { icon: GitBranch, label: "Logic", variant: "ghost", type: "logic" },
-];
-
-const iconButtonClass =
-  "editorial-transition h-10 w-10 shrink-0 rounded-2xl border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:translate-y-0 active:scale-[.98] sm:h-11 sm:w-11";
-
 const PageContentTopbar = ({
   onAddPage,
   onPreview,
@@ -61,115 +32,115 @@ const PageContentTopbar = ({
   onOpenSettings,
   onOpenDesignDrawer,
 }: PageContentTopbarProps) => {
-  // The drawer triggers are only passed on compact layouts, where the canvas is
-  // already phone-sized and the desktop/mobile toggle would be meaningless.
   const isCompact = Boolean(onOpenPages || onOpenSettings);
   const route = useNavigate();
-  const { formId } = useParams()
-  const rightButtons: RightButton[] = [
-    ...(isCompact
-      ? []
-      : [
-        {
-          icon: isMobileView ? Monitor : Smartphone,
-          tooltip: isMobileView ? "Desktop view" : "Mobile view",
-          type: "view",
-        },
-      ]),
-    {
-      icon: Play,
-      tooltip: "Preview",
-      type: "preview",
-    },
-  ];
-
-  const handleBtnClick = (type: string) => {
-    switch (type) {
-      case "add_page":
-        onAddPage();
-        break;
-      case "preview":
-        onPreview();
-        break;
-      case "view":
-        onToggleView();
-        break;
-      case "design":
-        onOpenDesignDrawer();
-        break;
-      case "logic":
-        route('/form-logic/' + formId)
-        break;
-
-      default:
-        break;
-    }
-  };
+  const { formId } = useParams();
 
   return (
-    <div className="editorial-shadow-sm flex shrink-0 items-center justify-between gap-2 rounded-[20px] border border-[var(--border)] bg-[var(--card)] px-3 py-3 sm:rounded-xl sm:px-6 sm:py-4">
-      <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+    <div className="flex shrink-0 items-center justify-between gap-3 rounded-lg border border-slate-200/90 bg-white/95 px-3 py-2 text-slate-800 shadow-xl backdrop-blur-md dark:border-zinc-800 dark:bg-[#141418]/95 dark:text-zinc-100 dark:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.9)]">
+      <div className="flex min-w-0 items-center gap-2">
         {onOpenPages && (
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
+            type="button"
             aria-label="Open pages"
-            className={iconButtonClass}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
             onClick={onOpenPages}
           >
             <PanelLeft className="h-5 w-5" />
-          </Button>
+          </button>
         )}
-        {leftButtons.map((button) => (
-          <Button
-            key={button.label}
-            variant={"ghost"}
-            aria-label={button.label}
-            className={
-              button.variant === "default"
-                ? "editorial-transition h-10 shrink-0 gap-2 rounded-[16px] bg-[var(--primary)] px-3 text-sm font-medium text-white hover:text-white hover:-translate-y-0.5 hover:bg-[var(--editorial-primary-hover)] dark:hover:bg-[var(--editorial-primary-hover)] dark:hover:text-white active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-hover)] sm:h-11 sm:px-5"
-                : "editorial-transition h-10 shrink-0 gap-2 rounded-[16px] px-3 text-sm text-[var(--editorial-body)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] sm:h-11 sm:px-4"
-            }
-            onClick={() => handleBtnClick(button.type)}
-          >
-            <button.icon className="h-5 w-5" />
-            <span className="hidden md:inline">{button.label}</span>
-          </Button>
-        ))}
+
+        {/* Add Page button */}
+        <button
+          type="button"
+          onClick={onAddPage}
+          className="flex items-center gap-2 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[#FF5722]/20 transition-all cursor-pointer active:scale-95"
+        >
+          <Plus className="h-4 w-4 stroke-[2.5]" />
+          <span>Add page</span>
+        </button>
+
+        {/* Design button */}
+        <button
+          type="button"
+          onClick={onOpenDesignDrawer}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+        >
+          <Paintbrush className="h-4 w-4 text-slate-400 dark:text-zinc-500" />
+          <span>Design</span>
+        </button>
+
+        {/* Divider */}
+        <div className="h-4 w-px bg-slate-200 dark:bg-zinc-800 mx-1 hidden sm:block" />
+
+        {/* Logic button */}
+        <button
+          type="button"
+          onClick={() => route("/form-logic/" + formId)}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+        >
+          <GitBranch className="h-4 w-4 text-slate-400 dark:text-zinc-500" />
+          <span>Logic</span>
+        </button>
       </div>
-      <TooltipProvider delay={200}>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {rightButtons.map((button) => (
-            <Tooltip key={button.tooltip}>
-              <TooltipTrigger render={<span />}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={button.tooltip}
-                  className={iconButtonClass}
-                  onClick={() => handleBtnClick(button.type)}
-                >
-                  <button.icon className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="editorial rounded-[12px] border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]">
-                {button.tooltip}
-              </TooltipContent>
-            </Tooltip>
-          ))}
-          {onOpenSettings && (
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Open settings"
-              className={iconButtonClass}
-              onClick={onOpenSettings}
+
+      <div className="flex items-center gap-2">
+        {/* Device view switcher */}
+        {!isCompact && (
+          <div className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-slate-100/90 p-1 dark:border-zinc-800 dark:bg-zinc-900/80">
+            <button
+              type="button"
+              onClick={() => isMobileView && onToggleView()}
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-lg transition-all cursor-pointer",
+                !isMobileView
+                  ? "bg-[#FF5722] text-white shadow-xs"
+                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:text-white dark:hover:bg-zinc-800",
+              )}
+              title="Desktop view"
             >
-              <SlidersHorizontal className="h-5 w-5" />
-            </Button>
-          )}
-        </div>
-      </TooltipProvider>
+              <Monitor className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => !isMobileView && onToggleView()}
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-lg transition-all cursor-pointer",
+                isMobileView
+                  ? "bg-[#FF5722] text-white shadow-xs"
+                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:text-white dark:hover:bg-zinc-800",
+              )}
+              title="Mobile view"
+            >
+              <Smartphone className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Preview trigger */}
+        {!isCompact && (
+          <button
+            type="button"
+            onClick={onPreview}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200/80 bg-white text-slate-500 shadow-xs transition-colors cursor-pointer hover:bg-slate-50 hover:text-slate-800 dark:border-zinc-800 dark:bg-[#18181c] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+            title="Open preview"
+            aria-label="Open preview"
+          >
+            <Play className="h-4 w-4" />
+          </button>
+        )}
+
+        {onOpenSettings && (
+          <button
+            type="button"
+            aria-label="Open settings"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+            onClick={onOpenSettings}
+          >
+            <SlidersHorizontal className="h-5 w-5" />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

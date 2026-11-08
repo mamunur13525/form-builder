@@ -14,7 +14,6 @@
 
 import { useEffect, useMemo } from "react";
 import {
-    ChevronDown,
     Circle,
     CircleSlash,
     Equal,
@@ -24,6 +23,7 @@ import {
     Minimize2,
     Plus,
     Slash,
+    Trash2,
     X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -55,8 +55,8 @@ import {
 import { emptyCondition } from "./ruleUtils";
 import type { LucideIcon } from "lucide-react";
 import {
-    PAGE_TYPE_COLORS,
     PAGE_TYPE_ICONS,
+    PAGE_TYPE_VISUALS,
 } from "../../../shared/constants/form-types";
 
 interface RuleEditorProps {
@@ -72,18 +72,20 @@ interface RuleEditorProps {
     onUpdate: (rule: FormLogicRule) => void
     /** Save button — persists the rule through the logic API. */
     onSave: (rule: FormLogicRule) => void
+    /** Delete button — deletes the rule through the logic API. */
+    onDelete?: () => void
     /** API error from the last save attempt, shown next to the Save button. */
     error?: string | null
     onCancel: () => void
 }
 
 /** Editorial select trigger — styled like the reference design's pill buttons. */
-export const TRIGGER_CLASS =
+const TRIGGER_CLASS =
     "h-9 rounded-lg border-[var(--input)] bg-[var(--card)] px-3.5 text-[15px] text-[var(--foreground)] shadow-sm hover:border-[var(--editorial-primary-ring)] focus-visible:border-[var(--ring)] data-[placeholder]:text-[var(--editorial-subtle)]"
 
 /** Portalled select popup — inherits the `.editorial` subtree styling. */
 const OVERLAY_CLASS =
-    "editorial rounded-xl border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
+    "editorial rounded-lg border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
 
 /** Editorial input field that matches the select trigger height/width. */
 const INPUT_CLASS =
@@ -102,7 +104,7 @@ const COMBINATOR_CLASS =
     "h-9 rounded-lg border-none bg-[var(--secondary)] px-3.5 text-[15px] font-medium text-[var(--foreground)] shadow-none hover:bg-[var(--accent)]"
 
 /** Icon per comparison operator — shown in the operator trigger and items. */
-export const OPERATOR_ICONS: Record<LogicOperator, LucideIcon> = {
+const OPERATOR_ICONS: Record<LogicOperator, LucideIcon> = {
     equals: Equal,
     notEquals: Slash,
     contains: Maximize2,
@@ -121,9 +123,18 @@ const IF_LABEL_CLASS =
 
 /** Amber-ish chip shown inside page selectors — icon + page number. */
 const PAGE_CHIP_CLASS =
-    "flex shrink-0 items-center gap-1.5 rounded-md bg-[var(--editorial-primary-selected)] px-2 py-0.5 text-xs font-semibold text-[var(--editorial-primary)]"
+    "flex shrink-0 items-center gap-1.5 rounded-lg bg-[var(--editorial-primary-selected)] px-2 py-0.5 text-xs font-semibold text-[var(--editorial-primary)]"
 
-/** Page-type chip — tinted, shows the page-type icon + page number. */
+function hexToRgba(hex: string, alpha: number): string {
+    const clean = hex.replace("#", "");
+    if (clean.length !== 6) return hex;
+    const r = parseInt(clean.substring(0, 2), 16);
+    const g = parseInt(clean.substring(2, 4), 16);
+    const b = parseInt(clean.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** Page-type chip — tinted, shows the page-type icon + page number matching icon color with low opacity. */
 export function PageTypeChip({
     page,
     pageNumber,
@@ -131,10 +142,18 @@ export function PageTypeChip({
     page: FormPage
     pageNumber: number
 }) {
-    const Icon = PAGE_TYPE_ICONS[page.type]
+    const visual = PAGE_TYPE_VISUALS[page.type]
+    const Icon = visual?.icon ?? PAGE_TYPE_ICONS[page.type]
+    const iconHexColor = visual?.bgColor?.match(/#[0-9a-fA-F]{6}/)?.[0] ?? "#5da2f6"
+
     return (
         <span
-            className={`flex shrink-0 items-center gap-1.5 rounded-md bg-gradient-to-br px-2 py-0.5 text-xs font-semibold ${PAGE_TYPE_COLORS[page.type]}`}
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border px-2 py-0.5 text-xs font-semibold leading-none"
+            style={{
+                borderColor: hexToRgba(iconHexColor, 0.45),
+                backgroundColor: hexToRgba(iconHexColor, 0.12),
+                color: iconHexColor,
+            }}
         >
             {Icon && <Icon className="h-3.5 w-3.5" aria-hidden />}
             Q{pageNumber}
@@ -170,16 +189,6 @@ function PageSelectContent({
     )
 }
 
-/** Chevron used in every pill trigger. */
-function Chevron() {
-    return (
-        <ChevronDown
-            className="h-4 w-4 shrink-0 text-[var(--editorial-subtle)]"
-            aria-hidden
-        />
-    )
-}
-
 export function RuleEditor({
     rule,
     section,
@@ -189,6 +198,7 @@ export function RuleEditor({
     index,
     onUpdate,
     onSave,
+    onDelete,
     error,
     onCancel,
 }: RuleEditorProps) {
@@ -310,7 +320,6 @@ export function RuleEditor({
                                 className={cn(COMBINATOR_CLASS, "w-fit gap-2")}
                             >
                                 <span className="uppercase">{condition.combinator ?? "and"}</span>
-                                <Chevron />
                             </Trigger>
                             <SelectContent className={OVERLAY_CLASS}>
                                 <SelectItem value="and">AND</SelectItem>
@@ -341,7 +350,6 @@ export function RuleEditor({
                             <span className="min-w-0 truncate">
                                 {condition.sourceType === "variable" ? "a variable" : "is"}
                             </span>
-                            <Chevron />
                         </Trigger>
                         <SelectContent className={OVERLAY_CLASS}>
                             <SelectItem value="page">is</SelectItem>
@@ -364,7 +372,6 @@ export function RuleEditor({
                                 <span className="min-w-0 truncate">
                                     @{condition.sourceKey || "Select variable…"}
                                 </span>
-                                <Chevron />
                             </Trigger>
                             <SelectContent className={OVERLAY_CLASS}>
                                 {variables.map((v) => (
@@ -402,7 +409,6 @@ export function RuleEditor({
                                     }
                                 </span>
                             </span>
-                            <Chevron />
                         </Trigger>
                         <SelectContent className={OVERLAY_CLASS}>
                             {operatorOptions.map((o) => {
@@ -445,7 +451,6 @@ export function RuleEditor({
                                             {String(condition.value ?? "Select Value…")}
                                         </span>
                                     </span>
-                                    <Chevron />
                                 </Trigger>
                                 <SelectContent className={OVERLAY_CLASS}>
                                     {valueOptions.map((o) => (
@@ -516,7 +521,6 @@ export function RuleEditor({
                                     (o) => o.value === (action?.action ?? "jumpToPage"),
                                 )?.label ?? "Skip to"}
                             </span>
-                            <Chevron />
                         </Trigger>
                         <SelectContent className={OVERLAY_CLASS}>
                             {section.actionOptions.map((o) => (
@@ -548,7 +552,6 @@ export function RuleEditor({
                                     }
                                     placeholder="Select a page…"
                                 />
-                                <Chevron />
                             </Trigger>
                             <SelectContent className={OVERLAY_CLASS}>
                                 {pages
@@ -594,7 +597,6 @@ export function RuleEditor({
                                     ? `@${action.variableName}`
                                     : "Set variable"}
                             </span>
-                            <Chevron />
                         </Trigger>
                         <SelectContent className={OVERLAY_CLASS}>
                             {numberVariables.map((v) => (
@@ -619,7 +621,6 @@ export function RuleEditor({
                                     (o) => o.value === (action?.operation ?? "set"),
                                 )?.label}
                             </span>
-                            <Chevron />
                         </Trigger>
                         <SelectContent className={OVERLAY_CLASS}>
                             {CALC_OPERATIONS.map((o) => (
@@ -644,7 +645,6 @@ export function RuleEditor({
                             <span className="min-w-0 truncate">
                                 {operandIsVariable ? "a variable" : "a number"}
                             </span>
-                            <Chevron />
                         </Trigger>
                         <SelectContent className={OVERLAY_CLASS}>
                             <SelectItem value="number">a number</SelectItem>
@@ -663,7 +663,6 @@ export function RuleEditor({
                                 <span className="min-w-0 truncate">
                                     @{operandVarName || "Select a variable…"}
                                 </span>
-                                <Chevron />
                             </Trigger>
                             <SelectContent className={OVERLAY_CLASS}>
                                 {numberVariables.map((v) => (
@@ -710,7 +709,6 @@ export function RuleEditor({
                             }
                             placeholder="Select a page…"
                         />
-                        <Chevron />
                     </Trigger>
                     <SelectContent className={OVERLAY_CLASS}>
                         {pages.map((p) => (
@@ -730,28 +728,43 @@ export function RuleEditor({
     }
 
     return (
-        <div className="editorial overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm">
+        <div className="editorial overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-sm">
             {/* Header — numbered badge, title, delete + collapse */}
             <header className="flex items-center gap-3 border-b border-[var(--border)] px-5 py-4">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-[var(--editorial-primary-selected)] text-sm font-semibold text-[var(--editorial-primary)]">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[var(--editorial-primary-selected)] text-sm font-semibold text-[var(--editorial-primary)]">
                     {index}
                 </span>
                 <h2 className="flex min-w-0 flex-1 items-center gap-2 truncate text-[15px] font-semibold text-[var(--foreground)]">
                     Rule #{index}
-                    <span className="inline-flex shrink-0 items-center rounded-md bg-[var(--editorial-primary-selected)] px-2 py-0.5 text-xs font-semibold text-[var(--editorial-primary)]">
+                    <span className="inline-flex shrink-0 items-center rounded-lg bg-[var(--editorial-primary-selected)] px-2 py-0.5 text-xs font-semibold text-[var(--editorial-primary)]">
                         {section.title}
                     </span>
                 </h2>
-                <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-[15px] font-medium text-[var(--editorial-body)]">
-                        Enabled
-                    </span>
-                    <Switch
-                        size="sm"
-                        checked={ruleEnabled}
-                        onCheckedChange={(checked) => onUpdate({ ...rule, enabled: checked })}
-                        aria-label="Toggle rule enabled"
-                    />
+                <div className="flex shrink-0 items-center gap-3">
+                    <div className="flex items-center gap-2">
+                        <span className="text-[15px] font-medium text-[var(--editorial-body)]">
+                            Enabled
+                        </span>
+                        <Switch
+                            size="sm"
+                            checked={ruleEnabled}
+                            onCheckedChange={(checked) => onUpdate({ ...rule, enabled: checked })}
+                            aria-label="Toggle rule enabled"
+                        />
+                    </div>
+                    {onDelete && (
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon-sm"
+                            aria-label="Delete rule"
+                            title="Delete rule"
+                            onClick={onDelete}
+                            className="size-8 rounded-lg cursor-pointer transition-colors"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    )}
                 </div>
             </header>
 
@@ -775,6 +788,18 @@ export function RuleEditor({
                 </span>
                 {renderThenControls()}
                 <div className="w-full ml-auto flex items-center justify-end gap-3">
+                    {onDelete && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="lg"
+                            onClick={onDelete}
+                            className="mr-auto h-9 rounded-lg px-4 text-[15px] text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                        >
+                            <Trash2 className="mr-1.5 h-4 w-4" />
+                            Delete rule
+                        </Button>
+                    )}
                     {error && (
                         <span className="text-sm font-medium text-[var(--destructive)]">
                             {error}
@@ -784,14 +809,14 @@ export function RuleEditor({
                         variant="outline"
                         size="lg"
                         onClick={onCancel}
-                        className="h-9 rounded-xl px-6 text-[15px]"
+                        className="h-9 rounded-lg px-6 text-[15px]"
                     >
                         Cancel
                     </Button>
                     <Button
                         size="lg"
                         onClick={() => onSave(rule)}
-                        className="h-9 rounded-xl px-6 text-[15px]"
+                        className="h-9 rounded-lg px-6 text-[15px]"
                     >
                         Save rule
                     </Button>

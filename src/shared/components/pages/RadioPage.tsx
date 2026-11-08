@@ -15,7 +15,7 @@ export function RadioPage({ value, onChange, options, name, disabled }: RadioPag
                 <label
                     key={opt.value}
                     className={cn(
-                        "flex items-center gap-2 p-2.5 rounded-md border cursor-pointer transition-colors",
+                        "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors",
                         value === opt.value
                             ? "bg-primary/5 border-primary"
                             : "hover:bg-muted/50",

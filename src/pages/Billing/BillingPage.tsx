@@ -109,12 +109,12 @@ export function BillingPage() {
     return (
         <div className="editorial mx-auto w-full max-w-none space-y-6 px-1 pb-4">
             {subscriptionQuery.isLoading ? (
-                <div className="h-[280px] animate-pulse rounded-xl border border-[var(--border)] bg-[var(--secondary)]" />
+                <div className="h-[280px] animate-pulse rounded-lg border border-[var(--border)] bg-[var(--secondary)]" />
             ) : (
-                <Card className="editorial-shadow-sm rounded-xl border-[var(--border)] bg-[var(--card)]">
+                <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
                     <CardContent className="p-5 sm:p-8">
                         <div className="flex items-start gap-4">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
                                 <CreditCard className="h-5 w-5" />
                             </div>
                             <div className="min-w-0 flex-1">
@@ -160,7 +160,7 @@ export function BillingPage() {
                                     type="button"
                                     onClick={() => void handleManageBilling()}
                                     disabled={pendingKey === "portal"}
-                                    className="editorial-transition h-11 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-5 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
+                                    className="editorial-transition h-11 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-5 text-sm font-medium text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]"
                                 >
                                     {pendingKey === "portal" ? (
                                         <Spinner className="mr-2 h-4 w-4" />
@@ -175,7 +175,7 @@ export function BillingPage() {
                                     type="button"
                                     onClick={() => void handleResume()}
                                     disabled={pendingKey === "resume"}
-                                    className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-5 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)]"
+                                    className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-5 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)]"
                                 >
                                     {pendingKey === "resume" && <Spinner className="mr-2 h-4 w-4" />}
                                     Resume subscription
@@ -186,7 +186,7 @@ export function BillingPage() {
                                     type="button"
                                     variant="ghost"
                                     onClick={() => setCancelDialogOpen(true)}
-                                    className="h-11 rounded-[16px] px-5 text-sm text-[var(--editorial-body)]"
+                                    className="h-11 rounded-lg px-5 text-sm text-[var(--editorial-body)]"
                                 >
                                     Cancel subscription
                                 </Button>
@@ -194,7 +194,7 @@ export function BillingPage() {
                             <Button
                                 type="button"
                                 onClick={() => setSection("pricing")}
-                                className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-5 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)]"
+                                className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-5 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)]"
                             >
                                 View plans
                             </Button>

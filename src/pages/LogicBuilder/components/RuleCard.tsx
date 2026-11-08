@@ -31,7 +31,7 @@ function Pill({ children, title }: { children: React.ReactNode; title?: string }
     return (
         <span
             title={title}
-            className="inline-flex max-w-[19rem] items-center truncate rounded-md bg-[var(--secondary)] px-2.5 py-1.5 text-[13px] font-medium text-[var(--foreground)]"
+            className="inline-flex max-w-[19rem] items-center truncate rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-[13px] font-medium text-[var(--foreground)]"
         >
             {children}
         </span>
@@ -115,7 +115,7 @@ export function RuleCard({ rule, index, pages = [], onEdit, onDelete }: RuleCard
     return (
         <li
             id={`logic-rule-${rule.id}`}
-            className="editorial overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm"
+            className="editorial overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-sm"
         >
             <header className="flex items-center justify-between gap-3 border-b border-[var(--editorial-border-light)] px-4 py-3 bg-[var(--secondary)]">
                 <h2 className="truncate text-[14px] font-medium text-[var(--foreground)]">

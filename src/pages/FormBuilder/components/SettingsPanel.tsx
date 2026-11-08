@@ -1,6 +1,17 @@
 import React from "react"
-import { ImagePlus, Palette, SlidersHorizontal, Trash2 } from "lucide-react"
-import { Label } from "../../../components/ui/label"
+import {
+    ImagePlus,
+    Palette,
+    Trash2,
+    Layers,
+    FileText,
+    Code2,
+    Image,
+    ShieldCheck,
+    MousePointer,
+    Settings as SettingsIcon,
+} from "lucide-react"
+import { Input } from "../../../components/ui/input"
 import {
     Combobox,
     ComboboxContent,
@@ -11,12 +22,10 @@ import {
 } from "../../../components/ui/combobox"
 import {
     Tabs,
-    TabsList,
-    TabsTrigger,
     TabsContent,
 } from "../../../components/ui/tabs"
 
-import { PAGE_TYPE_LABELS, PAGE_TYPE_ICONS, PAGE_TYPES, type PageType } from "../../../shared/constants/form-types"
+import { PAGE_TYPE_LABELS, PAGE_TYPES, PAGE_TYPE_VISUALS, type PageType } from "../../../shared/constants/form-types"
 import type {
     ChoiceSettings,
     PageSettings,
@@ -33,12 +42,12 @@ import {
     NumberSetting,
     RequiredToggle,
     SettingsSection,
-    TAB_LIST_CLASS,
-    TAB_TRIGGER_CLASS,
     TextSetting,
     ToggleRow,
+    CONTROL_CLASS,
 } from "./settings/primitives"
 import { ImagePickerDialog } from "./settings/ImagePickerDialog"
+import { CoverImageLayoutSetting } from "./settings/cover-image-layout"
 import {
     HideLabelsSetting,
     HorizontalAlignSetting,
@@ -54,6 +63,7 @@ import {
     StatementSettingsWidget,
     UploadSettingsWidget,
 } from "./settings/type-settings"
+import { cn } from "@/lib/utils"
 
 
 interface SettingsPanelProps {
@@ -115,88 +125,94 @@ export function SettingsPanel({
     }
 
     return (
-        <div className="editorial-shadow-md flex h-full w-full flex-col overflow-hidden bg-[var(--card)] border-l border-[var(--border)]">
-            <div className="flex flex-1 min-h-0 flex-col border-b border-[var(--editorial-border-light)]">
-                <div className="flex flex-1 min-h-0 flex-col">
-                    <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
-                        {/* Pill tabs on the editorial palette: the list is the track,
-                            the active tab is a raised card. */}
-                        <div className="px-6 pt-5">
-                            <TabsList className={TAB_LIST_CLASS}>
-                                {/* Settings is the only real tab and therefore
-                                    always active. Design is a plain action
-                                    button dressed up exactly like a tab
-                                    trigger: it opens the overlay drawer rather
-                                    than switching panels. */}
-                                <TabsTrigger value="settings" className={TAB_TRIGGER_CLASS}>
-                                    <SlidersHorizontal className="h-4 w-4" />
-                                    Settings
-                                </TabsTrigger>
-                                <button
-                                    type="button"
-                                    onClick={onOpenDesignDrawer}
-                                    className={
-                                        "inline-flex items-center justify-center whitespace-nowrap cursor-pointer" +
-                                        TAB_TRIGGER_CLASS
-                                    }
-                                >
-                                    <Palette className="h-4 w-4" />
-                                    Design
-                                </button>
-                            </TabsList>
+        <div className="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-[#141418] border-l border-slate-200/90 dark:border-zinc-800/90 text-slate-800 dark:text-zinc-100">
+            {/* Header: Page settings */}
+            <div className="flex items-center gap-2 px-6 pt-5 pb-2">
+                <Layers className="h-5 w-5 text-slate-900 dark:text-white" />
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Page settings</h3>
+            </div>
+
+            <div className="flex flex-1 min-h-0 flex-col">
+                <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
+                    {/* Pill tabs: Settings (active) | Design */}
+                    <div className="px-6 py-2">
+                        <div className="flex h-10 rounded-lg bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1">
+                            <div className="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#1e1e24] text-sm font-medium text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-zinc-700/60">
+                                <SettingsIcon className="h-4 w-4 text-[#FF5722]" />
+                                Settings
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onOpenDesignDrawer}
+                                className="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                            >
+                                <Palette className="h-4 w-4 text-slate-400 dark:text-zinc-400" />
+                                Design
+                            </button>
                         </div>
-                        <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
-                            <div className="space-y-8 px-6 py-6">
-                                {/* Page type — always available */}
-                                <div className="space-y-1.5">
-                                    <Label className="text-base font-semibold text-[var(--foreground)]">
-                                        Page type
-                                    </Label>
-                                    <Combobox
-                                        items={PAGE_TYPES}
-                                        value={page.type}
-                                        onValueChange={handleTypeChange}
-                                        // Controlled query: Base UI keeps the last
-                                        // selection as the filter text, which would
-                                        // reopen the list filtered down to the current
-                                        // type. Clearing on open always shows every type.
-                                        inputValue={typeQuery}
-                                        onInputValueChange={(next) => setTypeQuery(next ?? "")}
-                                        onOpenChange={(open) => {
-                                            if (open) setTypeQuery("")
-                                        }}
-                                    >
-                                        <ComboboxTrigger className="editorial-transition flex h-[44px] w-full items-center justify-between rounded-[14px] border border-[var(--input)] bg-[var(--secondary)] px-4 text-sm text-[var(--foreground)] hover:border-[var(--editorial-primary-ring)] focus-visible:border-[var(--ring)]">
-                                            {page.type && PAGE_TYPE_ICONS[page.type] ? (
-                                                (() => {
-                                                    const Icon = PAGE_TYPE_ICONS[page.type]
-                                                    return (
-                                                        <div className="flex items-center">
-                                                            <Icon className="h-4 w-4 mr-2" />
-                                                            <span>{PAGE_TYPE_LABELS[page.type]}</span>
+                    </div>
+
+                    <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
+                        <div className="space-y-6 px-6 py-4">
+                            {/* Page type section */}
+                            <SettingsSection
+                                title="Page Type"
+                                icon={<FileText className="h-4 w-4 text-slate-400 dark:text-zinc-400" />}
+                            >
+                                <Combobox
+                                    items={PAGE_TYPES}
+                                    value={page.type}
+                                    onValueChange={handleTypeChange}
+                                    inputValue={typeQuery}
+                                    onInputValueChange={(next) => setTypeQuery(next ?? "")}
+                                    onOpenChange={(open) => {
+                                        if (open) setTypeQuery("")
+                                    }}
+                                >
+                                    <ComboboxTrigger className="flex h-14 w-full items-center justify-between rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500 transition-colors cursor-pointer">
+                                        {page.type && PAGE_TYPE_VISUALS[page.type] ? (
+                                            (() => {
+                                                const visual = PAGE_TYPE_VISUALS[page.type]
+                                                const Icon = visual.icon
+                                                const label = visual.displayName ?? PAGE_TYPE_LABELS[page.type] ?? page.type
+                                                return (
+                                                    <div className="flex items-center gap-3 text-slate-800 dark:text-zinc-100 min-w-0">
+                                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white shadow-xs ${visual.bgColor}`}>
+                                                            <Icon className="h-4.5 w-4.5 stroke-[2]" />
                                                         </div>
-                                                    )
-                                                })()
-                                            ) : (
-                                                <span className="text-[var(--editorial-subtle)]">Select page type</span>
-                                            )}
-                                        </ComboboxTrigger>
-                                        <ComboboxContent className="editorial rounded-xl border border-[var(--border)] bg-[var(--popover)]">
-                                            <ComboboxEmpty>No items found.</ComboboxEmpty>
-                                            <ComboboxList>
-                                                    {(item: PageType) => {
-                                                    const Icon = PAGE_TYPE_ICONS[item]
-                                                    return (
-                                                        <ComboboxItem key={item} value={item} className="rounded-[12px] py-3.5!">
-                                                            <Icon className="h-4 w-4" />
-                                                            {PAGE_TYPE_LABELS[item]}
-                                                        </ComboboxItem>
-                                                    )
-                                                }}
-                                            </ComboboxList>
-                                        </ComboboxContent>
-                                    </Combobox>
-                                </div>
+                                                        <span className="font-semibold truncate text-[14.5px]">{label}</span>
+                                                    </div>
+                                                )
+                                            })()
+                                        ) : (
+                                            <span className="text-slate-400 dark:text-zinc-500">Select page type</span>
+                                        )}
+                                    </ComboboxTrigger>
+                                    <ComboboxContent className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
+                                        <ComboboxEmpty className="py-3 text-center text-sm text-slate-400 dark:text-zinc-500">No items found.</ComboboxEmpty>
+                                        <ComboboxList className="space-y-1 max-h-[460px] overflow-y-auto p-1.5">
+                                            {(item: PageType) => {
+                                                const visual = PAGE_TYPE_VISUALS[item]
+                                                const Icon = visual?.icon ?? FileText
+                                                const bgColor = visual?.bgColor ?? "bg-[#64748b]"
+                                                const label = visual?.displayName ?? PAGE_TYPE_LABELS[item] ?? item
+                                                return (
+                                                    <ComboboxItem
+                                                        key={item}
+                                                        value={item}
+                                                        className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 min-h-[46px] text-sm font-medium text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 data-highlighted:bg-slate-100 dark:data-highlighted:bg-zinc-800 data-highlighted:text-slate-900 dark:data-highlighted:text-white cursor-pointer transition-colors"
+                                                    >
+                                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white shadow-xs ${bgColor}`}>
+                                                            <Icon className="h-4.5 w-4.5 stroke-[2]" />
+                                                        </div>
+                                                        <span className="font-medium truncate">{label}</span>
+                                                    </ComboboxItem>
+                                                )
+                                            }}
+                                        </ComboboxList>
+                                    </ComboboxContent>
+                                </Combobox>
+                            </SettingsSection>
 
                                 {/* Required — every type except statement (forced false server-side) */}
                                 {!isStatement && (
@@ -218,7 +234,7 @@ export function SettingsPanel({
                                                     email: {
                                                         businessEmailsOnly,
                                                         emailVerification:
-                                                            settings.email?.emailVerification ?? false,
+                                                             settings.email?.emailVerification ?? false,
                                                     },
                                                 })
                                             }
@@ -300,7 +316,10 @@ export function SettingsPanel({
 
                                 {/* ---------------- Statement ---------------- */}
                                 {isStatement && (
-                                    <SettingsSection title="Embed">
+                                    <SettingsSection
+                                        title="Embed content"
+                                        icon={<Code2 className="h-4 w-4 text-zinc-400" />}
+                                    >
                                         <StatementSettingsWidget
                                             settings={
                                                 settings.statement ?? {
@@ -407,61 +426,86 @@ export function SettingsPanel({
                                 )}
 
                                 {/* Cover image — available on every page type */}
-                                <SettingsSection title="Cover image">
+                                <SettingsSection
+                                    title="Cover image"
+                                    icon={<Image className="h-4 w-4 text-zinc-400" />}
+                                >
                                     {page.coverImage?.url ? (
                                         <div className="space-y-3">
-                                            <div className="relative overflow-hidden rounded-[22px] border border-[var(--editorial-border-light)]">
+                                            <div className="relative overflow-hidden rounded-lg border border-zinc-800 shadow-xs">
                                                 <img
                                                     src={page.coverImage.url}
                                                     alt={page.coverImage.alt || "Cover"}
                                                     className="h-28 w-full object-cover"
                                                 />
                                             </div>
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={() => setCoverDialogOpen(true)}
-                                                    className="editorial-transition flex-1 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--foreground)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] active:translate-y-0 active:scale-[.98]"
+                                                    className="flex h-10 flex-1 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                                 >
                                                     Replace
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => onUpdate(pageIndex, { coverImage: null })}
-                                                    className="editorial-transition flex items-center justify-center gap-1.5 rounded-[16px] border border-[var(--border)] bg-[var(--secondary)] px-4 py-3 text-sm text-[var(--destructive)] hover:-translate-y-0.5 hover:border-[var(--destructive)]/30 active:translate-y-0 active:scale-[.98]"
+                                                    className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                                                 >
-                                                    <Trash2 className="h-4 w-4" />
+                                                    <Trash2 className="h-3.5 w-3.5" />
                                                     Remove
                                                 </button>
                                             </div>
+                                            <CoverImageLayoutSetting
+                                                value={page.coverImage.layout}
+                                                onChange={(layout) =>
+                                                    onUpdate(pageIndex, {
+                                                        coverImage: { ...page.coverImage!, layout },
+                                                    })
+                                                }
+                                            />
                                         </div>
                                     ) : (
-                                        <button
-                                            type="button"
+                                        <div
                                             onClick={() => setCoverDialogOpen(true)}
-                                            className="editorial-transition flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--input)] bg-[var(--secondary)] py-10 text-sm text-[var(--editorial-subtle)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]"
+                                            className="flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group"
                                         >
-                                            <ImagePlus className="h-5 w-5" />
-                                            <span>Add a cover image</span>
-                                        </button>
+                                            <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
+                                                <ImagePlus className="h-5 w-5" />
+                                            </div>
+                                            <p className="mt-3 text-sm font-medium text-slate-800 dark:text-zinc-200">
+                                                Add a cover image or drag & drop
+                                            </p>
+                                            <p className="mt-1 text-xs text-slate-500 dark:text-zinc-500">
+                                                JPG, PNG, SVG • Max 5MB
+                                            </p>
+                                        </div>
                                     )}
                                 </SettingsSection>
 
                                 {/* Custom validation error message — available on every type */}
-                                <SettingsSection title="Validation message">
-                                    <TextSetting
-                                        label="Message"
-                                        description="Shown to respondents when this page fails validation."
-                                        value={page.validation?.message ?? ""}
-                                        onChange={(message) => patchValidation({ message })}
-                                        placeholder="This page is required"
-                                    />
+                                <SettingsSection
+                                    title="Validation message"
+                                    icon={<ShieldCheck className="h-4 w-4 text-zinc-400" />}
+                                    description="Shown to respondents when this page fails validation."
+                                >
+                                    <div className="relative">
+                                        <Input
+                                            value={page.validation?.message ?? ""}
+                                            onChange={(e) => patchValidation({ message: e.target.value })}
+                                            placeholder="This page is required"
+                                            className={cn(CONTROL_CLASS, "pr-8")}
+                                        />
+                                    </div>
                                 </SettingsSection>
 
                                 {/* Button text — in settings tab */}
-                                <SettingsSection title="">
+                                <SettingsSection
+                                    title="Button"
+                                    icon={<MousePointer className="h-4 w-4 text-zinc-400" />}
+                                >
                                     <TextSetting
-                                        label="Button text"
+                                        label="Button Text"
                                         value={page.appearance.submitButtonText ?? ""}
                                         onChange={(submitButtonText) =>
                                             onUpdate(pageIndex, {
@@ -482,10 +526,16 @@ export function SettingsPanel({
                 <ImagePickerDialog
                     open={coverDialogOpen}
                     onOpenChange={setCoverDialogOpen}
-                    onSelect={(coverImage) => onUpdate(pageIndex, { coverImage })}
+                    onSelect={(coverImage) =>
+                        onUpdate(pageIndex, {
+                            coverImage: {
+                                ...coverImage,
+                                layout: page.coverImage?.layout ?? "top",
+                            },
+                        })
+                    }
                     currentImage={page.coverImage}
                 />
             </div>
-        </div>
     )
 }

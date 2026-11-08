@@ -105,7 +105,7 @@ export function SignaturePage({ value, onChange, disabled }: SignaturePageProps)
                 onTouchMove={draw}
                 onTouchEnd={end}
                 aria-label="Signature area"
-                className={`h-40 w-full touch-none rounded-md border bg-white ${
+                className={`h-40 w-full touch-none rounded-lg border bg-white ${
                     disabled ? "opacity-50" : "cursor-crosshair"
                 }`}
             />

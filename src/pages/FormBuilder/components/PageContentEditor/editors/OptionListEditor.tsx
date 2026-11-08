@@ -81,7 +81,7 @@ export function OptionListEditor({
                         key={optIndex}
                         className={cn(
                             "flex items-center gap-2",
-                            horizontalAlign && "min-w-0 rounded-md border p-2",
+                            horizontalAlign && "min-w-0 rounded-lg border p-2",
                         )}
                     >
                         <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -124,7 +124,7 @@ export function OptionListEditor({
                     <div
                         className={cn(
                             "flex items-center gap-2 text-muted-foreground",
-                            horizontalAlign && "min-w-0 rounded-md border border-dashed p-2",
+                            horizontalAlign && "min-w-0 rounded-lg border border-dashed p-2",
                         )}
                     >
                         <Icon className="h-4 w-4 shrink-0" />

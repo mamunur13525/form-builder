@@ -44,7 +44,7 @@ const TEMPLATES: Template[] = [
         category: "General",
         pageCount: 4,
         icon: ClipboardList,
-        tint: "bg-[var(--editorial-primary-light)] text-[var(--primary)]",
+        tint: "bg-[#FF5722]/15 text-[#FF5722]",
         badge: "Everyday",
     },
     {
@@ -54,7 +54,7 @@ const TEMPLATES: Template[] = [
         category: "Research",
         pageCount: 6,
         icon: MessageSquareHeart,
-        tint: "bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
+        tint: "bg-violet-500/15 text-violet-400",
         badge: "Research",
     },
     {
@@ -64,7 +64,7 @@ const TEMPLATES: Template[] = [
         category: "Events",
         pageCount: 7,
         icon: CalendarCheck,
-        tint: "bg-[var(--editorial-blue)]/12 text-[var(--editorial-blue)]",
+        tint: "bg-sky-500/15 text-sky-400",
         badge: "Events",
     },
     {
@@ -74,7 +74,7 @@ const TEMPLATES: Template[] = [
         category: "Hiring",
         pageCount: 8,
         icon: Briefcase,
-        tint: "bg-[var(--editorial-success)]/12 text-[#4E7F62]",
+        tint: "bg-emerald-500/15 text-emerald-400",
         badge: "Hiring",
     },
     {
@@ -84,7 +84,7 @@ const TEMPLATES: Template[] = [
         category: "Research",
         pageCount: 10,
         icon: Users,
-        tint: "bg-[var(--editorial-purple-light)] text-[var(--editorial-purple)]",
+        tint: "bg-amber-500/15 text-amber-400",
         badge: "Research",
     },
     {
@@ -94,7 +94,7 @@ const TEMPLATES: Template[] = [
         category: "Education",
         pageCount: 6,
         icon: GraduationCap,
-        tint: "bg-[var(--editorial-blue)]/12 text-[var(--editorial-blue)]",
+        tint: "bg-rose-500/15 text-rose-400",
         badge: "Education",
     },
 ]
@@ -158,17 +158,17 @@ export function TemplatesPage() {
                 </div>
 
                 {/* Segmented control — inset track with a raised active item. */}
-                <div className="flex items-center gap-1 overflow-x-auto rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible">
+                <div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible shadow-xs">
                     {CATEGORIES.map((item) => (
                         <button
                             key={item}
                             type="button"
                             onClick={() => setCategory(item)}
                             className={cn(
-                                "editorial-transition shrink-0 rounded-[13px] border px-4 py-2.5 text-sm font-medium",
+                                "editorial-transition shrink-0 rounded-lg border px-4 py-2 text-sm font-medium cursor-pointer",
                                 category === item
-                                    ? "border-[var(--editorial-border-light)] bg-[var(--card)] text-[var(--foreground)] shadow-[0_2px_8px_rgba(24,20,18,.06)]"
-                                    : "border-transparent text-[var(--editorial-subtle)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--foreground)]",
+                                    ? "border-[#FF5722]/30 bg-[#FF5722]/15 text-[#FF5722] font-semibold shadow-sm"
+                                    : "border-transparent text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800/60 hover:text-slate-900 dark:hover:text-zinc-100",
                             )}
                         >
                             {item}
@@ -181,7 +181,7 @@ export function TemplatesPage() {
             {visibleTemplates.length === 0 ? (
                 <Card className="editorial-shadow-sm mt-8 border-[var(--border)] bg-[var(--card)] sm:mt-10">
                     <CardContent className="flex flex-col items-center py-20 text-center">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
                             <FileSearch className="h-6 w-6" />
                         </div>
                         <h2 className="font-display mt-5 text-2xl text-[var(--foreground)]">
@@ -218,7 +218,7 @@ export function TemplatesPage() {
                             >
                                 {/* Featured ribbon */}
                                 {isFeatured && (
-                                    <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-[16px] bg-[var(--editorial-primary-selected)] px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] text-[var(--primary)] uppercase">
+                                    <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg bg-[var(--editorial-primary-selected)] px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] text-[var(--primary)] uppercase">
                                         <Sparkles className="h-3.5 w-3.5" />
                                         Featured
                                     </div>
@@ -228,7 +228,7 @@ export function TemplatesPage() {
                                     {/* Icon tile — soft tinted square, not a generic circle */}
                                     <div
                                         className={cn(
-                                            "flex h-14 w-14 items-center justify-center rounded-[18px]",
+                                            "flex h-14 w-14 items-center justify-center rounded-lg",
                                             template.tint,
                                         )}
                                     >

@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { Plus, Save, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type {
     FormLogicRule,
     FormVariable,
@@ -118,14 +119,6 @@ export function RuleEditorV2({
         [variables],
     )
 
-    const operandRaw =
-        typeof action?.value === "string"
-            ? action.value
-            : action?.value != null
-                ? String(action.value)
-                : ""
-    const operandIsVariable = operandRaw.startsWith("@")
-
     return (
         <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2.5">
@@ -141,7 +134,6 @@ export function RuleEditorV2({
                         onUpdate={setCondition}
                         onRemove={removeCondition}
                         canRemove={(rule.conditions ?? []).length > 1}
-                        sourceType={condition.sourceType}
                         pages={pages}
                         variables={variables}
                     />

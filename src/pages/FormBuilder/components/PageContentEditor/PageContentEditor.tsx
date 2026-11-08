@@ -1,5 +1,6 @@
 import type { FormPage, IFormTheme } from "@/shared/types/common";
 import { PageLabel, PageHelperText, PageSubmitButton, type VariableItem } from "@/shared/components/pages";
+import { CoverImageBlock, CoverImageSide } from "@/shared/components/CoverImageBlock";
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme";
 import { useEffect } from "react";
 
@@ -35,6 +36,12 @@ interface PageContentEditorProps {
   isMobileView: boolean;
   theme?: IFormTheme | null;
   variables?: VariableItem[];
+  /**
+   * When false the canvas background (colour + image) is owned by an outer
+   * container, e.g. the form builder's window canvas, so the editor stays
+   * transparent and lets it show through.
+   */
+  withBackground?: boolean;
 }
 
 const editorMap: Record<
@@ -78,6 +85,7 @@ export function PageContentEditor({
   isMobileView,
   theme,
   variables = [],
+  withBackground = true,
 }: PageContentEditorProps) {
   const PageEditor = editorMap[page.type];
   const isStatement = page.type === "statement";
@@ -98,7 +106,7 @@ export function PageContentEditor({
         : "text-left items-start";
 
   const containerStyle: React.CSSProperties = {
-    backgroundColor: themeResolved.backgroundColor,
+    ...(withBackground ? { backgroundColor: themeResolved.backgroundColor } : {}),
     color: themeResolved.textColor,
     fontFamily: themeResolved.font?.family ? `"${themeResolved.font.family}", sans-serif` : undefined,
   };
@@ -116,81 +124,107 @@ export function PageContentEditor({
     }
     : {};
   
+  const coverLayout = page.coverImage?.layout ?? "top";
+  const isSideCover =
+    Boolean(page.coverImage?.url) &&
+    (coverLayout === "left" || coverLayout === "right");
+
+  const content = (
+    <>
+      <PageLabel
+        label={page.label}
+        pageNumber={pageIndex + 1}
+        editable
+        onUpdate={(label) => onUpdate(pageIndex, { label })}
+        color={themeResolved.questionColor}
+        fontSizeClass={fontSizes.question}
+        variables={variables}
+      />
+
+      <PageHelperText
+        helperText={page.helperText}
+        editable
+        onUpdate={(helperText) => onUpdate(pageIndex, { helperText })}
+        color={themeResolved.textColor}
+        fontSizeClass={fontSizes.helper}
+        variables={variables}
+      />
+
+      <div className="mt-8 w-full" style={{ color: themeResolved.answerColor }}>
+        {/* Page-specific editor */}
+        {PageEditor && (
+          <PageEditor
+            page={page}
+            pageIndex={pageIndex}
+            onUpdate={onUpdate}
+            isMobileView={isMobileView}
+            color={themeResolved.answerColor}
+            fontSizeClass={fontSizes.input}
+          />
+        )}
+      </div>
+
+      <PageSubmitButton
+        text={
+          page.appearance.submitButtonText ||
+          (isStatement ? "Continue" : "Submit")
+        }
+        color={themeResolved.buttonColor || page.appearance.submitButtonColor}
+        textColor={themeResolved.buttonTextColor}
+        roundCorners={themeResolved.roundCorners}
+        fontSizeClass={fontSizes.button}
+      />
+    </>
+  );
+
   return (
     <div
-      className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
+      className="light relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
       style={containerStyle}
     >
       {/* Background Image Layer */}
-      {themeResolved.backgroundImage?.url && (
+      {withBackground && themeResolved.backgroundImage?.url && (
         <div
           className="absolute inset-0 pointer-events-none z-0"
           style={bgImageStyle}
         />
       )}
 
-      {/* Editor Content */}
-      <div className={cn("relative z-10 w-full min-h-0 overflow-y-auto max-w-[800px]")}>
-        <div
-          className={cn(
-            "mx-auto flex flex-col transition-all duration-500 ease-out pl-5 pr-2 py-8 sm:px-6 sm:py-12",
-            alignClass,
-            isMobileView ? "w-full" : "w-full sm:w-11/12",
-          )}
-        >
-          {page.coverImage?.url && (
-            <img
-              src={page.coverImage.url}
-              alt={page.coverImage.alt || ""}
-              className="mb-8 max-h-56 w-full rounded-[22px] border border-[var(--editorial-border-light)] object-cover"
-            />
-          )}
-
-          <PageLabel
-            label={page.label}
-            pageNumber={pageIndex + 1}
-            editable
-            onUpdate={(label) => onUpdate(pageIndex, { label })}
-            color={themeResolved.questionColor}
-            fontSizeClass={fontSizes.question}
-            variables={variables}
-          />
-
-          <PageHelperText
-            helperText={page.helperText}
-            editable
-            onUpdate={(helperText) => onUpdate(pageIndex, { helperText })}
-            color={themeResolved.textColor}
-            fontSizeClass={fontSizes.helper}
-            variables={variables}
-          />
-
-          <div className="mt-8 w-full" style={{ color: themeResolved.answerColor }}>
-            {/* Page-specific editor */}
-            {PageEditor && (
-              <PageEditor
-                page={page}
-                pageIndex={pageIndex}
-                onUpdate={onUpdate}
-                isMobileView={isMobileView}
-                color={themeResolved.answerColor}
-                fontSizeClass={fontSizes.input}
-              />
-            )}
+      {isSideCover ? (
+        /* Left/right: the page is split in half — image on one side, all
+           content (including the submit button) on the other. */
+        <div className="relative z-10 flex h-full w-full flex-col sm:flex-row">
+          <CoverImageSide coverImage={page.coverImage} side={coverLayout} />
+          <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto sm:h-full sm:w-1/2">
+            <div
+              className={cn(
+                "mx-auto my-auto flex w-full max-w-[800px] flex-col px-5 py-8 sm:px-8 sm:py-12",
+                alignClass,
+              )}
+            >
+              {content}
+            </div>
           </div>
-
-          <PageSubmitButton
-            text={
-              page.appearance.submitButtonText ||
-              (isStatement ? "Continue" : "Submit")
-            }
-            color={themeResolved.buttonColor || page.appearance.submitButtonColor}
-            textColor={themeResolved.buttonTextColor}
-            roundCorners={themeResolved.roundCorners}
-            fontSizeClass={fontSizes.button}
-          />
         </div>
-      </div>
+      ) : (
+        <div className={cn("relative z-10 w-full min-h-0 overflow-y-auto max-w-[800px]")}>
+          <div
+            className={cn(
+              "mx-auto flex flex-col transition-all duration-500 ease-out pl-5 pr-2 py-8 sm:px-6 sm:py-12",
+              alignClass,
+              isMobileView ? "w-full" : "w-full sm:w-11/12",
+            )}
+          >
+            <CoverImageBlock
+              coverImage={page.coverImage}
+              imageClassName="rounded-lg border border-[var(--editorial-border-light)]"
+              contentClassName={alignClass}
+            >
+              {content}
+            </CoverImageBlock>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

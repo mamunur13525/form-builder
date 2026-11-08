@@ -50,11 +50,14 @@ export function MainLayout({ children }: { children: ReactNode }) {
                         onClick={() => setDrawerOpen(true)}
                         aria-label="Open menu"
                         aria-expanded={drawerOpen}
-                        className="editorial-transition flex h-11 w-11 items-center justify-center rounded-[16px] border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:scale-[.98]"
+                        className="editorial-transition flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)] hover:text-[var(--primary)] active:scale-[.98]"
                     >
                         <Menu className="h-5 w-5" />
                     </button>
-                    <span className="font-display text-xl text-[var(--foreground)]">FormFlow</span>
+                    <div className="flex items-center gap-2">
+                        <img src="/flogo.png" alt="FormFlow logo" className="h-7 w-7 rounded-lg object-contain" />
+                        <span className="font-display text-xl font-bold text-[var(--foreground)]">FormFlow</span>
+                    </div>
                 </header>
 
                 <main>{children}</main>

@@ -24,7 +24,7 @@ export function IntegrationCard({ integration, onAction }: IntegrationCardProps)
     return (
         <div
             className={cn(
-                "group editorial-transition flex h-full flex-col rounded-xl border bg-[var(--card)] p-5",
+                "group editorial-transition flex h-full flex-col rounded-lg border bg-[var(--card)] p-5",
                 "editorial-shadow-sm hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(24,35,52,0.08)]",
                 connected
                     ? "border-[var(--editorial-primary-ring)]"
@@ -34,7 +34,7 @@ export function IntegrationCard({ integration, onAction }: IntegrationCardProps)
             <div className="flex items-start gap-3">
                 <div
                     className={cn(
-                        "editorial-transition flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border",
+                        "editorial-transition flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border",
                         connected
                             ? "border-transparent bg-[var(--primary)] text-[var(--primary-foreground)]"
                             : "border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--foreground)] group-hover:border-[var(--editorial-primary-ring)]",

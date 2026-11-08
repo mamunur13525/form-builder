@@ -5,7 +5,6 @@ import {
     ChevronRight,
     Crown,
     FilePlus2,
-    FileText,
     LogOut,
     MailX,
     Pencil,
@@ -242,7 +241,7 @@ export function ActivityFeed({ workspaceId }: ActivityFeedProps) {
     const totalPages = data?.meta.totalPages ?? 1
 
     return (
-        <section className="rounded-[24px] border border-[var(--border)] bg-[var(--card)] p-8">
+        <section className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-8">
             <h2 className="font-display text-2xl text-[var(--foreground)]">Activity</h2>
             <p className="mt-1 text-sm text-[var(--editorial-body)]">
                 Everything that has happened in this workspace, newest first.
@@ -253,14 +252,14 @@ export function ActivityFeed({ workspaceId }: ActivityFeedProps) {
                     {[0, 1, 2, 3].map((row) => (
                         <div
                             key={row}
-                            className="h-14 animate-pulse rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)]"
+                            className="h-14 animate-pulse rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)]"
                         />
                     ))}
                 </div>
             )}
 
             {!isLoading && items.length === 0 && (
-                <div className="mt-8 rounded-[18px] border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] p-10 text-center">
+                <div className="mt-8 rounded-lg border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] p-10 text-center">
                     <p className="text-sm text-[var(--editorial-body)]">
                         Nothing has happened here yet.
                     </p>
@@ -275,7 +274,7 @@ export function ActivityFeed({ workspaceId }: ActivityFeedProps) {
                         return (
                             <li
                                 key={entry.id}
-                                className="flex items-start gap-4 rounded-[18px] px-3 py-3 transition-colors hover:bg-[var(--secondary)]"
+                                className="flex items-start gap-4 rounded-lg px-3 py-3 transition-colors hover:bg-[var(--secondary)]"
                             >
                                 <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)]">
                                     <Icon className="h-4 w-4" />
@@ -306,7 +305,7 @@ export function ActivityFeed({ workspaceId }: ActivityFeedProps) {
                             variant="outline"
                             onClick={() => setPage((current) => Math.max(1, current - 1))}
                             disabled={page <= 1 || isFetching}
-                            className="h-11 rounded-[16px] border-[var(--border)] px-4"
+                            className="h-11 rounded-lg border-[var(--border)] px-4"
                         >
                             <ChevronLeft className="h-4 w-4" />
                             Newer
@@ -318,7 +317,7 @@ export function ActivityFeed({ workspaceId }: ActivityFeedProps) {
                                 setPage((current) => Math.min(totalPages, current + 1))
                             }
                             disabled={page >= totalPages || isFetching}
-                            className="h-11 rounded-[16px] border-[var(--border)] px-4"
+                            className="h-11 rounded-lg border-[var(--border)] px-4"
                         >
                             Older
                             <ChevronRight className="h-4 w-4" />

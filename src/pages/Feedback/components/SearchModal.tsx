@@ -52,7 +52,7 @@ export function SearchModal({
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange} className="max-w-xl overflow-hidden rounded-2xl border-gray-200 bg-white p-0 text-left">
+        <Dialog open={open} onOpenChange={onOpenChange} className="max-w-xl overflow-hidden rounded-lg border-gray-200 bg-white p-0 text-left">
             <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
                 <Search className="h-5 w-5 shrink-0 text-gray-400" />
                 <input
@@ -84,7 +84,7 @@ export function SearchModal({
                                 <button
                                     type="button"
                                     onClick={() => go(p.slug)}
-                                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-gray-50"
+                                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-gray-50"
                                 >
                                     <StatusDot status={p.status} />
                                     <span className="line-clamp-1 flex-1 text-sm text-gray-800">

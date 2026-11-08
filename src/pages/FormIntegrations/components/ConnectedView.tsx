@@ -26,7 +26,9 @@ function ConnectedRow({
 }) {
     const Icon = integration.icon
     const subline =
-        integration.id === "email-to-me" ? (
+        integration.subline ? (
+            integration.subline
+        ) : integration.id === "email-to-me" ? (
             <>
                 Notifying{" "}
                 <span className="font-medium text-[var(--foreground)]">
@@ -39,9 +41,9 @@ function ConnectedRow({
         )
 
     return (
-        <div className="flex flex-col gap-3 rounded-xl border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex flex-col gap-3 rounded-lg border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] p-4 dark:border-zinc-800 dark:bg-[#0c0c0f] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)]">
                     <Icon className="h-4 w-4" />
                 </div>
                 <div className="min-w-0">
@@ -83,7 +85,7 @@ export function ConnectedView({
             {/* What's live now */}
             <PanelCard>
                 <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--editorial-border-light)] bg-[var(--editorial-primary-light)] text-[var(--primary)]">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--editorial-primary-light)] text-[var(--primary)]">
                         <CheckCircle className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -154,7 +156,7 @@ function PanelCard({
     return (
         <section
             className={cn(
-                "editorial-shadow-sm rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 sm:p-7",
+                "editorial-shadow-sm rounded-lg border border-[var(--border)] bg-[var(--card)] p-5 dark:border-zinc-800 dark:bg-[#141418] dark:shadow-[0_4px_14px_rgba(0,0,0,0.45)] sm:p-7",
                 className,
             )}
         >

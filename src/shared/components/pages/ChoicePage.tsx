@@ -154,7 +154,7 @@ export function ChoicePage({
                         <label
                             key={opt.value}
                             className={cn(
-                                "flex cursor-pointer items-center gap-2 rounded-md border p-2.5 transition-colors",
+                                "flex cursor-pointer items-center gap-2 rounded-lg border p-2.5 transition-colors",
                                 checked ? "border-primary bg-primary/5" : "hover:bg-muted/50",
                                 (disabled || blocked) && "pointer-events-none opacity-50",
                                 hideLabels && "justify-center",
@@ -191,7 +191,7 @@ export function ChoicePage({
                     placeholder={`${otherLabel || "Other"}...`}
                     onChange={(e) => changeOtherText(e.target.value)}
                     className={cn(
-                        "h-10 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        "h-10 w-full rounded-lg border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                         fontSizeClass,
                     )}
                     style={color ? { color } : undefined}

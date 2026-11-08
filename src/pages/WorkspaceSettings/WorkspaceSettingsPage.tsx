@@ -77,8 +77,8 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
     if (isResolving || (activeWorkspaceId && isLoadingWorkspace && !workspace)) {
         return (
             <div className={shellClass(embedded)}>
-                <div className="h-14 w-72 animate-pulse rounded-[18px] bg-[var(--secondary)]" />
-                <div className="h-[420px] animate-pulse rounded-[24px] border border-[var(--border)] bg-[var(--secondary)]" />
+                <div className="h-14 w-72 animate-pulse rounded-lg bg-[var(--secondary)]" />
+                <div className="h-[420px] animate-pulse rounded-lg border border-[var(--border)] bg-[var(--secondary)]" />
             </div>
         )
     }
@@ -99,8 +99,8 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
                 {/* Anything addressed to this user, so they can join without a link. */}
                 <IncomingInvitations />
 
-                <div className="rounded-[24px] border border-dashed border-[var(--editorial-border-light)] bg-[var(--card)] p-12 text-center">
-                    <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
+                <div className="rounded-lg border border-dashed border-[var(--editorial-border-light)] bg-[var(--card)] p-12 text-center">
+                    <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
                         <Building2 className="h-6 w-6" />
                     </span>
                     <h2 className="font-display mt-6 text-2xl text-[var(--foreground)]">
@@ -113,7 +113,7 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
                     <Button
                         type="button"
                         onClick={openCreateWorkspace}
-                        className="editorial-transition mt-8 h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                        className="editorial-transition mt-8 h-11 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                     >
                         Create a workspace
                     </Button>
@@ -140,20 +140,20 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
                         <img
                             src={workspace.logoUrl}
                             alt=""
-                            className="h-14 w-14 shrink-0 rounded-[18px] border border-[var(--editorial-border-light)] object-cover"
+                            className="h-14 w-14 shrink-0 rounded-lg border border-[var(--editorial-border-light)] object-cover"
                         />
                     ) : (
-                        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-lg font-semibold text-[var(--editorial-body)]">
-                            {workspace.name.slice(0, 2).toUpperCase()}
+                        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-lg font-semibold text-[var(--editorial-body)]">
+                            {(workspace.name || "Workspace").slice(0, 2).toUpperCase()}
                         </span>
                     )}
                     <div className="min-w-0">
                         <h1 className="font-display truncate text-[28px] leading-[1.1] text-[var(--foreground)] sm:text-[40px]">
-                            {workspace.name}
+                            {workspace.name || "Workspace"}
                         </h1>
                         <p className="mt-1 text-sm text-[var(--editorial-body)]">
-                            /w/{workspace.slug}
-                            {role && ` · you are ${WORKSPACE_ROLE_LABELS[role]}`}
+                            {workspace.slug ? `/w/${workspace.slug}` : ""}
+                            {role && ` · you are ${WORKSPACE_ROLE_LABELS[role] ?? ((role as string) === "editor" ? "Editor" : role)}`}
                         </p>
                     </div>
                 </div>
@@ -171,7 +171,7 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
                         onClick={() => setTab(id)}
                         aria-current={tab === id ? "page" : undefined}
                         className={cn(
-                            "editorial-transition inline-flex h-11 items-center gap-2 rounded-[16px] px-5 text-sm",
+                            "editorial-transition inline-flex h-11 items-center gap-2 rounded-lg px-5 text-sm",
                             tab === id
                                 ? "bg-[var(--secondary)] text-[var(--foreground)]"
                                 : "text-[var(--editorial-body)] hover:text-[var(--foreground)]",

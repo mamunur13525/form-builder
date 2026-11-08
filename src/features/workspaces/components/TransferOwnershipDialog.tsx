@@ -92,7 +92,7 @@ export function TransferOwnershipDialog({
         <Dialog
             open={open}
             onOpenChange={handleOpenChange}
-            className="editorial max-w-lg rounded-[24px] border-[var(--border)] bg-[var(--card)] p-8"
+            className="editorial max-w-lg rounded-lg border-[var(--border)] bg-[var(--card)] p-8"
         >
             <DialogHeader>
                 <DialogTitle className="font-display text-2xl text-[var(--foreground)]">
@@ -106,7 +106,7 @@ export function TransferOwnershipDialog({
 
             <div className="space-y-6">
                 {candidates.length === 0 ? (
-                    <div className="rounded-[18px] border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] p-8 text-center">
+                    <div className="rounded-lg border border-dashed border-[var(--editorial-border-light)] bg-[var(--secondary)] p-8 text-center">
                         <p className="text-sm text-[var(--editorial-body)]">
                             There is nobody to transfer to yet. Invite a member and wait
                             for them to accept first.
@@ -143,7 +143,7 @@ export function TransferOwnershipDialog({
                             </Select>
                         </div>
 
-                        <div className="flex gap-3 rounded-[18px] border border-[var(--destructive)]/25 bg-[var(--destructive)]/8 p-5">
+                        <div className="flex gap-3 rounded-lg border border-[var(--destructive)]/25 bg-[var(--destructive)]/8 p-5">
                             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--destructive)]" />
                             <p className="text-xs leading-5 text-[var(--editorial-body)]">
                                 This takes effect immediately and cannot be undone by you
@@ -184,7 +184,7 @@ export function TransferOwnershipDialog({
                     type="button"
                     variant="outline"
                     onClick={() => handleOpenChange(false)}
-                    className="h-11 rounded-[16px] border-[var(--border)] px-6"
+                    className="h-11 rounded-lg border-[var(--border)] px-6"
                 >
                     Cancel
                 </Button>
@@ -193,7 +193,7 @@ export function TransferOwnershipDialog({
                         type="button"
                         onClick={handleSubmit}
                         disabled={!canSubmit}
-                        className="editorial-transition h-11 rounded-[16px] bg-[var(--destructive)] px-6 text-sm font-medium text-white hover:opacity-90 active:scale-[.98]"
+                        className="editorial-transition h-11 rounded-lg bg-[var(--destructive)] px-6 text-sm font-medium text-white hover:opacity-90 active:scale-[.98]"
                     >
                         {transferOwnership.isPending ? (
                             <>

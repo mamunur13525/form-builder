@@ -1,63 +1,80 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
+import { useParams } from "react-router-dom"
 import { useCurrentUser } from "@/features/auth/hooks/useAuth"
-import { FEATURED_IDS, INTEGRATIONS, type Integration } from "./integrations.data"
+import { useFormContext } from "@/features/forms/hooks/useFormContext"
 import { useIntegrationFilter } from "./useIntegrationFilter"
 import { ConnectedView } from "./components/ConnectedView"
 import { BrowseView } from "./components/BrowseView"
+import { IntegrationModal } from "./components/IntegrationModal"
+import { useFormIntegrations } from "./hooks/useFormIntegrations"
+import type { Integration } from "./types"
 
 type View = "connected" | "browse"
 
 /**
- * Integrations screen. This shell owns only the routing-level state — which
- * view is showing and the browse filters — and composes the presentational
- * pieces. Catalogue data lives in `integrations.data`, filtering in
- * `useIntegrationFilter`, and each view renders itself.
+ * Integrations screen. Connect your form to third-party tools (Gmail, Slack,
+ * Discord, Telegram, Google Analytics, Google Sheets, Notion, Zapier).
  */
 export function FormIntegrationsPage() {
+    const { formId } = useParams<{ formId: string }>()
+    const { form } = useFormContext()
     const { data: user } = useCurrentUser()
     const [view, setView] = useState<View>("connected")
     const [category, setCategory] = useState("All")
     const [search, setSearch] = useState("")
+    const [activeModalIntegration, setActiveModalIntegration] = useState<Integration | null>(null)
 
-    const { groups, counts } = useIntegrationFilter(category, search)
+    const {
+        integrations,
+        connectedIntegrations,
+        featuredIntegrations,
+        saveIntegration,
+        disconnectIntegration,
+        getConfig,
+    } = useFormIntegrations(formId)
 
-    const connected = useMemo(
-        () => INTEGRATIONS.filter((integration) => integration.connected),
-        [],
-    )
-    const featured = useMemo(
-        () => INTEGRATIONS.filter((integration) => FEATURED_IDS.includes(integration.id)),
-        [],
-    )
+    const { groups, counts } = useIntegrationFilter(category, search, integrations)
 
-    // Placeholder until connect flows are wired up.
-    const handleAction = (_integration: Integration) => { }
+    const handleAction = (integration: Integration) => {
+        setActiveModalIntegration(integration)
+    }
 
     return (
-        <div className="editorial mx-auto w-full max-w-[1160px] space-y-8 px-0 py-0 sm:px-6 sm:pt-10 lg:px-8">
-            {view === "connected" ? (
-                <>
+        <div className="editorial h-full w-full overflow-y-auto">
+            <div className="mx-auto w-full max-w-[1160px] space-y-8 px-0 py-0 pb-12 sm:px-6 sm:pt-10 sm:pb-16 lg:px-8">
+                {view === "connected" ? (
                     <ConnectedView
-                        connected={connected}
-                        featured={featured}
-                        total={INTEGRATIONS.length}
+                        connected={connectedIntegrations}
+                        featured={featuredIntegrations}
+                        total={integrations.length}
                         email={user?.email}
                         onBrowse={() => setView("browse")}
                         onAction={handleAction}
                     />
-                </>
-            ) : (
-                <BrowseView
-                    category={category}
-                    onCategoryChange={setCategory}
-                    search={search}
-                    onSearchChange={setSearch}
-                    groups={groups}
-                    counts={counts}
-                    onBack={() => setView("connected")}
-                    onAction={handleAction}
-                />
-            )}
+                ) : (
+                    <BrowseView
+                        category={category}
+                        onCategoryChange={setCategory}
+                        search={search}
+                        onSearchChange={setSearch}
+                        groups={groups}
+                        counts={counts}
+                        onBack={() => setView("connected")}
+                        onAction={handleAction}
+                    />
+                )}
+            </div>
+
+            <IntegrationModal
+                open={Boolean(activeModalIntegration)}
+                onOpenChange={(open) => !open && setActiveModalIntegration(null)}
+                integration={activeModalIntegration}
+                initialConfig={activeModalIntegration ? getConfig(activeModalIntegration.id) : {}}
+                onSave={saveIntegration}
+                onDisconnect={disconnectIntegration}
+                formTitle={form?.title || "My Form"}
+                defaultEmail={user?.email}
+            />
         </div>
     )
 }

@@ -30,7 +30,7 @@ export function IncomingInvitations() {
     const isBusy = acceptInvitation.isPending || rejectInvitation.isPending
 
     return (
-        <section className="rounded-[24px] border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] p-8">
+        <section className="rounded-lg border border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] p-8">
             <h2 className="font-display text-2xl text-[var(--foreground)]">
                 {pending.length === 1
                     ? "You have an invitation"
@@ -44,17 +44,17 @@ export function IncomingInvitations() {
                 {pending.map((invitation) => (
                     <li
                         key={invitation.id}
-                        className="flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[var(--border)] bg-[var(--card)] p-5"
+                        className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)] p-5"
                     >
                         <div className="flex min-w-0 items-center gap-3">
                             {invitation.workspace?.logoUrl ? (
                                 <img
                                     src={invitation.workspace.logoUrl}
                                     alt=""
-                                    className="h-10 w-10 shrink-0 rounded-[14px] border border-[var(--editorial-border-light)] object-cover"
+                                    className="h-10 w-10 shrink-0 rounded-lg border border-[var(--editorial-border-light)] object-cover"
                                 />
                             ) : (
-                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-sm font-semibold text-[var(--editorial-body)]">
+                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-sm font-semibold text-[var(--editorial-body)]">
                                     {(invitation.workspace?.name ?? "?")
                                         .slice(0, 2)
                                         .toUpperCase()}
@@ -79,7 +79,7 @@ export function IncomingInvitations() {
                                 variant="ghost"
                                 disabled={isBusy}
                                 onClick={() => rejectInvitation.mutate(invitation.token)}
-                                className="h-11 rounded-[16px] px-4 text-sm text-[var(--editorial-body)]"
+                                className="h-11 rounded-lg px-4 text-sm text-[var(--editorial-body)]"
                             >
                                 <X className="h-4 w-4" />
                                 Decline
@@ -88,7 +88,7 @@ export function IncomingInvitations() {
                                 type="button"
                                 disabled={isBusy}
                                 onClick={() => acceptInvitation.mutate(invitation.token)}
-                                className="editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-5 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                                className="editorial-transition h-11 rounded-lg bg-[var(--primary)] px-5 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                             >
                                 {acceptInvitation.isPending ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />

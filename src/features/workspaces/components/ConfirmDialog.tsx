@@ -46,7 +46,7 @@ export function ConfirmDialog({
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             {/* Portalled by Base UI, so the theme class must be re-applied. */}
-            <AlertDialogContent className="editorial rounded-[24px] border border-[var(--border)] bg-[var(--card)] p-8">
+            <AlertDialogContent className="editorial rounded-lg border border-[var(--border)] bg-[var(--card)] p-8">
                 <AlertDialogHeader>
                     <AlertDialogTitle className="font-display text-xl text-[var(--foreground)]">
                         {title}
@@ -58,7 +58,7 @@ export function ConfirmDialog({
                 <AlertDialogFooter>
                     <AlertDialogCancel
                         disabled={isPending}
-                        className="h-11 rounded-[16px] border-[var(--border)] px-6"
+                        className="h-11 rounded-lg border-[var(--border)] px-6"
                     >
                         {cancelLabel}
                     </AlertDialogCancel>
@@ -68,8 +68,8 @@ export function ConfirmDialog({
                         onClick={onConfirm}
                         className={
                             destructive
-                                ? "editorial-transition h-11 rounded-[16px] bg-[var(--destructive)] px-6 text-sm font-medium text-white hover:opacity-90 active:scale-[.98]"
-                                : "editorial-transition h-11 rounded-[16px] bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
+                                ? "editorial-transition h-11 rounded-lg bg-[var(--destructive)] px-6 text-sm font-medium text-white hover:opacity-90 active:scale-[.98]"
+                                : "editorial-transition h-11 rounded-lg bg-[var(--primary)] px-6 text-sm font-medium text-white hover:bg-[var(--editorial-primary-hover)] active:scale-[.98]"
                         }
                     >
                         {isPending ? (

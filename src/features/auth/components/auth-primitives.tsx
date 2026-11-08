@@ -25,7 +25,7 @@ export function AuthCard({
   children: ReactNode;
 }) {
   return (
-    <div className="editorial-shadow w-full rounded-[28px] border border-[var(--border)] bg-[var(--card)] p-6 sm:rounded-[32px] sm:p-10">
+    <div className="editorial-shadow w-full rounded-lg border border-[var(--border)] bg-[var(--card)] p-6 sm:rounded-lg sm:p-10">
       <div className="mb-8">
         <p className="editorial-eyebrow text-[var(--primary)]">{eyebrow}</p>
         <h1 className="mt-3 font-display text-[32px] leading-tight text-[var(--foreground)] sm:text-[40px]">
@@ -65,7 +65,7 @@ export function AuthPage({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
         className={cn(
-          "editorial-transition h-[52px] rounded-[16px] border-[var(--input)] bg-[var(--background)] px-4 text-base text-[var(--foreground)] placeholder:text-[var(--editorial-subtle)] focus-visible:border-[var(--editorial-primary-ring)] focus-visible:ring-2 focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:ring-offset-0",
+          "editorial-transition h-[52px] rounded-lg border-[var(--input)] bg-[var(--background)] px-4 text-base text-[var(--foreground)] placeholder:text-[var(--editorial-subtle)] focus-visible:border-[var(--editorial-primary-ring)] focus-visible:ring-2 focus-visible:ring-[var(--editorial-primary-ring)] focus-visible:ring-offset-0",
           error && "border-[var(--destructive)]",
           className,
         )}
@@ -82,7 +82,7 @@ export function AuthPage({
 
 /** Primary coral submit button used by both auth forms. */
 export const authSubmitClass =
-  "editorial-transition w-full py-3 rounded-[16px] text-sm font-medium text-white  hover:-translate-y-0.5  active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none";
+  "editorial-transition w-full py-3 rounded-lg text-sm font-medium text-white  hover:-translate-y-0.5  active:translate-y-0 active:scale-[.98] active:bg-[var(--editorial-primary-pressed)] disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none";
 
 /** "Or continue with" rule. */
 export function AuthDivider({ label }: { label: string }) {

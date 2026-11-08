@@ -353,15 +353,43 @@ export interface PageLogic {
 
 export interface PageAppearance {
     width: "full" | "half"
-    icon: string
+    icon?: string
     submitButtonText?: string
     submitButtonColor?: string
 }
+
+export interface FormQuestion {
+    _id?: string
+    id?: string
+    formId?: string
+    questionKey?: string
+    blockKey?: string
+    title: string
+    description: string
+    label?: string
+    helperText?: string
+    type: PageType
+    order: number
+    placeholder?: string
+    required?: boolean
+    options?: PageOption[]
+    validation?: PageValidation
+    appearance?: PageAppearance
+    coverImage?: PageCoverImage | null
+    settings?: PageSettings
+    isActive?: boolean
+    createdAt?: string
+    updatedAt?: string
+}
+
+export type FormBlock = FormQuestion
 
 export interface FormPage {
     _id: string
     formId: string
     pageKey: string
+    title?: string
+    description?: string
     label: string
     helperText: string
     placeholder: string
@@ -375,24 +403,16 @@ export interface FormPage {
     isActive: boolean
     coverImage?: PageCoverImage | null
     settings?: PageSettings
+    questions?: FormQuestion[]
+    blocks?: FormQuestion[]
     createdAt: string
     updatedAt: string
 }
 
 export interface CreatePageRequest {
-    type: PageType
-    label: string
-    helperText?: string
-    placeholder?: string
-    required?: boolean
-    options?: PageOption[]
-    validation?: PageValidation
-    appearance?: PageAppearance
-    coverImage?: PageCoverImage | null
-    settings?: PageSettings
-}
-
-export interface UpdatePageRequest {
+    type?: PageType
+    title?: string
+    description?: string
     label?: string
     helperText?: string
     placeholder?: string
@@ -402,6 +422,24 @@ export interface UpdatePageRequest {
     appearance?: PageAppearance
     coverImage?: PageCoverImage | null
     settings?: PageSettings
+    questions?: FormQuestion[]
+    blocks?: FormQuestion[]
+}
+
+export interface UpdatePageRequest {
+    title?: string
+    description?: string
+    label?: string
+    helperText?: string
+    placeholder?: string
+    required?: boolean
+    options?: PageOption[]
+    validation?: PageValidation
+    appearance?: PageAppearance
+    coverImage?: PageCoverImage | null
+    settings?: PageSettings
+    questions?: FormQuestion[]
+    blocks?: FormQuestion[]
 }
 
 export interface ReorderPagesRequest {
@@ -454,26 +492,34 @@ export interface ReorderEndPagesRequest {
 // Blocks
 // ---------------------------------------------------------------------------
 
-export interface FormBlock {
-    id: string
-    formId: string
-    title: string
-    description: string
-    type: string
-    order: number
-    createdAt: string
-    updatedAt: string
-}
-
 export interface CreateBlockRequest {
-    title: string
+    type?: PageType
+    title?: string
     description?: string
-    type?: string
+    label?: string
+    helperText?: string
+    placeholder?: string
+    required?: boolean
+    options?: PageOption[]
+    validation?: PageValidation
+    appearance?: PageAppearance
+    coverImage?: PageCoverImage | null
+    settings?: PageSettings
 }
 
 export interface UpdateBlockRequest {
+    type?: PageType
     title?: string
     description?: string
+    label?: string
+    helperText?: string
+    placeholder?: string
+    required?: boolean
+    options?: PageOption[]
+    validation?: PageValidation
+    appearance?: PageAppearance
+    coverImage?: PageCoverImage | null
+    settings?: PageSettings
 }
 
 export interface ReorderBlocksRequest {

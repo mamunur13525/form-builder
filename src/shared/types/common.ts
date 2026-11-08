@@ -338,10 +338,37 @@ export interface PageSettings {
     matrix?: MatrixSettings
 }
 
+export interface FormQuestion {
+    _id?: string
+    id?: string
+    questionKey?: string
+    blockKey?: string
+    type: PageType
+    title: string
+    description: string
+    label?: string
+    helperText?: string
+    placeholder?: string
+    required?: boolean
+    order: number
+    options?: Option[]
+    validation?: Validation
+    appearance?: Appearance
+    coverImage?: CoverImage | null
+    settings?: PageSettings
+    isActive?: boolean
+    createdAt?: string
+    updatedAt?: string
+}
+
+export type FormBlock = FormQuestion
+
 export interface FormPage {
     _id?: string
     formId?: string
     pageKey: string
+    title?: string
+    description?: string
     label: string
     helperText: string
     placeholder: string
@@ -355,6 +382,8 @@ export interface FormPage {
     isActive: boolean
     coverImage?: CoverImage | null
     settings?: PageSettings
+    questions?: FormQuestion[]
+    blocks?: FormQuestion[]
 }
 
 // ---------------------------------------------------------------------------

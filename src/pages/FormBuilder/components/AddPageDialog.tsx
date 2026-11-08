@@ -53,11 +53,15 @@ export function AddPageDialog({
 
             // Pages are now embedded in the form, so we create them locally
             // and they will be saved when the form is updated
+            const blockKey = `block_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
+            const initialTitle = PAGE_TYPE_LABELS[type as PageType] || "New Question"
             const newPage: FormPage = {
                 _id: undefined,
                 formId: id || "",
                 pageKey: `page_${Date.now()}`,
-                label: PAGE_TYPE_LABELS[type as PageType] || "New Question",
+                title: initialTitle,
+                description: "",
+                label: initialTitle,
                 helperText: "",
                 placeholder: "",
                 type,
@@ -69,6 +73,42 @@ export function AddPageDialog({
                 isActive: true,
                 coverImage: null,
                 settings: defaultSettingsForType(type as PageType),
+                questions: [
+                    {
+                        questionKey: blockKey,
+                        blockKey,
+                        type,
+                        title: initialTitle,
+                        description: "",
+                        label: initialTitle,
+                        helperText: "",
+                        placeholder: "",
+                        required: false,
+                        order: 1,
+                        options: defaultOptionsForType(type as PageType),
+                        settings: defaultSettingsForType(type as PageType),
+                        appearance: { width: "full", icon: "" },
+                        isActive: true,
+                    },
+                ],
+                blocks: [
+                    {
+                        questionKey: blockKey,
+                        blockKey,
+                        type,
+                        title: initialTitle,
+                        description: "",
+                        label: initialTitle,
+                        helperText: "",
+                        placeholder: "",
+                        required: false,
+                        order: 1,
+                        options: defaultOptionsForType(type as PageType),
+                        settings: defaultSettingsForType(type as PageType),
+                        appearance: { width: "full", icon: "" },
+                        isActive: true,
+                    },
+                ],
             }
             onAddPage(newPage)
         },

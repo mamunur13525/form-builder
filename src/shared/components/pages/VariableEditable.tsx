@@ -271,6 +271,10 @@ export function VariableEditable({
     )
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        // Prevent outer keyboard drag handlers (such as react-movable intercepting Space)
+        // from capturing typing events inside this editable field.
+        event.stopPropagation()
+
         if (!menu || filtered.length === 0) {
             if (menu && event.key === "Escape") {
                 event.preventDefault()
@@ -366,6 +370,11 @@ export function VariableEditable({
                         syncMenu()
                 }}
                 onMouseUp={syncMenu}
+                onKeyDownCapture={(e) => {
+                    // Stop key events in capture phase so ancestor listeners (such as react-movable List)
+                    // cannot intercept Space or other typing keys.
+                    e.stopPropagation()
+                }}
                 onKeyDown={handleKeyDown}
                 onBlur={() => {
                     paintTokens()

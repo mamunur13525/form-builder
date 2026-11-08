@@ -98,12 +98,33 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         setIsSubmitting(true)
         setError(null)
         try {
-            const answerList = Object.entries(answers).map(([pageKey, value]) => {
-                const page = form.pages.find((f) => f.pageKey === pageKey)
+            const answerList = Object.entries(answers).map(([key, value]) => {
+                let block: any = undefined
+                let page: any = undefined
+                for (const p of form.pages) {
+                    if (p.pageKey === key) {
+                        page = p
+                        break
+                    }
+                    if (p.blocks) {
+                        const found = p.blocks.find((b: any) => b.blockKey === key || b._id === key || b.id === key)
+                        if (found) {
+                            block = found
+                            page = p
+                            break
+                        }
+                    }
+                }
+                const label = block?.title || block?.label || page?.title || page?.label || ""
+                const type = block?.type || page?.type || "shortText"
+                const blockKey = block?.blockKey || key
+                const pageKey = page?.pageKey || key
                 return {
                     pageKey,
-                    label: page?.label || "",
-                    type: page?.type || "text",
+                    blockKey,
+                    title: label,
+                    label,
+                    type,
                     value,
                 }
             })
@@ -117,12 +138,12 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         } finally {
             setIsSubmitting(false)
         }
-    }, [isPreview, answers, form.slug, form.pages, onSubmit])
+    }, [isPreview, answers, form, onSubmit, computedVariables])
 
     const handleNext = useCallback(() => {
         if (!currentPage) return
 
-        const validationError = validatePage(currentPage, answers[currentPage.pageKey])
+        const validationError = validatePage(currentPage, answers)
         if (validationError) {
             setError(validationError)
             return
@@ -131,13 +152,24 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         setSubmittedPages((prev) => new Set(prev).add(currentStep))
         setDirection(1)
 
-        // Commit this page's answer, then evaluate logic against the committed
+        // Commit this page's answers, then evaluate logic against the committed
         // snapshot. This is what makes rules apply *after* submit: page
         // visibility / calculations only move once the answer is committed here,
         // and the current answer is included so branching on it works too.
-        const committed = {
-            ...committedAnswers,
-            [currentPage.pageKey]: answers[currentPage.pageKey],
+        const items = (currentPage.questions && currentPage.questions.length > 0)
+            ? currentPage.questions
+            : (currentPage.blocks && currentPage.blocks.length > 0 ? currentPage.blocks : [])
+        const pageQuestionKeys: string[] = items.length > 0
+            ? items.map((b) => (b.questionKey || b.blockKey || "")).filter(Boolean)
+            : [currentPage.pageKey]
+        const committed = { ...committedAnswers }
+        for (const key of pageQuestionKeys) {
+            if (answers[key] !== undefined) {
+                committed[key] = answers[key]
+            }
+        }
+        if (answers[currentPage.pageKey] !== undefined) {
+            committed[currentPage.pageKey] = answers[currentPage.pageKey]
         }
         setCommittedAnswers(committed)
 

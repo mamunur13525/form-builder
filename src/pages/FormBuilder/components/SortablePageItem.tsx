@@ -105,6 +105,17 @@ export function SortablePageItem({
     willChange: isDragged ? "transform" : undefined,
     zIndex: isDragged ? 9999 : undefined,
     transition: isDragged ? "none" : itemStyle?.transition,
+    // @ts-expect-error CSS custom properties
+    "--item-bg": isDragged
+      ? hexToRgba(iconHexColor, 0.14)
+      : isSelected
+      ? hexToRgba(iconHexColor, 0.12)
+      : hexToRgba(iconHexColor, 0.06),
+    "--item-bg-hover": isDragged
+      ? hexToRgba(iconHexColor, 0.14)
+      : isSelected
+      ? hexToRgba(iconHexColor, 0.14)
+      : hexToRgba(iconHexColor, 0.10),
   };
 
   return (
@@ -118,13 +129,14 @@ export function SortablePageItem({
       aria-current={isSelected ? "true" : undefined}
       className={`
         group relative flex items-center gap-2.5 rounded-lg border p-3
-        cursor-pointer select-none transition-all 
+        cursor-pointer select-none transition-all
+        bg-[var(--item-bg)] hover:bg-[var(--item-bg-hover)]
         ${isSelected
-          ? "border-[#D84315]/50 bg-white dark:bg-[#18181c] ring-2 ring-[#FF5722]/20 shadow-xs"
-          : "border-neutral-200/90 dark:border-zinc-800/90 bg-[#F0F5F9]/80 dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-xs"
+          ? "border-[#D84315]/50 ring-2 ring-[#FF5722]/20 shadow-xs"
+          : "border-neutral-200/90 dark:border-zinc-800/90 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-xs"
         }
-        ${isDragged ? "border-[#D84315] bg-[#F0F5F9]/80 dark:bg-[#18181c] shadow-2xl scale-[1.02] cursor-grabbing z-50" : ""}
-        ${isLifted && !isDragged ? "border-[#D84315] bg-[#F0F5F9]/80 dark:bg-[#18181c] shadow-xl" : ""}
+        ${isDragged ? "border-[#D84315] shadow-2xl scale-[1.02] cursor-grabbing z-50" : ""}
+        ${isLifted && !isDragged ? "border-[#D84315] shadow-xl" : ""}
       `}
     >
     

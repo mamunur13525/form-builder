@@ -28,10 +28,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../../../components/ui/select";
-import {
-    PAGE_TYPE_COLORS,
-    PAGE_TYPE_ICONS,
-} from "../../../shared/constants/form-types";
 import type {
     FormPage,
     FormVariable,
@@ -48,7 +44,7 @@ import { getLogicRules } from "@/entities/form/api/logic.api";
 import { useFormStore } from "@/app/store/formStore";
 import { SECTIONS } from "./logicEditorConfig";
 import { normalizeApiRule, emptyRule } from "./ruleUtils";
-import { RuleEditor } from "./RuleEditor";
+import { RuleEditor, PageTypeChip } from "./RuleEditor";
 import { RuleCard } from "./RuleCard";
 
 interface LogicEditorDialogProps {
@@ -76,20 +72,6 @@ interface LogicEditorDialogProps {
 interface EditorState {
     category: LogicCategory | null
     rule: FormLogicRule | null
-}
-
-/** Tinted page-type chip — icon + page number, used in page select items. */
-function PageTypeChip({ page, pageNumber }: { page: FormPage; pageNumber: number }) {
-    const Icon = PAGE_TYPE_ICONS[page.type]
-    if (!Icon) return null
-    return (
-        <span
-            className={`flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-br px-2 py-0.5 text-xs font-semibold ${PAGE_TYPE_COLORS[page.type]}`}
-        >
-            <Icon className="h-3.5 w-3.5" aria-hidden />
-            Q{pageNumber}
-        </span>
-    )
 }
 
 function LogicEditorDialogComponent({

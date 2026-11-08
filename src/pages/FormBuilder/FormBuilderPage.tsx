@@ -516,10 +516,22 @@ export function FormBuilderPage() {
 
   const addPage = useCallback(
     async (page: FormPage) => {
+      // Determine insertion index: directly below the selected page if a page is selected,
+      // otherwise at the end of the pages list.
+      const insertIndex =
+        selectedKind === "page" && selectedPageIndex >= 0 && selectedPageIndex < pages.length
+          ? selectedPageIndex + 1
+          : pages.length;
+
       if (!formId || formId === "new") {
-        // For new forms, just add to local state
-        setPages((prev) => [...prev, page]);
-        setSelectedPageIndex(pages.length);
+        // For new forms, just insert into local state
+        setPages((prev) => {
+          const updated = [...prev];
+          updated.splice(insertIndex, 0, page);
+          return updated;
+        });
+        setSelectedKind("page");
+        setSelectedPageIndex(insertIndex);
         return;
       }
 
@@ -542,12 +554,29 @@ export function FormBuilderPage() {
           settings: page.settings,
         });
 
-        // Update local state with the created page (which has id from server)
-        setPages((prev) => [
-          ...prev,
-          { ...page, _id: createdPage._id, pageKey: createdPage.pageKey },
-        ]);
-        setSelectedPageIndex(pages.length);
+        const newPageWithServerIds: FormPage = {
+          ...page,
+          _id: createdPage._id,
+          pageKey: createdPage.pageKey,
+        };
+
+        // Insert below selected page in local state
+        const updatedPages = [...pages];
+        updatedPages.splice(insertIndex, 0, newPageWithServerIds);
+        setPages(updatedPages);
+        setSelectedKind("page");
+        setSelectedPageIndex(insertIndex);
+
+        // If newly inserted page was not added at the very end, persist the new ordering
+        if (insertIndex < pages.length && createdPage._id) {
+          const pageIds = updatedPages
+            .map((p) => p._id)
+            .filter(Boolean) as string[];
+          if (pageIds.length === updatedPages.length) {
+            await reorderPagesApi(formId, { pageIds });
+          }
+        }
+
         showSaveStatus("saved");
         // Adding a page to a published form makes it out of date.
         setHasUnpublishedChanges(true);
@@ -556,7 +585,7 @@ export function FormBuilderPage() {
         showSaveStatus("error");
       }
     },
-    [formId, pages.length, showSaveStatus, setHasUnpublishedChanges],
+    [formId, pages, selectedKind, selectedPageIndex, showSaveStatus, setHasUnpublishedChanges],
   );
 
   const deletePage = useCallback(
@@ -746,7 +775,7 @@ export function FormBuilderPage() {
   );
 
   const editorColumn = (
-    <div className="relative flex h-full min-h-0 w-full flex-col gap-3 p-3 bg-slate-200/80 dark:bg-[#3f4255] bg-[radial-gradient(#94a3b8_1.2px,transparent_1.2px)] dark:bg-[radial-gradient(#5d617a_1.2px,transparent_1.2px)] [background-size:24px_24px] overflow-hidden">
+    <div className="relative flex h-full min-h-0 w-full flex-col gap-3 p-3 bg-slate-200/80 dark:bg-[#3f4255] bg-[radial-gradient(rgba(148,163,184,0.45)_1.2px,transparent_1.2px)] dark:bg-[radial-gradient(rgba(93,97,122,0.5)_1.2px,transparent_1.2px)] [background-size:24px_24px] overflow-hidden">
       {/* Neutral vignette: softly frames the canvas in light mode without muddying dots; hidden in dark mode */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(100,116,139,0.12)_100%)] dark:hidden" />
 
@@ -789,7 +818,7 @@ export function FormBuilderPage() {
       <div className="relative z-10 flex min-h-0 w-full flex-1 items-center justify-center overflow-auto p-1 sm:p-3">
         <div
           className={cn(
-            "light relative flex flex-col h-full max-h-[78vh] w-full overflow-hidden rounded-lg border border-slate-200/90 bg-white shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
+            "light relative flex flex-col h-full max-h-[78vh] -translate-y-7 w-full overflow-hidden rounded-lg border border-slate-200/90 bg-white shadow-xl dark:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] transition-all duration-300",
           )}
           style={{
             width: isMobileView ? "min(420px, 100%)" : "100%",

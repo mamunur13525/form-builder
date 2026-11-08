@@ -270,7 +270,7 @@ function LogicTopBar({ onBack }: { onBack: () => void }) {
   const zoomPercent = Math.round(zoom * 100);
 
   return (
-    <header className="relative z-10 flex h-14 w-full shrink-0 items-center justify-between border-b border-[var(--border)] bg-white px-4 select-none dark:border-zinc-800 dark:bg-[#141418]">
+    <header className="relative z-10 flex h-14 w-full shrink-0 items-center justify-between rounded-md border border-[var(--border)] bg-white px-4 select-none dark:border-zinc-800 dark:bg-[#141418] ">
       {/* Left: Editor back and Logic active tab */}
       <div className="flex items-center gap-2">
         <button
@@ -455,12 +455,12 @@ function LogicFlow() {
   }
 
   return (
-    <div className="editorial relative flex h-full w-full flex-col overflow-hidden bg-[var(--editorial-canvas)] dark:bg-[#0c0c0f] p-8">
+    <div className="editorial relative flex gap-5 h-full w-full flex-col overflow-hidden bg-[var(--editorial-canvas)] dark:bg-[#0c0c0f] p-8">
       {/* Top Header matching Image #1 */}
       <LogicTopBar onBack={() => navigate(`/form-builder/${formId}`)} />
 
       {/* Canvas */}
-      <div className="relative flex-1 min-h-0">
+      <div className="relative flex-1 min-h-0 rounded-md border border-[var(--border)] bg-white px-4 select-none dark:border-zinc-800 dark:bg-[#141418]">
         <ReactFlow
           nodes={nodes}
           edges={edges}

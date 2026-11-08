@@ -31,6 +31,7 @@ import {
 } from "../../../shared/constants/form-types";
 import type { FormPage } from "../../../shared/types/common";
 import type { IItemProps } from "react-movable";
+import { cn } from "@/lib/utils"
 
 interface SortablePageItemProps {
   /** Props provided by react-movable, spread over the root element. */
@@ -48,6 +49,15 @@ interface SortablePageItemProps {
   onDuplicate?: (index: number) => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const clean = hex.replace("#", "");
+  if (clean.length !== 6) return hex;
+  const r = parseInt(clean.substring(0, 2), 16);
+  const g = parseInt(clean.substring(2, 4), 16);
+  const b = parseInt(clean.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export function SortablePageItem({
@@ -84,6 +94,7 @@ export function SortablePageItem({
   };
   const Icon = visual.icon;
   const typeLabel = visual.displayName ?? PAGE_TYPE_LABELS[page.type] ?? page.type;
+  const iconHexColor = visual.bgColor.match(/#[0-9a-fA-F]{6}/)?.[0] ?? "#5da2f6";
 
   const isFirst = index === 0;
   const isLast = index === pagesCount - 1;
@@ -107,15 +118,16 @@ export function SortablePageItem({
       aria-current={isSelected ? "true" : undefined}
       className={`
         group relative flex items-center gap-2.5 rounded-lg border p-3
-        cursor-pointer select-none transition-all
+        cursor-pointer select-none transition-all 
         ${isSelected
-          ? "border-[#D84315] bg-white dark:bg-[#18181c] ring-2 ring-[#FF5722]/20 shadow-xs"
-          : "border-neutral-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-xs"
+          ? "border-[#D84315]/50 bg-white dark:bg-[#18181c] ring-2 ring-[#FF5722]/20 shadow-xs"
+          : "border-neutral-200/90 dark:border-zinc-800/90 bg-[#F0F5F9]/80 dark:bg-[#18181c] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-neutral-300 dark:hover:border-zinc-700 hover:shadow-xs"
         }
-        ${isDragged ? "border-[#D84315] bg-white dark:bg-[#18181c] shadow-2xl scale-[1.02] cursor-grabbing z-50" : ""}
-        ${isLifted && !isDragged ? "border-[#D84315] bg-white dark:bg-[#18181c] shadow-xl" : ""}
+        ${isDragged ? "border-[#D84315] bg-[#F0F5F9]/80 dark:bg-[#18181c] shadow-2xl scale-[1.02] cursor-grabbing z-50" : ""}
+        ${isLifted && !isDragged ? "border-[#D84315] bg-[#F0F5F9]/80 dark:bg-[#18181c] shadow-xl" : ""}
       `}
     >
+    
       {/* 1. Drag handle on far left (left of icon) */}
       <Tooltip>
         <TooltipTrigger
@@ -144,7 +156,14 @@ export function SortablePageItem({
       {/* 3. Text block: Subtitle and Question Title */}
       <div className="flex min-w-0 flex-1 flex-col justify-center text-left">
         <div className="mb-0.5 flex items-center gap-1.5 min-w-0">
-          <span className="inline-flex shrink-0 items-center justify-center rounded px-1.5 py-0.5 text-[10.5px] font-semibold leading-none border border-sky-400/60 dark:border-sky-500/50 bg-sky-50/80 dark:bg-sky-500/10 text-sky-600 dark:text-sky-300">
+          <span
+            className="inline-flex shrink-0 items-center justify-center rounded-full px-1.5 py-0.5 text-[10.5px] font-semibold leading-none border"
+            style={{
+              borderColor: hexToRgba(iconHexColor, 0.45),
+              backgroundColor: hexToRgba(iconHexColor, 0.12),
+              color: iconHexColor,
+            }}
+          >
             Q{index + 1}
           </span>
           <span className="truncate text-xs font-normal text-neutral-400 dark:text-zinc-500">
@@ -233,7 +252,7 @@ export function SortablePageItem({
               <button
                 type="button"
                 onClick={(e) => e.stopPropagation()}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                className={cn("flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors cursor-pointer ", confirmOpen ? "opacity-100": "opacity-0 group-hover:opacity-100")}
               >
                 <MoreVertical className="h-4 w-4" />
               </button>

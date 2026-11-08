@@ -10,6 +10,7 @@ import {
     ShieldCheck,
     MousePointer,
     Settings as SettingsIcon,
+    Search,
 } from "lucide-react"
 import { Input } from "../../../components/ui/input"
 import {
@@ -19,7 +20,9 @@ import {
     ComboboxItem,
     ComboboxList,
     ComboboxTrigger,
+    ComboboxInput,
 } from "../../../components/ui/combobox"
+import { InputGroupAddon } from "../../../components/ui/input-group"
 import {
     Tabs,
     TabsContent,
@@ -72,6 +75,8 @@ interface SettingsPanelProps {
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormPage>) => void
     onOpenDesignDrawer: () => void
+    selectedQuestionId?: string | null
+    onSelectQuestion?: (questionId: string | null) => void
 }
 
 export function SettingsPanel({
@@ -79,10 +84,34 @@ export function SettingsPanel({
     pageIndex,
     onUpdate,
     onOpenDesignDrawer,
+    selectedQuestionId,
+    onSelectQuestion,
 }: SettingsPanelProps) {
     const [coverDialogOpen, setCoverDialogOpen] = React.useState(false)
     const [typeQuery, setTypeQuery] = React.useState("")
+    const [comboboxOpen, setComboboxOpen] = React.useState(false)
     const [activeQuestionIndex, setActiveQuestionIndex] = React.useState(0)
+
+    React.useEffect(() => {
+        if (comboboxOpen) {
+            const timer = setTimeout(() => {
+                const input = document.querySelector<HTMLInputElement>("[data-slot='combobox-content'] input")
+                input?.focus()
+            }, 50)
+            return () => clearTimeout(timer)
+        }
+    }, [comboboxOpen])
+
+    const filteredTypes = React.useMemo(() => {
+        if (!typeQuery.trim()) return PAGE_TYPES
+        const q = typeQuery.toLowerCase().trim()
+        return PAGE_TYPES.filter((type) => {
+            const label = (PAGE_TYPE_LABELS[type] ?? type).toLowerCase()
+            const visual = PAGE_TYPE_VISUALS[type]
+            const displayName = (visual?.displayName ?? "").toLowerCase()
+            return label.includes(q) || displayName.includes(q) || type.toLowerCase().includes(q)
+        })
+    }, [typeQuery])
 
     const questions: FormQuestion[] = (page.questions && page.questions.length > 0)
         ? page.questions
@@ -115,6 +144,16 @@ export function SettingsPanel({
     const currentQuestion = questions[safeQuestionIndex] || questions[0]
     const currentBlock = currentQuestion
     const settings = currentQuestion.settings ?? {}
+
+    React.useEffect(() => {
+        if (!selectedQuestionId) return
+        const foundIdx = questions.findIndex(
+            (q) => (q.questionKey || q.blockKey) === selectedQuestionId
+        )
+        if (foundIdx !== -1) {
+            setActiveQuestionIndex(foundIdx)
+        }
+    }, [selectedQuestionId, questions])
 
     const updateCurrentQuestion = (updates: Partial<FormQuestion>) => {
         const updatedQuestions = [...questions]
@@ -182,7 +221,7 @@ export function SettingsPanel({
     }
 
     return (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-[#141418] border-l border-slate-200/90 dark:border-zinc-800/90 text-slate-800 dark:text-zinc-100">
+        <div data-settings-panel="true" className="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-[#141418] border-l border-slate-200/90 dark:border-zinc-800/90 text-slate-800 dark:text-zinc-100">
             {/* Header: Page settings */}
             <div className="flex items-center gap-2 px-6 pt-5 pb-2">
                 <Layers className="h-5 w-5 text-slate-900 dark:text-white" />
@@ -224,7 +263,10 @@ export function SettingsPanel({
                                             <button
                                                 key={q.questionKey || q.blockKey || idx}
                                                 type="button"
-                                                onClick={() => setActiveQuestionIndex(idx)}
+                                                onClick={() => {
+                                                    setActiveQuestionIndex(idx)
+                                                    onSelectQuestion?.(q.questionKey || q.blockKey || null)
+                                                }}
                                                 className={cn(
                                                     "px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer",
                                                     safeQuestionIndex === idx
@@ -246,13 +288,15 @@ export function SettingsPanel({
                                 icon={<FileText className="h-4 w-4 text-slate-400 dark:text-zinc-400" />}
                             >
                                 <Combobox
-                                    items={PAGE_TYPES}
+                                    items={filteredTypes}
                                     value={currentQuestion.type}
                                     onValueChange={handleTypeChange}
                                     inputValue={typeQuery}
                                     onInputValueChange={(next) => setTypeQuery(next ?? "")}
+                                    open={comboboxOpen}
                                     onOpenChange={(open) => {
-                                        if (open) setTypeQuery("")
+                                        setComboboxOpen(open)
+                                        if (!open) setTypeQuery("")
                                     }}
                                 >
                                     <ComboboxTrigger className="flex h-14 w-full items-center justify-between rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500 transition-colors cursor-pointer">
@@ -275,12 +319,26 @@ export function SettingsPanel({
                                         )}
                                     </ComboboxTrigger>
                                     <ComboboxContent className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
-                                        <ComboboxEmpty className="py-3 text-center text-sm text-slate-400 dark:text-zinc-500">No items found.</ComboboxEmpty>
-                                        <ComboboxList className="space-y-1 max-h-[460px] overflow-y-auto p-1.5">
+                                        {/* Search bar with autofocus */}
+                                        <div className="p-1 mb-1 border-b border-slate-100 dark:border-zinc-800">
+                                            <ComboboxInput
+                                                autoFocus
+                                                showTrigger={false}
+                                                showClear={Boolean(typeQuery)}
+                                                placeholder="Search question types..."
+                                                className="w-full text-xs h-8 bg-slate-50 dark:bg-zinc-800/50 rounded-md border border-slate-200 dark:border-zinc-700/60 focus:border-[#FF5722]"
+                                            >
+                                                <InputGroupAddon align="inline-start">
+                                                    <Search className="size-3.5 text-slate-400 dark:text-zinc-500" />
+                                                </InputGroupAddon>
+                                            </ComboboxInput>
+                                        </div>
+                                        <ComboboxEmpty className="py-4 text-center text-xs text-slate-400 dark:text-zinc-500">No question types found.</ComboboxEmpty>
+                                        <ComboboxList className="space-y-1 max-h-[380px] overflow-y-auto p-1">
                                             {(item: PageType) => {
                                                 const visual = PAGE_TYPE_VISUALS[item]
                                                 const Icon = visual?.icon ?? FileText
-                                                const bgColor = visual?.bgColor ?? "bg-[#64748b]\"\n"
+                                                const bgColor = visual?.bgColor ?? "bg-[#64748b]"
                                                 const label = visual?.displayName ?? PAGE_TYPE_LABELS[item] ?? item
                                                 return (
                                                     <ComboboxItem

@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, memo } from "react"
 import { motion } from "framer-motion"
 
 interface ConfettiBurstProps {
@@ -30,7 +30,7 @@ const DEFAULT_COLORS = [
  * gravity and fade out — once, on mount. Purely decorative and
  * non-interactive (`pointer-events-none`).
  */
-export function ConfettiBurst({
+export const ConfettiBurst = memo(function ConfettiBurst({
     count = 120,
     colors = DEFAULT_COLORS,
     originX = "50%",
@@ -105,4 +105,4 @@ export function ConfettiBurst({
             ))}
         </div>
     )
-}
+})

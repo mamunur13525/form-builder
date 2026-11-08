@@ -110,8 +110,18 @@ export function FormBuilderPage() {
 
   const [pages, setPages] = useState<FormPage[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [endPages, setEndPages] = useState<EndPage[]>([]);
   const [selectedEndPageIndex, setSelectedEndPageIndex] = useState(0);
+
+  const handleSelectQuestion = useCallback(
+    (pageIndex: number, questionId: string | null) => {
+      setSelectedKind("page");
+      setSelectedPageIndex(pageIndex);
+      setSelectedQuestionId(questionId);
+    },
+    [],
+  );
   // True while a new end page is being created on the backend, so the list can
   // show a loading placeholder until the created record comes back.
   const [isAddingEndPage, setIsAddingEndPage] = useState(false);
@@ -755,9 +765,12 @@ export function FormBuilderPage() {
       pages={pages}
       selectedPageIndex={selectedPageIndex}
       isPageSelected={selectedKind === "page"}
+      selectedQuestionId={selectedQuestionId}
+      onSelectQuestion={handleSelectQuestion}
       onSelectPage={(index) => {
         setSelectedKind("page");
         setSelectedPageIndex(index);
+        setSelectedQuestionId(null);
       }}
       onPageOpened={() => setShowPagesDrawer(false)}
       onReorderPages={reorderPages}
@@ -775,6 +788,7 @@ export function FormBuilderPage() {
       onSelectEndPage={(index) => {
         setSelectedKind("endPage");
         setSelectedEndPageIndex(index);
+        setSelectedQuestionId(null);
       }}
       onAddEndPage={addEndPage}
       onDeleteEndPage={deleteEndPage}
@@ -796,6 +810,8 @@ export function FormBuilderPage() {
       pageIndex={selectedPageIndex}
       onUpdate={updatePage}
       onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
+      selectedQuestionId={selectedQuestionId}
+      onSelectQuestion={(qId) => setSelectedQuestionId(qId)}
     />
   ) : (
     <div className="flex h-full w-full flex-col overflow-hidden border-l border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] text-slate-800 dark:text-zinc-100">
@@ -922,6 +938,8 @@ export function FormBuilderPage() {
                   theme={form?.theme}
                   variables={variableItems}
                   withBackground={false}
+                  selectedQuestionId={selectedQuestionId}
+                  onSelectQuestion={(qId) => setSelectedQuestionId(qId)}
                 />
               </div>
             ) : (

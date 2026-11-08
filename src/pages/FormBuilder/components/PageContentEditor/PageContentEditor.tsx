@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import type { FormPage, FormQuestion, IFormTheme, PageType } from "@/shared/types/common";
-import { PageLabel, PageHelperText, PageSubmitButton, type VariableItem, VariableEditable } from "@/shared/components/pages";
+import { PageSubmitButton, type VariableItem, VariableEditable } from "@/shared/components/pages";
 import { CoverImageBlock, CoverImageSide } from "@/shared/components/CoverImageBlock";
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme";
-import { Plus, Trash2, Copy, GripVertical } from "lucide-react";
+import { Plus, Trash2, Copy, GripVertical, Search, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PAGE_TYPE_LABELS, PAGE_TYPES, PAGE_TYPE_VISUALS } from "@/shared/constants/form-types";
 import { defaultOptionsForType, defaultSettingsForType } from "@/features/forms/model/page-defaults";
@@ -42,6 +42,8 @@ interface PageContentEditorProps {
   theme?: IFormTheme | null;
   variables?: VariableItem[];
   withBackground?: boolean;
+  selectedQuestionId?: string | null;
+  onSelectQuestion?: (questionId: string | null) => void;
 }
 
 const editorMap: Record<
@@ -85,6 +87,28 @@ interface AddQuestionButtonProps {
 
 function AddQuestionButton({ onAddQuestion, className }: AddQuestionButtonProps) {
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    } else {
+      setSearchQuery("");
+    }
+  }, [open]);
+
+  const filteredTypes = PAGE_TYPES.filter((type) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const visual = PAGE_TYPE_VISUALS[type];
+    const label = (PAGE_TYPE_LABELS[type] ?? type).toLowerCase();
+    const displayName = (visual?.displayName ?? "").toLowerCase();
+    return label.includes(q) || displayName.includes(q) || type.toLowerCase().includes(q);
+  });
 
   return (
     <div
@@ -99,6 +123,7 @@ function AddQuestionButton({ onAddQuestion, className }: AddQuestionButtonProps)
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           type="button"
+          data-add-question="true"
           aria-label="Add question"
           className="relative inline-flex items-center justify-center h-6 rounded-full border border-slate-300/80 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-2 text-slate-500 dark:text-zinc-400 shadow-2xs hover:border-[#FF5722] hover:text-[#FF5722] hover:shadow-xs transition-all duration-200 cursor-pointer overflow-hidden group/btn"
         >
@@ -108,42 +133,73 @@ function AddQuestionButton({ onAddQuestion, className }: AddQuestionButtonProps)
           </span>
         </PopoverTrigger>
         <PopoverContent
-          className="w-72 max-h-96 overflow-y-auto p-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl rounded-xl z-50"
+          data-add-question="true"
+          className="w-72 max-h-[460px] flex flex-col p-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl rounded-xl z-50 overflow-hidden"
           align="center"
           sideOffset={6}
         >
-          <div className="px-2 py-1.5 text-xs font-semibold text-slate-500 dark:text-zinc-400">
-            Select question type
+          {/* Search bar with autofocus */}
+          <div className="relative mb-2 px-0.5">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 dark:text-zinc-500 pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search question types..."
+              autoFocus
+              className="w-full h-8 pl-8 pr-7 text-xs rounded-lg border border-slate-200 dark:border-zinc-700 bg-slate-50/80 dark:bg-zinc-800/60 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#FF5722] focus:ring-1 focus:ring-[#FF5722]/30 transition-colors"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 cursor-pointer"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
           </div>
-          <div className="grid grid-cols-1 gap-1">
-            {PAGE_TYPES.map((type) => {
-              const visual = PAGE_TYPE_VISUALS[type];
-              const TypeIcon = visual?.icon;
-              const label = visual?.displayName ?? PAGE_TYPE_LABELS[type] ?? type;
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    onAddQuestion(type);
-                  }}
-                  className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left text-sm hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer w-full"
-                >
-                  <div
-                    className={cn(
-                      "flex h-6 w-6 shrink-0 items-center justify-center rounded text-white shadow-2xs",
-                      visual?.bgColor ?? "bg-slate-500"
-                    )}
+
+          <div className="px-2 py-1 text-[11px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
+            Select question type ({filteredTypes.length})
+          </div>
+
+          <div className="grid grid-cols-1 gap-1 overflow-y-auto max-h-[320px] pr-0.5">
+            {filteredTypes.length === 0 ? (
+              <div className="py-6 text-center text-xs text-slate-400 dark:text-zinc-500">
+                No question types found.
+              </div>
+            ) : (
+              filteredTypes.map((type) => {
+                const visual = PAGE_TYPE_VISUALS[type];
+                const TypeIcon = visual?.icon;
+                const label = visual?.displayName ?? PAGE_TYPE_LABELS[type] ?? type;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      onAddQuestion(type);
+                    }}
+                    className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left text-sm hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer w-full group/item"
                   >
-                    {TypeIcon ? <TypeIcon className="h-3.5 w-3.5 stroke-[2]" /> : null}
-                  </div>
-                  <span className="font-medium text-slate-800 dark:text-zinc-200 text-xs">
-                    {label}
-                  </span>
-                </button>
-              );
-            })}
+                    <div
+                      className={cn(
+                        "flex h-6 w-6 shrink-0 items-center justify-center rounded text-white shadow-2xs transition-transform group-hover/item:scale-105",
+                        visual?.bgColor ?? "bg-slate-500"
+                      )}
+                    >
+                      {TypeIcon ? <TypeIcon className="h-3.5 w-3.5 stroke-[2]" /> : null}
+                    </div>
+                    <span className="font-medium text-slate-800 dark:text-zinc-200 text-xs truncate">
+                      {label}
+                    </span>
+                  </button>
+                );
+              })
+            )}
           </div>
         </PopoverContent>
       </Popover>
@@ -159,14 +215,65 @@ export function PageContentEditor({
   theme,
   variables = [],
   withBackground = true,
+  selectedQuestionId,
+  onSelectQuestion,
 }: PageContentEditorProps) {
-  const themeResolved = resolveFormTheme(theme);
+  const themeResolved = useMemo(() => resolveFormTheme(theme), [theme]);
+
+  const fontKey = useMemo(() => {
+    if (!themeResolved.font?.family) return "";
+    return `${themeResolved.font.family}:${themeResolved.font.source}:${themeResolved.font.url ?? ""}`;
+  }, [themeResolved.font]);
 
   useEffect(() => {
     if (themeResolved.font) {
       loadThemeFont(themeResolved.font);
     }
-  }, [themeResolved.font]);
+  }, [fontKey, themeResolved.font]);
+
+  // Deselect nested question when clicking outside the question
+  useEffect(() => {
+    if (!selectedQuestionId) return;
+
+    const handlePointerDown = (event: MouseEvent | PointerEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+
+      // 1. If clicked inside any question card in the editor, keep selection
+      if (
+        target.closest("[data-question-item='true']") ||
+        target.closest(".group\\/question")
+      ) {
+        return;
+      }
+
+      // 2. If clicked inside sidebar nested question items, keep selection
+      if (
+        target.closest("[data-sidebar-question='true']") ||
+        target.closest(".group\\/questionitem")
+      ) {
+        return;
+      }
+
+      // 3. If clicked inside SettingsPanel, drawers, dialogs, popovers, or add-question button
+      if (
+        target.closest("[data-settings-panel='true']") ||
+        target.closest("[role='dialog']") ||
+        target.closest("[data-radix-popper-content-wrapper]") ||
+        target.closest("[data-add-question='true']")
+      ) {
+        return;
+      }
+
+      // Clicked outside any question -> deselect
+      onSelectQuestion?.(null);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [selectedQuestionId, onSelectQuestion]);
 
   const fontSizes = getFontSizeClasses(themeResolved.fontSize);
   const alignClass =
@@ -228,6 +335,11 @@ export function PageContentEditor({
               isActive: page.isActive ?? true,
             },
           ];
+
+  const hasSelectedQuestion = Boolean(
+    selectedQuestionId &&
+      questions.some((q) => (q.questionKey || q.blockKey) === selectedQuestionId)
+  );
 
   const updateQuestion = (questionIndex: number, updates: Partial<FormQuestion>) => {
     const updatedQuestions = [...questions];
@@ -379,27 +491,60 @@ export function PageContentEditor({
 
   const isStatement = page.type === "statement";
 
+  const questionTitleSize =
+    themeResolved.fontSize === "small"
+      ? "text-[16px] sm:text-[17px]"
+      : themeResolved.fontSize === "large"
+        ? "text-[20px] sm:text-[22px]"
+        : "text-[17px] sm:text-[19px]";
+
+  const questionDescSize =
+    themeResolved.fontSize === "small"
+      ? "text-[12px] sm:text-[13px]"
+      : themeResolved.fontSize === "large"
+        ? "text-[15px] sm:text-[16px]"
+        : "text-[13px] sm:text-[14px]";
+
   const content = (
     <div className="w-full space-y-6">
-      {/* 1. Page Title and Description with page number on top-left as before */}
-      <div className="w-full relative space-y-1 mb-2">
-        <PageLabel
-          label={pageTitle}
-          pageNumber={pageIndex + 1}
-          editable
-          onUpdate={handlePageTitleChange}
-          color={themeResolved.questionColor}
-          fontSizeClass={fontSizes.question}
-          variables={variables}
-        />
-        <PageHelperText
-          helperText={pageDescription}
-          editable
-          onUpdate={handlePageDescriptionChange}
-          color={themeResolved.textColor}
-          fontSizeClass={fontSizes.helper}
-          variables={variables}
-        />
+      {/* 1. Page Title and Description with page number on top-left aligned with question handles */}
+      <div className="w-full relative mb-2">
+        <div className="flex items-start gap-2.5">
+          {/* Page number badge aligned in the exact same 24px column as question drag handles */}
+          <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-slate-900 dark:bg-zinc-800 text-white text-[11px] font-bold select-none shadow-2xs">
+            {pageIndex + 1}
+          </span>
+
+          <div className="flex-1 min-w-0">
+            <VariableEditable
+              value={pageTitle}
+              onCommit={handlePageTitleChange}
+              variables={variables}
+              ariaLabel="Page Title"
+              placeholder="Page title (optional)"
+              className={cn(
+                fontSizes.question || "text-[24px] sm:text-[28px]",
+                "font-normal outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
+              )}
+              style={themeResolved.questionColor ? { color: themeResolved.questionColor } : undefined}
+            />
+
+            <div className="mt-1 w-full">
+              <VariableEditable
+                value={pageDescription}
+                onCommit={handlePageDescriptionChange}
+                variables={variables}
+                ariaLabel="Page Description"
+                placeholder="Description (optional)"
+                className={cn(
+                  fontSizes.helper || "text-[16px] sm:text-[18px]",
+                  "font-normal text-muted-foreground outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
+                )}
+                style={themeResolved.textColor ? { color: themeResolved.textColor } : undefined}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 2. Top-most Add Question button (above first question) - hidden until hovered */}
@@ -451,19 +596,35 @@ export function PageContentEditor({
           };
 
           const questionId = question.questionKey || question.blockKey;
+          const isThisQuestionSelected = !hasSelectedQuestion || questionId === selectedQuestionId;
 
           return (
             <div
               key={key}
               id={`question-${questionId}`}
               data-block-id={`block-${questionId}`}
+              data-question-item="true"
               {...itemProps}
               style={combinedStyle}
+              onClick={() => {
+                if (selectedQuestionId !== questionId) {
+                  onSelectQuestion?.(questionId || null);
+                }
+              }}
+              onFocusCapture={() => {
+                if (selectedQuestionId !== questionId) {
+                  onSelectQuestion?.(questionId || null);
+                }
+              }}
               className={cn(
-                "group/question relative w-full rounded-xl transition-all",
+                "group/question relative w-full rounded-xl transition-all duration-200",
                 isDragged
                   ? "opacity-75 bg-slate-50/80 dark:bg-zinc-800/80 shadow-lg ring-1 ring-[#FF5722]/30"
-                  : ""
+                  : !hasSelectedQuestion
+                    ? "opacity-100"
+                    : isThisQuestionSelected
+                      ? "opacity-100 ring-2 ring-[#FF5722]/25 rounded-xl bg-white/40 dark:bg-zinc-900/40 shadow-xs"
+                      : "opacity-35 hover:opacity-75 cursor-pointer"
               )}
             >
               {/* Question Main Content: clean design, no card border, no type icon */}
@@ -489,8 +650,8 @@ export function PageContentEditor({
                       ariaLabel="Question"
                       placeholder="Type your question... Use @ to recall information."
                       className={cn(
-                        fontSizes.question || "text-[26px]",
-                        "font-semibold outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
+                        questionTitleSize,
+                        "font-normal outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
                       )}
                       style={themeResolved.questionColor ? { color: themeResolved.questionColor } : undefined}
                     />
@@ -503,8 +664,8 @@ export function PageContentEditor({
                         ariaLabel="Description"
                         placeholder="Description (optional)"
                         className={cn(
-                          fontSizes.helper || "text-[18px]",
-                          "text-muted-foreground outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
+                          questionDescSize,
+                          "font-normal text-muted-foreground outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
                         )}
                         style={themeResolved.textColor ? { color: themeResolved.textColor } : undefined}
                       />
@@ -515,7 +676,10 @@ export function PageContentEditor({
                   <div className="flex items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity">
                     <button
                       type="button"
-                      onClick={() => handleDuplicateQuestion(qIdx)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDuplicateQuestion(qIdx);
+                      }}
                       title="Duplicate question"
                       className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
                     >
@@ -524,7 +688,10 @@ export function PageContentEditor({
                     {questions.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleDeleteQuestion(qIdx)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteQuestion(qIdx);
+                        }}
                         title="Delete question"
                         className="p-1 rounded text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
                       >
@@ -535,7 +702,7 @@ export function PageContentEditor({
                 </div>
 
                 {/* Question Editor Input */}
-                <div className="mt-6 w-full pl-8" style={{ color: themeResolved.answerColor }}>
+                <div className="mt-6 w-full pl-[34px]" style={{ color: themeResolved.answerColor }}>
                   {QuestionEditor ? (
                     <QuestionEditor
                       page={questionAsPage}
@@ -584,6 +751,18 @@ export function PageContentEditor({
     <div
       className="light relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
       style={containerStyle}
+      onClick={(e) => {
+        const target = e.target as HTMLElement | null;
+        if (
+          selectedQuestionId &&
+          target &&
+          !target.closest("[data-question-item='true']") &&
+          !target.closest(".group\\/question") &&
+          !target.closest("[data-add-question='true']")
+        ) {
+          onSelectQuestion?.(null);
+        }
+      }}
     >
       {/* Background Image Layer */}
       {withBackground && themeResolved.backgroundImage?.url && (

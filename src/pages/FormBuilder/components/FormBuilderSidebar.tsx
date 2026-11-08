@@ -29,6 +29,8 @@ interface FormBuilderSidebarProps {
   onPageOpened?: () => void;
   /** Applies a reordered page list and persists the new order. */
   onReorderPages: (pages: FormPage[]) => void;
+  selectedQuestionId?: string | null;
+  onSelectQuestion?: (pageIndex: number, questionId: string | null) => void;
   /** Reorders nested questions within a page */
   onReorderQuestions?: (pageIndex: number, oldIndex: number, newIndex: number) => void;
   onReorderBlocks?: (pageIndex: number, oldIndex: number, newIndex: number) => void;
@@ -58,6 +60,8 @@ export function FormBuilderSidebar({
   onSelectPage,
   onPageOpened,
   onReorderPages,
+  selectedQuestionId,
+  onSelectQuestion,
   onReorderQuestions,
   onReorderBlocks,
   onAddPage,
@@ -195,6 +199,8 @@ export function FormBuilderSidebar({
                     onDuplicate={onDuplicatePage}
                     onMoveUp={movePageUp}
                     onMoveDown={movePageDown}
+                    selectedQuestionId={isPageSelected && index === selectedPageIndex ? selectedQuestionId : null}
+                    onSelectQuestion={onSelectQuestion}
                     onReorderQuestions={(onReorderQuestions || onReorderBlocks) ? (oldIdx, newIdx) => (onReorderQuestions || onReorderBlocks)!(index, oldIdx, newIdx) : undefined}
                     onReorderBlocks={(onReorderQuestions || onReorderBlocks) ? (oldIdx, newIdx) => (onReorderQuestions || onReorderBlocks)!(index, oldIdx, newIdx) : undefined}
                   />

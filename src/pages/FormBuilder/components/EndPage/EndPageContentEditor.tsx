@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useCallback, useRef, useState, memo } from "react"
 import { Share2 } from "lucide-react"
 import type { EndPage, IFormTheme } from "@/shared/types/common"
 import { PageLabel, PageHelperText, PageSubmitButton, type VariableItem } from "@/shared/components/pages"
@@ -23,52 +23,77 @@ interface EndPageContentEditorProps {
     withBackground?: boolean
 }
 
+const EMPTY_VARIABLES: VariableItem[] = []
+
 /**
  * The middle-column editor for a single end page. Mirrors PageContentEditor:
  * a themed canvas with an editable title and message, plus a preview of the
  * cover image, embed, and call-to-action button.
  */
-export function EndPageContentEditor({
+function EndPageContentEditorComponent({
     endPage,
     endPageIndex,
     onUpdate,
     isMobileView,
     theme,
-    variables = [],
+    variables = EMPTY_VARIABLES,
     withBackground = true,
 }: EndPageContentEditorProps) {
-    const themeResolved = resolveFormTheme(theme)
+    const themeResolved = useMemo(() => resolveFormTheme(theme), [theme])
+
+    const fontKey = useMemo(() => {
+        if (!themeResolved.font?.family) return ""
+        return `${themeResolved.font.family}:${themeResolved.font.source}:${themeResolved.font.url ?? ""}`
+    }, [themeResolved.font])
 
     useEffect(() => {
         if (themeResolved.font) loadThemeFont(themeResolved.font)
-    }, [themeResolved.font])
+    }, [fontKey, themeResolved.font])
 
-    const fontSizes = getFontSizeClasses(themeResolved.fontSize)
-    const alignClass =
-        endPage.alignment === "center"
+    const fontSizes = useMemo(
+        () => getFontSizeClasses(themeResolved.fontSize),
+        [themeResolved.fontSize],
+    )
+
+    const alignClass = useMemo(() => {
+        return endPage.alignment === "center"
             ? "text-center items-center"
             : endPage.alignment === "right"
                 ? "text-right items-end"
                 : "text-left items-start"
+    }, [endPage.alignment])
 
     const shareLinks = useMemo(
         () => buildShareLinks(endPage.socialShareMessage),
         [endPage.socialShareMessage],
     )
-    const enabledShares = (Object.keys(SHARE_LABELS) as ShareKey[]).filter(
-        (k) => endPage.socialShareMedia?.[k],
+
+    const enabledShares = useMemo(() => {
+        if (!endPage.socialShareButtons || !endPage.socialShareMedia) return []
+        return (Object.keys(SHARE_LABELS) as ShareKey[]).filter(
+            (k) => endPage.socialShareMedia?.[k],
+        )
+    }, [endPage.socialShareButtons, endPage.socialShareMedia])
+
+    const containerStyle = useMemo<React.CSSProperties>(
+        () => ({
+            ...(withBackground ? { backgroundColor: themeResolved.backgroundColor } : {}),
+            color: themeResolved.textColor,
+            fontFamily: themeResolved.font?.family
+                ? `"${themeResolved.font.family}", sans-serif`
+                : undefined,
+        }),
+        [
+            withBackground,
+            themeResolved.backgroundColor,
+            themeResolved.textColor,
+            themeResolved.font?.family,
+        ],
     )
 
-    const containerStyle: React.CSSProperties = {
-        ...(withBackground ? { backgroundColor: themeResolved.backgroundColor } : {}),
-        color: themeResolved.textColor,
-        fontFamily: themeResolved.font?.family
-            ? `"${themeResolved.font.family}", sans-serif`
-            : undefined,
-    }
-
-    const bgImageStyle: React.CSSProperties = themeResolved.backgroundImage?.url
-        ? {
+    const bgImageStyle = useMemo<React.CSSProperties>(() => {
+        if (!themeResolved.backgroundImage?.url) return {}
+        return {
             backgroundImage: `url(${themeResolved.backgroundImage.url})`,
             backgroundRepeat: themeResolved.backgroundImage.tile ? "repeat" : "no-repeat",
             backgroundSize: themeResolved.backgroundImage.tile ? "auto" : "cover",
@@ -78,73 +103,136 @@ export function EndPageContentEditor({
                     ? `brightness(${(100 + themeResolved.backgroundImage.brightness) / 100})`
                     : undefined,
         }
-        : {}
+    }, [themeResolved.backgroundImage])
+
+    const onUpdateRef = useRef(onUpdate)
+    useEffect(() => {
+        onUpdateRef.current = onUpdate
+    }, [onUpdate])
+
+    const handleTitleChange = useCallback(
+        (title: string) => {
+            onUpdateRef.current(endPageIndex, { title })
+        },
+        [endPageIndex],
+    )
+
+    const handleHelperTextChange = useCallback(
+        (helperText: string) => {
+            onUpdateRef.current(endPageIndex, { helperText })
+        },
+        [endPageIndex],
+    )
+
+    // Unmount confetti burst after animation finishes (~3.5s) to avoid 120 framer-motion
+    // elements lingering indefinitely and degrading builder performance on subsequent actions.
+    const [confettiActive, setConfettiActive] = useState(false)
+    useEffect(() => {
+        if (endPage.showConfetti) {
+            setConfettiActive(true)
+            const timer = setTimeout(() => {
+                setConfettiActive(false)
+            }, 3500)
+            return () => clearTimeout(timer)
+        } else {
+            setConfettiActive(false)
+        }
+    }, [endPage.showConfetti, endPageIndex])
+
+    const trimmedEmbedUrl = endPage.embed?.url?.trim() ?? ""
+    const isValidEmbedUrl = useMemo(() => {
+        return Boolean(trimmedEmbedUrl && /^https?:\/\//i.test(trimmedEmbedUrl))
+    }, [trimmedEmbedUrl])
 
     const coverLayout = endPage.coverImage?.layout ?? "top"
     const isSideCover =
         Boolean(endPage.coverImage?.url) &&
         (coverLayout === "left" || coverLayout === "right")
 
-    const content = (
-        <>
-            <PageLabel
-                label={endPage.title}
-                editable
-                onUpdate={(title) => onUpdate(endPageIndex, { title })}
-                color={themeResolved.questionColor}
-                fontSizeClass={fontSizes.question}
-                variables={variables}
-            />
-
-            <PageHelperText
-                helperText={endPage.helperText ?? ""}
-                editable
-                onUpdate={(helperText) => onUpdate(endPageIndex, { helperText })}
-                color={themeResolved.textColor}
-                fontSizeClass={fontSizes.helper}
-                variables={variables}
-            />
-
-            {endPage.embed?.url && (
-                <div className="mt-8 w-full overflow-hidden rounded-lg border border-[var(--editorial-border-light)] aspect-video">
-                    <iframe
-                        src={endPage.embed.url}
-                        title={endPage.embed.title || "Embedded media"}
-                        className="h-full w-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    />
-                </div>
-            )}
-
-            {endPage.socialShareButtons && enabledShares.length > 0 && (
-                <div className="mt-8 flex flex-wrap gap-2.5">
-                    {enabledShares.map((key) => (
-                        <a
-                            key={key}
-                            href={shareLinks[key]}
-                            // Illustrative in the builder — don't navigate away on click.
-                            onClick={(e) => e.preventDefault()}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-current/20 px-4 py-2 text-sm font-medium opacity-90 transition-opacity hover:opacity-100"
-                            style={{ color: themeResolved.textColor }}
-                        >
-                            <Share2 className="h-3.5 w-3.5" />
-                            {SHARE_LABELS[key]}
-                        </a>
-                    ))}
-                </div>
-            )}
-
-            {endPage.button?.text && (
-                <PageSubmitButton
-                    text={endPage.button.text}
-                    color={themeResolved.buttonColor}
-                    textColor={themeResolved.buttonTextColor}
-                    roundCorners={themeResolved.roundCorners}
-                    fontSizeClass={fontSizes.button}
+    const content = useMemo(
+        () => (
+            <>
+                <PageLabel
+                    label={endPage.title}
+                    editable
+                    onUpdate={handleTitleChange}
+                    color={themeResolved.questionColor}
+                    fontSizeClass={fontSizes.question}
+                    variables={variables}
                 />
-            )}
-        </>
+
+                <PageHelperText
+                    helperText={endPage.helperText ?? ""}
+                    editable
+                    onUpdate={handleHelperTextChange}
+                    color={themeResolved.textColor}
+                    fontSizeClass={fontSizes.helper}
+                    variables={variables}
+                />
+
+                {isValidEmbedUrl && (
+                    <div className="mt-8 w-full overflow-hidden rounded-lg border border-[var(--editorial-border-light)] aspect-video">
+                        <iframe
+                            src={trimmedEmbedUrl}
+                            title={endPage.embed?.title || "Embedded media"}
+                            className="h-full w-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        />
+                    </div>
+                )}
+
+                {endPage.socialShareButtons && enabledShares.length > 0 && (
+                    <div className="mt-8 flex flex-wrap gap-2.5">
+                        {enabledShares.map((key) => (
+                            <a
+                                key={key}
+                                href={shareLinks[key]}
+                                // Illustrative in the builder — don't navigate away on click.
+                                onClick={(e) => e.preventDefault()}
+                                className="inline-flex items-center gap-1.5 rounded-full border border-current/20 px-4 py-2 text-sm font-medium opacity-90 transition-opacity hover:opacity-100"
+                                style={{ color: themeResolved.textColor }}
+                            >
+                                <Share2 className="h-3.5 w-3.5" />
+                                {SHARE_LABELS[key]}
+                            </a>
+                        ))}
+                    </div>
+                )}
+
+                {endPage.button?.text && (
+                    <PageSubmitButton
+                        text={endPage.button.text}
+                        color={themeResolved.buttonColor}
+                        textColor={themeResolved.buttonTextColor}
+                        roundCorners={themeResolved.roundCorners}
+                        fontSizeClass={fontSizes.button}
+                    />
+                )}
+            </>
+        ),
+        [
+            endPage.title,
+            endPage.helperText,
+            endPage.socialShareButtons,
+            endPage.button?.text,
+            endPage.embed?.title,
+            handleTitleChange,
+            handleHelperTextChange,
+            themeResolved.questionColor,
+            themeResolved.textColor,
+            themeResolved.buttonColor,
+            themeResolved.buttonTextColor,
+            themeResolved.roundCorners,
+            fontSizes.question,
+            fontSizes.helper,
+            fontSizes.button,
+            variables,
+            isValidEmbedUrl,
+            trimmedEmbedUrl,
+            enabledShares,
+            shareLinks,
+        ],
     )
 
     return (
@@ -156,7 +244,7 @@ export function EndPageContentEditor({
                 <div className="absolute inset-0 pointer-events-none z-0" style={bgImageStyle} />
             )}
 
-            {endPage.showConfetti && <ConfettiBurst originY="20%" />}
+            {confettiActive && <ConfettiBurst originY="20%" />}
 
             {isSideCover ? (
                 /* Left/right: the page is split in half — image on one side,
@@ -196,3 +284,6 @@ export function EndPageContentEditor({
         </div>
     )
 }
+
+export const EndPageContentEditor = memo(EndPageContentEditorComponent)
+

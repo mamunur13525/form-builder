@@ -49,6 +49,8 @@ interface SortablePageItemProps {
   onDuplicate?: (index: number) => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
+  selectedQuestionId?: string | null;
+  onSelectQuestion?: (pageIndex: number, questionId: string | null) => void;
   onReorderQuestions?: (oldIndex: number, newIndex: number) => void;
   onReorderBlocks?: (oldIndex: number, newIndex: number) => void;
 }
@@ -85,6 +87,8 @@ export function SortablePageItem({
   onDuplicate,
   onMoveUp,
   onMoveDown,
+  selectedQuestionId,
+  onSelectQuestion,
   onReorderQuestions,
   onReorderBlocks,
 }: SortablePageItemProps) {
@@ -211,6 +215,13 @@ export function SortablePageItem({
     }
   }, [isDragged]);
 
+  useEffect(() => {
+    if (isSelected && selectedQuestionId) {
+      const el = document.getElementById(`sidebar-question-${selectedQuestionId}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [isSelected, selectedQuestionId]);
+
   const visual = PAGE_TYPE_VISUALS[page.type] ?? {
     icon: Type,
     bgColor: "bg-[#64748b]",
@@ -248,6 +259,7 @@ export function SortablePageItem({
       onClick={() => {
         if (isDragged || wasDraggedRef.current) return;
         onSelect(index);
+        onSelectQuestion?.(index, null);
       }}
       aria-current={isSelected ? "true" : undefined}
       className={`
@@ -490,9 +502,14 @@ export function SortablePageItem({
                 }
               }
 
+              const qId = question.questionKey || question.blockKey;
+              const isQuestionSelected = isSelected && Boolean(selectedQuestionId && selectedQuestionId === qId);
+
               return (
                 <div
                   key={questionKey}
+                  id={qId ? `sidebar-question-${qId}` : undefined}
+                  data-sidebar-question="true"
                   ref={(el) => {
                     questionItemRefs.current[qIdx] = el;
                   }}
@@ -500,11 +517,13 @@ export function SortablePageItem({
                     e.stopPropagation();
                     if (wasQuestionDraggedRef.current) return;
                     onSelect(index);
-                    const qId = question.questionKey || question.blockKey;
-                    const targetEl =
-                      document.getElementById(`question-${qId}`) ||
-                      document.getElementById(`block-${qId}`);
-                    targetEl?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    onSelectQuestion?.(index, qId || null);
+                    if (qId) {
+                      const targetEl =
+                        document.getElementById(`question-${qId}`) ||
+                        document.getElementById(`block-${qId}`);
+                      targetEl?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    }
                   }}
                   style={{
                     transform,
@@ -512,10 +531,12 @@ export function SortablePageItem({
                     transition,
                   }}
                   className={cn(
-                    "group/questionitem relative flex items-center gap-2 rounded-md bg-white dark:bg-zinc-800/90 border border-slate-200/90 dark:border-zinc-700/80 p-2 shadow-2xs select-none cursor-pointer",
+                    "group/questionitem relative flex items-center gap-2 rounded-md border p-2 shadow-2xs select-none cursor-pointer transition-all",
                     isItemDragged
                       ? "shadow-xl border-[#FF5722] bg-white dark:bg-zinc-800 ring-2 ring-[#FF5722]/30 scale-[1.02]"
-                      : "hover:border-[#FF5722]/50"
+                      : isQuestionSelected
+                        ? "border-[#FF5722] bg-[#FF5722]/10 dark:bg-[#FF5722]/20 ring-2 ring-[#FF5722]/40 shadow-xs"
+                        : "bg-white dark:bg-zinc-800/90 border-slate-200/90 dark:border-zinc-700/80 hover:border-[#FF5722]/50 hover:bg-slate-50 dark:hover:bg-zinc-800"
                   )}
                 >
                   {/* Drag handle for nested question reordering (6-dot) */}
@@ -539,7 +560,10 @@ export function SortablePageItem({
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col text-left">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-400">
+                      <span className={cn(
+                        "text-[10px] font-bold",
+                        isQuestionSelected ? "text-[#FF5722]" : "text-slate-500 dark:text-zinc-400"
+                      )}>
                         Q{qIdx + 1}
                       </span>
                       <span className="text-[10.5px] font-medium text-slate-500 dark:text-zinc-400 truncate">

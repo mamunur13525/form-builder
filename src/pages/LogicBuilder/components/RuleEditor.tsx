@@ -52,7 +52,7 @@ import {
     CALC_OPERATIONS,
     type SectionConfig,
 } from "./logicEditorConfig";
-import { emptyCondition } from "./ruleUtils";
+import { emptyCondition, extractAllQuestions, sourceQuestionLabel } from "./ruleUtils";
 import type { LucideIcon } from "lucide-react";
 import {
     PAGE_TYPE_ICONS,
@@ -156,7 +156,7 @@ export function PageTypeChip({
             }}
         >
             {Icon && <Icon className="h-3.5 w-3.5" aria-hidden />}
-            Q{pageNumber}
+            P{pageNumber}
         </span>
     )
 }
@@ -171,6 +171,7 @@ function PageSelectContent({
     pageNumber: number | null
     placeholder?: string
 }) {
+    const title = page?.title || page?.label || (pageNumber != null ? `Page ${pageNumber}` : placeholder)
     return (
         <span className="flex min-w-0 items-center gap-2 truncate">
             {pageNumber != null &&
@@ -179,11 +180,11 @@ function PageSelectContent({
                 ) : (
                     <span className={PAGE_CHIP_CLASS}>
                         <List className="h-3.5 w-3.5" aria-hidden />
-                        Q{pageNumber}
+                        P{pageNumber}
                     </span>
                 ))}
             <span className="min-w-0 truncate">
-                {page?.label ?? placeholder}
+                {title}
             </span>
         </span>
     )
@@ -204,26 +205,37 @@ export function RuleEditor({
 }: RuleEditorProps) {
     const action = (rule.actions ?? [])[0]
 
-    // Page-answer conditions always read from the currently selected page, so
-    // keep their sourceKey pinned to it. Covers new rules, added conditions, a
-    // source-type switch back to "page", and rules loaded from the API that
-    // referenced a different page.
+    const allQuestions = useMemo(() => extractAllQuestions(pages), [pages])
+    const questionsOnCurrentPage = useMemo(
+        () => allQuestions.filter((q) => q.pageKey === selectedPageKey),
+        [allQuestions, selectedPageKey],
+    )
+    const defaultQuestionKey = questionsOnCurrentPage[0]?.questionKey || selectedPageKey
+
+    // Ensure conditions have a valid sourceKey if missing
     useEffect(() => {
         const conditions = rule.conditions ?? []
         const needsBinding = conditions.some(
-            (c) => c.sourceType === "page" && c.sourceKey !== selectedPageKey,
+            (c) => c.sourceType === "page" && !c.sourceKey,
         )
         if (!needsBinding) return
         onUpdate({
             ...rule,
             conditions: conditions.map((c) =>
-                c.sourceType === "page" ? { ...c, sourceKey: selectedPageKey } : c,
+                c.sourceType === "page" && !c.sourceKey
+                    ? { ...c, sourceKey: defaultQuestionKey }
+                    : c,
             ),
         })
-    }, [rule, selectedPageKey, onUpdate])
+    }, [rule, defaultQuestionKey, onUpdate])
 
     const numericSources = useMemo(() => {
         const set = new Set<string>()
+        for (const q of allQuestions) {
+            if (["number", "rating", "opinionScale", "date", "time"].includes(q.type)) {
+                set.add(q.questionKey)
+            }
+        }
         for (const p of pages) {
             if (["number", "rating", "opinionScale", "date", "time"].includes(p.type)) {
                 set.add(p.pageKey)
@@ -233,7 +245,7 @@ export function RuleEditor({
             if (v.type === "number") set.add(v.name)
         }
         return set
-    }, [pages, variables])
+    }, [allQuestions, pages, variables])
 
     const setCondition = (conditionIndex: number, patch: Partial<LogicCondition>) => {
         const conditions = [...(rule.conditions ?? [])]
@@ -246,7 +258,7 @@ export function RuleEditor({
             ...rule,
             conditions: [
                 ...(rule.conditions ?? []),
-                { ...emptyCondition(selectedPageKey), combinator: "and" as LogicCombinator },
+                { ...emptyCondition(defaultQuestionKey), combinator: "and" as LogicCombinator },
             ],
         })
     }
@@ -259,26 +271,6 @@ export function RuleEditor({
     const setAction = (patch: Partial<NonNullable<FormLogicRule["actions"]>[number]>) => {
         onUpdate({ ...rule, actions: [{ ...action, ...patch }] })
     }
-
-    // Which operator options apply to the current source.
-    const operatorOptions = useMemo(() => {
-        const source = (rule.conditions ?? [])[0]
-        if (!source?.sourceKey) return OPERATOR_OPTIONS
-        const isNumeric = numericSources.has(source.sourceKey)
-        if (isNumeric) return OPERATOR_OPTIONS
-        return OPERATOR_OPTIONS.filter((o) => !NUMERIC_ONLY_OPERATORS.includes(o.value))
-    }, [rule.conditions, numericSources])
-
-    // Value choices when the source is a choice page.
-    const valueOptions = useMemo(() => {
-        const source = (rule.conditions ?? [])[0]
-        if (!source?.sourceKey || source.sourceType !== "page") return []
-        const page = pages.find((p) => p.pageKey === source.sourceKey)
-        if (!page) return []
-        return source.operator === "contains" || source.operator === "notContains"
-            ? []
-            : (page.options ?? []).filter((o) => o.value != null || o.label != null)
-    }, [rule.conditions, pages])
 
     const isCalculation = section.category === "calculation"
     const numberVariables = useMemo(
@@ -300,8 +292,35 @@ export function RuleEditor({
 
     /** One condition row: "If the answer <operator> <value> [x]". */
     const renderCondition = (condition: LogicCondition, conditionIndex: number) => {
+        const isVariable = condition.sourceType === "variable"
+        const currentQ = !isVariable
+            ? allQuestions.find((q) => q.questionKey === condition.sourceKey)
+            : undefined
+        const currentPage = !isVariable && !currentQ
+            ? pages.find((p) => p.pageKey === condition.sourceKey)
+            : undefined
+        const currentVar = isVariable
+            ? variables.find((v) => v.name === condition.sourceKey)
+            : undefined
+
+        const isNumeric = isVariable
+            ? currentVar?.type === "number"
+            : ["number", "rating", "opinionScale", "date", "time"].includes(
+                  currentQ?.type || currentPage?.type || "",
+              ) || numericSources.has(condition.sourceKey)
+
+        const condOperatorOptions = isNumeric
+            ? OPERATOR_OPTIONS
+            : OPERATOR_OPTIONS.filter((o) => !NUMERIC_ONLY_OPERATORS.includes(o.value))
+
+        const questionOptions = currentQ?.options || currentPage?.options || []
+        const condValueOptions =
+            condition.operator === "contains" || condition.operator === "notContains"
+                ? []
+                : questionOptions.filter((o) => o.value != null || o.label != null)
+
         const hasValue = OPERATORS_WITH_VALUE.has(condition.operator)
-        const showValueSelect = valueOptions.length > 0 && hasValue
+        const showValueSelect = condValueOptions.length > 0 && hasValue
         return (
             <div key={conditionIndex}>
                 {/* Combinator divider between rows */}
@@ -340,24 +359,24 @@ export function RuleEditor({
                             if (v !== "page" && v !== "variable") return
                             setCondition(conditionIndex, {
                                 sourceType: v,
-                                sourceKey: v === "page" ? selectedPageKey : "",
+                                sourceKey: v === "page" ? defaultQuestionKey : (variables[0]?.name || ""),
                                 operator: "equals",
                                 value: "",
                             })
                         }}
                     >
-                        <Trigger aria-label="Condition source type" className="w-[185px] shrink-0">
+                        <Trigger aria-label="Condition source type" className="w-[140px] shrink-0">
                             <span className="min-w-0 truncate">
-                                {condition.sourceType === "variable" ? "a variable" : "is"}
+                                {condition.sourceType === "variable" ? "a variable" : "a question"}
                             </span>
                         </Trigger>
                         <SelectContent className={OVERLAY_CLASS}>
-                            <SelectItem value="page">is</SelectItem>
+                            <SelectItem value="page">a question</SelectItem>
                             <SelectItem value="variable">a variable</SelectItem>
                         </SelectContent>
                     </Select>
 
-                    {condition.sourceType === "variable" && (
+                    {condition.sourceType === "variable" ? (
                         <Select
                             value={condition.sourceKey || null}
                             onValueChange={(v) => {
@@ -377,6 +396,37 @@ export function RuleEditor({
                                 {variables.map((v) => (
                                     <SelectItem key={v.name} value={v.name}>
                                         @{v.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    ) : (
+                        <Select
+                            value={condition.sourceKey || null}
+                            onValueChange={(v) => {
+                                if (!v) return
+                                setCondition(conditionIndex, {
+                                    sourceKey: v,
+                                    value: "",
+                                })
+                            }}
+                        >
+                            <Trigger aria-label="Select question" className="w-[240px] shrink-0">
+                                <span className="min-w-0 truncate">
+                                    {sourceQuestionLabel(pages, condition.sourceKey) || "Select question…"}
+                                </span>
+                            </Trigger>
+                            <SelectContent className={OVERLAY_CLASS}>
+                                {allQuestions.map((q) => (
+                                    <SelectItem key={q.questionKey} value={q.questionKey}>
+                                        <span className="flex items-center gap-2 truncate">
+                                            <span className="shrink-0 font-semibold text-[var(--editorial-primary)]">
+                                                P{q.pageIndex + 1}·Q{q.questionIndex + 1}
+                                            </span>
+                                            <span className="truncate">
+                                                {q.title}
+                                            </span>
+                                        </span>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -403,7 +453,7 @@ export function RuleEditor({
                                 })()}
                                 <span className="min-w-0 truncate">
                                     {
-                                        operatorOptions.find(
+                                        condOperatorOptions.find(
                                             (o) => o.value === condition.operator,
                                         )?.label
                                     }
@@ -411,7 +461,7 @@ export function RuleEditor({
                             </span>
                         </Trigger>
                         <SelectContent className={OVERLAY_CLASS}>
-                            {operatorOptions.map((o) => {
+                            {condOperatorOptions.map((o) => {
                                 const OpIcon = OPERATOR_ICONS[o.value] ?? Equal
                                 return (
                                     <SelectItem key={o.value} value={o.value}>
@@ -441,24 +491,32 @@ export function RuleEditor({
                                         setCondition(conditionIndex, { value: v })
                                 }}
                             >
-                                <Trigger aria-label="Value" className="flex-1">
+                                <Trigger aria-label="Value" className="flex-1 min-w-[150px]">
                                     <span className="flex min-w-0 items-center gap-2 truncate">
                                         <Circle
                                             className="h-4 w-4 shrink-0 text-[var(--foreground)]"
                                             aria-hidden
                                         />
                                         <span className="min-w-0 truncate">
-                                            {String(condition.value ?? "Select Value…")}
+                                            {String(
+                                                condValueOptions.find(
+                                                    (o) =>
+                                                        String(o.value) === String(condition.value) ||
+                                                        o.label === String(condition.value),
+                                                )?.label ??
+                                                    condition.value ??
+                                                    "Select Value…",
+                                            )}
                                         </span>
                                     </span>
                                 </Trigger>
                                 <SelectContent className={OVERLAY_CLASS}>
-                                    {valueOptions.map((o) => (
+                                    {condValueOptions.map((o) => (
                                         <SelectItem
-                                            key={o.value ?? o.label}
-                                            value={o.value ?? o.label ?? ""}
+                                            key={String(o.value ?? o.label)}
+                                            value={String(o.value ?? o.label ?? "")}
                                         >
-                                            {o.label ?? o.value}
+                                            {o.label ?? String(o.value)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -556,8 +614,7 @@ export function RuleEditor({
                             <SelectContent className={OVERLAY_CLASS}>
                                 {pages
                                     .filter(
-                                        (p) =>
-                                            p.pageKey !== rule.conditions?.[0]?.sourceKey,
+                                        (p) => p.pageKey !== selectedPageKey,
                                     )
                                     .map((p) => (
                                         <SelectItem key={p.pageKey} value={p.pageKey}>

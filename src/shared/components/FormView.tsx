@@ -190,7 +190,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
                 {hasMultipleQuestions && questionTitle ? (
                   <div className="space-y-1">
                     <h3
-                      className={cn("font-semibold text-lg sm:text-xl", fontSizes.question)}
+                      className={cn("font-normal text-lg sm:text-xl", fontSizes.question)}
                       style={{ color: themeResolved.questionColor }}
                     >
                       {questionTitle}

@@ -464,10 +464,10 @@ export const evaluateRule = (
 /* -------------------------------------------------------------------------- */
 
 export const resolveFormLogic = ({
-    pages,
-    answers,
+    pages = [],
+    answers = {},
     variables = [],
-    rules,
+    rules = [],
 }: ResolveFormLogicInput): ResolveFormLogicResult => {
     const pageKeys = new Set(pages.map((p) => p.pageKey))
     const variablesByName = new Map(
@@ -573,8 +573,17 @@ export const resolveFormLogic = ({
             (c) => c && (!c.sourceType || c.sourceType === "page") && c.sourceKey,
         )
         const ownerKey = ownerCondition?.sourceKey
-        if (!ownerKey || !pageKeys.has(ownerKey)) continue
-        if (jumpTargets[ownerKey]) continue // first matching rule wins
+        if (!ownerKey) continue
+
+        // Find the page owning this condition (either by pageKey or questionKey)
+        const ownerPage = pages.find((p) => {
+            if (p.pageKey === ownerKey) return true
+            const qs = p.questions ?? p.blocks ?? []
+            return qs.some((q) => (q.questionKey || q.blockKey || q._id || q.id) === ownerKey)
+        })
+        if (!ownerPage) continue
+        const pageKey = ownerPage.pageKey
+        if (jumpTargets[pageKey]) continue // first matching rule wins
 
         const action = (rule.actions ?? []).find(
             (a) => a && (a.action === "jumpToPage" || a.action === "goToEnd"),
@@ -582,12 +591,12 @@ export const resolveFormLogic = ({
         if (!action) continue
 
         if (action.action === "goToEnd") {
-            jumpTargets[ownerKey] = JUMP_TO_END
+            jumpTargets[pageKey] = JUMP_TO_END
             continue
         }
         const target = action.targetPageKey
-        if (!target || !pageKeys.has(target) || target === ownerKey) continue
-        jumpTargets[ownerKey] = target
+        if (!target || !pageKeys.has(target) || target === pageKey) continue
+        jumpTargets[pageKey] = target
     }
 
     return { hiddenPageKeys, computedVariables, jumpTargets }
@@ -598,17 +607,36 @@ export const resolveFormLogic = ({
  * display/hidePage rules targeting the page, branching rules reading from it,
  * and calculation rules referencing it anywhere.
  */
-export const countRulesForPage = (rules: FormLogicRule[], pageKey: string): number =>
-    rules.filter((rule) => {
+export const countRulesForPage = (
+    rules: FormLogicRule[],
+    pageKey: string,
+    page?: FormPage,
+): number => {
+    const questionKeys = new Set<string>()
+    questionKeys.add(pageKey)
+    if (page) {
+        const qs = page.questions ?? page.blocks ?? []
+        for (const q of qs) {
+            const k = q.questionKey || q.blockKey || q._id || q.id
+            if (k) questionKeys.add(k)
+        }
+    }
+
+    return rules.filter((rule) => {
         const targeted = (rule.actions ?? []).some((a) => a?.targetPageKey === pageKey)
         const referenced = (rule.conditions ?? []).some(
-            (c) => (!c.sourceType || c.sourceType === "page") && c.sourceKey === pageKey,
+            (c) => (!c.sourceType || c.sourceType === "page") && questionKeys.has(c.sourceKey),
         )
-        const inExpression = (rule.actions ?? []).some((a) =>
-            typeof a?.expression === "string" ? a.expression.includes(`@${pageKey}`) : false,
-        )
+        const inExpression = (rule.actions ?? []).some((a) => {
+            if (typeof a?.expression !== "string") return false
+            for (const k of questionKeys) {
+                if (a.expression.includes(`@${k}`)) return true
+            }
+            return false
+        })
         return targeted || referenced || inExpression
     }).length
+}
 
 
 

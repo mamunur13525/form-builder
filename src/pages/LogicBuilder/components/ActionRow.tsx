@@ -71,13 +71,13 @@ export function ActionRow({
                             <SelectContent>
                                 {pages
                                     .filter((p) => p.pageKey !== rule.conditions?.[0]?.sourceKey)
-                                    .map((p) => (
+                                    .map((p, pIdx) => (
                                         <SelectItem key={p.pageKey} value={p.pageKey}>
                                             <span className="flex items-center gap-2">
                                                 <span className="inline-flex h-5 w-5 items-center justify-center rounded-lg bg-[#e0f2fe] text-[#06b6d4] text-[10px] font-semibold">
-                                                    Q{p.label}
+                                                    P{pIdx + 1}
                                                 </span>
-                                                {p.label || p.pageKey}
+                                                {p.title || p.label || `Page ${pIdx + 1}`}
                                             </span>
                                         </SelectItem>
                                     ))}

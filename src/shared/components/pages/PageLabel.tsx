@@ -68,12 +68,12 @@ export function PageLabel({
                     as="h2"
                     text={label}
                     variables={variables}
-                    className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-semibold")}
+                    className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-normal")}
                     style={color ? { color } : undefined}
                 />
             ) : (
                 <h2
-                    className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-semibold")}
+                    className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-normal")}
                     style={color ? { color } : undefined}
                 >
                     {renderVariableText(label, variables)}

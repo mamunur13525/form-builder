@@ -116,7 +116,14 @@ function buildGraph(
   // Question pages
   pages.forEach((page, index) => {
     const id = pageId(page, index);
-    const ruleCount = countRulesForPage(rules, page.pageKey);
+    const ruleCount = countRulesForPage(rules, page.pageKey, page);
+
+    const questions =
+      page.questions && page.questions.length > 0
+        ? page.questions
+        : page.blocks && page.blocks.length > 0
+          ? page.blocks
+          : [];
 
     nodes.push({
       id,
@@ -127,6 +134,8 @@ function buildGraph(
       },
       data: {
         index,
+        pageKey: page.pageKey,
+        title: page.title,
         label: page.label,
         helperText: page.helperText,
         type: page.type,
@@ -134,6 +143,7 @@ function buildGraph(
         ruleCount,
         hasTarget: true,
         hasSource: true,
+        questions,
       } satisfies PageNodeData,
     });
 
@@ -374,7 +384,11 @@ function LogicFlow() {
 
   const handleRuleSelect = useCallback(
     (ownerKey: string, ruleId?: string) => {
-      const pageIndex = pages.findIndex((p) => p.pageKey === ownerKey);
+      const pageIndex = pages.findIndex((p) => {
+        if (p.pageKey === ownerKey) return true;
+        const qs = p.questions ?? p.blocks ?? [];
+        return qs.some((q) => (q.questionKey || q.blockKey || q._id || q.id) === ownerKey);
+      });
       if (pageIndex !== -1) {
         setSelected({
           page: pages[pageIndex],

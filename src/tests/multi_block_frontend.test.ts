@@ -1,8 +1,9 @@
 import assert from "node:assert";
 import { adaptApiPage } from "../features/forms/model/adapters.ts";
 import { validatePage, validateBlock } from "../shared/hooks/useFormValidation.ts";
+import { resolveFormLogic, countRulesForPage } from "../shared/utils/formLogic.ts";
 import type { FormPage as ApiPage } from "../entities/form/model/types.ts";
-import type { FormPage } from "../shared/types/common.ts";
+import type { FormPage, FormLogicRule } from "../shared/types/common.ts";
 
 console.log("--- Starting Frontend Multi-Block & UI Tests ---");
 
@@ -277,6 +278,114 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   const ok = validatePage(pageWithQuestions, { q_name: "John Doe" });
   assert.strictEqual(ok, null);
   console.log("✓ Test 6: validatePage validates questions with questionKey properly");
+}
+
+// Test 7: countRulesForPage counts rules referencing questions on the page
+{
+  const testPage: FormPage = {
+    _id: "page_1",
+    formId: "form_1",
+    pageKey: "page_1_key",
+    title: "Page 1",
+    label: "Page 1",
+    type: "shortText",
+    required: false,
+    order: 1,
+    questions: [
+      {
+        questionKey: "q_101",
+        type: "multipleChoice",
+        title: "Do you like coding?",
+        required: true,
+        order: 1,
+      },
+    ],
+  };
+
+  const testRules: FormLogicRule[] = [
+    {
+      id: "rule_1",
+      category: "branching",
+      conditions: [{ sourceType: "page", sourceKey: "q_101", operator: "equals", value: "yes" }],
+      actions: [{ action: "jumpToPage", targetPageKey: "page_2_key" }],
+    },
+    {
+      id: "rule_2",
+      category: "display",
+      conditions: [{ sourceType: "page", sourceKey: "q_999", operator: "equals", value: "other" }],
+      actions: [{ action: "showPage", targetPageKey: "page_3_key" }],
+    },
+  ];
+
+  const count = countRulesForPage(testRules, "page_1_key", testPage);
+  assert.strictEqual(count, 1);
+  console.log("✓ Test 7: countRulesForPage properly counts rules referencing nested question keys");
+}
+
+// Test 8: resolveFormLogic maps question-level condition to parent page jump
+{
+  const testPages: FormPage[] = [
+    {
+      _id: "p1",
+      formId: "form_1",
+      pageKey: "page_1_key",
+      title: "Page 1",
+      label: "Page 1",
+      type: "shortText",
+      required: false,
+      order: 1,
+      questions: [
+        {
+          questionKey: "q_satisfaction",
+          type: "rating",
+          title: "How satisfied are you?",
+          order: 1,
+        },
+      ],
+    },
+    {
+      _id: "p2",
+      formId: "form_1",
+      pageKey: "page_2_key",
+      title: "Page 2",
+      label: "Page 2",
+      type: "shortText",
+      required: false,
+      order: 2,
+    },
+    {
+      _id: "p3",
+      formId: "form_1",
+      pageKey: "page_3_key",
+      title: "Page 3 (VIP)",
+      label: "Page 3",
+      type: "shortText",
+      required: false,
+      order: 3,
+    },
+  ];
+
+  const rules: FormLogicRule[] = [
+    {
+      id: "rule_branch_vip",
+      category: "branching",
+      conditions: [
+        { sourceType: "page", sourceKey: "q_satisfaction", operator: "greaterThanOrEquals", value: 5 },
+      ],
+      actions: [{ action: "jumpToPage", targetPageKey: "page_3_key" }],
+    },
+  ];
+
+  const resolved = resolveFormLogic({
+    pages: testPages,
+    answers: { q_satisfaction: 5 },
+    variables: [],
+    rules,
+  });
+
+  // Jump targets should be mapped to the parent page page_1_key so the navigation engine knows where to jump on submit
+  assert.strictEqual(resolved.jumpTargets["page_1_key"], "page_3_key");
+  console.log("✓ Test 8: resolveFormLogic resolves question-level condition to owner page jump");
 }
 
 console.log("--- All Frontend Multi-Block & UI Tests Passed Successfully! ---");

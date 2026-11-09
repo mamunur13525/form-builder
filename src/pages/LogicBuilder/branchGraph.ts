@@ -100,10 +100,26 @@ function describeCondition(c: LogicCondition, pages?: FormPage[]): string {
     if (c.operator === "isEmpty" || c.operator === "isNotEmpty") return symbol
     let rawVal = c.value !== undefined && c.value !== null ? String(c.value).trim() : ""
     if (pages && c.sourceKey) {
-        const sourcePage = pages.find((p) => p.pageKey === c.sourceKey)
-        const matchedOption = sourcePage?.options?.find(
-            (o) => String(o.value).trim() === rawVal || String(o.label).trim() === rawVal,
-        )
+        let matchedOption: { label?: string; value?: unknown } | undefined = undefined
+        for (const p of pages) {
+            if (p.pageKey === c.sourceKey) {
+                matchedOption = p.options?.find(
+                    (o) => String(o.value).trim() === rawVal || String(o.label).trim() === rawVal,
+                )
+                if (matchedOption) break
+            }
+            const qs = p.questions ?? p.blocks ?? []
+            for (const q of qs) {
+                const k = q.questionKey || q.blockKey || q._id || q.id
+                if (k === c.sourceKey) {
+                    matchedOption = (q.options || p.options)?.find(
+                        (o) => String(o.value).trim() === rawVal || String(o.label).trim() === rawVal,
+                    )
+                    if (matchedOption) break
+                }
+            }
+            if (matchedOption) break
+        }
         if (matchedOption?.label) {
             rawVal = matchedOption.label
         }
@@ -140,8 +156,21 @@ export function computeBranchLinks(
     rules: FormLogicRule[],
 ): BranchLink[] {
     const indexByKey = new Map<string, number>()
+    const pageKeyForSource = new Map<string, string>()
+
     pages.forEach((p, i) => {
-        if (p.pageKey) indexByKey.set(p.pageKey, i)
+        if (p.pageKey) {
+            indexByKey.set(p.pageKey, i)
+            pageKeyForSource.set(p.pageKey, p.pageKey)
+        }
+        const qs = p.questions ?? p.blocks ?? []
+        qs.forEach((q) => {
+            const k = q.questionKey || q.blockKey || q._id || q.id
+            if (k) {
+                indexByKey.set(k, i)
+                pageKeyForSource.set(k, p.pageKey)
+            }
+        })
     })
     const idFor = (index: number) => pageId(pages[index], index)
 
@@ -161,9 +190,10 @@ export function computeBranchLinks(
                 c.sourceKey &&
                 indexByKey.has(c.sourceKey),
         )
-        const ownerKey = ownerCondition?.sourceKey
-        if (!ownerKey) continue
-        const sourceIndex = indexByKey.get(ownerKey)!
+        const conditionSourceKey = ownerCondition?.sourceKey
+        if (!conditionSourceKey) continue
+        const sourceIndex = indexByKey.get(conditionSourceKey)!
+        const ownerKey = pageKeyForSource.get(conditionSourceKey) ?? pages[sourceIndex].pageKey
 
         const action = (rule.actions ?? []).find(
             (a) => a && (a.action === "jumpToPage" || a.action === "goToEnd"),

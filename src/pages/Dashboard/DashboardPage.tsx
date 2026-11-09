@@ -14,6 +14,9 @@ import {
 import { useForms } from "../../features/forms/hooks/useForms";
 import { useFormPermissions } from "../../features/forms/hooks/useFormPermissions";
 
+import { showInfo,showError, showWarning, showSuccess } from "@/shared/hooks/useToast"
+
+
 export function DashboardPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
@@ -44,6 +47,14 @@ export function DashboardPage() {
     );
   }
 
+const handleTost = ()=>{
+  console.log('click')
+
+showInfo('Infor')
+showSuccess('Success')
+showError("error")
+showWarning('warning')
+}
   return (
     <div className="editorial mx-auto w-full max-w-[1600px] space-y-8 px-4 pt-8 pb-12 sm:space-y-12 sm:px-6 sm:pt-12 sm:pb-16 lg:px-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
@@ -54,6 +65,7 @@ export function DashboardPage() {
           <p className="mt-1 text-sm leading-6 sm:mt-2 sm:text-base text-[var(--editorial-body)]">
             Manage your forms and view responses
           </p>
+          <button onClick={handleTost}>click toast </button>
         </div>
         {/* A viewer sees the same dashboard, minus the ways to change it. */}
         {canCreate && (

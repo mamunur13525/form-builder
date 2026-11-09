@@ -17,7 +17,7 @@ export function RatingSettingsWidget({
     return (
         <div className="space-y-3">
             <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-zinc-200">Rating style</Label>
+                <Label className="text-sm font-medium text-slate-800 dark:text-zinc-200">Rating style</Label>
                 <div className="flex items-center gap-2">
                     <StyleButton
                         active={settings.style === "star"}
@@ -35,7 +35,7 @@ export function RatingSettingsWidget({
             </div>
 
             <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-zinc-200">Max rating</Label>
+                <Label className="text-sm font-medium text-slate-800 dark:text-zinc-200">Max rating</Label>
                 <Select
                     value={String(settings.max)}
                     onValueChange={(v) => onChange({ ...settings, max: Number(v) })}
@@ -48,7 +48,7 @@ export function RatingSettingsWidget({
                             <SelectItem
                                 key={v}
                                 value={v}
-                                className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                                className="cursor-pointer"
                             >
                                 <span className="font-medium">{v}</span>
                             </SelectItem>

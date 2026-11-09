@@ -12,7 +12,7 @@
 import { Pencil, Trash2 } from "lucide-react";
 import type { FormLogicRule, FormPage } from "../../../shared/types/common";
 import { CALC_OPERATION_SYMBOLS, OPERATOR_LABELS } from "./logicEditorConfig";
-import { pageLabel } from "./ruleUtils";
+import { extractAllQuestions, pageLabel, sourceQuestionLabel } from "./ruleUtils";
 import { PageTypeChip } from "./RuleEditor";
 import { Button } from "@/components/ui/button";
 
@@ -47,19 +47,21 @@ function valueLabel(rule: FormLogicRule, pages: FormPage[]): string {
     const raw = condition.value == null ? "" : String(condition.value)
     if (raw === "") return "(value)"
     if (condition.sourceType === "page") {
-        const page = pages.find((p) => p.pageKey === condition.sourceKey)
-        const option = page?.options?.find((o) => o.value === raw)
-        if (option) return option.label ?? option.value ?? raw
+        const questions = extractAllQuestions(pages)
+        const q = questions.find((item) => item.questionKey === condition.sourceKey)
+        const options = q?.options ?? pages.find((p) => p.pageKey === condition.sourceKey)?.options
+        const option = options?.find((o) => String(o.value) === raw || o.label === raw)
+        if (option) return option.label ?? (option.value != null ? String(option.value) : raw)
     }
     return raw
 }
 
-/** The source page label for a rule, falling back to "@key" for unknowns. */
+/** The source page or question label for a rule, falling back to "@key" for unknowns. */
 function sourceLabel(rule: FormLogicRule, pages: FormPage[]): string {
     const condition = (rule.conditions ?? [])[0]
     if (!condition?.sourceKey) return "(choose a source)"
     if (condition.sourceType === "variable") return `@${condition.sourceKey}`
-    return pageLabel(pages, condition.sourceKey)
+    return sourceQuestionLabel(pages, condition.sourceKey)
 }
 
 /** The chip text for the rule's outcome (the THEN side). */
@@ -99,10 +101,16 @@ export function RuleCard({ rule, index, pages = [], onEdit, onDelete }: RuleCard
     const value = valueLabel(rule, pages)
     const outcome = outcomeLabel(rule, pages)
     const condition = (rule.conditions ?? [])[0]
-    // The page referenced by the IF side (when the source is a page answer).
+    const allQuestions = extractAllQuestions(pages)
+    const sourceQuestion =
+        condition?.sourceType !== "variable" && condition?.sourceKey
+            ? allQuestions.find((q) => q.questionKey === condition.sourceKey)
+            : undefined
     const sourcePage =
         condition?.sourceType !== "variable" && condition?.sourceKey
-            ? pages.find((p) => p.pageKey === condition.sourceKey)
+            ? (sourceQuestion
+                  ? pages[sourceQuestion.pageIndex]
+                  : pages.find((p) => p.pageKey === condition.sourceKey))
             : undefined
     const action = (rule.actions ?? [])[0]
     // The page referenced by the THEN side (jump / show / hide targets).
@@ -143,14 +151,26 @@ export function RuleCard({ rule, index, pages = [], onEdit, onDelete }: RuleCard
 
             <div className="flex flex-wrap items-center gap-2  px-4 py-6">
                 <span className="text-[13px] font-bold text-[var(--foreground)]">IF</span>
-                {sourcePage ? (
-                    <Pill title={sourcePage.label || sourcePage.pageKey}>
+                {sourceQuestion ? (
+                    <Pill title={`Page ${sourceQuestion.pageIndex + 1} · Question ${sourceQuestion.questionIndex + 1}: ${sourceQuestion.title}`}>
+                        {sourcePage && (
+                            <PageTypeChip
+                                page={sourcePage}
+                                pageNumber={sourceQuestion.pageIndex + 1}
+                            />
+                        )}
+                        <span className="ml-1.5 truncate">
+                            Q{sourceQuestion.questionIndex + 1}: {sourceQuestion.title}
+                        </span>
+                    </Pill>
+                ) : sourcePage ? (
+                    <Pill title={sourcePage.title || sourcePage.label || sourcePage.pageKey}>
                         <PageTypeChip
                             page={sourcePage}
                             pageNumber={pageNumber(sourcePage.pageKey)}
                         />
                         <span className="ml-1.5 truncate">
-                            {sourcePage.label || sourcePage.pageKey}
+                            {sourcePage.title || sourcePage.label || sourcePage.pageKey}
                         </span>
                     </Pill>
                 ) : (
@@ -171,7 +191,7 @@ export function RuleCard({ rule, index, pages = [], onEdit, onDelete }: RuleCard
                             pageNumber={pageNumber(targetPage.pageKey)}
                         />
                         <span className="ml-1.5 truncate">
-                            {targetPage.label || targetPage.pageKey}
+                            {targetPage.title || targetPage.label || targetPage.pageKey}
                         </span>
                     </Pill>
                 ) : (

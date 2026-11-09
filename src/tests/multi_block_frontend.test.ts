@@ -1,0 +1,396 @@
+import assert from "node:assert";
+import { adaptApiPage } from "../features/forms/model/adapters.ts";
+import { validatePage, validateBlock } from "../shared/hooks/useFormValidation.ts";
+import { resolveFormLogic, countRulesForPage } from "../shared/utils/formLogic.ts";
+import type { FormPage as ApiPage } from "../entities/form/model/types.ts";
+import type { FormPage, FormLogicRule } from "../shared/types/common.ts";
+
+console.log("--- Starting Frontend Multi-Block & UI Tests ---");
+
+// Test 1: adaptApiPage with multiple blocks
+{
+  const mockApiPage: ApiPage = {
+    _id: "page_123",
+    formId: "form_abc",
+    pageKey: "page_key_1",
+    title: "Customer Onboarding",
+    description: "Please fill out the following questions.",
+    label: "Customer Onboarding",
+    helperText: "Please fill out the following questions.",
+    placeholder: "",
+    type: "shortText",
+    required: false,
+    order: 1,
+    options: [],
+    logic: [],
+    appearance: { width: "full", icon: "" },
+    isActive: true,
+    coverImage: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    blocks: [
+      {
+        _id: "block_1",
+        id: "block_1",
+        blockKey: "block_name",
+        type: "shortText",
+        title: "Full Name",
+        description: "Your legal name",
+        required: true,
+        order: 1,
+      },
+      {
+        _id: "block_2",
+        id: "block_2",
+        blockKey: "block_rating",
+        type: "rating",
+        title: "Satisfaction Rating",
+        description: "",
+        required: true,
+        order: 2,
+        settings: {
+          rating: { style: "star", max: 5 },
+        },
+      },
+    ],
+  };
+
+  const adapted = adaptApiPage(mockApiPage, "form_abc");
+  assert.strictEqual(adapted.title, "Customer Onboarding");
+  assert.strictEqual(adapted.description, "Please fill out the following questions.");
+  assert.strictEqual(adapted.blocks?.length, 2);
+  assert.strictEqual(adapted.blocks[0].title, "Full Name");
+  assert.strictEqual(adapted.blocks[0].description, ""); // description removed from question
+  assert.strictEqual(adapted.blocks[0].required, true);
+  assert.strictEqual(adapted.blocks[1].title, "Satisfaction Rating");
+  assert.strictEqual(adapted.blocks[1].description, ""); // description removed from question
+  console.log("✓ Test 1: adaptApiPage correctly maps multi-block pages with page title/desc, question titles, and no question desc");
+}
+
+// Test 2: adaptApiPage backward compatibility (synthesizes default block when blocks is empty)
+{
+  const mockLegacyPage: ApiPage = {
+    _id: "page_legacy",
+    formId: "form_abc",
+    pageKey: "page_key_legacy",
+    label: "Single Question",
+    helperText: "Help text",
+    placeholder: "Type here...",
+    type: "email",
+    required: true,
+    order: 1,
+    options: [],
+    logic: [],
+    appearance: { width: "full", icon: "" },
+    isActive: true,
+    coverImage: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  const adapted = adaptApiPage(mockLegacyPage, "form_abc");
+  assert.strictEqual(adapted.title, "Single Question");
+  assert.strictEqual(adapted.description, "Help text");
+  assert.strictEqual(adapted.blocks?.length, 1);
+  assert.strictEqual(adapted.blocks[0].blockKey, "page_key_legacy");
+  assert.strictEqual(adapted.blocks[0].type, "email");
+  // Single question: no question title, no question description
+  assert.strictEqual(adapted.blocks[0].title, "");
+  assert.strictEqual(adapted.blocks[0].description, "");
+  assert.strictEqual(adapted.blocks[0].required, true);
+  console.log("✓ Test 2: adaptApiPage backwards compatibility maps page title and ensures single question has no question title/desc");
+}
+
+// Test 3: Page title and description can both be empty string
+{
+  const mockEmptyTitlePage: ApiPage = {
+    _id: "page_empty_titles",
+    formId: "form_abc",
+    pageKey: "page_empty",
+    title: "",
+    description: "",
+    label: "",
+    helperText: "",
+    placeholder: "",
+    type: "statement",
+    required: false,
+    order: 1,
+    options: [],
+    logic: [],
+    appearance: { width: "full", icon: "" },
+    isActive: true,
+    coverImage: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    blocks: [
+      {
+        blockKey: "blk_empty",
+        type: "statement",
+        title: "",
+        description: "",
+        required: false,
+        order: 1,
+      },
+    ],
+  };
+
+  const adapted = adaptApiPage(mockEmptyTitlePage, "form_abc");
+  assert.strictEqual(adapted.title, "");
+  assert.strictEqual(adapted.description, "");
+  assert.strictEqual(adapted.blocks?.[0].title, "");
+  assert.strictEqual(adapted.blocks?.[0].description, "");
+  console.log("✓ Test 3: Empty page title and description and empty block title and description are supported");
+}
+
+// Test 4: validatePage for multi-block pages
+{
+  const pageWithBlocks: FormPage = {
+    _id: "page_multi",
+    formId: "form_abc",
+    pageKey: "page_multi",
+    title: "Multi-Question Page",
+    description: "Please answer all required questions",
+    label: "Multi-Question Page",
+    helperText: "Please answer all required questions",
+    placeholder: "",
+    type: "shortText",
+    required: false,
+    order: 1,
+    options: [],
+    logic: [],
+    appearance: { width: "full" },
+    isActive: true,
+    blocks: [
+      {
+        blockKey: "block_name",
+        type: "shortText",
+        title: "Full Name",
+        description: "",
+        required: true,
+        order: 1,
+      },
+      {
+        blockKey: "block_email",
+        type: "email",
+        title: "Work Email",
+        description: "",
+        required: true,
+        order: 2,
+      },
+      {
+        blockKey: "block_notes",
+        type: "longText",
+        title: "Additional Notes",
+        description: "Optional notes",
+        required: false,
+        order: 3,
+      },
+    ],
+  };
+
+  // Case A: Missing first required block
+  const errorMissingName = validatePage(pageWithBlocks, {
+    block_name: "",
+    block_email: "test@example.com",
+  });
+  assert.strictEqual(errorMissingName, "Full Name is required.");
+
+  // Case B: Missing second required block
+  const errorMissingEmail = validatePage(pageWithBlocks, {
+    block_name: "Alice Smith",
+    block_email: "",
+  });
+  assert.strictEqual(errorMissingEmail, "Work Email is required.");
+
+  // Case C: Invalid email in second block
+  const errorInvalidEmail = validatePage(pageWithBlocks, {
+    block_name: "Alice Smith",
+    block_email: "not-an-email",
+  });
+  assert.strictEqual(errorInvalidEmail, "Please enter a valid email address.");
+
+  // Case D: All valid (optional block can be empty)
+  const validResult = validatePage(pageWithBlocks, {
+    block_name: "Alice Smith",
+    block_email: "alice@company.com",
+    block_notes: "",
+  });
+  assert.strictEqual(validResult, null);
+
+  console.log("✓ Test 4: validatePage validates every block in multi-block pages correctly");
+}
+
+// Test 5: validateBlock for individual blocks
+{
+  const statementBlock = {
+    blockKey: "blk_stmt",
+    type: "statement" as const,
+    title: "Welcome",
+    description: "Welcome to our form",
+    order: 1,
+    required: true, // statement is never required even if flag is true
+  };
+  assert.strictEqual(validateBlock(statementBlock, null), null);
+
+  const numberBlock = {
+    blockKey: "blk_num",
+    type: "number" as const,
+    title: "Age",
+    description: "",
+    order: 2,
+    required: true,
+    validation: { min: 18, max: 99 },
+  };
+  assert.strictEqual(validateBlock(numberBlock, ""), "Age is required.");
+  assert.strictEqual(validateBlock(numberBlock, 15), "Minimum value is 18.");
+  assert.strictEqual(validateBlock(numberBlock, 25), null);
+
+  console.log("✓ Test 5: validateBlock validates block rules and constraints properly");
+}
+
+// Test 6: questions array and questionKey validation
+{
+  const pageWithQuestions: FormPage = {
+    _id: "page_q",
+    formId: "form_q",
+    pageKey: "page_q",
+    title: "Question Page",
+    description: "",
+    label: "Question Page",
+    helperText: "",
+    placeholder: "",
+    type: "shortText",
+    required: false,
+    order: 1,
+    options: [],
+    logic: [],
+    appearance: { width: "full" },
+    isActive: true,
+    questions: [
+      {
+        questionKey: "q_name",
+        type: "shortText",
+        title: "Full Name",
+        description: "",
+        required: true,
+        order: 1,
+      },
+    ],
+  };
+
+  const err = validatePage(pageWithQuestions, { q_name: "" });
+  assert.strictEqual(err, "Full Name is required.");
+  const ok = validatePage(pageWithQuestions, { q_name: "John Doe" });
+  assert.strictEqual(ok, null);
+  console.log("✓ Test 6: validatePage validates questions with questionKey properly");
+}
+
+// Test 7: countRulesForPage counts rules referencing questions on the page
+{
+  const testPage: FormPage = {
+    _id: "page_1",
+    formId: "form_1",
+    pageKey: "page_1_key",
+    title: "Page 1",
+    label: "Page 1",
+    type: "shortText",
+    required: false,
+    order: 1,
+    questions: [
+      {
+        questionKey: "q_101",
+        type: "multipleChoice",
+        title: "Do you like coding?",
+        required: true,
+        order: 1,
+      },
+    ],
+  };
+
+  const testRules: FormLogicRule[] = [
+    {
+      id: "rule_1",
+      category: "branching",
+      conditions: [{ sourceType: "page", sourceKey: "q_101", operator: "equals", value: "yes" }],
+      actions: [{ action: "jumpToPage", targetPageKey: "page_2_key" }],
+    },
+    {
+      id: "rule_2",
+      category: "display",
+      conditions: [{ sourceType: "page", sourceKey: "q_999", operator: "equals", value: "other" }],
+      actions: [{ action: "showPage", targetPageKey: "page_3_key" }],
+    },
+  ];
+
+  const count = countRulesForPage(testRules, "page_1_key", testPage);
+  assert.strictEqual(count, 1);
+  console.log("✓ Test 7: countRulesForPage properly counts rules referencing nested question keys");
+}
+
+// Test 8: resolveFormLogic maps question-level condition to parent page jump
+{
+  const testPages: FormPage[] = [
+    {
+      _id: "p1",
+      formId: "form_1",
+      pageKey: "page_1_key",
+      title: "Page 1",
+      label: "Page 1",
+      type: "shortText",
+      required: false,
+      order: 1,
+      questions: [
+        {
+          questionKey: "q_satisfaction",
+          type: "rating",
+          title: "How satisfied are you?",
+          order: 1,
+        },
+      ],
+    },
+    {
+      _id: "p2",
+      formId: "form_1",
+      pageKey: "page_2_key",
+      title: "Page 2",
+      label: "Page 2",
+      type: "shortText",
+      required: false,
+      order: 2,
+    },
+    {
+      _id: "p3",
+      formId: "form_1",
+      pageKey: "page_3_key",
+      title: "Page 3 (VIP)",
+      label: "Page 3",
+      type: "shortText",
+      required: false,
+      order: 3,
+    },
+  ];
+
+  const rules: FormLogicRule[] = [
+    {
+      id: "rule_branch_vip",
+      category: "branching",
+      conditions: [
+        { sourceType: "page", sourceKey: "q_satisfaction", operator: "greaterThanOrEquals", value: 5 },
+      ],
+      actions: [{ action: "jumpToPage", targetPageKey: "page_3_key" }],
+    },
+  ];
+
+  const resolved = resolveFormLogic({
+    pages: testPages,
+    answers: { q_satisfaction: 5 },
+    variables: [],
+    rules,
+  });
+
+  // Jump targets should be mapped to the parent page page_1_key so the navigation engine knows where to jump on submit
+  assert.strictEqual(resolved.jumpTargets["page_1_key"], "page_3_key");
+  console.log("✓ Test 8: resolveFormLogic resolves question-level condition to owner page jump");
+}
+
+console.log("--- All Frontend Multi-Block & UI Tests Passed Successfully! ---");

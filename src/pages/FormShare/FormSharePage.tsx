@@ -140,7 +140,7 @@ export function FormSharePage() {
             icon: Mail,
             hover: "hover:border-[#FF5722]/60 hover:bg-[#FF5722]/10 hover:text-[#FF5722]",
             action: () => {
-                window.location.href = `mailto:?subject=${enc(shareText)}&body=${enc(`${shareText}:\n${formUrl}`)}`
+                window.location.assign(`mailto:?subject=${enc(shareText)}&body=${enc(`${shareText}:\n${formUrl}`)}`)
             },
         },
         {

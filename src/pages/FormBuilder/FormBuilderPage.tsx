@@ -18,7 +18,6 @@ import {
   ResizableHandle,
 } from "../../components/ui/resizable";
 import type { FormPage, EndPage, IFormTheme } from "../../shared/types/common";
-import { PAGE_TYPE_LABELS } from "../../shared/constants/form-types";
 import {
   createPage,
   updatePage as updatePageApi,
@@ -33,6 +32,7 @@ import {
   reorderEndPages as reorderEndPagesApi,
 } from "../../entities/form/api/end-page.api";
 import { updateFormTheme } from "@/entities/form/api/form.api";
+import { adaptApiPage } from "@/features/forms/model/adapters";
 import { useDebounce } from "../../shared/hooks/useDebounce";
 import { useFormContext } from "@/features/forms/hooks/useFormContext";
 import { useFormSettings } from "@/features/forms/hooks/useFormSettings";
@@ -110,13 +110,23 @@ export function FormBuilderPage() {
 
   const [pages, setPages] = useState<FormPage[]>([]);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [endPages, setEndPages] = useState<EndPage[]>([]);
   const [selectedEndPageIndex, setSelectedEndPageIndex] = useState(0);
+  // Which list the middle editor and settings panel follow.
+  const [selectedKind, setSelectedKind] = useState<"page" | "endPage">("page");
+
+  const handleSelectQuestion = useCallback(
+    (pageIndex: number, questionId: string | null) => {
+      setSelectedKind("page");
+      setSelectedPageIndex(pageIndex);
+      setSelectedQuestionId(questionId);
+    },
+    [],
+  );
   // True while a new end page is being created on the backend, so the list can
   // show a loading placeholder until the created record comes back.
   const [isAddingEndPage, setIsAddingEndPage] = useState(false);
-  // Which list the middle editor and settings panel follow.
-  const [selectedKind, setSelectedKind] = useState<"page" | "endPage">("page");
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
   const pendingPageUpdateRef = useRef<
     { pageId: string; data: Record<string, unknown> } | null
@@ -540,6 +550,8 @@ export function FormBuilderPage() {
         // Create page via API
         const createdPage = await createPage(formId, {
           type: page.type,
+          title: page.title,
+          description: page.description,
           label: page.label,
           helperText: page.helperText,
           placeholder: page.placeholder,
@@ -552,10 +564,13 @@ export function FormBuilderPage() {
           },
           coverImage: page.coverImage ?? null,
           settings: page.settings,
+          blocks: page.blocks as any,
         });
 
+        const adapted = adaptApiPage(createdPage as any, formId);
         const newPageWithServerIds: FormPage = {
           ...page,
+          ...adapted,
           _id: createdPage._id,
           pageKey: createdPage.pageKey,
         };
@@ -650,12 +665,14 @@ export function FormBuilderPage() {
         try {
           showSaveStatus("saving");
           const duplicatedPage = await duplicatePageApi(formId, pageId);
+          const adapted = adaptApiPage(duplicatedPage as any, formId);
 
           // Update the temporary page with the real one from server
           setPages((prev) => {
             const updated = [...prev];
             updated[index + 1] = {
               ...newPage,
+              ...adapted,
               _id: duplicatedPage._id,
               pageKey: duplicatedPage.pageKey,
             } as FormPage;
@@ -674,6 +691,35 @@ export function FormBuilderPage() {
     },
     [formId, pages, showSaveStatus, setHasUnpublishedChanges],
   );
+
+  const reorderPageQuestions = useCallback(
+    (pageIndex: number, oldIndex: number, newIndex: number) => {
+      const page = pages[pageIndex];
+      const items = (page?.questions && page.questions.length > 0)
+        ? page.questions
+        : (page?.blocks && page.blocks.length > 0 ? page.blocks : []);
+      if (!page || items.length <= 1 || oldIndex === newIndex) return;
+      if (newIndex < 0 || newIndex >= items.length) return;
+
+      const updated = [...items];
+      const [moved] = updated.splice(oldIndex, 1);
+      updated.splice(newIndex, 0, moved);
+      const reindexed = updated.map((b, idx) => ({ ...b, order: idx + 1 }));
+
+      updatePage(pageIndex, {
+        questions: reindexed,
+        blocks: reindexed,
+        type: reindexed[0]?.type ?? page.type,
+        label: reindexed[0]?.title || reindexed[0]?.label || page.label,
+        title: reindexed[0]?.title ?? page.title,
+        description: reindexed[0]?.description ?? page.description,
+        helperText: reindexed[0]?.helperText ?? page.helperText,
+      });
+    },
+    [pages, updatePage],
+  );
+
+  const reorderPageBlocks = reorderPageQuestions;
 
   // Show loading state while fetching form
   if (isLoadingForm) {
@@ -719,12 +765,17 @@ export function FormBuilderPage() {
       pages={pages}
       selectedPageIndex={selectedPageIndex}
       isPageSelected={selectedKind === "page"}
+      selectedQuestionId={selectedQuestionId}
+      onSelectQuestion={handleSelectQuestion}
       onSelectPage={(index) => {
         setSelectedKind("page");
         setSelectedPageIndex(index);
+        setSelectedQuestionId(null);
       }}
       onPageOpened={() => setShowPagesDrawer(false)}
       onReorderPages={reorderPages}
+      onReorderQuestions={reorderPageQuestions}
+      onReorderBlocks={reorderPageBlocks}
       onAddPage={() => {
         setShowPagesDrawer(false);
         setShowAddPageDialog(true);
@@ -737,6 +788,7 @@ export function FormBuilderPage() {
       onSelectEndPage={(index) => {
         setSelectedKind("endPage");
         setSelectedEndPageIndex(index);
+        setSelectedQuestionId(null);
       }}
       onAddEndPage={addEndPage}
       onDeleteEndPage={deleteEndPage}
@@ -758,6 +810,8 @@ export function FormBuilderPage() {
       pageIndex={selectedPageIndex}
       onUpdate={updatePage}
       onOpenDesignDrawer={() => setDesignDrawerOpen(true)}
+      selectedQuestionId={selectedQuestionId}
+      onSelectQuestion={(qId) => setSelectedQuestionId(qId)}
     />
   ) : (
     <div className="flex h-full w-full flex-col overflow-hidden border-l border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] text-slate-800 dark:text-zinc-100">
@@ -868,7 +922,7 @@ export function FormBuilderPage() {
               <div className="relative h-full w-full transition-all">
                 {/* Top-left tag badge */}
                 <div className="absolute -top-3 left-4 z-20 flex items-center gap-1.5 rounded-lg bg-[#FF5722] px-2 py-0.5 text-[11px] font-semibold text-white shadow-md">
-                  <span>{selectedPageIndex + 1}. {PAGE_TYPE_LABELS[selectedPage.type] || selectedPage.label || "Page"}</span>
+                  <span>Page {selectedPageIndex + 1}</span>
                 </div>
                 {/* 4 Corner pip handles */}
                 <div className="absolute -top-1 -left-1 h-2 w-2 rounded-lg border border-[#FF5722] bg-white z-20 pointer-events-none" />
@@ -884,6 +938,8 @@ export function FormBuilderPage() {
                   theme={form?.theme}
                   variables={variableItems}
                   withBackground={false}
+                  selectedQuestionId={selectedQuestionId}
+                  onSelectQuestion={(qId) => setSelectedQuestionId(qId)}
                 />
               </div>
             ) : (

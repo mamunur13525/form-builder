@@ -1,7 +1,7 @@
-import type { FormPage } from "../types/common"
+import type { FormBlock, FormQuestion, FormPage } from "../types/common"
 
 /** True when a value counts as "answered". */
-function isEmpty(value: unknown): boolean {
+export function isEmpty(value: unknown): boolean {
     if (value === null || value === undefined) return true
     if (typeof value === "string") return value.trim() === ""
     if (typeof value === "number") return false
@@ -15,22 +15,26 @@ function isEmpty(value: unknown): boolean {
     return false
 }
 
-export function validatePage(page: FormPage, value: unknown): string | null {
-    // Statement pages are display-only and never required.
-    if (page.type === "statement") return null
+export function validateQuestion(
+    block: FormQuestion | FormBlock | FormPage,
+    value: unknown,
+): string | null {
+    // Statement questions/pages are display-only and never required.
+    if (block.type === "statement") return null
 
-    if (page.required && isEmpty(value)) {
-        return page.validation?.message || "This page is required."
+    const titleOrLabel = block.title || block.label || "This field"
+
+    if (block.required && isEmpty(value)) {
+        return block.validation?.message || `${titleOrLabel} is required.`
     }
 
-    const settings = page.settings ?? {}
+    const settings = block.settings ?? {}
 
-    if (page.type === "email") {
+    if (block.type === "email") {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (value && !emailRegex.test(value as string)) {
-            return page.validation?.message || "Please enter a valid email address."
+            return block.validation?.message || "Please enter a valid email address."
         }
-        // Flag-only on the backend, but we can still enforce it client-side.
         if (value && settings.email?.businessEmailsOnly) {
             const freeDomains = [
                 "gmail.com",
@@ -45,51 +49,51 @@ export function validatePage(page: FormPage, value: unknown): string | null {
             const domain = String(value).split("@")[1]?.toLowerCase()
             if (domain && freeDomains.includes(domain)) {
                 return (
-                    page.validation?.message ||
+                    block.validation?.message ||
                     "Please enter a business email address."
                 )
             }
         }
     }
 
-    if (page.type === "url" && value) {
+    if (block.type === "url" && value) {
         try {
             new URL(String(value))
         } catch {
-            return page.validation?.message || "Please enter a valid URL."
+            return block.validation?.message || "Please enter a valid URL."
         }
     }
 
-    if ((page.type === "shortText" || page.type === "longText") && typeof value === "string") {
-        if (page.validation?.minLength && value.length < page.validation.minLength) {
-            return page.validation?.message || `Minimum length is ${page.validation.minLength}.`
+    if ((block.type === "shortText" || block.type === "longText") && typeof value === "string") {
+        if (block.validation?.minLength && value.length < block.validation.minLength) {
+            return block.validation?.message || `Minimum length is ${block.validation.minLength}.`
         }
-        if (page.validation?.maxLength && value.length > page.validation.maxLength) {
-            return page.validation?.message || `Maximum length is ${page.validation.maxLength}.`
+        if (block.validation?.maxLength && value.length > block.validation.maxLength) {
+            return block.validation?.message || `Maximum length is ${block.validation.maxLength}.`
         }
     }
 
-    if (page.type === "number" && typeof value !== "undefined" && value !== "") {
+    if (block.type === "number" && typeof value !== "undefined" && value !== "") {
         const numValue = Number(value)
-        if (isNaN(numValue)) return page.validation?.message || "Please enter a valid number."
-        if (page.validation?.min !== undefined && numValue < page.validation.min) {
-            return page.validation?.message || `Minimum value is ${page.validation.min}.`
+        if (isNaN(numValue)) return block.validation?.message || "Please enter a valid number."
+        if (block.validation?.min !== undefined && numValue < block.validation.min) {
+            return block.validation?.message || `Minimum value is ${block.validation.min}.`
         }
-        if (page.validation?.max !== undefined && numValue > page.validation.max) {
-            return page.validation?.message || `Maximum value is ${page.validation.max}.`
+        if (block.validation?.max !== undefined && numValue > block.validation.max) {
+            return block.validation?.message || `Maximum value is ${block.validation.max}.`
         }
     }
 
     // Selection limits for multi-answer choice pages.
     if (
-        (page.type === "multiSelect" || page.type === "checkbox") &&
+        (block.type === "multiSelect" || block.type === "checkbox") &&
         Array.isArray(value)
     ) {
         const limit = settings.choice?.selectionLimit
         if (limit && limit.mode === "exact" && limit.exact !== undefined) {
             if (value.length !== limit.exact) {
                 return (
-                    page.validation?.message ||
+                    block.validation?.message ||
                     `Please select exactly ${limit.exact} option(s).`
                 )
             }
@@ -97,13 +101,13 @@ export function validatePage(page: FormPage, value: unknown): string | null {
         if (limit && limit.mode === "range") {
             if (limit.min !== undefined && value.length < limit.min) {
                 return (
-                    page.validation?.message ||
+                    block.validation?.message ||
                     `Please select at least ${limit.min} option(s).`
                 )
             }
             if (limit.max !== undefined && value.length > limit.max) {
                 return (
-                    page.validation?.message ||
+                    block.validation?.message ||
                     `Please select no more than ${limit.max} option(s).`
                 )
             }
@@ -111,18 +115,18 @@ export function validatePage(page: FormPage, value: unknown): string | null {
     }
 
     // Required sub-pages on an address.
-    if (page.type === "address" && settings.address) {
+    if (block.type === "address" && settings.address) {
         const answers = (value as Record<string, string> | undefined) ?? {}
         const missing = settings.address.pages.find(
             (f) => !f.hidden && f.required && !answers[f.key]?.trim(),
         )
         if (missing) {
-            return page.validation?.message || `${missing.label} is required.`
+            return block.validation?.message || `${missing.label} is required.`
         }
     }
 
     // Every visible matrix row must be answered when the page is required.
-    if (page.type === "matrix" && page.required && settings.matrix) {
+    if (block.type === "matrix" && block.required && settings.matrix) {
         const answers = (value as Record<string, string | string[]> | undefined) ?? {}
         const unanswered = settings.matrix.rows.find((row) => {
             const cell = answers[row.key]
@@ -130,19 +134,41 @@ export function validatePage(page: FormPage, value: unknown): string | null {
         })
         if (unanswered) {
             return (
-                page.validation?.message ||
+                block.validation?.message ||
                 `Please answer "${unanswered.label}".`
             )
         }
     }
 
     // Opinion scale must fall inside the configured range.
-    if (page.type === "opinionScale" && typeof value === "number" && settings.opinionScale) {
+    if (block.type === "opinionScale" && typeof value === "number" && settings.opinionScale) {
         const { min, max } = settings.opinionScale
         if (value < min || value > max) {
-            return page.validation?.message || `Please choose a value between ${min} and ${max}.`
+            return block.validation?.message || `Please choose a value between ${min} and ${max}.`
         }
     }
 
     return null
+}
+
+export const validateBlock = validateQuestion
+
+export function validatePage(page: FormPage, valueOrAnswers: unknown): string | null {
+    const questions = (page.questions && page.questions.length > 0)
+        ? page.questions
+        : (page.blocks && page.blocks.length > 0 ? page.blocks : [])
+
+    if (questions.length > 0) {
+        for (const question of questions) {
+            const key: string = question.questionKey || question.blockKey || page.pageKey
+            const questionValue = (typeof valueOrAnswers === "object" && valueOrAnswers !== null)
+                ? (valueOrAnswers as Record<string, unknown>)[key] ?? (valueOrAnswers as Record<string, unknown>)[page.pageKey]
+                : valueOrAnswers
+            const error = validateQuestion(question, questionValue)
+            if (error) return error
+        }
+        return null
+    }
+
+    return validateQuestion(page, valueOrAnswers)
 }

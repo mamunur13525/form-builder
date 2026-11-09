@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "node --experimental-strip-types src/tests/multi_block_frontend.test.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -20,11 +21,9 @@
     "@xyflow/react": "^12.11.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cn": "^0.2.6",
     "date-fns": "^4.4.0",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.26.0",
-    "motion": "^12.42.2",
     "react": "^19.2.7",
     "react-day-picker": "^10.0.1",
     "react-dom": "^19.2.7",

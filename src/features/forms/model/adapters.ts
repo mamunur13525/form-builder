@@ -83,22 +83,96 @@ export function adaptPublishedForm(publishedForm: PublishedForm): Form {
 
 /** Convert an API FormPage into the legacy FormPage type. */
 export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
+    const rawQuestions = (Array.isArray(apiPage.questions) && apiPage.questions.length > 0)
+        ? apiPage.questions
+        : (Array.isArray(apiPage.blocks) && apiPage.blocks.length > 0 ? apiPage.blocks : [])
+
+    const hasMultiple = rawQuestions.length > 1
+
+    const title = apiPage.title !== undefined && apiPage.title !== ""
+        ? apiPage.title
+        : (apiPage.label || (!hasMultiple ? rawQuestions[0]?.title : "") || "")
+    const description = apiPage.description !== undefined && apiPage.description !== ""
+        ? apiPage.description
+        : (apiPage.helperText || (!hasMultiple ? rawQuestions[0]?.description : "") || "")
+    const label = apiPage.label !== undefined ? apiPage.label : title
+    const helperText = apiPage.helperText !== undefined ? apiPage.helperText : description
+
+    const questions = rawQuestions.length > 0
+        ? rawQuestions.map((b: any) => {
+            const key = b.questionKey || b.blockKey || `question_${b._id || b.id || Math.random()}`
+            return {
+                _id: b._id || b.id,
+                id: b.id || b._id,
+                questionKey: key,
+                blockKey: key,
+                type: b.type,
+                title: hasMultiple ? (b.title !== undefined ? b.title : (b.label || "")) : "",
+                description: "",
+                label: hasMultiple ? (b.label !== undefined ? b.label : (b.title || "")) : "",
+                helperText: "",
+                placeholder: b.placeholder || "",
+                required: b.required ?? false,
+                order: b.order || 1,
+                options: (b.options || []).map((opt: any) => ({
+                    label: opt.label ?? "",
+                    value: opt.value ?? "",
+                })),
+                validation: b.validation,
+                appearance: b.appearance || { width: "full", icon: "" },
+                coverImage: b.coverImage ?? null,
+                settings: b.settings,
+                isActive: b.isActive !== false,
+                createdAt: b.createdAt,
+                updatedAt: b.updatedAt,
+            }
+        })
+        : [
+            {
+                _id: apiPage._id,
+                id: apiPage._id,
+                questionKey: apiPage.pageKey,
+                blockKey: apiPage.pageKey,
+                type: apiPage.type,
+                title: "",
+                description: "",
+                label: "",
+                helperText: "",
+                placeholder: apiPage.placeholder,
+                required: apiPage.required,
+                order: 1,
+                options: (apiPage.options || []).map((opt) => ({
+                    label: opt.label ?? "",
+                    value: opt.value ?? "",
+                })),
+                validation: apiPage.validation,
+                appearance: apiPage.appearance,
+                coverImage: apiPage.coverImage ?? null,
+                settings: apiPage.settings,
+                isActive: apiPage.isActive ?? true,
+                createdAt: apiPage.createdAt,
+                updatedAt: apiPage.updatedAt,
+            },
+        ]
+
     return {
         _id: apiPage._id,
         formId: formId,
         pageKey: apiPage.pageKey,
-        label: apiPage.label,
-        helperText: apiPage.helperText,
+        title,
+        description,
+        label,
+        helperText,
         placeholder: apiPage.placeholder,
         type: apiPage.type,
         required: apiPage.required,
         order: apiPage.order,
-        options: apiPage.options.map((opt) => ({
+        options: (apiPage.options || []).map((opt) => ({
             label: opt.label ?? "",
             value: opt.value ?? "",
         })),
         validation: apiPage.validation,
-        logic: apiPage.logic.map((rule) => ({
+        logic: (apiPage.logic || []).map((rule) => ({
             whenPageKey: rule.whenPageKey ?? "",
             operator: rule.operator ?? "equals",
             value: rule.value,
@@ -109,6 +183,8 @@ export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
         isActive: apiPage.isActive,
         coverImage: apiPage.coverImage ?? null,
         settings: apiPage.settings,
+        questions,
+        blocks: questions,
     }
 }
 

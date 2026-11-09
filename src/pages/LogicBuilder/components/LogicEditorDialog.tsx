@@ -43,7 +43,7 @@ import {
 import { getLogicRules } from "@/entities/form/api/logic.api";
 import { useFormStore } from "@/app/store/formStore";
 import { SECTIONS } from "./logicEditorConfig";
-import { normalizeApiRule, emptyRule } from "./ruleUtils";
+import { normalizeApiRule, emptyRule, extractAllQuestions } from "./ruleUtils";
 import { RuleEditor, PageTypeChip } from "./RuleEditor";
 import { RuleCard } from "./RuleCard";
 
@@ -160,17 +160,36 @@ function LogicEditorDialogComponent({
             const pageCondition = (rule.conditions ?? []).find(
                 (c) => (!c.sourceType || c.sourceType === "page") && c.sourceKey,
             )
+            const findPageKey = (key: string): string | null => {
+                const found = allPages.find((p) => {
+                    if (p.pageKey === key) return true
+                    const qs = p.questions ?? p.blocks ?? []
+                    return qs.some((q) => (q.questionKey || q.blockKey || q._id || q.id) === key)
+                })
+                return found?.pageKey ?? null
+            }
+
             if (rule.category === "branching") {
-                if (pageCondition) return pageCondition.sourceKey
+                if (pageCondition) {
+                    const pk = findPageKey(pageCondition.sourceKey)
+                    if (pk) return pk
+                }
                 // Variable-driven branch: owned by the page it jumps to.
                 return (rule.actions ?? [])[0]?.targetPageKey ?? null
             }
             if (rule.category === "calculation") {
-                if (pageCondition) return pageCondition.sourceKey
-                // Fall back to the first @pageKey referenced in the expression.
+                if (pageCondition) {
+                    const pk = findPageKey(pageCondition.sourceKey)
+                    if (pk) return pk
+                }
+                // Fall back to the first referenced question/page in the expression.
                 const expression = (rule.actions ?? [])[0]?.expression ?? ""
                 const refs = Array.from(expression.matchAll(/@([\w-]+)/g)).map((m) => m[1])
-                return refs.find((ref) => allPages.some((p) => p.pageKey === ref)) ?? null
+                for (const ref of refs) {
+                    const pk = findPageKey(ref)
+                    if (pk) return pk
+                }
+                return null
             }
             return null
         }
@@ -213,7 +232,15 @@ function LogicEditorDialogComponent({
     // Rule type picked from the dropdown — open a fresh editor for it.
     const selectRuleType = (category: LogicCategory) => {
         setSaveError(null)
-        setEditor({ category, rule: emptyRule(category, selectedPage?.pageKey ?? "") })
+        const allQs = extractAllQuestions(allPages)
+        const firstQKey =
+            allQs.find((q) => q.pageKey === selectedPage?.pageKey)?.questionKey ||
+            selectedPage?.pageKey ||
+            ""
+        setEditor({
+            category,
+            rule: emptyRule(category, firstQKey, selectedPage?.pageKey ?? ""),
+        })
     }
 
     // Edit a saved rule from its card — same editor, type already known.
@@ -375,22 +402,30 @@ function LogicEditorDialogComponent({
                                                     }
                                                 />
                                                 <span className="truncate">
-                                                    {selectedPage.label || "Untitled page"}
+                                                    {selectedPage.title || selectedPage.label || "Untitled page"}
                                                 </span>
                                             </span>
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent className="editorial">
-                                        {allPages.map((p, index) => (
-                                            <SelectItem key={p.pageKey} value={p.pageKey}>
-                                                <span className="flex items-center gap-2">
-                                                    <PageTypeChip page={p} pageNumber={index + 1} />
-                                                    <span className="truncate">
-                                                        {p.label || "Untitled page"}
+                                        {allPages.map((p, index) => {
+                                            const qs = p.questions ?? p.blocks ?? []
+                                            const qCount = qs.length > 0 ? qs.length : 1
+                                            const pageTitle = p.title || p.label || "Untitled page"
+                                            return (
+                                                <SelectItem key={p.pageKey} value={p.pageKey}>
+                                                    <span className="flex items-center gap-2">
+                                                        <PageTypeChip page={p} pageNumber={index + 1} />
+                                                        <span className="truncate">
+                                                            {pageTitle}
+                                                        </span>
+                                                        <span className="text-xs text-[var(--muted-foreground)]">
+                                                            ({qCount} {qCount === 1 ? "question" : "questions"})
+                                                        </span>
                                                     </span>
-                                                </span>
-                                            </SelectItem>
-                                        ))}
+                                                </SelectItem>
+                                            )
+                                        })}
                                     </SelectContent>
                                 </Select>
                             </div>

@@ -100,11 +100,11 @@ function buildGraph(
   // so the branches and badges have generous, uncrowded room.
   let currentX = 0;
 
-  // Welcome node
+  // Welcome node (height ~70px, center at y=55 when y=20)
   nodes.push({
     id: "welcome",
     type: "welcomeNode",
-    position: { x: currentX, y: 0 },
+    position: { x: currentX, y: 20 },
     data: {
       title: "Welcome",
       hasSource: true,
@@ -113,10 +113,17 @@ function buildGraph(
 
   currentX += NODE_STEP_X;
 
-  // Question pages
+  // Question pages (standard height ~110px, center at y=55 when y=0)
   pages.forEach((page, index) => {
     const id = pageId(page, index);
-    const ruleCount = countRulesForPage(rules, page.pageKey);
+    const ruleCount = countRulesForPage(rules, page.pageKey, page);
+
+    const questions =
+      page.questions && page.questions.length > 0
+        ? page.questions
+        : page.blocks && page.blocks.length > 0
+          ? page.blocks
+          : [];
 
     nodes.push({
       id,
@@ -127,6 +134,8 @@ function buildGraph(
       },
       data: {
         index,
+        pageKey: page.pageKey,
+        title: page.title,
         label: page.label,
         helperText: page.helperText,
         type: page.type,
@@ -134,6 +143,7 @@ function buildGraph(
         ruleCount,
         hasTarget: true,
         hasSource: true,
+        questions,
       } satisfies PageNodeData,
     });
 
@@ -142,11 +152,11 @@ function buildGraph(
     currentX += NODE_STEP_X + extraGap;
   });
 
-  // End page ("Thank you")
+  // End page ("Thank you", height ~70px, center at y=55 when y=20)
   nodes.push({
     id: END_PAGE_NODE_ID,
     type: "endPageNode",
-    position: { x: currentX, y: 0 },
+    position: { x: currentX, y: 20 },
     data: {
       title: endPage?.title || "Thank you",
       hasTarget: true,
@@ -368,13 +378,49 @@ function LogicFlow() {
 
   const [aiPrompt, setAiPrompt] = useState("");
 
-  const { fitView } = useReactFlow();
+  const { fitView, getNodes } = useReactFlow();
   const nodesInitialized = useNodesInitialized();
   const didInitialFit = useRef(false);
 
+  /**
+   * Pull every node onto one shared horizontal axis.
+   *
+   * Nodes differ in height (e.g. Welcome ~70px, Page ~110px-180px, EndPage ~70px),
+   * so their left/right connection handles — pinned at 50% of each card —
+   * would otherwise sit at different vertical positions and slant the default flow lines.
+   * Once nodes are measured, re-position each one so their vertical centers
+   * (and thus in/out handles) land on the same horizontal line.
+   */
+  const centerNodesVertically = useCallback(() => {
+    const rendered = getNodes();
+    const maxHeight = rendered.reduce(
+      (max, node) => Math.max(max, node.measured?.height ?? 0),
+      0,
+    );
+    if (maxHeight <= 0) return;
+    const axis = maxHeight / 2;
+    setNodes((current) =>
+      current.map((node) => {
+        const height =
+          rendered.find((n) => n.id === node.id)?.measured?.height ??
+          node.measured?.height ??
+          0;
+        if (height <= 0) return node;
+        const y = Math.round(axis - height / 2);
+        return node.position.y === y
+          ? node
+          : ({ ...node, position: { ...node.position, y } } as FlowNode);
+      }),
+    );
+  }, [getNodes, setNodes]);
+
   const handleRuleSelect = useCallback(
     (ownerKey: string, ruleId?: string) => {
-      const pageIndex = pages.findIndex((p) => p.pageKey === ownerKey);
+      const pageIndex = pages.findIndex((p) => {
+        if (p.pageKey === ownerKey) return true;
+        const qs = p.questions ?? p.blocks ?? [];
+        return qs.some((q) => (q.questionKey || q.blockKey || q._id || q.id) === ownerKey);
+      });
       if (pageIndex !== -1) {
         setSelected({
           page: pages[pageIndex],
@@ -401,9 +447,14 @@ function LogicFlow() {
   useEffect(() => {
     if (nodesInitialized && nodes.length > 0 && !didInitialFit.current) {
       didInitialFit.current = true;
-      window.setTimeout(() => fitView({ padding: 0.25, duration: 250 }), 30);
+      centerNodesVertically();
+      const timer = window.setTimeout(() => {
+        centerNodesVertically();
+        fitView({ padding: 0.25, duration: 250 });
+      }, 50);
+      return () => window.clearTimeout(timer);
     }
-  }, [nodesInitialized, nodes.length, fitView]);
+  }, [nodesInitialized, nodes.length, centerNodesVertically, fitView]);
 
   const handleNodeClick = useCallback(
     (

@@ -223,15 +223,15 @@ export function UploadSettingsWidget({
             />
 
             <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-zinc-200">Allowed file types</Label>
-                <p className="text-xs leading-5 text-zinc-400">
+                <Label className="text-sm font-medium text-slate-800 dark:text-zinc-200">Allowed file types</Label>
+                <p className="text-xs leading-5 text-slate-500 dark:text-zinc-400">
                     Leave all unchecked to allow every file type.
                 </p>
-                <div className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
+                <div className="space-y-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/50 p-3">
                     {UPLOAD_FILE_GROUPS.map((group) => (
                         <label
                             key={group.value}
-                            className="flex cursor-pointer items-center justify-between text-sm text-zinc-300 hover:text-white"
+                            className="flex cursor-pointer items-center justify-between text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white"
                         >
                             <span>{group.label}</span>
                             <Switch
@@ -281,13 +281,13 @@ export function AddressSettingsWidget({
 
     return (
         <div className="space-y-3">
-            <p className="text-xs leading-5 text-zinc-400">
+            <p className="text-xs leading-5 text-slate-500 dark:text-zinc-400">
                 Rename labels, set placeholders, and choose which parts are required or hidden.
             </p>
             {sorted.map((page) => (
                 <div
                     key={page.key}
-                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3"
+                    className="space-y-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/50 p-3 data-[hidden=true]:opacity-60"
                     data-hidden={page.hidden}
                 >
                     <div className="flex items-center gap-2">
@@ -301,7 +301,7 @@ export function AddressSettingsWidget({
                             type="button"
                             onClick={() => updatePage(page.key, { hidden: !page.hidden })}
                             title={page.hidden ? "Show page" : "Hide page"}
-                            className="rounded-lg border border-zinc-800 bg-[#1a1a20] p-2 text-zinc-400 hover:border-zinc-700 hover:text-white transition-colors cursor-pointer"
+                            className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] p-2 text-slate-500 dark:text-zinc-400 hover:border-slate-300 dark:hover:border-zinc-700 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                         >
                             {page.hidden ? (
                                 <EyeOff className="h-3.5 w-3.5" />
@@ -324,7 +324,7 @@ export function AddressSettingsWidget({
                             <div className="flex items-center justify-between gap-3">
                                 <Label
                                     htmlFor={`address-required-${page.key}`}
-                                    className="cursor-pointer text-xs text-zinc-400"
+                                    className="cursor-pointer text-xs text-slate-600 dark:text-zinc-400"
                                 >
                                     Required
                                 </Label>
@@ -462,8 +462,8 @@ function MatrixList({
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium text-zinc-200">{title}</Label>
-                <span className="text-xs text-zinc-500">
+                <Label className="text-sm font-medium text-slate-800 dark:text-zinc-200">{title}</Label>
+                <span className="text-xs text-slate-500 dark:text-zinc-500">
                     {items.length} / {max}
                 </span>
             </div>
@@ -482,7 +482,7 @@ function MatrixList({
                             type="button"
                             onClick={() => onRemove(item.key)}
                             disabled={items.length <= 1}
-                            className="rounded-lg border border-zinc-800 bg-[#1a1a20] p-2 text-zinc-400 hover:border-rose-500/30 hover:text-rose-400 disabled:pointer-events-none disabled:opacity-40 transition-colors cursor-pointer"
+                            className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] p-2 text-slate-500 dark:text-zinc-400 hover:border-rose-500/30 hover:text-rose-500 dark:hover:text-rose-400 disabled:pointer-events-none disabled:opacity-40 transition-colors cursor-pointer"
                         >
                             <X className="h-3.5 w-3.5" />
                         </button>
@@ -492,7 +492,7 @@ function MatrixList({
                 type="button"
                 onClick={onAdd}
                 disabled={items.length >= max}
-                className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-800 bg-[#1a1a20] text-xs font-medium text-zinc-300 hover:border-[#FF5722] hover:text-[#FF5722] hover:bg-zinc-800/60 disabled:pointer-events-none disabled:opacity-40 transition-all cursor-pointer"
+                className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:border-slate-300 dark:hover:border-zinc-700 hover:text-slate-900 dark:hover:text-zinc-100 disabled:pointer-events-none disabled:opacity-40 transition-all cursor-pointer"
             >
                 <Plus className="h-4 w-4" />
                 Add {title === "Rows" ? "row" : "column"}

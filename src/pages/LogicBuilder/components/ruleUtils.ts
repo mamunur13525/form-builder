@@ -9,8 +9,57 @@ import type {
     LogicActionItem,
     LogicCategory,
     LogicCondition,
+    PageType,
 } from "../../../shared/types/common";
 import { CALC_OPERATION_SYMBOLS, OPERATOR_LABELS } from "./logicEditorConfig";
+
+export interface QuestionMeta {
+    pageIndex: number
+    pageKey: string
+    pageTitle: string
+    questionIndex: number
+    questionKey: string
+    title: string
+    type: PageType
+    options?: { label?: string; value?: unknown }[]
+}
+
+/** Flatten all questions across pages with their page indices and titles. */
+export function extractAllQuestions(pages: FormPage[]): QuestionMeta[] {
+    const list: QuestionMeta[] = []
+    pages.forEach((p, pIdx) => {
+        const pageTitle = p.title || p.label || `Page ${pIdx + 1}`
+        const qs = (p.questions && p.questions.length > 0)
+            ? p.questions
+            : (p.blocks && p.blocks.length > 0 ? p.blocks : [])
+        if (qs.length === 0) {
+            list.push({
+                pageIndex: pIdx,
+                pageKey: p.pageKey,
+                pageTitle,
+                questionIndex: 0,
+                questionKey: p.pageKey,
+                title: p.label || p.title || "Untitled question",
+                type: p.type,
+                options: p.options,
+            })
+        } else {
+            qs.forEach((q, qIdx) => {
+                list.push({
+                    pageIndex: pIdx,
+                    pageKey: p.pageKey,
+                    pageTitle,
+                    questionIndex: qIdx,
+                    questionKey: q.questionKey || q.blockKey || q._id || q.id || `${p.pageKey}_q${qIdx}`,
+                    title: q.title || pageTitle || q.label || `Question ${qIdx + 1}`,
+                    type: q.type,
+                    options: q.options || p.options,
+                })
+            })
+        }
+    })
+    return list
+}
 
 export const emptyCondition = (sourceKey = ""): LogicCondition => ({
     sourceType: "page",
@@ -32,14 +81,14 @@ export const emptyActionFor = (category: LogicCategory, targetPageKey: string) =
     }
 }
 
-export const emptyRule = (category: LogicCategory, selectedPageKey: string): FormLogicRule => ({
+export const emptyRule = (category: LogicCategory, defaultSourceKey: string, targetPageKey = defaultSourceKey): FormLogicRule => ({
     id: `draft-${Math.random().toString(36).slice(2)}`,
     category,
     enabled: true,
     combinator: "and",
-    // Conditions read from the currently selected page.
-    conditions: [emptyCondition(selectedPageKey)],
-    actions: [emptyActionFor(category, selectedPageKey)],
+    // Conditions read from default source key (page or question).
+    conditions: [emptyCondition(defaultSourceKey)],
+    actions: [emptyActionFor(category, targetPageKey)],
 })
 
 /** Loose legacy condition shape tolerated before normalization. */
@@ -116,7 +165,7 @@ export function ruleSummary(rule: FormLogicRule, pages: FormPage[] = []): string
     const describe = (c: LogicCondition): string => {
         if (!c.sourceKey) return "(choose a source)"
         const source =
-            c.sourceType === "variable" ? `@${c.sourceKey}` : pageLabel(pages, c.sourceKey)
+            c.sourceType === "variable" ? `@${c.sourceKey}` : sourceQuestionLabel(pages, c.sourceKey)
         const operator = OPERATOR_LABELS[c.operator] ?? c.operator
         if (c.operator === "isEmpty" || c.operator === "isNotEmpty") {
             return `${source} ${operator}`
@@ -166,11 +215,21 @@ export function ruleSummary(rule: FormLogicRule, pages: FormPage[] = []): string
 // Page label helper (used by the rule summary chips)
 // ---------------------------------------------------------------------------
 
-/** "page 03 · Contact info" for a known key, "@key" otherwise. */
+/** "Page 03 · Contact info" for a known key, "@key" otherwise. */
 export function pageLabel(pages: FormPage[], pageKey: string): string {
     const index = pages.findIndex((p) => p.pageKey === pageKey)
     if (index === -1) return `@${pageKey}`
-    return `page ${String(index + 1).padStart(2, "0")} · ${
-        pages[index].label || "Untitled page"
+    return `Page ${index + 1} · ${
+        pages[index].title || pages[index].label || "Untitled page"
     }`
+}
+
+/** "P1 · Q2: Question title" for a question, or "Page 1 · Page Title" for a page. */
+export function sourceQuestionLabel(pages: FormPage[], sourceKey: string): string {
+    const questions = extractAllQuestions(pages)
+    const q = questions.find((item) => item.questionKey === sourceKey)
+    if (q) {
+        return `P${q.pageIndex + 1} · Q${q.questionIndex + 1}: ${q.title}`
+    }
+    return pageLabel(pages, sourceKey)
 }

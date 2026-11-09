@@ -29,6 +29,11 @@ interface FormBuilderSidebarProps {
   onPageOpened?: () => void;
   /** Applies a reordered page list and persists the new order. */
   onReorderPages: (pages: FormPage[]) => void;
+  selectedQuestionId?: string | null;
+  onSelectQuestion?: (pageIndex: number, questionId: string | null) => void;
+  /** Reorders nested questions within a page */
+  onReorderQuestions?: (pageIndex: number, oldIndex: number, newIndex: number) => void;
+  onReorderBlocks?: (pageIndex: number, oldIndex: number, newIndex: number) => void;
   onAddPage: () => void;
   onDeletePage: (index: number) => void;
   /** Retained for API compatibility; duplicate is no longer surfaced here. */
@@ -55,6 +60,10 @@ export function FormBuilderSidebar({
   onSelectPage,
   onPageOpened,
   onReorderPages,
+  selectedQuestionId,
+  onSelectQuestion,
+  onReorderQuestions,
+  onReorderBlocks,
   onAddPage,
   onDeletePage,
   onDuplicatePage,
@@ -131,8 +140,8 @@ export function FormBuilderSidebar({
   return (
     <div className="flex h-full w-full flex-col overflow-hidden border-r border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#141418] text-slate-800 dark:text-zinc-100">
       <ResizablePanelGroup orientation="vertical" className="h-full w-full">
-        {/* Top: pages */}
-        <ResizablePanel defaultSize={340} minSize={160}>
+        {/* Top: pages (approx 80%) */}
+        <ResizablePanel defaultSize="80%" minSize="60%">
           <div className="flex h-full w-full flex-col overflow-hidden">
             {/* Header — "Pages" with a count and an add button */}
             <div className="flex items-center justify-between gap-2 px-5 py-4 border-b border-slate-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#141418]">
@@ -190,6 +199,10 @@ export function FormBuilderSidebar({
                     onDuplicate={onDuplicatePage}
                     onMoveUp={movePageUp}
                     onMoveDown={movePageDown}
+                    selectedQuestionId={isPageSelected && index === selectedPageIndex ? selectedQuestionId : null}
+                    onSelectQuestion={onSelectQuestion}
+                    onReorderQuestions={(onReorderQuestions || onReorderBlocks) ? (oldIdx, newIdx) => (onReorderQuestions || onReorderBlocks)!(index, oldIdx, newIdx) : undefined}
+                    onReorderBlocks={(onReorderQuestions || onReorderBlocks) ? (oldIdx, newIdx) => (onReorderQuestions || onReorderBlocks)!(index, oldIdx, newIdx) : undefined}
                   />
                 );
               }}
@@ -207,8 +220,8 @@ export function FormBuilderSidebar({
           </span>
         </div>
 
-        {/* Bottom: end pages */}
-        <ResizablePanel defaultSize={240} minSize={150}>
+        {/* Bottom: end pages (approx 20%) */}
+        <ResizablePanel defaultSize="20%" minSize="12%" maxSize="40%">
           <EndPageList
             endPages={endPages}
             selectedIndex={selectedEndPageIndex}

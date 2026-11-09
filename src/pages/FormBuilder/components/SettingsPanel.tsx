@@ -10,6 +10,7 @@ import {
     ShieldCheck,
     MousePointer,
     Settings as SettingsIcon,
+    Search,
 } from "lucide-react"
 import { Input } from "../../../components/ui/input"
 import {
@@ -19,7 +20,9 @@ import {
     ComboboxItem,
     ComboboxList,
     ComboboxTrigger,
+    ComboboxInput,
 } from "../../../components/ui/combobox"
+import { InputGroupAddon } from "../../../components/ui/input-group"
 import {
     Tabs,
     TabsContent,
@@ -30,6 +33,7 @@ import type {
     ChoiceSettings,
     PageSettings,
     FormPage,
+    FormQuestion,
     Validation,
 } from "../../../shared/types/common"
 import {
@@ -71,6 +75,8 @@ interface SettingsPanelProps {
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormPage>) => void
     onOpenDesignDrawer: () => void
+    selectedQuestionId?: string | null
+    onSelectQuestion?: (questionId: string | null) => void
 }
 
 export function SettingsPanel({
@@ -78,43 +84,133 @@ export function SettingsPanel({
     pageIndex,
     onUpdate,
     onOpenDesignDrawer,
+    selectedQuestionId,
+    onSelectQuestion,
 }: SettingsPanelProps) {
-
     const [coverDialogOpen, setCoverDialogOpen] = React.useState(false)
     const [typeQuery, setTypeQuery] = React.useState("")
-    const settings = page.settings ?? {}
+    const [comboboxOpen, setComboboxOpen] = React.useState(false)
+    const [activeQuestionIndex, setActiveQuestionIndex] = React.useState(0)
 
-    /** Merge a single settings group, preserving the rest. */
+    React.useEffect(() => {
+        if (comboboxOpen) {
+            const timer = setTimeout(() => {
+                const input = document.querySelector<HTMLInputElement>("[data-slot='combobox-content'] input")
+                input?.focus()
+            }, 50)
+            return () => clearTimeout(timer)
+        }
+    }, [comboboxOpen])
+
+    const filteredTypes = React.useMemo(() => {
+        if (!typeQuery.trim()) return PAGE_TYPES
+        const q = typeQuery.toLowerCase().trim()
+        return PAGE_TYPES.filter((type) => {
+            const label = (PAGE_TYPE_LABELS[type] ?? type).toLowerCase()
+            const visual = PAGE_TYPE_VISUALS[type]
+            const displayName = (visual?.displayName ?? "").toLowerCase()
+            return label.includes(q) || displayName.includes(q) || type.toLowerCase().includes(q)
+        })
+    }, [typeQuery])
+
+    const questions: FormQuestion[] = React.useMemo(() => {
+        if (page.questions && page.questions.length > 0) return page.questions
+        if (page.blocks && page.blocks.length > 0) return page.blocks
+        return [
+            {
+                _id: page._id,
+                id: page._id,
+                questionKey: page.pageKey,
+                blockKey: page.pageKey,
+                type: page.type || "shortText",
+                title: page.title !== undefined ? page.title : (page.label || ""),
+                description: page.description !== undefined ? page.description : (page.helperText || ""),
+                label: page.label || page.title || "",
+                helperText: page.helperText || page.description || "",
+                placeholder: page.placeholder || "",
+                required: page.required ?? false,
+                order: 1,
+                options: page.options || [],
+                validation: page.validation,
+                settings: page.settings,
+                appearance: page.appearance || { width: "full", icon: "" },
+                coverImage: page.coverImage,
+                isActive: page.isActive ?? true,
+            },
+        ]
+    }, [page])
+
+    const safeQuestionIndex = Math.min(activeQuestionIndex, Math.max(0, questions.length - 1))
+    const currentQuestion = questions[safeQuestionIndex] || questions[0]
+    const currentBlock = currentQuestion
+    const settings = currentQuestion.settings ?? {}
+
+    React.useEffect(() => {
+        if (!selectedQuestionId) return
+        const foundIdx = questions.findIndex(
+            (q) => (q.questionKey || q.blockKey) === selectedQuestionId
+        )
+        if (foundIdx !== -1) {
+            setActiveQuestionIndex(foundIdx)
+        }
+    }, [selectedQuestionId, questions])
+
+    const updateCurrentQuestion = (updates: Partial<FormQuestion>) => {
+        const updatedQuestions = [...questions]
+        const target = updatedQuestions[safeQuestionIndex]
+        if (!target) return
+
+        updatedQuestions[safeQuestionIndex] = {
+            ...target,
+            ...updates,
+        }
+
+        const pageUpdates: Partial<FormPage> = {
+            questions: updatedQuestions,
+            blocks: updatedQuestions,
+        }
+        if (safeQuestionIndex === 0) {
+            if (updates.type) pageUpdates.type = updates.type
+            if (updates.placeholder !== undefined) pageUpdates.placeholder = updates.placeholder
+            if (updates.options !== undefined) pageUpdates.options = updates.options
+            if (updates.settings !== undefined) pageUpdates.settings = updates.settings
+            if (updates.required !== undefined) pageUpdates.required = updates.required
+        }
+        onUpdate(pageIndex, pageUpdates)
+    }
+
+    /** Merge a single settings group into the active question. */
     const patchSettings = (group: Partial<PageSettings>) => {
-        onUpdate(pageIndex, { settings: { ...settings, ...group } })
+        updateCurrentQuestion({ settings: { ...settings, ...group } })
     }
 
     const patchValidation = (patch: Partial<Validation>) => {
-        onUpdate(pageIndex, { validation: { ...page.validation, ...patch } })
+        updateCurrentQuestion({ validation: { ...(currentQuestion.validation || {}), ...patch } })
     }
 
+    const updateCurrentBlock = updateCurrentQuestion
+
     /**
-     * Changing the type wipes settings server-side, so reset locally to the
-     * new type's defaults (and reseed options for option-based types).
+     * Changing the question type resets settings to the new type's defaults.
      */
     const handleTypeChange = (value: FormPage["type"] | null) => {
         if (!value) return
         const nextType = value
         const isOptionType = defaultOptionsForType(nextType).length > 0
-        onUpdate(pageIndex, {
+        updateCurrentQuestion({
             type: nextType,
             settings: defaultSettingsForType(nextType),
-            ...(isOptionType && page.options.length === 0
+            ...(isOptionType && (!currentQuestion.options || currentQuestion.options.length === 0)
                 ? { options: defaultOptionsForType(nextType) }
                 : {}),
         })
     }
 
-    const isChoiceType = CHOICE_TYPES.includes(page.type)
-    const isMultiAnswer = MULTI_ANSWER_TYPES.includes(page.type)
-    const isStatement = page.type === "statement"
+    const isChoiceType = CHOICE_TYPES.includes(currentQuestion.type)
+    const isMultiAnswer = MULTI_ANSWER_TYPES.includes(currentQuestion.type)
+    const isStatement = currentQuestion.type === "statement"
 
-    // The choice group with guaranteed defaults, so the widgets never see undefined.
+    // The choice group with guaranteed defaults, so widgets never see undefined.
     const choice: ChoiceSettings = settings.choice ?? {
         allowOther: false,
         otherLabel: "Other",
@@ -125,7 +221,7 @@ export function SettingsPanel({
     }
 
     return (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-[#141418] border-l border-slate-200/90 dark:border-zinc-800/90 text-slate-800 dark:text-zinc-100">
+        <div data-settings-panel="true" className="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-[#141418] border-l border-slate-200/90 dark:border-zinc-800/90 text-slate-800 dark:text-zinc-100">
             {/* Header: Page settings */}
             <div className="flex items-center gap-2 px-6 pt-5 pb-2">
                 <Layers className="h-5 w-5 text-slate-900 dark:text-white" />
@@ -154,27 +250,61 @@ export function SettingsPanel({
 
                     <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
                         <div className="space-y-6 px-6 py-4">
-                            {/* Page type section */}
+                            {/* Question Switcher (if multiple questions on this page) */}
+                            {questions.length > 1 && (
+                                <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/80 dark:bg-zinc-900/60 p-3 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                                            Configure Question ({safeQuestionIndex + 1} of {questions.length})
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {questions.map((q, idx) => (
+                                            <button
+                                                key={q.questionKey || q.blockKey || idx}
+                                                type="button"
+                                                onClick={() => {
+                                                    setActiveQuestionIndex(idx)
+                                                    onSelectQuestion?.(q.questionKey || q.blockKey || null)
+                                                }}
+                                                className={cn(
+                                                    "px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer",
+                                                    safeQuestionIndex === idx
+                                                        ? "bg-[#FF5722] text-white border-[#FF5722] shadow-xs"
+                                                        : "bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600"
+                                                )}
+                                            >
+                                                Q{idx + 1}
+                                                {q.title ? `: ${q.title.slice(0, 10)}` : ` (${PAGE_TYPE_LABELS[q.type] ?? q.type})`}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Question type section */}
                             <SettingsSection
-                                title="Page Type"
+                                title={`Question Type (${safeQuestionIndex + 1}/${questions.length})`}
                                 icon={<FileText className="h-4 w-4 text-slate-400 dark:text-zinc-400" />}
                             >
                                 <Combobox
-                                    items={PAGE_TYPES}
-                                    value={page.type}
+                                    items={filteredTypes}
+                                    value={currentQuestion.type}
                                     onValueChange={handleTypeChange}
                                     inputValue={typeQuery}
                                     onInputValueChange={(next) => setTypeQuery(next ?? "")}
+                                    open={comboboxOpen}
                                     onOpenChange={(open) => {
-                                        if (open) setTypeQuery("")
+                                        setComboboxOpen(open)
+                                        if (!open) setTypeQuery("")
                                     }}
                                 >
                                     <ComboboxTrigger className="flex h-14 w-full items-center justify-between rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-800 dark:text-zinc-100 shadow-xs hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500 transition-colors cursor-pointer">
-                                        {page.type && PAGE_TYPE_VISUALS[page.type] ? (
+                                        {currentQuestion.type && PAGE_TYPE_VISUALS[currentQuestion.type] ? (
                                             (() => {
-                                                const visual = PAGE_TYPE_VISUALS[page.type]
+                                                const visual = PAGE_TYPE_VISUALS[currentQuestion.type]
                                                 const Icon = visual.icon
-                                                const label = visual.displayName ?? PAGE_TYPE_LABELS[page.type] ?? page.type
+                                                const label = visual.displayName ?? PAGE_TYPE_LABELS[currentQuestion.type] ?? currentQuestion.type
                                                 return (
                                                     <div className="flex items-center gap-3 text-slate-800 dark:text-zinc-100 min-w-0">
                                                         <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white shadow-xs ${visual.bgColor}`}>
@@ -185,12 +315,26 @@ export function SettingsPanel({
                                                 )
                                             })()
                                         ) : (
-                                            <span className="text-slate-400 dark:text-zinc-500">Select page type</span>
+                                            <span className="text-slate-400 dark:text-zinc-500">Select question type</span>
                                         )}
                                     </ComboboxTrigger>
                                     <ComboboxContent className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-slate-800 dark:text-zinc-100 shadow-xl dark:shadow-2xl p-1.5 z-50 min-w-(--anchor-width)">
-                                        <ComboboxEmpty className="py-3 text-center text-sm text-slate-400 dark:text-zinc-500">No items found.</ComboboxEmpty>
-                                        <ComboboxList className="space-y-1 max-h-[460px] overflow-y-auto p-1.5">
+                                        {/* Search bar with autofocus */}
+                                        <div className="p-1 mb-1 border-b border-slate-100 dark:border-zinc-800">
+                                            <ComboboxInput
+                                                autoFocus
+                                                showTrigger={false}
+                                                showClear={Boolean(typeQuery)}
+                                                placeholder="Search question types..."
+                                                className="w-full text-xs h-8 bg-slate-50 dark:bg-zinc-800/50 rounded-md border border-slate-200 dark:border-zinc-700/60 outline-0 ring-0 shadow-none focus:outline-0 focus:ring-0 focus:border-slate-200 dark:focus:border-zinc-700/60 focus-visible:outline-0 focus-visible:ring-0 focus-within:outline-0 focus-within:ring-0 focus-within:border-slate-200 dark:focus-within:border-zinc-700/60 has-[[data-slot=input-group-control]:focus-visible]:outline-0 has-[[data-slot=input-group-control]:focus-visible]:ring-0 has-[[data-slot=input-group-control]:focus-visible]:shadow-none has-[[data-slot=input-group-control]:focus-visible]:border-slate-200 dark:has-[[data-slot=input-group-control]:focus-visible]:border-zinc-700/60"
+                                            >
+                                                <InputGroupAddon align="inline-start">
+                                                    <Search className="size-3.5 text-slate-400 dark:text-zinc-500" />
+                                                </InputGroupAddon>
+                                            </ComboboxInput>
+                                        </div>
+                                        <ComboboxEmpty className="py-4 text-center text-xs text-slate-400 dark:text-zinc-500">No question types found.</ComboboxEmpty>
+                                        <ComboboxList className="space-y-1 max-h-[380px] overflow-y-auto p-1">
                                             {(item: PageType) => {
                                                 const visual = PAGE_TYPE_VISUALS[item]
                                                 const Icon = visual?.icon ?? FileText
@@ -214,328 +358,327 @@ export function SettingsPanel({
                                 </Combobox>
                             </SettingsSection>
 
-                                {/* Required — every type except statement (forced false server-side) */}
-                                {!isStatement && (
-                                    <RequiredToggle
-                                        checked={page.required}
-                                        onCheckedChange={(required) => onUpdate(pageIndex, { required })}
-                                    />
-                                )}
+                            {/* Required — every type except statement */}
+                            {!isStatement && (
+                                <RequiredToggle
+                                    checked={currentBlock.required ?? false}
+                                    onCheckedChange={(required) => updateCurrentBlock({ required })}
+                                />
+                            )}
 
-                                {/* ---------------- Email ---------------- */}
-                                {page.type === "email" && (
-                                    <SettingsSection title="Email">
-                                        <ToggleRow
-                                            id="business-emails"
-                                            label="Accept only business emails?"
-                                            checked={settings.email?.businessEmailsOnly ?? false}
-                                            onCheckedChange={(businessEmailsOnly) =>
-                                                patchSettings({
-                                                    email: {
-                                                        businessEmailsOnly,
-                                                        emailVerification:
-                                                             settings.email?.emailVerification ?? false,
-                                                    },
-                                                })
-                                            }
-                                        />
-                                        <ToggleRow
-                                            id="email-verification"
-                                            label="Email verification"
-                                            checked={settings.email?.emailVerification ?? false}
-                                            onCheckedChange={(emailVerification) =>
-                                                patchSettings({
-                                                    email: {
-                                                        businessEmailsOnly:
-                                                            settings.email?.businessEmailsOnly ?? false,
-                                                        emailVerification,
-                                                    },
-                                                })
-                                            }
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Long text: character limits ---------------- */}
-                                {page.type === "longText" && (
-                                    <SettingsSection title="Character limits">
-                                        <NumberSetting
-                                            label="Minimum characters"
-                                            description="Leave blank for no minimum limit."
-                                            value={page.validation?.minLength}
-                                            onChange={(minLength) => patchValidation({ minLength })}
-                                            placeholder="No minimum"
-                                            min={0}
-                                        />
-                                        <NumberSetting
-                                            label="Maximum characters"
-                                            description="Leave blank for no maximum limit."
-                                            value={page.validation?.maxLength}
-                                            onChange={(maxLength) => patchValidation({ maxLength })}
-                                            placeholder="No maximum"
-                                            min={0}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Number: min / max ---------------- */}
-                                {page.type === "number" && (
-                                    <SettingsSection title="Number range">
-                                        <NumberSetting
-                                            label="Minimum number"
-                                            description="Leave blank for no minimum limit."
-                                            value={page.validation?.min}
-                                            onChange={(min) => patchValidation({ min })}
-                                            placeholder="No minimum"
-                                        />
-                                        <NumberSetting
-                                            label="Maximum number"
-                                            description="Leave blank for no maximum limit."
-                                            value={page.validation?.max}
-                                            onChange={(max) => patchValidation({ max })}
-                                            placeholder="No maximum"
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Phone ---------------- */}
-                                {page.type === "phone" && (
-                                    <SettingsSection title="Phone">
-                                        <PhoneSettingsWidget
-                                            settings={
-                                                settings.phone ?? {
-                                                    phoneVerification: false,
-                                                    countryCodeMode: "auto",
-                                                    defaultCountry: null,
-                                                }
-                                            }
-                                            onChange={(phone) => patchSettings({ phone })}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Statement ---------------- */}
-                                {isStatement && (
-                                    <SettingsSection
-                                        title="Embed content"
-                                        icon={<Code2 className="h-4 w-4 text-zinc-400" />}
-                                    >
-                                        <StatementSettingsWidget
-                                            settings={
-                                                settings.statement ?? {
-                                                    embedUrl: "",
-                                                    embedProvider: "youtube",
-                                                    embedTitle: "",
-                                                }
-                                            }
-                                            onChange={(statement) => patchSettings({ statement })}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Choice types ---------------- */}
-                                {isChoiceType && (
-                                    <SettingsSection title="Options">
-                                        <OtherOptionSetting
-                                            settings={choice}
-                                            onChange={(next) => patchSettings({ choice: next })}
-                                        />
-                                        <HorizontalAlignSetting
-                                            settings={choice}
-                                            onChange={(next) => patchSettings({ choice: next })}
-                                        />
-                                        <HideLabelsSetting
-                                            settings={choice}
-                                            onChange={(next) => patchSettings({ choice: next })}
-                                        />
-                                        <SelectionLimitSetting
-                                            settings={choice}
-                                            onChange={(next) => patchSettings({ choice: next })}
-                                            isMultiAnswer={isMultiAnswer}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Address ---------------- */}
-                                {page.type === "address" && (
-                                    <SettingsSection title="Address pages">
-                                        <AddressSettingsWidget
-                                            settings={settings.address ?? { pages: [] }}
-                                            onChange={(address) => patchSettings({ address })}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Rating ---------------- */}
-                                {page.type === "rating" && (
-                                    <SettingsSection title="Rating">
-                                        <RatingSettingsWidget
-                                            settings={settings.rating ?? { style: "star", max: 5 }}
-                                            onChange={(rating) => patchSettings({ rating })}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Opinion scale ---------------- */}
-                                {page.type === "opinionScale" && (
-                                    <SettingsSection title="Scale">
-                                        <OpinionScaleSettingsWidget
-                                            settings={
-                                                settings.opinionScale ?? {
-                                                    min: 0,
-                                                    max: 10,
-                                                    leftLabel: "",
-                                                    rightLabel: "",
-                                                }
-                                            }
-                                            onChange={(opinionScale) => patchSettings({ opinionScale })}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Upload ---------------- */}
-                                {page.type === "file" && (
-                                    <SettingsSection title="Upload">
-                                        <UploadSettingsWidget
-                                            settings={
-                                                settings.upload ?? {
-                                                    allowMultiple: false,
-                                                    allowedFileTypes: [],
-                                                    maxFileSizeMb: 10,
-                                                }
-                                            }
-                                            onChange={(upload) => patchSettings({ upload })}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* ---------------- Matrix ---------------- */}
-                                {page.type === "matrix" && (
-                                    <SettingsSection title="Matrix">
-                                        <MatrixSettingsWidget
-                                            settings={
-                                                settings.matrix ?? {
-                                                    rows: [],
-                                                    columns: [],
-                                                    allowMultiplePerRow: false,
-                                                }
-                                            }
-                                            onChange={(matrix) => patchSettings({ matrix })}
-                                        />
-                                    </SettingsSection>
-                                )}
-
-                                {/* Cover image — available on every page type */}
-                                <SettingsSection
-                                    title="Cover image"
-                                    icon={<Image className="h-4 w-4 text-zinc-400" />}
-                                >
-                                    {page.coverImage?.url ? (
-                                        <div className="space-y-3">
-                                            <div className="relative overflow-hidden rounded-lg border border-zinc-800 shadow-xs">
-                                                <img
-                                                    src={page.coverImage.url}
-                                                    alt={page.coverImage.alt || "Cover"}
-                                                    className="h-28 w-full object-cover"
-                                                />
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setCoverDialogOpen(true)}
-                                                    className="flex h-10 flex-1 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-                                                >
-                                                    Replace
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onUpdate(pageIndex, { coverImage: null })}
-                                                    className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                    Remove
-                                                </button>
-                                            </div>
-                                            <CoverImageLayoutSetting
-                                                value={page.coverImage.layout}
-                                                onChange={(layout) =>
-                                                    onUpdate(pageIndex, {
-                                                        coverImage: { ...page.coverImage!, layout },
-                                                    })
-                                                }
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div
-                                            onClick={() => setCoverDialogOpen(true)}
-                                            className="flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group"
-                                        >
-                                            <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
-                                                <ImagePlus className="h-5 w-5" />
-                                            </div>
-                                            <p className="mt-3 text-sm font-medium text-slate-800 dark:text-zinc-200">
-                                                Add a cover image or drag & drop
-                                            </p>
-                                            <p className="mt-1 text-xs text-slate-500 dark:text-zinc-500">
-                                                JPG, PNG, SVG • Max 5MB
-                                            </p>
-                                        </div>
-                                    )}
-                                </SettingsSection>
-
-                                {/* Custom validation error message — available on every type */}
-                                <SettingsSection
-                                    title="Validation message"
-                                    icon={<ShieldCheck className="h-4 w-4 text-zinc-400" />}
-                                    description="Shown to respondents when this page fails validation."
-                                >
-                                    <div className="relative">
-                                        <Input
-                                            value={page.validation?.message ?? ""}
-                                            onChange={(e) => patchValidation({ message: e.target.value })}
-                                            placeholder="This page is required"
-                                            className={cn(CONTROL_CLASS, "pr-8")}
-                                        />
-                                    </div>
-                                </SettingsSection>
-
-                                {/* Button text — in settings tab */}
-                                <SettingsSection
-                                    title="Button"
-                                    icon={<MousePointer className="h-4 w-4 text-zinc-400" />}
-                                >
-                                    <TextSetting
-                                        label="Button Text"
-                                        value={page.appearance.submitButtonText ?? ""}
-                                        onChange={(submitButtonText) =>
-                                            onUpdate(pageIndex, {
-                                                appearance: {
-                                                    ...page.appearance,
-                                                    submitButtonText,
+                            {/* ---------------- Email ---------------- */}
+                            {currentBlock.type === "email" && (
+                                <SettingsSection title="Email">
+                                    <ToggleRow
+                                        id="business-emails"
+                                        label="Accept only business emails?"
+                                        checked={settings.email?.businessEmailsOnly ?? false}
+                                        onCheckedChange={(businessEmailsOnly) =>
+                                            patchSettings({
+                                                email: {
+                                                    businessEmailsOnly,
+                                                    emailVerification:
+                                                        settings.email?.emailVerification ?? false,
                                                 },
                                             })
                                         }
-                                        placeholder="Submit"
+                                    />
+                                    <ToggleRow
+                                        id="email-verification"
+                                        label="Email verification"
+                                        checked={settings.email?.emailVerification ?? false}
+                                        onCheckedChange={(emailVerification) =>
+                                            patchSettings({
+                                                email: {
+                                                    businessEmailsOnly:
+                                                        settings.email?.businessEmailsOnly ?? false,
+                                                    emailVerification,
+                                                },
+                                            })
+                                        }
                                     />
                                 </SettingsSection>
-                            </div>
-                        </TabsContent>
-                    </Tabs>
-                </div>
+                            )}
 
-                <ImagePickerDialog
-                    open={coverDialogOpen}
-                    onOpenChange={setCoverDialogOpen}
-                    onSelect={(coverImage) =>
-                        onUpdate(pageIndex, {
-                            coverImage: {
-                                ...coverImage,
-                                layout: page.coverImage?.layout ?? "top",
-                            },
-                        })
-                    }
-                    currentImage={page.coverImage}
-                />
+                            {/* ---------------- Long text: character limits ---------------- */}
+                            {currentBlock.type === "longText" && (
+                                <SettingsSection title="Character limits">
+                                    <NumberSetting
+                                        label="Minimum characters"
+                                        description="Leave blank for no minimum limit."
+                                        value={currentBlock.validation?.minLength}
+                                        onChange={(minLength) => patchValidation({ minLength })}
+                                        placeholder="No minimum"
+                                        min={0}
+                                    />
+                                    <NumberSetting
+                                        label="Maximum characters"
+                                        description="Leave blank for no maximum limit."
+                                        value={currentBlock.validation?.maxLength}
+                                        onChange={(maxLength) => patchValidation({ maxLength })}
+                                        placeholder="No maximum"
+                                        min={0}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Number: min / max ---------------- */}
+                            {currentBlock.type === "number" && (
+                                <SettingsSection title="Number range">
+                                    <NumberSetting
+                                        label="Minimum number"
+                                        description="Leave blank for no minimum limit."
+                                        value={currentBlock.validation?.min}
+                                        onChange={(min) => patchValidation({ min })}
+                                        placeholder="No minimum"
+                                    />
+                                    <NumberSetting
+                                        label="Maximum number"
+                                        description="Leave blank for no maximum limit."
+                                        value={currentBlock.validation?.max}
+                                        onChange={(max) => patchValidation({ max })}
+                                        placeholder="No maximum"
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Phone ---------------- */}
+                            {currentBlock.type === "phone" && (
+                                <SettingsSection title="Phone">
+                                    <PhoneSettingsWidget
+                                        settings={
+                                            settings.phone ?? {
+                                                phoneVerification: false,
+                                                countryCodeMode: "auto",
+                                                defaultCountry: null,
+                                            }
+                                        }
+                                        onChange={(phone) => patchSettings({ phone })}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Statement ---------------- */}
+                            {isStatement && (
+                                <SettingsSection
+                                    title="Embed content"
+                                    icon={<Code2 className="h-4 w-4 text-zinc-400" />}
+                                >
+                                    <StatementSettingsWidget
+                                        settings={
+                                            settings.statement ?? {
+                                                embedUrl: "",
+                                                embedProvider: "youtube",
+                                                embedTitle: "",
+                                            }
+                                        }
+                                        onChange={(statement) => patchSettings({ statement })}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Choice types ---------------- */}
+                            {isChoiceType && (
+                                <SettingsSection title="Options">
+                                    <OtherOptionSetting
+                                        settings={choice}
+                                        onChange={(next) => patchSettings({ choice: next })}
+                                    />
+                                    <HorizontalAlignSetting
+                                        settings={choice}
+                                        onChange={(next) => patchSettings({ choice: next })}
+                                    />
+                                    <HideLabelsSetting
+                                        settings={choice}
+                                        onChange={(next) => patchSettings({ choice: next })}
+                                    />
+                                    <SelectionLimitSetting
+                                        settings={choice}
+                                        onChange={(next) => patchSettings({ choice: next })}
+                                        isMultiAnswer={isMultiAnswer}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Address ---------------- */}
+                            {currentBlock.type === "address" && (
+                                <SettingsSection title="Address pages">
+                                    <AddressSettingsWidget
+                                        settings={settings.address ?? { pages: [] }}
+                                        onChange={(address) => patchSettings({ address })}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Rating ---------------- */}
+                            {currentBlock.type === "rating" && (
+                                <SettingsSection title="Rating">
+                                    <RatingSettingsWidget
+                                        settings={settings.rating ?? { style: "star", max: 5 }}
+                                        onChange={(rating) => patchSettings({ rating })}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Opinion scale ---------------- */}
+                            {currentBlock.type === "opinionScale" && (
+                                <SettingsSection title="Scale">
+                                    <OpinionScaleSettingsWidget
+                                        settings={
+                                            settings.opinionScale ?? {
+                                                min: 0,
+                                                max: 10,
+                                                leftLabel: "",
+                                                rightLabel: "",
+                                            }
+                                        }
+                                        onChange={(opinionScale) => patchSettings({ opinionScale })}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Upload ---------------- */}
+                            {currentBlock.type === "file" && (
+                                <SettingsSection title="Upload">
+                                    <UploadSettingsWidget
+                                        settings={
+                                            settings.upload ?? {
+                                                allowMultiple: false,
+                                                allowedFileTypes: [],
+                                                maxFileSizeMb: 10,
+                                            }
+                                        }
+                                        onChange={(upload) => patchSettings({ upload })}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* ---------------- Matrix ---------------- */}
+                            {currentBlock.type === "matrix" && (
+                                <SettingsSection title="Matrix">
+                                    <MatrixSettingsWidget
+                                        settings={
+                                            settings.matrix ?? {
+                                                rows: [],
+                                                columns: [],
+                                                allowMultiplePerRow: false,
+                                            }
+                                        }
+                                        onChange={(matrix) => patchSettings({ matrix })}
+                                    />
+                                </SettingsSection>
+                            )}
+
+                            {/* Custom validation error message */}
+                            <SettingsSection
+                                title="Validation message"
+                                icon={<ShieldCheck className="h-4 w-4 text-zinc-400" />}
+                                description="Shown to respondents when this question fails validation."
+                            >
+                                <div className="relative">
+                                    <Input
+                                        value={currentBlock.validation?.message ?? ""}
+                                        onChange={(e) => patchValidation({ message: e.target.value })}
+                                        placeholder="This field is required"
+                                        className={cn(CONTROL_CLASS, "pr-8")}
+                                    />
+                                </div>
+                            </SettingsSection>
+
+                            {/* Cover image — page level */}
+                            <SettingsSection
+                                title="Page Cover Image"
+                                icon={<Image className="h-4 w-4 text-zinc-400" />}
+                            >
+                                {page.coverImage?.url ? (
+                                    <div className="space-y-3">
+                                        <div className="relative overflow-hidden rounded-lg border border-zinc-800 shadow-xs">
+                                            <img
+                                                src={page.coverImage.url}
+                                                alt={page.coverImage.alt || "Cover"}
+                                                className="h-28 w-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setCoverDialogOpen(true)}
+                                                className="flex h-10 flex-1 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                            >
+                                                Replace
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => onUpdate(pageIndex, { coverImage: null })}
+                                                className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                                Remove
+                                            </button>
+                                        </div>
+                                        <CoverImageLayoutSetting
+                                            value={page.coverImage.layout}
+                                            onChange={(layout) =>
+                                                onUpdate(pageIndex, {
+                                                    coverImage: { ...page.coverImage!, layout },
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                ) : (
+                                    <div
+                                        onClick={() => setCoverDialogOpen(true)}
+                                        className="flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 py-7 px-4 text-center cursor-pointer hover:bg-slate-100/70 dark:hover:bg-zinc-900/80 hover:border-[#FF5722]/60 transition-all group"
+                                    >
+                                        <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] text-[#FF5722] shadow-xs group-hover:scale-105 transition-transform">
+                                            <ImagePlus className="h-5 w-5" />
+                                        </div>
+                                        <p className="mt-3 text-sm font-medium text-slate-800 dark:text-zinc-200">
+                                            Add a cover image or drag & drop
+                                        </p>
+                                        <p className="mt-1 text-xs text-slate-500 dark:text-zinc-500">
+                                            JPG, PNG, SVG • Max 5MB
+                                        </p>
+                                    </div>
+                                )}
+                            </SettingsSection>
+
+                            {/* Button text — in settings tab */}
+                            <SettingsSection
+                                title="Page Button"
+                                icon={<MousePointer className="h-4 w-4 text-zinc-400" />}
+                            >
+                                <TextSetting
+                                    label="Submit / Continue Text"
+                                    value={page.appearance?.submitButtonText ?? ""}
+                                    onChange={(submitButtonText) =>
+                                        onUpdate(pageIndex, {
+                                            appearance: {
+                                                ...(page.appearance || { width: "full", icon: "" }),
+                                                submitButtonText,
+                                            },
+                                        })
+                                    }
+                                    placeholder={isStatement ? "Continue" : "Submit"}
+                                />
+                            </SettingsSection>
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </div>
+
+            <ImagePickerDialog
+                open={coverDialogOpen}
+                onOpenChange={setCoverDialogOpen}
+                onSelect={(coverImage) =>
+                    onUpdate(pageIndex, {
+                        coverImage: {
+                            ...coverImage,
+                            layout: page.coverImage?.layout ?? "top",
+                        },
+                    })
+                }
+            />
+        </div>
     )
 }

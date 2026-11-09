@@ -494,9 +494,9 @@ export function PageContentEditor({
     <div className="w-full space-y-6">
       {/* 1. Page Title and Description with page number on top-left aligned with question handles */}
       <div className="w-full relative mb-2">
-        <div className="flex items-start gap-2.5">
+        <div className="flex items-start gap-4">
           {/* Page number badge aligned in the exact same 24px column as question drag handles */}
-          <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-slate-900 dark:bg-zinc-800 text-white text-[11px] font-bold select-none shadow-2xs">
+          <span className="mt-1 ml-1 flex shrink-0 items-center justify-center rounded text-white text-[11px] font-bold select-none shadow-2xs text-xs font-bold text-muted select-none bg-gray-900 px-1 rounded">
             {pageIndex + 1}
           </span>
 
@@ -601,13 +601,13 @@ export function PageContentEditor({
                 }
               }}
               className={cn(
-                "group/question relative w-full rounded-xl transition-all duration-200",
+                "group/question relative w-full rounded-xl pr-2",
                 isDragged
                   ? "opacity-75 bg-slate-50/80 dark:bg-zinc-800/80 shadow-lg ring-1 ring-[#FF5722]/30"
                   : !hasSelectedQuestion
                     ? "opacity-100"
                     : isThisQuestionSelected
-                      ? "opacity-100 ring-2 ring-[#FF5722]/25 rounded-xl bg-white/40 dark:bg-zinc-900/40 shadow-xs"
+                      ? "opacity-100 ring-2 ring-[#FF5722]/25 rounded-xl bg-white/5 dark:bg-zinc-900/5 shadow-xs"
                       : "opacity-35 hover:opacity-75 cursor-pointer"
               )}
             >

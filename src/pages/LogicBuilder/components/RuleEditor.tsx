@@ -212,18 +212,19 @@ export function RuleEditor({
     )
     const defaultQuestionKey = questionsOnCurrentPage[0]?.questionKey || selectedPageKey
 
-    // Ensure conditions have a valid sourceKey if missing
+    // Ensure conditions have a valid sourceKey if missing. Existing bindings are
+    // left untouched so rules can keep referencing answers from earlier pages.
     useEffect(() => {
         const conditions = rule.conditions ?? []
         const needsBinding = conditions.some(
-            (c) => c.sourceType === "page" && !c.sourceKey,
+            (c) => (!c.sourceType || c.sourceType === "page") && !c.sourceKey,
         )
         if (!needsBinding) return
         onUpdate({
             ...rule,
             conditions: conditions.map((c) =>
-                c.sourceType === "page" && !c.sourceKey
-                    ? { ...c, sourceKey: defaultQuestionKey }
+                (!c.sourceType || c.sourceType === "page") && !c.sourceKey
+                    ? { ...c, sourceType: "page", sourceKey: defaultQuestionKey }
                     : c,
             ),
         })
@@ -293,21 +294,22 @@ export function RuleEditor({
     /** One condition row: "If the answer <operator> <value> [x]". */
     const renderCondition = (condition: LogicCondition, conditionIndex: number) => {
         const isVariable = condition.sourceType === "variable"
+        const effectiveSourceKey = condition.sourceKey || (isVariable ? (variables[0]?.name || "") : defaultQuestionKey)
         const currentQ = !isVariable
-            ? allQuestions.find((q) => q.questionKey === condition.sourceKey)
+            ? allQuestions.find((q) => q.questionKey === effectiveSourceKey)
             : undefined
         const currentPage = !isVariable && !currentQ
-            ? pages.find((p) => p.pageKey === condition.sourceKey)
+            ? pages.find((p) => p.pageKey === effectiveSourceKey)
             : undefined
         const currentVar = isVariable
-            ? variables.find((v) => v.name === condition.sourceKey)
+            ? variables.find((v) => v.name === effectiveSourceKey)
             : undefined
 
         const isNumeric = isVariable
             ? currentVar?.type === "number"
             : ["number", "rating", "opinionScale", "date", "time"].includes(
                   currentQ?.type || currentPage?.type || "",
-              ) || numericSources.has(condition.sourceKey)
+              ) || numericSources.has(effectiveSourceKey)
 
         const condOperatorOptions = isNumeric
             ? OPERATOR_OPTIONS
@@ -402,7 +404,7 @@ export function RuleEditor({
                         </Select>
                     ) : (
                         <Select
-                            value={condition.sourceKey || null}
+                            value={effectiveSourceKey}
                             onValueChange={(v) => {
                                 if (!v) return
                                 setCondition(conditionIndex, {
@@ -412,9 +414,20 @@ export function RuleEditor({
                             }}
                         >
                             <Trigger aria-label="Select question" className="w-[240px] shrink-0">
-                                <span className="min-w-0 truncate">
-                                    {sourceQuestionLabel(pages, condition.sourceKey) || "Select question…"}
-                                </span>
+                                {currentQ ? (
+                                    <span className="flex min-w-0 items-center gap-2 truncate">
+                                        <span className="shrink-0 font-semibold text-[var(--editorial-primary)]">
+                                            P{currentQ.pageIndex + 1}·Q{currentQ.questionIndex + 1}
+                                        </span>
+                                        <span className="truncate">
+                                            {currentQ.title}
+                                        </span>
+                                    </span>
+                                ) : (
+                                    <span className="min-w-0 truncate">
+                                        {sourceQuestionLabel(pages, effectiveSourceKey) || "Select question…"}
+                                    </span>
+                                )}
                             </Trigger>
                             <SelectContent className={OVERLAY_CLASS}>
                                 {allQuestions.map((q) => (

@@ -326,7 +326,7 @@ export function SettingsPanel({
                                                 showTrigger={false}
                                                 showClear={Boolean(typeQuery)}
                                                 placeholder="Search question types..."
-                                                className="w-full text-xs h-8 bg-slate-50 dark:bg-zinc-800/50 rounded-md border border-slate-200 dark:border-zinc-700/60 focus:border-[#FF5722]"
+                                                className="w-full text-xs h-8 bg-slate-50 dark:bg-zinc-800/50 rounded-md border border-slate-200 dark:border-zinc-700/60 outline-0 ring-0 shadow-none focus:outline-0 focus:ring-0 focus:border-slate-200 dark:focus:border-zinc-700/60 focus-visible:outline-0 focus-visible:ring-0 focus-within:outline-0 focus-within:ring-0 focus-within:border-slate-200 dark:focus-within:border-zinc-700/60 has-[[data-slot=input-group-control]:focus-visible]:outline-0 has-[[data-slot=input-group-control]:focus-visible]:ring-0 has-[[data-slot=input-group-control]:focus-visible]:shadow-none has-[[data-slot=input-group-control]:focus-visible]:border-slate-200 dark:has-[[data-slot=input-group-control]:focus-visible]:border-zinc-700/60"
                                             >
                                                 <InputGroupAddon align="inline-start">
                                                     <Search className="size-3.5 text-slate-400 dark:text-zinc-500" />

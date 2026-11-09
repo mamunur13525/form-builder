@@ -43,7 +43,7 @@ import {
 import { getLogicRules } from "@/entities/form/api/logic.api";
 import { useFormStore } from "@/app/store/formStore";
 import { SECTIONS } from "./logicEditorConfig";
-import { normalizeApiRule, emptyRule } from "./ruleUtils";
+import { normalizeApiRule, emptyRule, extractAllQuestions } from "./ruleUtils";
 import { RuleEditor, PageTypeChip } from "./RuleEditor";
 import { RuleCard } from "./RuleCard";
 
@@ -232,10 +232,11 @@ function LogicEditorDialogComponent({
     // Rule type picked from the dropdown — open a fresh editor for it.
     const selectRuleType = (category: LogicCategory) => {
         setSaveError(null)
-        const qs = (selectedPage?.questions && selectedPage.questions.length > 0)
-            ? selectedPage.questions
-            : (selectedPage?.blocks && selectedPage.blocks.length > 0 ? selectedPage.blocks : [])
-        const firstQKey = qs[0]?.questionKey || qs[0]?.blockKey || selectedPage?.pageKey || ""
+        const allQs = extractAllQuestions(allPages)
+        const firstQKey =
+            allQs.find((q) => q.pageKey === selectedPage?.pageKey)?.questionKey ||
+            selectedPage?.pageKey ||
+            ""
         setEditor({
             category,
             rule: emptyRule(category, firstQKey, selectedPage?.pageKey ?? ""),

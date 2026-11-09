@@ -34,55 +34,60 @@ export function JumpEdge({
   let badgeY: number;
 
   if (isForward) {
-    // Forward jump (e.g. Page 1 -> Page 3, or Page 1 -> Thank you)
-    const dx1 = Math.min(36, Math.max(26, dx * 0.08));
-    const dx2 = Math.min(36, Math.max(26, dx * 0.08));
-    const r = Math.min(28, Math.max(18, (dx - dx1 - dx2) * 0.2));
+    const drop = Math.min(48, Math.max(26, dx * 0.12));
+    const ease = drop * 0.55;
 
-    const p1X = sourceX + dx1;
-    const p1Y = sourceY;
+    if (dx > drop * 2 + 60) {
+      // Smooth eased step: the line leaves the handle, glides down into the
+      // jump lane, drifts along a gently bowed middle section, then rises back
+      // into the target. No hard right angles, so it reads like the default
+      // curved connectors while still clearing the cards in between.
+      const ax = sourceX + drop;
+      const bx = targetX - drop;
+      const sag = Math.min(22, Math.max(8, dx * 0.03));
+      const midCtrlX = (bx - ax) * 0.34;
+      // Match the entry/exit tangents to the bowl's slope so the joins are
+      // C1-continuous — otherwise the direction changes abruptly and the line
+      // visibly "brakes" where the segments meet.
+      const slope = midCtrlX > 0 ? sag / midCtrlX : 0;
 
-    const p2X = p1X + r;
-    const p2Y = laneY;
-
-    const p3X = targetX - dx2 - r;
-    const p3Y = laneY;
-
-    const p4X = targetX - dx2;
-    const p4Y = targetY;
-
-    if (dx >= 90 && p3X > p2X) {
       path =
         `M ${sourceX} ${sourceY} ` +
-        `L ${p1X} ${p1Y} ` +
-        `C ${p1X + r * 0.55} ${p1Y}, ${p2X - r * 0.45} ${p2Y}, ${p2X} ${p2Y} ` +
-        `L ${p3X} ${p3Y} ` +
-        `C ${p3X + r * 0.45} ${p3Y}, ${p4X - r * 0.55} ${p4Y}, ${p4X} ${p4Y} ` +
-        `L ${targetX} ${targetY}`;
+        `C ${sourceX + ease} ${sourceY}, ${ax - ease} ${laneY - ease * slope}, ${ax} ${laneY} ` +
+        `C ${ax + midCtrlX} ${laneY + sag}, ${bx - midCtrlX} ${laneY + sag}, ${bx} ${laneY} ` +
+        `C ${bx + ease} ${laneY - ease * slope}, ${targetX - ease} ${targetY}, ${targetX} ${targetY}`;
 
-      badgeX = isLongJump ? p2X + (p3X - p2X) * 0.38 : (p2X + p3X) / 2;
-      badgeY = laneY;
+      badgeX = (sourceX + targetX) / 2;
+      badgeY = laneY + sag * 0.75;
     } else {
+      // Short hop: one flowing curve straight through the lane.
+      const controlY = (8 * laneY - sourceY - targetY) / 6;
+      const controlX = Math.max(24, dx * 0.32);
+
       path =
         `M ${sourceX} ${sourceY} ` +
-        `C ${sourceX + dx * 0.35} ${laneY}, ${targetX - dx * 0.35} ${laneY}, ${targetX} ${targetY}`;
+        `C ${sourceX + controlX} ${controlY}, ${targetX - controlX} ${controlY}, ${targetX} ${targetY}`;
+
       badgeX = (sourceX + targetX) / 2;
       badgeY = laneY;
     }
   } else {
-    // Backward jump (e.g. Page 3 -> Page 1)
-    const loopOutX = sourceX + 40;
-    const loopInX = targetX - 40;
+    // Backward jump (e.g. Page 3 -> Page 1). Loop out of the source handle,
+    // glide down into the lane, bow gently across it, then rise into the target.
+    const drop = 40;
+    const sag = Math.min(22, Math.max(8, dx * 0.03));
+    const midCtrlX = dx * 0.34;
+    // Same C1 tangent matching as the forward hop, just mirrored.
+    const slope = midCtrlX > 0 ? sag / midCtrlX : 0;
 
     path =
       `M ${sourceX} ${sourceY} ` +
-      `C ${loopOutX} ${sourceY}, ${loopOutX} ${laneY}, ${sourceX} ${laneY} ` +
-      `L ${targetX} ${laneY} ` +
-      `C ${loopInX} ${laneY}, ${loopInX} ${targetY}, ${targetX} ${targetY}`;
+      `C ${sourceX + drop} ${sourceY}, ${sourceX + drop} ${laneY - drop * slope}, ${sourceX} ${laneY} ` +
+      `C ${sourceX - midCtrlX} ${laneY + sag}, ${targetX + midCtrlX} ${laneY + sag}, ${targetX} ${laneY} ` +
+      `C ${targetX - drop} ${laneY - drop * slope}, ${targetX - drop} ${targetY}, ${targetX} ${targetY}`;
 
-    // Place badge along the horizontal return section exactly in the middle between source and target
     badgeX = (sourceX + targetX) / 2;
-    badgeY = laneY;
+    badgeY = laneY + sag * 0.75;
   }
 
   const labelText = data?.label ? String(data.label) : "Logic jump";

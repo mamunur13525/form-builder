@@ -113,6 +113,8 @@ export function FormBuilderPage() {
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [endPages, setEndPages] = useState<EndPage[]>([]);
   const [selectedEndPageIndex, setSelectedEndPageIndex] = useState(0);
+  // Which list the middle editor and settings panel follow.
+  const [selectedKind, setSelectedKind] = useState<"page" | "endPage">("page");
 
   const handleSelectQuestion = useCallback(
     (pageIndex: number, questionId: string | null) => {
@@ -125,8 +127,6 @@ export function FormBuilderPage() {
   // True while a new end page is being created on the backend, so the list can
   // show a loading placeholder until the created record comes back.
   const [isAddingEndPage, setIsAddingEndPage] = useState(false);
-  // Which list the middle editor and settings panel follow.
-  const [selectedKind, setSelectedKind] = useState<"page" | "endPage">("page");
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
   const pendingPageUpdateRef = useRef<
     { pageId: string; data: Record<string, unknown> } | null

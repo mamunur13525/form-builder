@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { motion } from "motion/react"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { useForm } from "@/features/forms/hooks/useForms"
 import { useResponses } from "@/features/forms/hooks/useFormResponses"

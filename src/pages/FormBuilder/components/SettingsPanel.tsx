@@ -113,32 +113,32 @@ export function SettingsPanel({
         })
     }, [typeQuery])
 
-    const questions: FormQuestion[] = (page.questions && page.questions.length > 0)
-        ? page.questions
-        : (page.blocks && page.blocks.length > 0)
-            ? page.blocks
-            : [
-                {
-                    _id: page._id,
-                    id: page._id,
-                    questionKey: page.pageKey,
-                    blockKey: page.pageKey,
-                    type: page.type || "shortText",
-                    title: page.title !== undefined ? page.title : (page.label || ""),
-                    description: page.description !== undefined ? page.description : (page.helperText || ""),
-                    label: page.label || page.title || "",
-                    helperText: page.helperText || page.description || "",
-                    placeholder: page.placeholder || "",
-                    required: page.required ?? false,
-                    order: 1,
-                    options: page.options || [],
-                    validation: page.validation,
-                    settings: page.settings,
-                    appearance: page.appearance || { width: "full", icon: "" },
-                    coverImage: page.coverImage,
-                    isActive: page.isActive ?? true,
-                },
-            ]
+    const questions: FormQuestion[] = React.useMemo(() => {
+        if (page.questions && page.questions.length > 0) return page.questions
+        if (page.blocks && page.blocks.length > 0) return page.blocks
+        return [
+            {
+                _id: page._id,
+                id: page._id,
+                questionKey: page.pageKey,
+                blockKey: page.pageKey,
+                type: page.type || "shortText",
+                title: page.title !== undefined ? page.title : (page.label || ""),
+                description: page.description !== undefined ? page.description : (page.helperText || ""),
+                label: page.label || page.title || "",
+                helperText: page.helperText || page.description || "",
+                placeholder: page.placeholder || "",
+                required: page.required ?? false,
+                order: 1,
+                options: page.options || [],
+                validation: page.validation,
+                settings: page.settings,
+                appearance: page.appearance || { width: "full", icon: "" },
+                coverImage: page.coverImage,
+                isActive: page.isActive ?? true,
+            },
+        ]
+    }, [page])
 
     const safeQuestionIndex = Math.min(activeQuestionIndex, Math.max(0, questions.length - 1))
     const currentQuestion = questions[safeQuestionIndex] || questions[0]

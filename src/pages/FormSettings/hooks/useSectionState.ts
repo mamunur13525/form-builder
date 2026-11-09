@@ -21,26 +21,28 @@ import { useEffect, useRef, useState } from "react"
  */
 export function useSectionState<T>(loaded: T | undefined, defaults: T) {
     const [values, setValues] = useState<T>(defaults)
-    const baselineRef = useRef<T>(defaults)
+    const [baseline, setBaseline] = useState<T>(defaults)
 
-    // Track the latest values without making them an effect dependency.
+    // Track the latest values without making them an effect dependency of the loader.
     const valuesRef = useRef<T>(values)
-    valuesRef.current = values
+    useEffect(() => {
+        valuesRef.current = values
+    })
 
     useEffect(() => {
         if (loaded === undefined) return
-        const isClean =
-            JSON.stringify(valuesRef.current) ===
-            JSON.stringify(baselineRef.current)
-        baselineRef.current = loaded
-        if (isClean) setValues(loaded)
+        setBaseline((prevBaseline) => {
+            const isClean =
+                JSON.stringify(valuesRef.current) === JSON.stringify(prevBaseline)
+            if (isClean) setValues(loaded)
+            return loaded
+        })
     }, [loaded])
 
-    const dirty =
-        JSON.stringify(values) !== JSON.stringify(baselineRef.current)
+    const dirty = JSON.stringify(values) !== JSON.stringify(baseline)
 
     const commit = (next: T) => {
-        baselineRef.current = next
+        setBaseline(next)
         setValues(next)
     }
 

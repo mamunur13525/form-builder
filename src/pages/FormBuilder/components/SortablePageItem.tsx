@@ -120,7 +120,9 @@ export function SortablePageItem({
 
     try {
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    } catch {}
+    } catch {
+      // Ignore if pointer capture is not supported or already released
+    }
 
     setDragState({
       startIndex: qIdx,
@@ -173,7 +175,9 @@ export function SortablePageItem({
 
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {}
+    } catch {
+      // Ignore if pointer capture already released
+    }
 
     if (dragState.isStarted && dragState.startIndex !== dragState.targetIndex) {
       reorderHandler?.(dragState.startIndex, dragState.targetIndex);
@@ -196,7 +200,9 @@ export function SortablePageItem({
 
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {}
+    } catch {
+      // Ignore if pointer capture already released
+    }
 
     setTimeout(() => {
       wasQuestionDraggedRef.current = false;

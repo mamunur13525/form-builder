@@ -60,10 +60,11 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   assert.strictEqual(adapted.description, "Please fill out the following questions.");
   assert.strictEqual(adapted.blocks?.length, 2);
   assert.strictEqual(adapted.blocks[0].title, "Full Name");
+  assert.strictEqual(adapted.blocks[0].description, ""); // description removed from question
   assert.strictEqual(adapted.blocks[0].required, true);
   assert.strictEqual(adapted.blocks[1].title, "Satisfaction Rating");
-  assert.strictEqual(adapted.blocks[1].description, ""); // empty description preserved
-  console.log("✓ Test 1: adaptApiPage correctly maps multi-block pages and preserves empty descriptions");
+  assert.strictEqual(adapted.blocks[1].description, ""); // description removed from question
+  console.log("✓ Test 1: adaptApiPage correctly maps multi-block pages with page title/desc, question titles, and no question desc");
 }
 
 // Test 2: adaptApiPage backward compatibility (synthesizes default block when blocks is empty)
@@ -88,12 +89,16 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   };
 
   const adapted = adaptApiPage(mockLegacyPage, "form_abc");
+  assert.strictEqual(adapted.title, "Single Question");
+  assert.strictEqual(adapted.description, "Help text");
   assert.strictEqual(adapted.blocks?.length, 1);
   assert.strictEqual(adapted.blocks[0].blockKey, "page_key_legacy");
   assert.strictEqual(adapted.blocks[0].type, "email");
-  assert.strictEqual(adapted.blocks[0].title, "Single Question");
+  // Single question: no question title, no question description
+  assert.strictEqual(adapted.blocks[0].title, "");
+  assert.strictEqual(adapted.blocks[0].description, "");
   assert.strictEqual(adapted.blocks[0].required, true);
-  console.log("✓ Test 2: adaptApiPage backwards compatibility synthesizes default block");
+  console.log("✓ Test 2: adaptApiPage backwards compatibility maps page title and ensures single question has no question title/desc");
 }
 
 // Test 3: Page title and description can both be empty string

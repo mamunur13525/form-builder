@@ -51,7 +51,7 @@ export function extractAllQuestions(pages: FormPage[]): QuestionMeta[] {
                     pageTitle,
                     questionIndex: qIdx,
                     questionKey: q.questionKey || q.blockKey || q._id || q.id || `${p.pageKey}_q${qIdx}`,
-                    title: q.title || q.label || `Question ${qIdx + 1}`,
+                    title: q.title || pageTitle || q.label || `Question ${qIdx + 1}`,
                     type: q.type,
                     options: q.options || p.options,
                 })

@@ -6,6 +6,7 @@ import { VariableText } from "./VariableText"
 interface PageLabelProps {
     label: string
     pageNumber?: number
+    required?: boolean
     editable?: boolean
     onUpdate?: (label: string) => void
     color?: string
@@ -23,6 +24,7 @@ interface PageLabelProps {
 export function PageLabel({
     label,
     pageNumber,
+    required,
     editable,
     onUpdate,
     color,
@@ -40,18 +42,23 @@ export function PageLabel({
                         {pageNumber}
                     </span>
                 )}
-                <VariableEditable
-                    value={label}
-                    onCommit={(next) => onUpdate?.(next)}
-                    variables={variables}
-                    ariaLabel="Question"
-                    placeholder="Type your question... Use @ to recall information."
-                    className={cn(
-                        sizeClass,
-                        "outline-none border-0 border-transparent pb-1 transition-colors cursor-text",
+                <div className="flex items-center gap-1">
+                    <VariableEditable
+                        value={label}
+                        onCommit={(next) => onUpdate?.(next)}
+                        variables={variables}
+                        ariaLabel="Question"
+                        placeholder="Type your question... Use @ to recall information."
+                        className={cn(
+                            sizeClass,
+                            "outline-none border-0 border-transparent pb-1 transition-colors cursor-text",
+                        )}
+                        style={color ? { color } : undefined}
+                    />
+                    {required && (
+                        <span className="text-destructive font-bold select-none">*</span>
                     )}
-                    style={color ? { color } : undefined}
-                />
+                </div>
             </div>
         )
     }
@@ -63,22 +70,27 @@ export function PageLabel({
                     {pageNumber}
                 </span>
             )}
-            {highlightVariables ? (
-                <VariableText
-                    as="h2"
-                    text={label}
-                    variables={variables}
-                    className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-normal")}
-                    style={color ? { color } : undefined}
-                />
-            ) : (
-                <h2
-                    className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-normal")}
-                    style={color ? { color } : undefined}
-                >
-                    {renderVariableText(label, variables)}
-                </h2>
-            )}
+            <div className="flex items-baseline gap-1">
+                {highlightVariables ? (
+                    <VariableText
+                        as="h2"
+                        text={label}
+                        variables={variables}
+                        className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-normal")}
+                        style={color ? { color } : undefined}
+                    />
+                ) : (
+                    <h2
+                        className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-normal")}
+                        style={color ? { color } : undefined}
+                    >
+                        {renderVariableText(label, variables)}
+                    </h2>
+                )}
+                {required && (
+                    <span className="text-destructive font-bold select-none text-lg">*</span>
+                )}
+            </div>
         </div>
     )
 }

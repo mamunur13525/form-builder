@@ -146,16 +146,17 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
     return (
       <div className="w-full space-y-6">
         {/* Page Title & Description (when present / non-empty) */}
-        {(page.title || (hasMultipleQuestions ? "" : page.label)) ? (
+        {(page.title || page.label || page.description || page.helperText) ? (
           <div>
             <PageLabel
               label={page.title || page.label}
               pageNumber={currentStep + 1}
+              required={!hasMultipleQuestions && (page.required || questions[0]?.required)}
               color={themeResolved.questionColor}
               fontSizeClass={fontSizes.question}
               variables={variableItems}
             />
-            {(page.description || (hasMultipleQuestions ? "" : page.helperText)) ? (
+            {(page.description || (!hasMultipleQuestions ? page.helperText : "")) ? (
               <PageHelperText
                 helperText={page.description || page.helperText}
                 color={themeResolved.textColor}
@@ -169,8 +170,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
         {/* Questions List */}
         <div className="w-full space-y-8">
           {questions.map((question, qIdx) => {
-            const questionTitle = question.title || (hasMultipleQuestions ? "" : question.label);
-            const questionDesc = question.description || (hasMultipleQuestions ? "" : question.helperText);
+            const questionTitle = question.title || (hasMultipleQuestions ? question.label : "");
             const questionKey: string = question.questionKey || question.blockKey || page.pageKey;
             const questionAsPage: FormPage = {
               ...page,
@@ -198,14 +198,6 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
                         <span className="ml-1 text-destructive font-bold">*</span>
                       )}
                     </h3>
-                    {questionDesc ? (
-                      <p
-                        className={cn("text-sm opacity-80", fontSizes.helper)}
-                        style={{ color: themeResolved.textColor }}
-                      >
-                        {questionDesc}
-                      </p>
-                    ) : null}
                   </div>
                 ) : null}
 

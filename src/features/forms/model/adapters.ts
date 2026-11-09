@@ -83,14 +83,20 @@ export function adaptPublishedForm(publishedForm: PublishedForm): Form {
 
 /** Convert an API FormPage into the legacy FormPage type. */
 export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
-    const title = apiPage.title !== undefined ? apiPage.title : (apiPage.label || "")
-    const description = apiPage.description !== undefined ? apiPage.description : (apiPage.helperText || "")
-    const label = apiPage.label !== undefined ? apiPage.label : title
-    const helperText = apiPage.helperText !== undefined ? apiPage.helperText : description
-
     const rawQuestions = (Array.isArray(apiPage.questions) && apiPage.questions.length > 0)
         ? apiPage.questions
         : (Array.isArray(apiPage.blocks) && apiPage.blocks.length > 0 ? apiPage.blocks : [])
+
+    const hasMultiple = rawQuestions.length > 1
+
+    const title = apiPage.title !== undefined && apiPage.title !== ""
+        ? apiPage.title
+        : (apiPage.label || (!hasMultiple ? rawQuestions[0]?.title : "") || "")
+    const description = apiPage.description !== undefined && apiPage.description !== ""
+        ? apiPage.description
+        : (apiPage.helperText || (!hasMultiple ? rawQuestions[0]?.description : "") || "")
+    const label = apiPage.label !== undefined ? apiPage.label : title
+    const helperText = apiPage.helperText !== undefined ? apiPage.helperText : description
 
     const questions = rawQuestions.length > 0
         ? rawQuestions.map((b: any) => {
@@ -101,10 +107,10 @@ export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
                 questionKey: key,
                 blockKey: key,
                 type: b.type,
-                title: b.title !== undefined ? b.title : (b.label || ""),
-                description: b.description !== undefined ? b.description : (b.helperText || ""),
-                label: b.label !== undefined ? b.label : (b.title || ""),
-                helperText: b.helperText !== undefined ? b.helperText : (b.description || ""),
+                title: hasMultiple ? (b.title !== undefined ? b.title : (b.label || "")) : "",
+                description: "",
+                label: hasMultiple ? (b.label !== undefined ? b.label : (b.title || "")) : "",
+                helperText: "",
                 placeholder: b.placeholder || "",
                 required: b.required ?? false,
                 order: b.order || 1,
@@ -128,10 +134,10 @@ export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
                 questionKey: apiPage.pageKey,
                 blockKey: apiPage.pageKey,
                 type: apiPage.type,
-                title,
-                description,
-                label,
-                helperText,
+                title: "",
+                description: "",
+                label: "",
+                helperText: "",
                 placeholder: apiPage.placeholder,
                 required: apiPage.required,
                 order: 1,
@@ -143,7 +149,9 @@ export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
                 appearance: apiPage.appearance,
                 coverImage: apiPage.coverImage ?? null,
                 settings: apiPage.settings,
-                isActive: apiPage.isActive,
+                isActive: apiPage.isActive ?? true,
+                createdAt: apiPage.createdAt,
+                updatedAt: apiPage.updatedAt,
             },
         ]
 

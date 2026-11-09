@@ -16,7 +16,7 @@ export function OtherOptionSetting({
         <div className="flex items-center justify-between gap-3">
             <Label
                 htmlFor="allow-other"
-                className="cursor-pointer text-sm font-medium text-zinc-200"
+                className="cursor-pointer text-sm font-medium text-slate-800 dark:text-zinc-200"
             >
                 "Other" option
             </Label>
@@ -53,7 +53,7 @@ export function HorizontalAlignSetting({
             <div className="flex items-center justify-between gap-3">
                 <Label
                     htmlFor="horiz-align"
-                    className="cursor-pointer text-sm font-medium text-zinc-200"
+                    className="cursor-pointer text-sm font-medium text-slate-800 dark:text-zinc-200"
                 >
                     Horizontally align options
                 </Label>
@@ -67,8 +67,8 @@ export function HorizontalAlignSetting({
             </div>
 
             {settings.horizontalAlign && (
-                <div className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
-                    <Label className="text-sm font-medium text-zinc-200">
+                <div className="space-y-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/50 p-3">
+                    <Label className="text-sm font-medium text-slate-800 dark:text-zinc-200">
                         Number of options per row
                     </Label>
                     <OptionsPerRowSetting
@@ -96,7 +96,7 @@ function OptionsPerRowSetting({
     return (
         <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-                <Label className="text-xs text-zinc-400">Desktop</Label>
+                <Label className="text-xs text-slate-500 dark:text-zinc-400">Desktop</Label>
                 <Select
                     value={String(value.desktop)}
                     onValueChange={(v) => onChange({ ...value, desktop: Number(v) })}
@@ -109,7 +109,7 @@ function OptionsPerRowSetting({
                             <SelectItem
                                 key={opt.value}
                                 value={opt.value}
-                                className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                                className="cursor-pointer"
                             >
                                 <span className="font-medium">{opt.label}</span>
                             </SelectItem>
@@ -118,7 +118,7 @@ function OptionsPerRowSetting({
                 </Select>
             </div>
             <div className="space-y-1.5">
-                <Label className="text-xs text-zinc-400">Mobile</Label>
+                <Label className="text-xs text-slate-500 dark:text-zinc-400">Mobile</Label>
                 <Select
                     value={String(value.mobile)}
                     onValueChange={(v) => onChange({ ...value, mobile: Number(v) })}
@@ -131,7 +131,7 @@ function OptionsPerRowSetting({
                             <SelectItem
                                 key={opt.value}
                                 value={opt.value}
-                                className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                                className="cursor-pointer"
                             >
                                 <span className="font-medium">{opt.label}</span>
                             </SelectItem>
@@ -155,7 +155,7 @@ export function HideLabelsSetting({
         <div className="flex items-center justify-between gap-3">
             <Label
                 htmlFor="hide-labels"
-                className="cursor-pointer text-sm font-medium text-zinc-200"
+                className="cursor-pointer text-sm font-medium text-slate-800 dark:text-zinc-200"
             >
                 Hide labels
             </Label>
@@ -185,7 +185,7 @@ export function SelectionLimitSetting({
 
     return (
         <div className="space-y-3">
-            <Label className="text-sm font-medium text-zinc-200">Selection limit</Label>
+            <Label className="text-sm font-medium text-slate-800 dark:text-zinc-200">Selection limit</Label>
             <Select
                 value={mode}
                 onValueChange={(v: "none" | "exact" | "range" | null) => {
@@ -202,19 +202,19 @@ export function SelectionLimitSetting({
                 <SelectContent className={OVERLAY_CLASS}>
                     <SelectItem
                         value="none"
-                        className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                        className="cursor-pointer"
                     >
                         <span className="font-medium">No limit</span>
                     </SelectItem>
                     <SelectItem
                         value="exact"
-                        className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                        className="cursor-pointer"
                     >
                         <span className="font-medium">Exact number</span>
                     </SelectItem>
                     <SelectItem
                         value="range"
-                        className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
+                        className="cursor-pointer"
                     >
                         <span className="font-medium">Range</span>
                     </SelectItem>
@@ -269,7 +269,7 @@ function NumberInput({
 }) {
     return (
         <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-zinc-200">{label}</Label>
+            <Label className="text-sm font-medium text-slate-800 dark:text-zinc-200">{label}</Label>
             <input
                 type="number"
                 value={value ?? ""}

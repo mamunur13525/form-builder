@@ -341,6 +341,8 @@ export function PageContentEditor({
       questions.some((q) => (q.questionKey || q.blockKey) === selectedQuestionId)
   );
 
+  const hasMultipleQuestions = questions.length > 1;
+
   const updateQuestion = (questionIndex: number, updates: Partial<FormQuestion>) => {
     const updatedQuestions = [...questions];
     const target = updatedQuestions[questionIndex];
@@ -352,20 +354,14 @@ export function PageContentEditor({
         : updates.label !== undefined
           ? updates.label
           : target.title;
-    const nextDesc =
-      updates.description !== undefined
-        ? updates.description
-        : updates.helperText !== undefined
-          ? updates.helperText
-          : target.description;
 
     updatedQuestions[questionIndex] = {
       ...target,
       ...updates,
       title: nextTitle,
       label: nextTitle,
-      description: nextDesc,
-      helperText: nextDesc,
+      description: "",
+      helperText: "",
     };
 
     const pageUpdates: Partial<FormPage> = {
@@ -380,14 +376,6 @@ export function PageContentEditor({
       if (updates.options !== undefined) pageUpdates.options = updates.options;
       if (updates.settings !== undefined) pageUpdates.settings = updates.settings;
       if (updates.required !== undefined) pageUpdates.required = updates.required;
-      if (nextTitle !== undefined) {
-        pageUpdates.label = nextTitle;
-        pageUpdates.title = nextTitle;
-      }
-      if (nextDesc !== undefined) {
-        pageUpdates.helperText = nextDesc;
-        pageUpdates.description = nextDesc;
-      }
     }
 
     onUpdate(pageIndex, pageUpdates);
@@ -463,6 +451,8 @@ export function PageContentEditor({
       blockKey: key,
       title: target.title ? `${target.title} (copy)` : "",
       label: target.title ? `${target.title} (copy)` : "",
+      description: "",
+      helperText: "",
       order: questionIndex + 2,
     };
     const updated = [...questions];
@@ -477,17 +467,19 @@ export function PageContentEditor({
   const handlePageTitleChange = (nextTitle: string) => {
     onUpdate(pageIndex, {
       title: nextTitle,
+      label: nextTitle,
     });
   };
 
   const handlePageDescriptionChange = (nextDesc: string) => {
     onUpdate(pageIndex, {
       description: nextDesc,
+      helperText: nextDesc,
     });
   };
 
-  const pageTitle = page.title ?? "";
-  const pageDescription = page.description ?? "";
+  const pageTitle = page.title !== undefined ? page.title : (page.label || (!hasMultipleQuestions ? questions[0]?.title : "") || "");
+  const pageDescription = page.description !== undefined ? page.description : (page.helperText || "");
 
   const isStatement = page.type === "statement";
 
@@ -497,13 +489,6 @@ export function PageContentEditor({
       : themeResolved.fontSize === "large"
         ? "text-[20px] sm:text-[22px]"
         : "text-[17px] sm:text-[19px]";
-
-  const questionDescSize =
-    themeResolved.fontSize === "small"
-      ? "text-[12px] sm:text-[13px]"
-      : themeResolved.fontSize === "large"
-        ? "text-[15px] sm:text-[16px]"
-        : "text-[13px] sm:text-[14px]";
 
   const content = (
     <div className="w-full space-y-6">
@@ -570,7 +555,6 @@ export function PageContentEditor({
           const { key, ...itemProps } = props;
           const QuestionEditor = editorMap[question.type];
           const questionTitle = question.title !== undefined ? question.title : (question.label || "");
-          const questionDesc = question.description !== undefined ? question.description : (question.helperText || "");
 
           const questionAsPage: FormPage = {
             ...page,
@@ -578,9 +562,9 @@ export function PageContentEditor({
             pageKey: question.questionKey || question.blockKey || page.pageKey,
             type: question.type,
             title: question.title,
-            description: question.description,
+            description: "",
             label: question.label || question.title || "",
-            helperText: question.helperText || question.description || "",
+            helperText: "",
             placeholder: question.placeholder || "",
             options: question.options || [],
             settings: question.settings,
@@ -629,63 +613,48 @@ export function PageContentEditor({
             >
               {/* Question Main Content: clean design, no card border, no type icon */}
               <div className="relative w-full py-2">
-                <div className="flex items-start gap-2.5">
-                  {/* 6-dot drag handle for reordering */}
-                  <span
-                    data-movable-handle
-                    aria-hidden="true"
-                    tabIndex={-1}
-                    title="Drag to reorder question"
-                    className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded text-slate-300 dark:text-zinc-600 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 touch-none select-none cursor-grab active:cursor-grabbing transition-colors"
-                  >
-                    <GripVertical className="h-4 w-4" />
-                  </span>
+                {hasMultipleQuestions ? (
+                  <div className="flex items-start gap-2.5">
+                    {/* 6-dot drag handle for reordering */}
+                    <span
+                      data-movable-handle
+                      aria-hidden="true"
+                      tabIndex={-1}
+                      title="Drag to reorder question"
+                      className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded text-slate-300 dark:text-zinc-600 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 touch-none select-none cursor-grab active:cursor-grabbing transition-colors"
+                    >
+                      <GripVertical className="h-4 w-4" />
+                    </span>
 
-                  {/* Question Title & Description */}
-                  <div className="flex-1 min-w-0">
-                    <VariableEditable
-                      value={questionTitle}
-                      onCommit={(title) => updateQuestion(qIdx, { title })}
-                      variables={variables}
-                      ariaLabel="Question"
-                      placeholder="Type your question... Use @ to recall information."
-                      className={cn(
-                        questionTitleSize,
-                        "font-normal outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
-                      )}
-                      style={themeResolved.questionColor ? { color: themeResolved.questionColor } : undefined}
-                    />
-
-                    <div className="mt-1 w-full">
+                    {/* Question Title (only when page has multiple questions) */}
+                    <div className="flex-1 min-w-0">
                       <VariableEditable
-                        value={questionDesc}
-                        onCommit={(description) => updateQuestion(qIdx, { description })}
+                        value={questionTitle}
+                        onCommit={(title) => updateQuestion(qIdx, { title })}
                         variables={variables}
-                        ariaLabel="Description"
-                        placeholder="Description (optional)"
+                        ariaLabel="Question"
+                        placeholder="Question title..."
                         className={cn(
-                          questionDescSize,
-                          "font-normal text-muted-foreground outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
+                          questionTitleSize,
+                          "font-normal outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
                         )}
-                        style={themeResolved.textColor ? { color: themeResolved.textColor } : undefined}
+                        style={themeResolved.questionColor ? { color: themeResolved.questionColor } : undefined}
                       />
                     </div>
-                  </div>
 
-                  {/* Question Actions: Duplicate & Delete (revealed on question hover) */}
-                  <div className="flex items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDuplicateQuestion(qIdx);
-                      }}
-                      title="Duplicate question"
-                      className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </button>
-                    {questions.length > 1 && (
+                    {/* Question Actions: Duplicate & Delete (revealed on question hover) */}
+                    <div className="flex items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDuplicateQuestion(qIdx);
+                        }}
+                        title="Duplicate question"
+                        className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -697,12 +666,27 @@ export function PageContentEditor({
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
-                    )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  /* Single question: allow duplicate on hover */
+                  <div className="absolute top-2 right-2 flex items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity z-10">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDuplicateQuestion(qIdx);
+                      }}
+                      title="Duplicate question"
+                      className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
 
                 {/* Question Editor Input */}
-                <div className="mt-6 w-full pl-[34px]" style={{ color: themeResolved.answerColor }}>
+                <div className={cn("w-full pl-[34px]", hasMultipleQuestions ? "mt-4" : "mt-1")} style={{ color: themeResolved.answerColor }}>
                   {QuestionEditor ? (
                     <QuestionEditor
                       page={questionAsPage}

@@ -8,8 +8,9 @@ export const ROUTES = {
     TEMPLATES: "/templates",
     SETTINGS: "/settings",
     WORKSPACE_SETTINGS: "/workspace/settings",
-    // Must match `buildInviteUrl` on the server: `${FRONTEND_URL}/invitations/:token`
+    // Matches invite URLs: `${FRONTEND_URL}/invite/:token` or `${FRONTEND_URL}/invitations/:token`
     INVITATION_ACCEPT: "/invitations/:token",
+    INVITATION_PREVIEW: "/invite/:token",
     PRICING: "/pricing",
     BILLING: "/billing",
     BILLING_SUCCESS: "/billing/success",

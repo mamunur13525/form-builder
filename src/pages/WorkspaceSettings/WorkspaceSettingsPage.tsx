@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Activity, Building2, ShieldAlert, Users } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { useCurrentUserProfile } from "@/features/users/hooks/useUsers"
 import {
@@ -77,8 +78,8 @@ export function WorkspaceSettingsPage({ embedded = false }: { embedded?: boolean
     if (isResolving || (activeWorkspaceId && isLoadingWorkspace && !workspace)) {
         return (
             <div className={shellClass(embedded)}>
-                <div className="h-14 w-72 animate-pulse rounded-lg bg-[var(--secondary)]" />
-                <div className="h-[420px] animate-pulse rounded-lg border border-[var(--border)] bg-[var(--secondary)]" />
+                <Skeleton className="h-14 w-72 max-w-full rounded-lg" />
+                <Skeleton className="h-[420px] rounded-lg" />
             </div>
         )
     }

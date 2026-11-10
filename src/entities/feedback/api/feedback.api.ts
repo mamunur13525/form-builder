@@ -22,7 +22,6 @@ import type {
     FeedbackPage,
     FeedbackPost,
     FeedbackQuery,
-    UploadedImage,
 } from "@/entities/feedback/model/types"
 
 /** GET /feedback/boards — the list of boards shown in the sidebar. */
@@ -91,16 +90,5 @@ export async function dislikeComment(commentId: string): Promise<Comment> {
     })
 }
 
-/**
- * POST /uploads/image — upload an image to ImageKit and get back a hosted URL.
- * Sends multipart/form-data; the client omits the JSON Content-Type for FormData
- * bodies so the browser sets the multipart boundary. Requires auth.
- */
-export async function uploadImage(file: File): Promise<UploadedImage> {
-    const form = new FormData()
-    form.append("file", file)
-    return apiRequest<UploadedImage>("/uploads/image", {
-        method: "POST",
-        body: form,
-    })
-}
+export { uploadImage } from "@/shared/api/upload.api"
+

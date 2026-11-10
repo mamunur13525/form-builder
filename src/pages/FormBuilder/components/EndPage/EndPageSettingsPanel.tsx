@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { memo, useState } from "react"
 import {
     AlignLeft,
     AlignCenter,
@@ -54,7 +54,7 @@ const SHARE_PLATFORMS: { key: keyof EndPageSocialShareMedia; label: string }[] =
  * Every control writes through `onUpdate`, so edits flow to the same optimistic
  * + debounced persist path the page settings use.
  */
-export function EndPageSettingsPanel({
+function EndPageSettingsPanelComponent({
     endPage,
     endPageIndex,
     onUpdate,
@@ -279,3 +279,5 @@ export function EndPageSettingsPanel({
         </div>
     )
 }
+
+export const EndPageSettingsPanel = memo(EndPageSettingsPanelComponent)

@@ -1,45 +1,21 @@
 import { useState } from "react"
-import {
-    Clock,
-    Crown,
-    MailX,
-    MoreHorizontal,
-    RefreshCw,
-    Send,
-    ShieldCheck,
-    UserMinus,
-    UserPlus,
-} from "lucide-react"
+import { Send, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
     ASSIGNABLE_WORKSPACE_ROLES,
-    WORKSPACE_ROLE_LABELS,
     hasWorkspacePermission,
     type AssignableWorkspaceRole,
     type Workspace,
     type WorkspaceMember,
-    type WorkspaceRole,
 } from "@/entities/workspace/model/types"
 import {
-    useCancelInvitation,
-    useRemoveMember,
     useResendInvitation,
     useUpdateMemberRole,
     useWorkspaceMembers,
 } from "@/features/workspaces/hooks/useWorkspaces"
-import { ConfirmDialog } from "./ConfirmDialog"
-import { InviteMemberDialog } from "./InviteMemberDialog"
-import { TransferOwnershipDialog } from "./TransferOwnershipDialog"
+import { MemberRow } from "./MemberRow"
+import { MembersPanelDialogs } from "./MembersPanelDialogs"
 
 interface MembersPanelProps {
     workspace: Workspace
@@ -56,79 +32,6 @@ const ROLE_RANK: Record<string, number> = {
     owner: 4,
 }
 
-function initialsOf(value: string): string {
-    if (!value.trim()) return "?"
-    return value
-        .trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() ?? "")
-        .join("")
-}
-
-function formatDate(value: string | null): string {
-    if (!value) return "—"
-    return new Date(value).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-    })
-}
-
-/**
- * Whether a date has already passed. Lives at module scope rather than inline so
- * reading the clock happens outside the render body.
- */
-function isPastDate(value: string | null): boolean {
-    if (!value) return false
-    return new Date(value).getTime() < Date.now()
-}
-
-/** Role pill. Owner gets the one accent in the row; the rest stay neutral. */
-function RoleBadge({ role }: { role: WorkspaceRole }) {
-    const label = WORKSPACE_ROLE_LABELS[role] ?? (role === ("editor" as any) ? "Editor" : (role || "Member"))
-    return (
-        <span
-            className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs",
-                role === "owner"
-                    ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-light)] text-[var(--primary)]"
-                    : "border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-body)]",
-            )}
-        >
-            {role === "owner" && <Crown className="h-3 w-3" />}
-            {label}
-        </span>
-    )
-}
-
-/** Status pill — the `Active / Invited` distinction from the members list. */
-function StatusBadge({ member }: { member: WorkspaceMember }) {
-    if (member.status === "active") {
-        return (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] px-3 py-1 text-xs text-[var(--editorial-body)]">
-                Active
-            </span>
-        )
-    }
-
-    const isExpired = isPastDate(member.expiresAt)
-
-    return (
-        <span
-            className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs",
-                isExpired
-                    ? "border-[var(--destructive)]/30 bg-[var(--destructive)]/8 text-[var(--destructive)]"
-                    : "border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-subtle)]",
-            )}
-        >
-            <Clock className="h-3 w-3" />
-            {isExpired ? "Expired" : "Invited"}
-        </span>
-    )
-}
-
 /**
  * The workspace member list: active members and pending invitations in one
  * table, with the actions each row supports.
@@ -141,9 +44,7 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
     const { data: members = [], isLoading } = useWorkspaceMembers(workspace.id)
 
     const updateRole = useUpdateMemberRole(workspace.id)
-    const removeMember = useRemoveMember(workspace.id)
     const resendInvitation = useResendInvitation(workspace.id)
-    const cancelInvitation = useCancelInvitation(workspace.id)
 
     const [inviteOpen, setInviteOpen] = useState(false)
     const [transferOpen, setTransferOpen] = useState(false)
@@ -207,8 +108,14 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                     {[0, 1, 2].map((row) => (
                         <div
                             key={row}
-                            className="h-[72px] animate-pulse rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)]"
-                        />
+                            className="animate-in fade-in duration-300"
+                            style={{
+                                animationDelay: `${row * 80}ms`,
+                                animationFillMode: "backwards",
+                            }}
+                        >
+                            <Skeleton className="h-[72px] rounded-lg border border-[var(--editorial-border-light)]" />
+                        </div>
                     ))}
                 </div>
             )}
@@ -226,9 +133,6 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
             {!isLoading && members.length > 0 && (
                 <ul className="mt-6 divide-y divide-[var(--editorial-border-light)]">
                     {members.map((member) => {
-                        const displayName =
-                            member.user?.name || member.email || "Unknown member"
-                        const isMe = member.user?.id === currentUserId
                         const actionable = canActOn(member)
                         const showMenu =
                             member.status === "invited"
@@ -236,154 +140,21 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                                 : actionable && (canRemove || canChangeRole)
 
                         return (
-                            <li
+                            <MemberRow
                                 key={member.id}
-                                className="flex flex-wrap items-center gap-4 py-4"
-                            >
-                                {/* Identity */}
-                                <div className="flex min-w-0 flex-1 items-center gap-3">
-                                    {member.user?.avatarUrl ? (
-                                        <img
-                                            src={member.user.avatarUrl}
-                                            alt=""
-                                            className="h-10 w-10 shrink-0 rounded-full border border-[var(--editorial-border-light)] object-cover"
-                                        />
-                                    ) : (
-                                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-sm font-semibold text-[var(--editorial-body)]">
-                                            {initialsOf(displayName)}
-                                        </span>
-                                    )}
-                                    <div className="min-w-0">
-                                        <p className="truncate text-sm text-[var(--foreground)]">
-                                            {displayName}
-                                            {isMe && (
-                                                <span className="ml-2 text-xs text-[var(--editorial-subtle)]">
-                                                    You
-                                                </span>
-                                            )}
-                                        </p>
-                                        <p className="truncate text-xs text-[var(--editorial-subtle)]">
-                                            {member.email || "No email on file"}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Meta */}
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <StatusBadge member={member} />
-                                    <RoleBadge role={member.role} />
-                                    <span className="hidden text-xs text-[var(--editorial-subtle)] sm:block">
-                                        {member.status === "active"
-                                            ? `Joined ${formatDate(member.joinedAt)}`
-                                            : `Expires ${formatDate(member.expiresAt)}`}
-                                    </span>
-
-                                    {/* Row actions */}
-                                    {showMenu ? (
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger
-                                                aria-label={`Actions for ${displayName}`}
-                                                className="editorial-transition flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:border-[var(--editorial-primary-ring)] hover:text-[var(--foreground)]"
-                                            >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent
-                                                align="end"
-                                                sideOffset={8}
-                                                className="editorial w-[15rem] rounded-lg border border-[var(--border)] bg-[var(--popover)] p-2"
-                                            >
-                                                {member.status === "active" ? (
-                                                    <>
-                                                        {canChangeRole &&
-                                                            assignableRoles.length > 0 && (
-                                                                <DropdownMenuGroup>
-                                                                    <DropdownMenuLabel className="px-3 py-2 text-xs uppercase tracking-wide text-[var(--editorial-subtle)]">
-                                                                        Change role
-                                                                    </DropdownMenuLabel>
-                                                                    {assignableRoles.map(
-                                                                        (role) => (
-                                                                            <DropdownMenuItem
-                                                                                key={role}
-                                                                                className="rounded-lg px-3 py-2.5"
-                                                                                disabled={
-                                                                                    role ===
-                                                                                    member.role
-                                                                                }
-                                                                                onClick={() =>
-                                                                                    updateRole.mutate(
-                                                                                        {
-                                                                                            memberId:
-                                                                                                member.id,
-                                                                                            role,
-                                                                                        },
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                <ShieldCheck className="h-4 w-4" />
-                                                                                {
-                                                                                    WORKSPACE_ROLE_LABELS[
-                                                                                        role
-                                                                                    ]
-                                                                                }
-                                                                            </DropdownMenuItem>
-                                                                        ),
-                                                                    )}
-                                                                </DropdownMenuGroup>
-                                                            )}
-
-                                                        {canRemove && (
-                                                            <>
-                                                                <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
-                                                                <DropdownMenuItem
-                                                                    variant="destructive"
-                                                                    className="rounded-lg px-3 py-2.5"
-                                                                    onClick={() =>
-                                                                        setPendingRemoval(
-                                                                            member,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <UserMinus className="h-4 w-4" />
-                                                                    Remove from workspace
-                                                                </DropdownMenuItem>
-                                                            </>
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <DropdownMenuItem
-                                                            className="rounded-lg px-3 py-2.5"
-                                                            onClick={() =>
-                                                                resendInvitation.mutate(
-                                                                    member.id,
-                                                                )
-                                                            }
-                                                        >
-                                                            <RefreshCw className="h-4 w-4" />
-                                                            Resend invitation
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuSeparator className="bg-[var(--editorial-border-light)]" />
-                                                        <DropdownMenuItem
-                                                            variant="destructive"
-                                                            className="rounded-lg px-3 py-2.5"
-                                                            onClick={() =>
-                                                                setPendingCancel(member)
-                                                            }
-                                                        >
-                                                            <MailX className="h-4 w-4" />
-                                                            Cancel invitation
-                                                        </DropdownMenuItem>
-                                                    </>
-                                                )}
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    ) : (
-                                        // Keeps every row the same height whether or not
-                                        // it has a menu.
-                                        <span className="h-11 w-11" aria-hidden="true" />
-                                    )}
-                                </div>
-                            </li>
+                                member={member}
+                                currentUserId={currentUserId}
+                                showMenu={showMenu}
+                                canChangeRole={canChangeRole}
+                                canRemove={canRemove}
+                                assignableRoles={assignableRoles}
+                                onRoleChange={(memberId, role) =>
+                                    updateRole.mutate({ memberId, role })
+                                }
+                                onRemove={setPendingRemoval}
+                                onResend={(memberId) => resendInvitation.mutate(memberId)}
+                                onCancel={setPendingCancel}
+                            />
                         )
                     })}
                 </ul>
@@ -413,74 +184,19 @@ export function MembersPanel({ workspace, currentUserId }: MembersPanelProps) {
                 </div>
             )}
 
-            {/* Dialogs */}
-            <InviteMemberDialog
-                workspaceId={workspace.id}
-                open={inviteOpen}
-                onOpenChange={setInviteOpen}
-                defaultRole={
-                    workspace.settings?.defaultMemberRole === "owner"
-                        ? "member"
-                        : ((workspace.settings?.defaultMemberRole as AssignableWorkspaceRole) || "member")
-                }
-                assignableRoles={assignableRoles}
-            />
-
-            <TransferOwnershipDialog
+            <MembersPanelDialogs
                 workspace={workspace}
                 members={members}
                 currentUserId={currentUserId}
-                open={transferOpen}
-                onOpenChange={setTransferOpen}
-            />
-
-            <ConfirmDialog
-                open={Boolean(pendingRemoval)}
-                onOpenChange={(open) => !open && setPendingRemoval(null)}
-                title="Remove this member?"
-                description={
-                    <>
-                        <strong className="text-[var(--foreground)]">
-                            {pendingRemoval?.user?.name || pendingRemoval?.email}
-                        </strong>{" "}
-                        will lose access to this workspace immediately. You can invite
-                        them again later.
-                    </>
-                }
-                confirmLabel="Remove member"
-                destructive
-                isPending={removeMember.isPending}
-                onConfirm={() => {
-                    if (!pendingRemoval) return
-                    removeMember.mutate(pendingRemoval.id, {
-                        onSuccess: () => setPendingRemoval(null),
-                    })
-                }}
-            />
-
-            <ConfirmDialog
-                open={Boolean(pendingCancel)}
-                onOpenChange={(open) => !open && setPendingCancel(null)}
-                title="Cancel this invitation?"
-                description={
-                    <>
-                        The link sent to{" "}
-                        <strong className="text-[var(--foreground)]">
-                            {pendingCancel?.email}
-                        </strong>{" "}
-                        will stop working. You can send a new invitation any time.
-                    </>
-                }
-                confirmLabel="Cancel invitation"
-                cancelLabel="Keep it"
-                destructive
-                isPending={cancelInvitation.isPending}
-                onConfirm={() => {
-                    if (!pendingCancel) return
-                    cancelInvitation.mutate(pendingCancel.id, {
-                        onSuccess: () => setPendingCancel(null),
-                    })
-                }}
+                assignableRoles={assignableRoles}
+                inviteOpen={inviteOpen}
+                onInviteOpenChange={setInviteOpen}
+                transferOpen={transferOpen}
+                onTransferOpenChange={setTransferOpen}
+                pendingRemoval={pendingRemoval}
+                onPendingRemovalChange={setPendingRemoval}
+                pendingCancel={pendingCancel}
+                onPendingCancelChange={setPendingCancel}
             />
         </div>
     )

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { List } from "react-movable";
 import {
@@ -53,7 +53,7 @@ interface FormBuilderSidebarProps {
   isAddingEndPage?: boolean;
 }
 
-export function FormBuilderSidebar({
+function FormBuilderSidebarComponent({
   pages,
   selectedPageIndex,
   isPageSelected,
@@ -240,3 +240,5 @@ export function FormBuilderSidebar({
     </div>
   );
 }
+
+export const FormBuilderSidebar = memo(FormBuilderSidebarComponent);

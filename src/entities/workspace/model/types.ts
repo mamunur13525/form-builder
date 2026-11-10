@@ -247,6 +247,8 @@ export interface UpdateWorkspaceSettingsPayload {
 export interface InviteMemberPayload {
   email: string;
   role?: AssignableWorkspaceRole;
+  canEditAllForms?: boolean;
+  preAssignedFormIds?: string[];
 }
 
 // ---------------------------------------------------------------------------

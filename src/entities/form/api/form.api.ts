@@ -147,3 +147,41 @@ export async function updateFormShare(
     body: JSON.stringify(data),
   });
 }
+
+export interface FormAccessMember {
+  userId: string;
+  name: string;
+  email: string;
+  avatarUrl: string;
+  role: "admin" | "member" | "viewer";
+  canEditAllForms: boolean;
+  canEdit: boolean;
+}
+
+export interface FormAccessResponse {
+  formId: string;
+  allowedEditors: string[];
+  members: FormAccessMember[];
+}
+
+export interface UpdateFormAccessRequest {
+  userId?: string;
+  canEdit?: boolean;
+  allowedEditors?: string[];
+}
+
+/** GET /forms/:formId/access — retrieve form access members */
+export async function getFormAccess(formId: string): Promise<FormAccessResponse> {
+  return apiRequest<FormAccessResponse>(`/forms/${formId}/access`);
+}
+
+/** PATCH /forms/:formId/access — update form access */
+export async function updateFormAccess(
+  formId: string,
+  data: UpdateFormAccessRequest,
+): Promise<FormAccessResponse> {
+  return apiRequest<FormAccessResponse>(`/forms/${formId}/access`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}

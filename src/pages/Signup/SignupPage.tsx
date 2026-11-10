@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { ROUTES } from "../../shared/constants/routes";
 import { useRegister } from "../../features/auth/hooks/useAuth";
@@ -15,8 +15,12 @@ import { showError, showSuccess } from "@/shared/hooks/useToast";
 import { Spinner } from "@/components/ui/spinner";
 
 export function SignupPage() {
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
+  const emailParam = searchParams.get("email");
+
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(emailParam || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
@@ -41,7 +45,7 @@ export function SignupPage() {
             "Account created!",
             "Your account has been created successfully. Welcome aboard!",
           );
-          navigate(ROUTES.DASHBOARD);
+          navigate(redirect || ROUTES.DASHBOARD);
         },
         onError: (err) => {
           showError("Sign up failed", err);
@@ -114,13 +118,17 @@ export function SignupPage() {
           <AuthDivider label="Or continue with" />
 
           <div className="flex justify-center">
-            <GoogleSignInButton />
+            <GoogleSignInButton redirectTo={redirect || ROUTES.DASHBOARD} />
           </div>
 
           <AuthSwitchPrompt
             prompt="Already have an account?"
             linkLabel="Sign in"
-            to={ROUTES.LOGIN}
+            to={
+              redirect
+                ? `${ROUTES.LOGIN}?redirect=${encodeURIComponent(redirect)}${emailParam ? `&email=${encodeURIComponent(emailParam)}` : ""}`
+                : ROUTES.LOGIN
+            }
           />
         </div>
       </form>

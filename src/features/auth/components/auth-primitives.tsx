@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ROUTES } from "@/shared/constants/routes";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -108,7 +107,7 @@ export function AuthSwitchPrompt({
 }: {
   prompt: string;
   linkLabel: string;
-  to: (typeof ROUTES)[keyof typeof ROUTES];
+  to: string;
 }) {
   return (
     <p className="text-center text-sm text-[var(--editorial-body)]">

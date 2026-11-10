@@ -67,6 +67,9 @@ export interface Form {
     hasUnpublishedChanges?: boolean
     version?: number
     responses_count?: number
+    workspaceId?: string
+    allowedEditors?: string[]
+    canEdit?: boolean
 }
 
 export interface PublishedForm {

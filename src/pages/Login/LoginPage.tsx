@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { ROUTES } from "../../shared/constants/routes";
 import { useLogin } from "../../features/auth/hooks/useAuth";
@@ -15,7 +15,11 @@ import { showError, showSuccess } from "@/shared/hooks/useToast";
 import { Spinner } from "@/components/ui/spinner";
 
 export function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
+  const emailParam = searchParams.get("email");
+
+  const [email, setEmail] = useState(emailParam || "");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const login = useLogin();
@@ -27,7 +31,7 @@ export function LoginPage() {
       {
         onSuccess: () => {
           showSuccess("Welcome back!", "You have been signed in successfully.");
-          navigate(ROUTES.DASHBOARD);
+          navigate(redirect || ROUTES.DASHBOARD);
         },
         onError: (err) => {
           showError("Sign in failed", err);
@@ -86,13 +90,17 @@ export function LoginPage() {
           <AuthDivider label="Or continue with" />
 
           <div className="flex justify-center">
-            <GoogleSignInButton />
+            <GoogleSignInButton redirectTo={redirect || ROUTES.DASHBOARD} />
           </div>
 
           <AuthSwitchPrompt
             prompt="Don't have an account?"
             linkLabel="Sign up"
-            to={ROUTES.SIGNUP}
+            to={
+              redirect
+                ? `${ROUTES.SIGNUP}?redirect=${encodeURIComponent(redirect)}${emailParam ? `&email=${encodeURIComponent(emailParam)}` : ""}`
+                : ROUTES.SIGNUP
+            }
           />
         </div>
       </form>

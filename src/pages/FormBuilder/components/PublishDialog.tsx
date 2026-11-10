@@ -1,15 +1,11 @@
 import { useCallback, useState } from "react";
 import {
   AlertCircle,
-  ExternalLink,
   Globe,
   Inbox,
-  Loader2,
-  Undo2,
 } from "lucide-react";
 import { CopyToClipboard } from "@/shared/components/CopyToClipboard";
 import { showError, showSuccess } from "@/shared/hooks/useToast";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -18,10 +14,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { useFormStore } from "@/app/store/formStore";
 import { cn } from "@/lib/utils";
+import {
+  PublishDialogFooter,
+  type Busy,
+  type Confirming,
+  type PublishState,
+  COPY,
+  CONFIRM_COPY,
+} from "./PublishDialogFooter";
 
 interface PublishDialogProps {
   open: boolean;
@@ -40,50 +43,6 @@ interface PublishDialogProps {
    */
   onAfterDiscard?: () => void | Promise<void>;
 }
-
-/** The three mutually exclusive states this dialog represents. */
-type PublishState = "draft" | "pending" | "live";
-
-/** A destructive action awaiting confirmation. */
-type Confirming = "unpublish" | "discard";
-
-/** Which async action is in flight. */
-type Busy = "publish" | "unpublish" | "discard";
-
-const COPY: Record<PublishState, { badge: string; title: string; body: string }> =
-{
-  draft: {
-    badge: "Draft",
-    title: "Publish form",
-    body: "Make this form public so people can start responding.",
-  },
-  pending: {
-    badge: "Changes pending",
-    title: "Publish changes",
-    body: "Your latest edits are saved, but only as a draft.",
-  },
-  live: {
-    badge: "Live",
-    title: "Form published",
-    body: "Your form is live and collecting responses.",
-  },
-};
-
-const CONFIRM_COPY: Record<
-  Confirming,
-  { title: string; body: string; action: string }
-> = {
-  unpublish: {
-    title: "Take this form offline?",
-    body: "The public link will stop working and nobody will be able to submit a response until you publish again. Existing responses are kept.",
-    action: "Unpublish",
-  },
-  discard: {
-    title: "Discard your unpublished changes?",
-    body: "Your draft edits will be deleted and the form will revert to the version that is currently live. This cannot be undone.",
-    action: "Discard changes",
-  },
-};
 
 export function PublishDialog({
   open,
@@ -109,15 +68,12 @@ export function PublishDialog({
     onOpenChange(false);
   }, [onOpenChange]);
 
-  // Publishes (or republishes) the form, closing the dialog only on success so
-  // the user can retry after a failure.
   const handlePublish = useCallback(async () => {
     if (!formId || formId === "new") return;
     setBusy("publish");
     try {
       const updated = await publishForm(formId);
       onIsPublishedChange(true);
-      // Republishing brings the live form back in sync with the draft.
       onHasUnpublishedChangesChange?.(updated.hasUnpublishedChanges ?? false);
       showSuccess("Form published", "Your form is live.");
     } catch (error) {
@@ -132,8 +88,6 @@ export function PublishDialog({
     onHasUnpublishedChangesChange,
   ]);
 
-  // Takes the form offline. The draft content is untouched, so the pending
-  // flag is preserved as reported by the server.
   const handleUnpublish = useCallback(async () => {
     if (!formId || formId === "new") return;
     setBusy("unpublish");
@@ -154,8 +108,6 @@ export function PublishDialog({
     onHasUnpublishedChangesChange,
   ]);
 
-  // Throws away draft edits and reverts to the live version. The server
-  // rewrites the pages, so the builder has to re-sync afterwards.
   const handleDiscard = useCallback(async () => {
     if (!formId || formId === "new") return;
     setBusy("discard");
@@ -296,115 +248,21 @@ export function PublishDialog({
           </div>
         )}
 
-        <DialogFooter
-          className={cn(
-            "mt-8 flex flex-col gap-2.5 border-t border-slate-200/90 dark:border-zinc-800/90 bg-slate-50/80 dark:bg-[#18181c]/80 px-6 py-4 sm:flex-row sm:items-center sm:gap-2.5",
-            !confirming && state !== "draft" ? "sm:justify-between" : "sm:justify-end",
-          )}
-        >
-          {confirming ? (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => setConfirming(null)}
-                disabled={isBusy}
-                className="h-10 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
-              >
-                Keep it
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={
-                  confirming === "unpublish" ? handleUnpublish : handleDiscard
-                }
-                disabled={isBusy}
-                className="h-10 rounded-lg bg-rose-600 hover:bg-rose-700 text-white px-5 text-sm font-semibold shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto"
-              >
-                {isBusy && <Loader2 className="animate-spin h-4 w-4" />}
-                {isBusy ? "Working…" : confirmCopy?.action}
-              </Button>
-            </>
-          ) : state === "draft" ? (
-            <>
-              <Button
-                variant="outline"
-                onClick={closeDialog}
-                disabled={isBusy}
-                className="h-10 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handlePublish}
-                disabled={isBusy}
-                className="h-10 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-5 text-sm font-semibold text-white shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto active:scale-[0.98]"
-              >
-                {busy === "publish" && <Loader2 className="animate-spin h-4 w-4" />}
-                {busy === "publish" ? "Publishing…" : "Publish form"}
-              </Button>
-            </>
-          ) : state === "pending" ? (
-            <>
-              <Button
-                variant="ghost"
-                className="h-10 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3.5 text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto"
-                onClick={() => setConfirming("discard")}
-                disabled={isBusy}
-              >
-                <Undo2 className="h-4 w-4" />
-                Discard changes
-              </Button>
-              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5">
-                <Button
-                  variant="outline"
-                  onClick={onOpenForm}
-                  disabled={isBusy}
-                  className="h-10 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto shadow-xs"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Open form
-                </Button>
-                <Button
-                  onClick={handlePublish}
-                  disabled={isBusy}
-                  className="h-10 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-5 text-sm font-semibold text-white shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto active:scale-[0.98]"
-                >
-                  {busy === "publish" && <Loader2 className="animate-spin h-4 w-4" />}
-                  {busy === "publish" ? "Publishing…" : "Publish changes"}
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="ghost"
-                className="h-10 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3.5 text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto"
-                onClick={() => setConfirming("unpublish")}
-                disabled={isBusy}
-              >
-                Unpublish
-              </Button>
-              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5">
-                <Button
-                  variant="outline"
-                  onClick={closeDialog}
-                  disabled={isBusy}
-                  className="h-10 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-[#1a1a20] px-4 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer w-full sm:w-auto shadow-xs"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={onOpenForm}
-                  disabled={isBusy}
-                  className="h-10 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-5 text-sm font-semibold text-white shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto active:scale-[0.98]"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Open form
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogFooter>
+        <PublishDialogFooter
+          state={state}
+          confirming={confirming}
+          isBusy={isBusy}
+          busy={busy}
+          confirmActionLabel={confirmCopy?.action}
+          onClose={closeDialog}
+          onCancelConfirm={() => setConfirming(null)}
+          onConfirmAction={
+            confirming === "unpublish" ? handleUnpublish : handleDiscard
+          }
+          onPublish={handlePublish}
+          onOpenForm={onOpenForm}
+          onStartConfirm={(type) => setConfirming(type)}
+        />
       </DialogContent>
     </Dialog>
   );

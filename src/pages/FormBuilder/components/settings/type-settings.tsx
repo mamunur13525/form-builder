@@ -78,6 +78,21 @@ export function StatementSettingsWidget({
     settings: StatementSettingsType
     onChange: (next: StatementSettingsType) => void
 }) {
+    // Statement settings saved before `embedProvider` existed (or partial API
+    // payloads) arrive without it. Falling back keeps the Select controlled and
+    // rewrites the full shape on the next edit.
+    const embedProvider = settings.embedProvider ?? "youtube"
+    const embedUrl = settings.embedUrl ?? ""
+    const embedTitle = settings.embedTitle ?? ""
+
+    const emit = (patch: Partial<StatementSettingsType>) =>
+        onChange({
+            embedUrl,
+            embedProvider,
+            embedTitle,
+            ...patch,
+        })
+
     return (
         <div className="space-y-3.5">
             <p className="text-xs leading-4 text-slate-500 dark:text-zinc-400">
@@ -87,17 +102,16 @@ export function StatementSettingsWidget({
             <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-slate-700 dark:text-zinc-300">Provider</Label>
                 <Select
-                    value={settings.embedProvider}
+                    value={embedProvider}
                     onValueChange={(v) =>
-                        onChange({
-                            ...settings,
+                        emit({
                             embedProvider: v as StatementSettingsType["embedProvider"],
                         })
                     }
                 >
                     <SelectTrigger className="transition-colors h-11 w-full rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] px-3 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 hover:border-slate-300 dark:hover:border-zinc-700 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs flex items-center justify-between cursor-pointer [&>svg:last-child]:text-slate-400 dark:[&>svg:last-child]:text-zinc-500">
                         <div className="flex items-center gap-2.5 min-w-0">
-                            {PROVIDER_ICONS[settings.embedProvider]?.badge ?? (
+                            {PROVIDER_ICONS[embedProvider]?.badge ?? (
                                 <Shield className="h-4 w-4 text-slate-400 dark:text-zinc-400 shrink-0" />
                             )}
                             <SelectValue placeholder="Select provider" className="font-medium text-slate-800 dark:text-zinc-100" />
@@ -125,16 +139,16 @@ export function StatementSettingsWidget({
 
             <TextSetting
                 label="Embed URL"
-                value={settings.embedUrl}
-                onChange={(embedUrl) => onChange({ ...settings, embedUrl })}
+                value={embedUrl}
+                onChange={(embedUrl) => emit({ embedUrl })}
                 placeholder="https://youtube.com/watch?v=..."
                 icon={<Link2 className="h-4 w-4" />}
             />
 
             <TextSetting
                 label="Embed title"
-                value={settings.embedTitle}
-                onChange={(embedTitle) => onChange({ ...settings, embedTitle })}
+                value={embedTitle}
+                onChange={(embedTitle) => emit({ embedTitle })}
                 placeholder="Optional title"
                 icon={<Type className="h-4 w-4" />}
             />

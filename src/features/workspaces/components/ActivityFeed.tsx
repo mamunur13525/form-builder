@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
     WORKSPACE_ROLE_LABELS,
     type WorkspaceActivity,
@@ -252,8 +253,14 @@ export function ActivityFeed({ workspaceId }: ActivityFeedProps) {
                     {[0, 1, 2, 3].map((row) => (
                         <div
                             key={row}
-                            className="h-14 animate-pulse rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)]"
-                        />
+                            className="animate-in fade-in duration-300"
+                            style={{
+                                animationDelay: `${row * 80}ms`,
+                                animationFillMode: "backwards",
+                            }}
+                        >
+                            <Skeleton className="h-14 rounded-lg border border-[var(--editorial-border-light)]" />
+                        </div>
                     ))}
                 </div>
             )}

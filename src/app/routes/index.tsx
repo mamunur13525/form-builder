@@ -81,6 +81,8 @@ export const router = createBrowserRouter([
                     { path: ROUTES.ADMIN_UPDATES, element: <AdminUpdatesPage /> },
                 ],
             },
+            { path: ROUTES.INVITATION_ACCEPT, element: <AcceptInvitationPage /> },
+            { path: ROUTES.INVITATION_PREVIEW, element: <AcceptInvitationPage /> },
             {
                 element: <ProtectedLayout />,
                 children: [
@@ -91,9 +93,6 @@ export const router = createBrowserRouter([
                     { path: ROUTES.WORKSPACE_SETTINGS, element: <SettingsDeepLink section="workspace" /> },
                     { path: ROUTES.BILLING, element: <SettingsDeepLink section="billing" /> },
                     { path: ROUTES.PRICING, element: <SettingsDeepLink section="pricing" /> },
-                    // Behind auth: the server matches the signed-in email against
-                    // the invited address before accepting.
-                    { path: ROUTES.INVITATION_ACCEPT, element: <AcceptInvitationPage /> },
                     { path: ROUTES.BILLING_SUCCESS, element: <BillingSuccessPage /> },
                     {
                         element: <FormLayout />,

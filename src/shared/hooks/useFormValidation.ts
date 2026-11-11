@@ -22,10 +22,8 @@ export function validateQuestion(
     // Statement questions/pages are display-only and never required.
     if (block.type === "statement") return null
 
-    const titleOrLabel = block.title || block.label || "This field"
-
     if (block.required && isEmpty(value)) {
-        return block.validation?.message || `${titleOrLabel} is required.`
+        return block.validation?.message || "This field is required."
     }
 
     const settings = block.settings ?? {}
@@ -162,7 +160,7 @@ export function validatePage(page: FormPage, valueOrAnswers: unknown): string | 
         for (const question of questions) {
             const key: string = question.questionKey || question.blockKey || page.pageKey
             const questionValue = (typeof valueOrAnswers === "object" && valueOrAnswers !== null)
-                ? (valueOrAnswers as Record<string, unknown>)[key] ?? (valueOrAnswers as Record<string, unknown>)[page.pageKey]
+                ? (valueOrAnswers as Record<string, unknown>)[key]
                 : valueOrAnswers
             const error = validateQuestion(question, questionValue)
             if (error) return error

@@ -2,7 +2,7 @@ import { Copy, GripVertical, Trash2 } from "lucide-react";
 import type { FormPage, FormQuestion, PageType } from "@/shared/types/common";
 import type { VariableItem } from "@/shared/components/pages";
 import { VariableEditable } from "@/shared/components/pages";
-import { getFontSizeClasses, resolveFormTheme } from "@/shared/utils/theme";
+import { getFontSizeClasses, getQuestionTitleClasses, resolveFormTheme } from "@/shared/utils/theme";
 import { cn } from "@/lib/utils";
 
 import {
@@ -139,12 +139,7 @@ export function PageQuestionItem({
 
   const questionId = question.questionKey || question.blockKey;
 
-  const questionTitleSize =
-    theme.fontSize === "small"
-      ? "text-[16px] sm:text-[17px]"
-      : theme.fontSize === "large"
-        ? "text-[20px] sm:text-[22px]"
-        : "text-[17px] sm:text-[19px]";
+  const questionTitleSize = getQuestionTitleClasses(theme.fontSize);
 
   return (
     <div
@@ -254,7 +249,7 @@ export function PageQuestionItem({
             <QuestionEditor
               page={questionAsPage}
               pageIndex={pageIndex}
-              onUpdate={(_, updates) => onUpdateQuestion(questionIndex, updates as any)}
+              onUpdate={(_, updates) => onUpdateQuestion(questionIndex, updates as Partial<FormQuestion>)}
               isMobileView={isMobileView}
               color={theme.answerColor}
               fontSizeClass={fontSizes.input}

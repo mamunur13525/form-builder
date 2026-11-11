@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { FormPageRenderer } from "./FormPageRenderer";
 import { PageLabel, PageHelperText, PageSubmitButton, type VariableItem } from "./pages";
 import type { ResolvedFormTheme } from "../utils/theme";
+import { getQuestionTitleClasses } from "../utils/theme";
+import { validateQuestion } from "../hooks/useFormValidation";
 
 interface FormPageContentProps {
   page: FormPage;
@@ -67,6 +69,12 @@ export function FormPageContent({
 
   const hasMultipleQuestions = questions.length > 1;
   const isStatementOnly = questions.every((q) => q.type === "statement");
+  const questionTitleClass = getQuestionTitleClasses(themeResolved.fontSize);
+  // Errors are per question: each one shows under the field it belongs to.
+  const questionErrors = error
+    ? questions.map((q) => validateQuestion(q, answers[q.questionKey || q.blockKey || page.pageKey]))
+    : [];
+  const hasQuestionError = questionErrors.some(Boolean);
 
   return (
     <div className="w-full space-y-6">
@@ -97,6 +105,7 @@ export function FormPageContent({
         {questions.map((question, qIdx) => {
           const questionTitle = question.title || (hasMultipleQuestions ? question.label : "");
           const questionKey: string = question.questionKey || question.blockKey || page.pageKey;
+          const questionError = questionErrors[qIdx] ?? null;
           const questionAsPage: FormPage = {
             ...page,
             _id: question._id || question.id,
@@ -115,7 +124,7 @@ export function FormPageContent({
               {hasMultipleQuestions && questionTitle ? (
                 <div className="space-y-1">
                   <h3
-                    className={cn("font-normal text-lg sm:text-xl", fontSizes.question)}
+                    className={cn("font-normal", questionTitleClass)}
                     style={{ color: themeResolved.questionColor }}
                   >
                     {questionTitle}
@@ -129,19 +138,27 @@ export function FormPageContent({
               <div className="w-full" style={{ color: themeResolved.answerColor }}>
                 <FormPageRenderer
                   page={questionAsPage}
-                  value={answers[questionKey] ?? answers[question.blockKey ?? ""] ?? answers[page.pageKey]}
-                  error={error}
+                  value={answers[questionKey]}
+                  error={questionError}
                   onAnswer={(key, val) => onAnswer(key || questionKey, val)}
                   color={themeResolved.answerColor}
                   fontSizeClass={fontSizes.input}
                 />
               </div>
+
+              {questionError && (
+                <div className="flex items-center gap-1.5 text-sm text-destructive font-medium pt-1">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                  {questionError}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      {error && (
+      {/* Errors with no field of their own (e.g. a failed submit). */}
+      {error && !hasQuestionError && (
         <motion.div
           initial={{ y: -4, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

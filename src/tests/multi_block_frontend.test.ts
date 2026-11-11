@@ -193,14 +193,14 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
     block_name: "",
     block_email: "test@example.com",
   });
-  assert.strictEqual(errorMissingName, "Full Name is required.");
+  assert.strictEqual(errorMissingName, "This field is required.");
 
   // Case B: Missing second required block
   const errorMissingEmail = validatePage(pageWithBlocks, {
     block_name: "Alice Smith",
     block_email: "",
   });
-  assert.strictEqual(errorMissingEmail, "Work Email is required.");
+  assert.strictEqual(errorMissingEmail, "This field is required.");
 
   // Case C: Invalid email in second block
   const errorInvalidEmail = validatePage(pageWithBlocks, {
@@ -241,7 +241,7 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
     required: true,
     validation: { min: 18, max: 99 },
   };
-  assert.strictEqual(validateBlock(numberBlock, ""), "Age is required.");
+  assert.strictEqual(validateBlock(numberBlock, ""), "This field is required.");
   assert.strictEqual(validateBlock(numberBlock, 15), "Minimum value is 18.");
   assert.strictEqual(validateBlock(numberBlock, 25), null);
 
@@ -279,7 +279,7 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   };
 
   const err = validatePage(pageWithQuestions, { q_name: "" });
-  assert.strictEqual(err, "Full Name is required.");
+  assert.strictEqual(err, "This field is required.");
   const ok = validatePage(pageWithQuestions, { q_name: "John Doe" });
   assert.strictEqual(ok, null);
   console.log("✓ Test 6: validatePage validates questions with questionKey properly");
@@ -391,6 +391,39 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   // Jump targets should be mapped to the parent page page_1_key so the navigation engine knows where to jump on submit
   assert.strictEqual(resolved.jumpTargets["page_1_key"], "page_3_key");
   console.log("✓ Test 8: resolveFormLogic resolves question-level condition to owner page jump");
+}
+
+// Test 9: a required question never borrows another question's answer
+{
+  // The first block's key matches the page key, as the backend stores it.
+  const page: FormPage = {
+    _id: "page_shared_key",
+    formId: "form_abc",
+    pageKey: "page_shared_key",
+    title: "Two questions",
+    description: "",
+    label: "Two questions",
+    helperText: "",
+    placeholder: "",
+    type: "longText",
+    required: false,
+    order: 1,
+    options: [],
+    logic: [],
+    appearance: { width: "full" },
+    isActive: true,
+    questions: [
+      { questionKey: "page_shared_key", blockKey: "page_shared_key", type: "longText", title: "First", required: true, order: 1 },
+      { questionKey: "question_2", blockKey: "question_2", type: "shortText", title: "Second", required: true, order: 2 },
+    ],
+  };
+
+  const err = validatePage(page, { page_shared_key: "answered first" });
+  assert.strictEqual(err, "This field is required.");
+
+  const ok = validatePage(page, { page_shared_key: "answered first", question_2: "answered second" });
+  assert.strictEqual(ok, null);
+  console.log("✓ Test 9: required questions validate their own answer, not the page-level one");
 }
 
 console.log("--- All Frontend Multi-Block & UI Tests Passed Successfully! ---");

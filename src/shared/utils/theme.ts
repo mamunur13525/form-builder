@@ -103,6 +103,22 @@ export function getFontSizeClasses(size?: string) {
   }
 }
 
+/**
+ * Question titles inside a page sit one step below the page title, in both the
+ * builder and the fill view.
+ */
+export function getQuestionTitleClasses(size?: string) {
+  switch (size) {
+    case "small":
+      return "text-[16px] sm:text-[17px]";
+    case "large":
+      return "text-[20px] sm:text-[22px]";
+    case "medium":
+    default:
+      return "text-[17px] sm:text-[19px]";
+  }
+}
+
 export function loadThemeFont(font?: IFormTheme["font"]) {
   if (!font?.family) return;
 

@@ -195,7 +195,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
                 "absolute inset-0",
                 isSideCover
                   ? "flex overflow-hidden"
-                  : "overflow-y-auto px-6 py-10 flex items-center",
+                  : "overflow-y-auto px-6 py-10 flex",
               )}
             >
               {isSideCover && currentPage ? (
@@ -210,7 +210,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
                   </div>
                 </div>
               ) : (
-                <div className="mx-auto max-w-2xl w-full">
+                <div className="mx-auto my-auto max-w-2xl w-full">
                   {activePages.length === 0 ? (
                     <div className="text-center py-20 text-muted-foreground">
                       <p className="text-lg">No pages in this form yet.</p>

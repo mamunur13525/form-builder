@@ -103,6 +103,13 @@ export function usePageQuestions(
       type: reordered[0]?.type ?? page.type,
       label: reordered[0]?.label ?? page.label,
     });
+
+    // The new question is empty, so drop the caret straight into its title.
+    setTimeout(() => {
+      document
+        .querySelector<HTMLElement>(`#question-${key} [aria-label="Question"]`)
+        ?.focus();
+    }, 0);
   };
 
   const deleteQuestion = (questionIndex: number) => {

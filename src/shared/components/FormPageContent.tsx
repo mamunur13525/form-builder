@@ -72,7 +72,19 @@ export function FormPageContent({
   const questionTitleClass = getQuestionTitleClasses(themeResolved.fontSize);
   // Errors are per question: each one shows under the field it belongs to.
   const questionErrors = error
-    ? questions.map((q) => validateQuestion(q, answers[q.questionKey || q.blockKey || page.pageKey]))
+    ? questions.map((q, idx) => {
+        const qKey =
+          q.questionKey ||
+          q.blockKey ||
+          (q as any).id ||
+          (q as any)._id ||
+          (hasMultipleQuestions ? `${page.pageKey}_q${idx + 1}` : page.pageKey);
+        const val =
+          answers[qKey] !== undefined
+            ? answers[qKey]
+            : (!hasMultipleQuestions ? answers[page.pageKey] : undefined);
+        return validateQuestion(q, val);
+      })
     : [];
   const hasQuestionError = questionErrors.some(Boolean);
 
@@ -104,7 +116,12 @@ export function FormPageContent({
       <div className="w-full space-y-8">
         {questions.map((question, qIdx) => {
           const questionTitle = question.title || (hasMultipleQuestions ? question.label : "");
-          const questionKey: string = question.questionKey || question.blockKey || page.pageKey;
+          const questionKey: string =
+            question.questionKey ||
+            question.blockKey ||
+            (question as any).id ||
+            (question as any)._id ||
+            (hasMultipleQuestions ? `${page.pageKey}_q${qIdx + 1}` : page.pageKey);
           const questionError = questionErrors[qIdx] ?? null;
           const questionAsPage: FormPage = {
             ...page,
@@ -118,6 +135,11 @@ export function FormPageContent({
             appearance: question.appearance || page.appearance,
             required: question.required ?? false,
           };
+
+          const questionValue =
+            answers[questionKey] !== undefined
+              ? answers[questionKey]
+              : (!hasMultipleQuestions ? answers[page.pageKey] : undefined);
 
           return (
             <div key={questionKey || qIdx} className="w-full space-y-3">
@@ -138,9 +160,14 @@ export function FormPageContent({
               <div className="w-full" style={{ color: themeResolved.answerColor }}>
                 <FormPageRenderer
                   page={questionAsPage}
-                  value={answers[questionKey]}
+                  value={questionValue}
                   error={questionError}
-                  onAnswer={(key, val) => onAnswer(key || questionKey, val)}
+                  onAnswer={(_key, val) => {
+                    onAnswer(questionKey, val);
+                    if (!hasMultipleQuestions && questionKey !== page.pageKey) {
+                      onAnswer(page.pageKey, val);
+                    }
+                  }}
                   color={themeResolved.answerColor}
                   fontSizeClass={fontSizes.input}
                 />

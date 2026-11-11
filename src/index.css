@@ -543,3 +543,32 @@
         animation: none;
     }
 }
+/* Print only the summary report, without the app chrome around it. */
+@media print {
+    body:has([data-summary-report]) {
+        background: #fff !important;
+    }
+
+    body:has([data-summary-report]) * {
+        visibility: hidden;
+    }
+
+    body:has([data-summary-report]) [data-summary-report],
+    body:has([data-summary-report]) [data-summary-report] * {
+        visibility: visible;
+    }
+
+    [data-summary-report] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 0;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    [data-summary-report] .summary-card {
+        break-inside: avoid;
+    }
+}

@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { adaptApiPage } from "../features/forms/model/adapters.ts";
 import { validatePage, validateBlock } from "../shared/hooks/useFormValidation.ts";
 import { resolveFormLogic, countRulesForPage } from "../shared/utils/formLogic.ts";
+import { npsGroups, percent, tally } from "../pages/FormResponse/components/summaryMath.ts";
 import type { FormPage as ApiPage } from "../entities/form/model/types.ts";
 import type { FormPage, FormLogicRule } from "../shared/types/common.ts";
 
@@ -424,6 +425,27 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   const ok = validatePage(page, { page_shared_key: "answered first", question_2: "answered second" });
   assert.strictEqual(ok, null);
   console.log("✓ Test 9: required questions validate their own answer, not the page-level one");
+}
+
+// Test 10: summary breakdown tallies answers and NPS buckets
+{
+  const counts = tally(["a", ["b", "c"], "a", null, undefined, ""]);
+  assert.strictEqual(counts.get("a"), 2);
+  assert.strictEqual(counts.get("b"), 1);
+  assert.strictEqual(counts.get("c"), 1);
+  assert.strictEqual(counts.size, 3);
+
+  assert.strictEqual(percent(1, 4), 25);
+  assert.strictEqual(percent(3, 0), 0);
+
+  const nps = npsGroups(new Map([["6", 1]]), 1);
+  assert.strictEqual(nps.score, -100);
+  assert.strictEqual(nps.groups[0].count, 1);
+  assert.strictEqual(nps.groups[2].count, 0);
+
+  const mixed = npsGroups(new Map([["10", 1], ["9", 1], ["8", 1], ["2", 1]]), 4);
+  assert.strictEqual(mixed.score, 25);
+  console.log("✓ Test 10: summary breakdown tallies answers and NPS buckets");
 }
 
 console.log("--- All Frontend Multi-Block & UI Tests Passed Successfully! ---");

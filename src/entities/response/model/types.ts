@@ -6,6 +6,9 @@
 
 export interface ResponseAnswer {
     pageKey: string
+    blockKey?: string
+    questionKey?: string
+    title?: string
     label: string
     type: string
     value: unknown
@@ -24,6 +27,7 @@ export interface FormResponse {
     formId: string
     respondentId?: string
     sessionId: string
+    status?: "completed" | "partial"
     answers: ResponseAnswer[]
     metadata: ResponseMetadata
     submittedAt: string
@@ -40,6 +44,7 @@ export interface ResponsesListParams {
     page?: number
     limit?: number
     sort?: string
+    status?: "completed" | "partial"
 }
 
 // ---------------------------------------------------------------------------
@@ -52,6 +57,8 @@ export interface ResponseStats {
     todayResponses: number
     averageCompletionTime: number
     completionRate: number
+    completedCount?: number
+    partialCount?: number
 }
 
 export interface ResponseSummaryPage {
@@ -60,6 +67,8 @@ export interface ResponseSummaryPage {
     type: string
     answerCount: number
     uniqueAnswers: number
+    /** Every raw answer recorded for this question. */
+    values: unknown[]
 }
 
 export interface ResponseSummary {
@@ -75,6 +84,7 @@ export type ExportFormat = "json" | "csv"
 
 export interface ExportParams {
     format?: ExportFormat
+    status?: "completed" | "partial"
 }
 
 export interface ExportResult {
@@ -89,6 +99,7 @@ export interface ExportResult {
 
 export interface SubmitFormRequest {
     answers: ResponseAnswer[]
+    sessionId?: string
 }
 
 export interface SubmissionResult {
@@ -141,4 +152,41 @@ export interface PublicFormTheme {
         backgroundColor: string
         textColor: string
     }
+}
+
+// ---------------------------------------------------------------------------
+// Form Analytics & Drop-off
+// ---------------------------------------------------------------------------
+
+export interface FormAnalyticsFilter {
+    timeRange?: "all" | "today" | "7d" | "30d" | "90d"
+    device?: "all" | "desktop" | "mobile" | "tablet"
+}
+
+export interface AnalyticsTrendPoint {
+    date: string
+    views: number
+    starts: number
+    submissions: number
+}
+
+export interface AnalyticsDropoffItem {
+    id: string
+    key: string
+    title: string
+    type: string
+    views: number
+    dropoffRate: number
+}
+
+export interface FormAnalytics {
+    formId: string
+    formTitle?: string
+    views: number
+    starts: number
+    submissions: number
+    completionRate: number
+    completionTime: number
+    trends: AnalyticsTrendPoint[]
+    dropoff: AnalyticsDropoffItem[]
 }

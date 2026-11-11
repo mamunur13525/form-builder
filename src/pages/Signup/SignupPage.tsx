@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { ROUTES } from "../../shared/constants/routes";
 import { useRegister } from "../../features/auth/hooks/useAuth";
@@ -120,6 +120,18 @@ export function SignupPage() {
           <div className="flex justify-center">
             <GoogleSignInButton redirectTo={redirect || ROUTES.DASHBOARD} />
           </div>
+
+          <p className="text-center text-xs text-[var(--editorial-subtle)] leading-relaxed">
+            By creating an account, you agree to our{" "}
+            <Link to={ROUTES.TERMS} className="text-[var(--primary)] underline hover:opacity-80">
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link to={ROUTES.PRIVACY} className="text-[var(--primary)] underline hover:opacity-80">
+              Privacy Policy
+            </Link>
+            .
+          </p>
 
           <AuthSwitchPrompt
             prompt="Already have an account?"

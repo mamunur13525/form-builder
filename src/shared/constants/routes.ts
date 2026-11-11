@@ -29,4 +29,6 @@ export const ROUTES = {
     UPDATES: "/updates",
     UPDATE_DETAIL: "/updates/:slug",
     ADMIN_UPDATES: "/admin/updates",
+    TERMS: "/terms",
+    PRIVACY: "/privacy",
 } as const

@@ -1,4 +1,4 @@
-import { List, Plus, X } from "lucide-react"
+import { ChevronsUpDown, Plus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { FormPage } from "@/shared/types/common"
@@ -10,7 +10,9 @@ import {
     StatementPage,
     StarRatingPage,
     UploadPage,
+    dropdownTriggerClasses,
 } from "@/shared/components/pages"
+import { cn } from "@/lib/utils"
 
 interface EditorProps {
     page: FormPage
@@ -44,16 +46,30 @@ export function StatementEditor({ page }: EditorProps) {
 }
 
 // ---------------------------------------------------------------------------
-// Dropdown — same option list editing as Select.
+// Dropdown — boxed trigger preview with its options always visible below.
 // ---------------------------------------------------------------------------
 
-export function DropdownEditor({ page, pageIndex, onUpdate, color }: EditorProps) {
+export function DropdownEditor({ page, pageIndex, onUpdate, color, fontSizeClass }: EditorProps) {
+    const patchOptions = (options: FormPage["options"]) => onUpdate(pageIndex, { options })
+
     return (
-        <div className="space-y-3">
-            <div className="space-y-2">
+        <div className="space-y-2">
+            <div
+                aria-hidden="true"
+                className={cn(
+                    dropdownTriggerClasses,
+                    fontSizeClass,
+                    "border-slate-600 dark:border-zinc-500",
+                )}
+                style={color ? { color } : undefined}
+            >
+                <span className="truncate">Please select an option</span>
+                <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-70" />
+            </div>
+
+            <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-2 shadow-md dark:border-zinc-700 dark:bg-zinc-900">
                 {page.options.map((opt, optIndex) => (
                     <div key={optIndex} className="flex items-center gap-2">
-                        <List className="h-4 w-4 shrink-0 text-muted-foreground" />
                         <Input
                             value={opt.label}
                             onChange={(e) => {
@@ -62,7 +78,7 @@ export function DropdownEditor({ page, pageIndex, onUpdate, color }: EditorProps
                                     label: e.target.value,
                                     value: e.target.value.toLowerCase().replace(/\s+/g, "_"),
                                 }
-                                onUpdate(pageIndex, { options: newOpts })
+                                patchOptions(newOpts)
                             }}
                             placeholder="Option label"
                             className="flex-1"
@@ -72,29 +88,24 @@ export function DropdownEditor({ page, pageIndex, onUpdate, color }: EditorProps
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 shrink-0"
+                            aria-label={`Remove option ${optIndex + 1}`}
                             onClick={() =>
-                                onUpdate(pageIndex, {
-                                    options: page.options.filter((_, i) => i !== optIndex),
-                                })
+                                patchOptions(page.options.filter((_, i) => i !== optIndex))
                             }
                         >
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
                 ))}
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => patchOptions([...page.options, { label: "", value: "" }])}
+                >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Option
+                </Button>
             </div>
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                    onUpdate(pageIndex, {
-                        options: [...page.options, { label: "", value: "" }],
-                    })
-                }
-            >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Option
-            </Button>
         </div>
     )
 }

@@ -43,6 +43,12 @@ export function adaptLogicRule(rule: ApiFormLogic): FormLogicRule {
 
 /** Convert an API Form into the legacy Form type. Pages are now embedded in the form. */
 export function adaptApiForm(apiForm: ApiForm): Form {
+    const sortedPages = [...(apiForm.pages ?? [])].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0)
+    )
+    const sortedEndPages = [...(apiForm.endPages ?? [])].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0)
+    )
     return {
         id: apiForm.id,
         title: apiForm.title,
@@ -52,8 +58,8 @@ export function adaptApiForm(apiForm: ApiForm): Form {
         settings: apiForm.settings,
         createdBy: apiForm.createdBy,
         updatedBy: undefined,
-        pages: (apiForm.pages ?? []).map((a) => adaptApiPage(a, apiForm.id)),
-        endPages: (apiForm.endPages ?? []).map(adaptApiEndPage),
+        pages: sortedPages.map((a) => adaptApiPage(a, apiForm.id)),
+        endPages: sortedEndPages.map(adaptApiEndPage),
         logic: (apiForm as any).logic
             ? ((apiForm as any).logic as ApiFormLogic[]).map(adaptLogicRule)
             : undefined,
@@ -64,6 +70,12 @@ export function adaptApiForm(apiForm: ApiForm): Form {
 
 /** Convert a PublishedForm (from public API) into the legacy Form type. */
 export function adaptPublishedForm(publishedForm: PublishedForm): Form {
+    const sortedPages = [...(publishedForm.pages ?? [])].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0)
+    )
+    const sortedEndPages = [...(publishedForm.endPages ?? [])].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0)
+    )
     return {
         id: publishedForm.id,
         title: publishedForm.title,
@@ -73,8 +85,8 @@ export function adaptPublishedForm(publishedForm: PublishedForm): Form {
         settings: publishedForm.settings,
         createdBy: "",
         updatedBy: undefined,
-        pages: (publishedForm.pages ?? []).map((a) => adaptApiPage(a, publishedForm.id)),
-        endPages: (publishedForm.endPages ?? []).map(adaptApiEndPage),
+        pages: sortedPages.map((a) => adaptApiPage(a, publishedForm.id)),
+        endPages: sortedEndPages.map(adaptApiEndPage),
         logic: (publishedForm.logic ?? []).map(adaptLogicRule),
         createdAt: "",
         updatedAt: "",
@@ -87,19 +99,23 @@ export function adaptApiPage(apiPage: ApiPage, formId: string): FormPage {
         ? apiPage.questions
         : (Array.isArray(apiPage.blocks) && apiPage.blocks.length > 0 ? apiPage.blocks : [])
 
-    const hasMultiple = rawQuestions.length > 1
+    const sortedRawQuestions = [...rawQuestions].sort(
+        (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)
+    )
+
+    const hasMultiple = sortedRawQuestions.length > 1
 
     const title = apiPage.title !== undefined && apiPage.title !== ""
         ? apiPage.title
-        : (apiPage.label || (!hasMultiple ? rawQuestions[0]?.title : "") || "")
+        : (apiPage.label || (!hasMultiple ? sortedRawQuestions[0]?.title : "") || "")
     const description = apiPage.description !== undefined && apiPage.description !== ""
         ? apiPage.description
-        : (apiPage.helperText || (!hasMultiple ? rawQuestions[0]?.description : "") || "")
+        : (apiPage.helperText || (!hasMultiple ? sortedRawQuestions[0]?.description : "") || "")
     const label = apiPage.label !== undefined ? apiPage.label : title
     const helperText = apiPage.helperText !== undefined ? apiPage.helperText : description
 
-    const questions = rawQuestions.length > 0
-        ? rawQuestions.map((b: any) => {
+    const questions = sortedRawQuestions.length > 0
+        ? sortedRawQuestions.map((b: any) => {
             const key = b.questionKey || b.blockKey || `question_${b._id || b.id || Math.random()}`
             return {
                 _id: b._id || b.id,
@@ -222,11 +238,19 @@ export function adaptApiEndPage(apiEndPage: ApiEndPage): EndPage {
 /** Convert an API FormResponse into the legacy FormResponse type. */
 export function adaptApiResponse(apiResponse: ApiResponse): CommonFormResponse {
     return {
-        _id: apiResponse.id,
+        _id: apiResponse.id || (apiResponse as any)._id,
         formId: apiResponse.formId,
         respondentId: apiResponse.respondentId,
         sessionId: apiResponse.sessionId,
-        answers: apiResponse.answers,
+        status: (apiResponse as any).status || "completed",
+        answers: (apiResponse.answers || []).map((a: any) => ({
+            ...a,
+            pageKey: a.pageKey || a.blockKey || "",
+            blockKey: a.blockKey || a.questionKey || a.pageKey || "",
+            questionKey: a.questionKey || a.blockKey || a.pageKey || "",
+            label: a.label || a.title || "",
+            title: a.title || a.label || "",
+        })),
         metadata: apiResponse.metadata,
         submittedAt: apiResponse.submittedAt,
     }

@@ -32,6 +32,7 @@ import {
     UpdatesListPage,
     UpdateDetailPage,
 } from "../../pages/Feedback"
+import { TermsPage, PrivacyPage } from "../../pages/Legal"
 import { FormLayout } from "../layouts/FormLayout"
 import { ROUTES } from "@/shared/constants/routes"
 import { tokenStorage } from "@/shared/utils/storage"
@@ -83,6 +84,8 @@ export const router = createBrowserRouter([
             },
             { path: ROUTES.INVITATION_ACCEPT, element: <AcceptInvitationPage /> },
             { path: ROUTES.INVITATION_PREVIEW, element: <AcceptInvitationPage /> },
+            { path: ROUTES.TERMS, element: <TermsPage /> },
+            { path: ROUTES.PRIVACY, element: <PrivacyPage /> },
             {
                 element: <ProtectedLayout />,
                 children: [

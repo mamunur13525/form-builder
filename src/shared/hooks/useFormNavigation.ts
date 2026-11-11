@@ -1,10 +1,110 @@
-import { useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback, useEffect } from "react"
 import type { Form, FormPage } from "../types/common"
 import { validatePage } from "./useFormValidation"
-import { submitPublicForm } from "@/entities/response/api/public-form.api"
+import { submitPublicForm, savePublicFormDraft, trackPublicFormView } from "@/entities/response/api/public-form.api"
 import { resolveFormLogic, JUMP_TO_END } from "../utils/formLogic"
 import { useFormStore } from "@/app/store/formStore"
 import { dispatchClientIntegrations } from "@/pages/FormIntegrations/services/integrationService"
+
+function buildAnswersPayload(form: Form, currentAnswers: Record<string, unknown>) {
+    const list: Array<{
+        pageKey: string
+        blockKey: string
+        questionKey: string
+        title: string
+        label: string
+        type: string
+        value: unknown
+    }> = []
+
+    const processedKeys = new Set<string>()
+
+    for (const page of form.pages) {
+        const questions = (page.questions && page.questions.length > 0)
+            ? page.questions
+            : (page.blocks && page.blocks.length > 0)
+                ? page.blocks
+                : []
+
+        if (questions.length > 0) {
+            questions.forEach((q, idx) => {
+                const qKey =
+                    q.questionKey ||
+                    q.blockKey ||
+                    (q as any).id ||
+                    (q as any)._id ||
+                    (questions.length === 1 ? page.pageKey : `${page.pageKey}_q${idx + 1}`)
+                const bKey =
+                    q.blockKey ||
+                    q.questionKey ||
+                    (q as any).id ||
+                    (q as any)._id ||
+                    (questions.length === 1 ? page.pageKey : `${page.pageKey}_q${idx + 1}`)
+
+                const val =
+                    qKey && currentAnswers[qKey] !== undefined
+                        ? currentAnswers[qKey]
+                        : bKey && currentAnswers[bKey] !== undefined
+                            ? currentAnswers[bKey]
+                            : questions.length === 1 && currentAnswers[page.pageKey] !== undefined
+                                ? currentAnswers[page.pageKey]
+                                : undefined
+
+                if (val !== undefined) {
+                    if (qKey) processedKeys.add(qKey)
+                    if (bKey) processedKeys.add(bKey)
+                    if (questions.length === 1) processedKeys.add(page.pageKey)
+
+                    const label =
+                        q.title ||
+                        q.label ||
+                        (questions.length === 1 ? (page.title || page.label) : `Question ${idx + 1}`)
+                    list.push({
+                        pageKey: page.pageKey,
+                        blockKey: bKey || page.pageKey,
+                        questionKey: qKey || bKey || page.pageKey,
+                        title: label || `Question ${idx + 1}`,
+                        label: label || `Question ${idx + 1}`,
+                        type: q.type || page.type || "shortText",
+                        value: val,
+                    })
+                }
+            })
+        } else {
+            const val = currentAnswers[page.pageKey]
+            if (val !== undefined) {
+                processedKeys.add(page.pageKey)
+                const label = page.title || page.label || page.pageKey
+                list.push({
+                    pageKey: page.pageKey,
+                    blockKey: page.pageKey,
+                    questionKey: page.pageKey,
+                    title: label,
+                    label,
+                    type: page.type || "shortText",
+                    value: val,
+                })
+            }
+        }
+    }
+
+    // Also include any answers whose keys were not in form.pages
+    for (const [key, value] of Object.entries(currentAnswers)) {
+        if (!processedKeys.has(key) && value !== undefined) {
+            list.push({
+                pageKey: key,
+                blockKey: key,
+                questionKey: key,
+                title: key,
+                label: key,
+                type: "shortText",
+                value,
+            })
+        }
+    }
+
+    return list
+}
 
 interface UseFormNavigationOptions {
     form: Form
@@ -47,6 +147,37 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
     const [submittedPages, setSubmittedPages] = useState<Set<number>>(new Set())
 
     const isPreview = mode === "preview"
+
+    const sessionKey = `form_session_${form.slug || form.id || "default"}`
+    const sessionId = useMemo(() => {
+        if (typeof window === "undefined") return `session_${Date.now()}`
+        try {
+            let sid = sessionStorage.getItem(sessionKey)
+            if (!sid) {
+                sid = `session_${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`
+                sessionStorage.setItem(sessionKey, sid)
+            }
+            return sid
+        } catch {
+            return `session_${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`
+        }
+    }, [form.slug, form.id, sessionKey])
+
+    useEffect(() => {
+        if (!isPreview && form.slug && sessionId) {
+            const ua = typeof navigator !== "undefined" ? navigator.userAgent : ""
+            const device = /tablet|ipad/i.test(ua)
+                ? "tablet"
+                : /mobile|android|iphone/i.test(ua)
+                  ? "mobile"
+                  : "desktop"
+            trackPublicFormView(form.slug, {
+                sessionId,
+                device,
+                referrer: typeof document !== "undefined" ? document.referrer : "",
+            }).catch(() => {})
+        }
+    }, [isPreview, form.slug, sessionId])
 
     // Logic rules (branching / display / calculations) shipped with the form.
     // In preview mode the builder's live rules come from the form store — the
@@ -98,37 +229,11 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         setIsSubmitting(true)
         setError(null)
         try {
-            const answerList = Object.entries(answers).map(([key, value]) => {
-                let block: any = undefined
-                let page: any = undefined
-                for (const p of form.pages) {
-                    if (p.pageKey === key) {
-                        page = p
-                        break
-                    }
-                    if (p.blocks) {
-                        const found = p.blocks.find((b: any) => b.blockKey === key || b._id === key || b.id === key)
-                        if (found) {
-                            block = found
-                            page = p
-                            break
-                        }
-                    }
-                }
-                const label = block?.title || block?.label || page?.title || page?.label || ""
-                const type = block?.type || page?.type || "shortText"
-                const blockKey = block?.blockKey || key
-                const pageKey = page?.pageKey || key
-                return {
-                    pageKey,
-                    blockKey,
-                    title: label,
-                    label,
-                    type,
-                    value,
-                }
-            })
-            await submitPublicForm(form.slug, { answers: answerList })
+            const answerList = buildAnswersPayload(form, answers)
+            await submitPublicForm(form.slug, { answers: answerList, sessionId })
+            try {
+                sessionStorage.removeItem(sessionKey)
+            } catch {}
             dispatchClientIntegrations(form, answerList, computedVariables).catch(() => {})
             setSubmitted(true)
             onSubmit?.(answers)
@@ -138,7 +243,7 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         } finally {
             setIsSubmitting(false)
         }
-    }, [isPreview, answers, form, onSubmit, computedVariables])
+    }, [isPreview, answers, form, onSubmit, computedVariables, sessionId, sessionKey])
 
     const handleNext = useCallback(() => {
         if (!currentPage) return
@@ -160,7 +265,7 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
             ? currentPage.questions
             : (currentPage.blocks && currentPage.blocks.length > 0 ? currentPage.blocks : [])
         const pageQuestionKeys: string[] = items.length > 0
-            ? items.map((b) => (b.questionKey || b.blockKey || "")).filter(Boolean)
+            ? items.map((b, idx) => (b.questionKey || b.blockKey || (b as any).id || (b as any)._id || `${currentPage.pageKey}_q${idx + 1}`)).filter(Boolean)
             : [currentPage.pageKey]
         const committed = { ...committedAnswers }
         for (const key of pageQuestionKeys) {
@@ -172,6 +277,17 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
             committed[currentPage.pageKey] = answers[currentPage.pageKey]
         }
         setCommittedAnswers(committed)
+
+        // Save partial draft on page submit in published mode
+        if (!isPreview && form.slug) {
+            const draftPayload = buildAnswersPayload(form, { ...answers, ...committed })
+            savePublicFormDraft(form.slug, {
+                answers: draftPayload,
+                sessionId,
+            }).catch((err) => {
+                console.warn("Failed to auto-save partial page draft:", err)
+            })
+        }
 
         const { hiddenPageKeys: nextHidden, jumpTargets: nextJumps } = resolveFormLogic({
             pages: allPages,
@@ -217,6 +333,9 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         formVariables,
         logicRules,
         handleSubmit,
+        isPreview,
+        form,
+        sessionId,
     ])
 
     const handlePrev = useCallback(() => {

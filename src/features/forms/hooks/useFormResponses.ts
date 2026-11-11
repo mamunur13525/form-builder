@@ -12,6 +12,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import type {
     ExportParams,
+    FormAnalyticsFilter,
     FormResponse,
     ResponsesListParams,
     UpdateResponseRequest,
@@ -19,6 +20,7 @@ import type {
 import {
     deleteResponse,
     exportResponses,
+    getFormAnalytics,
     getResponseById,
     getResponseStats,
     getResponseSummary,
@@ -66,6 +68,17 @@ export function useResponseStats(formId: string) {
         enabled: !!formId,
         staleTime: 5 * 60 * 1000,
         gcTime: 10 * 60 * 1000,
+    })
+}
+
+/** GET /forms/:formId/analytics — get form analytics, trends, and question drop-off rates. */
+export function useFormAnalytics(formId: string, filters?: FormAnalyticsFilter) {
+    return useQuery({
+        queryKey: [...RESPONSES_QUERY_KEY(formId), "analytics", filters],
+        queryFn: () => getFormAnalytics(formId, filters),
+        enabled: !!formId,
+        staleTime: 60 * 1000,
+        gcTime: 5 * 60 * 1000,
     })
 }
 

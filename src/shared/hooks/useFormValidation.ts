@@ -157,10 +157,18 @@ export function validatePage(page: FormPage, valueOrAnswers: unknown): string | 
         : (page.blocks && page.blocks.length > 0 ? page.blocks : [])
 
     if (questions.length > 0) {
-        for (const question of questions) {
-            const key: string = question.questionKey || question.blockKey || page.pageKey
+        const hasMultiple = questions.length > 1
+        for (let idx = 0; idx < questions.length; idx++) {
+            const question = questions[idx]
+            const key: string =
+                question.questionKey ||
+                question.blockKey ||
+                (question as any).id ||
+                (question as any)._id ||
+                (hasMultiple ? `${page.pageKey}_q${idx + 1}` : page.pageKey)
             const questionValue = (typeof valueOrAnswers === "object" && valueOrAnswers !== null)
-                ? (valueOrAnswers as Record<string, unknown>)[key]
+                ? ((valueOrAnswers as Record<string, unknown>)[key] ??
+                   (!hasMultiple ? (valueOrAnswers as Record<string, unknown>)[page.pageKey] : undefined))
                 : valueOrAnswers
             const error = validateQuestion(question, questionValue)
             if (error) return error

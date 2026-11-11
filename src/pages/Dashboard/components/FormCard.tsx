@@ -152,7 +152,20 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
           <div className="flex gap-2 text-sm text-[var(--editorial-body)]">
             <span>{form.pages?.length || 0} pages</span>
             <span className="text-[var(--editorial-disabled)]">•</span>
-            <span>{form.responses_count || 0} responses</span>
+            <span>
+              {(() => {
+                const completed = form.responses_count || 0;
+                const partial = form.partial_count || 0;
+                if (completed === 0 && partial > 0) {
+                  return `${partial} partial`;
+                }
+                const completedText = `${completed} ${completed === 1 ? "response" : "responses"}`;
+                if (partial > 0) {
+                  return `${completedText} • ${partial} partial`;
+                }
+                return completedText;
+              })()}
+            </span>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger

@@ -466,6 +466,9 @@ export interface Form {
 
 export interface FormAnswer {
     pageKey: string
+    blockKey?: string
+    questionKey?: string
+    title?: string
     label: string
     type: string
     value: unknown
@@ -476,6 +479,7 @@ export interface FormResponse {
     formId: string
     respondentId?: string
     sessionId: string
+    status?: "completed" | "partial"
     answers: FormAnswer[]
     metadata: {
         ipAddress: string

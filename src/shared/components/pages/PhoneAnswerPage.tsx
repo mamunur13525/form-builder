@@ -1,12 +1,13 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
+import { CountrySelect } from "@/shared/components/CountrySelect"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { COUNTRIES } from "@/shared/constants/countries"
+    COUNTRY_PHONES,
+    detectedCountry,
+    findCountryPhone,
+    formatNationalNumber,
+    maxNationalDigits,
+    type CountryPhone,
+} from "@/shared/constants/country-phone"
 import type { PhoneSettings } from "@/shared/types/common"
 import { cn } from "@/lib/utils"
 
@@ -34,8 +35,9 @@ function splitValue(value: string): { dialCode: string; local: string } {
 }
 
 /**
- * Phone input with a country-code selector. The configured default is
- * pre-selected, and the respondent can still change it before submitting.
+ * Phone input with a searchable country picker. The selected country decides
+ * the dial code and the national number mask used for the placeholder and
+ * as-you-type formatting.
  */
 export function PhoneAnswerPage({
     value = "",
@@ -47,71 +49,96 @@ export function PhoneAnswerPage({
     color,
     fontSizeClass,
 }: PhoneAnswerPageProps) {
-    const configuredDial =
-        settings.countryCodeMode === "specific" && settings.defaultCountry
-            ? settings.defaultCountry.dialCode
-            : ""
+    const fallback =
+        settings.countryCodeMode === "specific"
+            ? settings.defaultCountry
+                ? findCountryPhone(settings.defaultCountry.iso2)
+                : undefined
+            : detectedCountry()
+
+    // The picker's choice must win over the dial code: countries such as the US
+    // and Canada share +1, so the value alone cannot tell them apart.
+    const [pickedIso, setPickedIso] = useState<string | null>(null)
+    const picked = pickedIso ? COUNTRY_PHONES.find((item) => item.iso2 === pickedIso) : undefined
 
     const parsed = useMemo(() => splitValue(value), [value])
-    const dialCode = parsed.dialCode || configuredDial
+    const parsedMatch = parsed.dialCode
+        ? COUNTRY_PHONES.find((item) => item.dialCode === parsed.dialCode)
+        : undefined
+    // Prefer the configured/locale country when it shares the stored dial code.
+    const country =
+        picked ??
+        (fallback && parsed.dialCode === fallback.dialCode ? fallback : (parsedMatch ?? fallback))
+    const dialCode = parsed.dialCode || country?.dialCode || ""
 
-    // Pick the first country matching the dial code for the select's value.
-    const selectedIso =
-        COUNTRIES.find((c) => c.dialCode === dialCode)?.iso2 ??
-        (settings.countryCodeMode === "specific" ? settings.defaultCountry?.iso2 : undefined) ??
-        ""
+    const mask = country?.format ?? "############"
+    const maxDigits = maxNationalDigits(mask)
+    const localDigits = parsed.local.replace(/\D/g, "").slice(0, maxDigits)
+    const local = formatNationalNumber(localDigits, mask)
 
     const emit = (nextDial: string, nextLocal: string) => {
         const dial = nextDial.trim()
-        const local = nextLocal.trim()
-        if (!dial && !local) {
+        const localPart = nextLocal.trim()
+        if (!dial && !localPart) {
             onChange?.("")
             return
         }
-        onChange?.(dial ? `${dial} ${local}`.trim() : local)
+        onChange?.(dial ? `${dial} ${localPart}`.trim() : localPart)
+    }
+
+    const chooseCountry = (next: CountryPhone) => {
+        setPickedIso(next.iso2)
+        const digits = localDigits.slice(0, maxNationalDigits(next.format))
+        emit(next.dialCode, formatNationalNumber(digits, next.format))
     }
 
     return (
         <div className="space-y-1">
-            <div className="flex items-stretch gap-2">
-                <Select
-                    value={selectedIso}
+            <div
+                className={cn(
+                    "flex items-center gap-2 border-b pb-1 transition-colors duration-300",
+                    error ? "border-destructive!" : !color && "border-gray-500 focus-within:border-gray-200",
+                    disabled && "opacity-50",
+                )}
+                style={
+                    color && !error
+                        ? {
+                            borderColor: `color-mix(in oklab, ${color} 40%, transparent)`,
+                        }
+                        : undefined
+                }
+            >
+                <CountrySelect
+                    variant="flag"
+                    value={country?.iso2 ?? ""}
+                    onChange={chooseCountry}
                     disabled={disabled}
-                    onValueChange={(iso2: string | null) => {
-                        if (!iso2) return
-                        const country = COUNTRIES.find((c) => c.iso2 === iso2)
-                        if (country) emit(country.dialCode, parsed.local)
-                    }}
-                >
-                    <SelectTrigger className="h-11 w-28 shrink-0">
-                        <SelectValue placeholder="Code" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {COUNTRIES.map((country) => (
-                            <SelectItem key={country.iso2} value={country.iso2}>
-                                <span className="flex items-center gap-2">
-                                    <span className="w-14 shrink-0 text-muted-foreground">
-                                        {country.dialCode}
-                                    </span>
-                                    {country.name}
-                                </span>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    style={color ? { color } : undefined}
+                />
 
                 <input
                     type="tel"
-                    value={parsed.local}
+                    value={local}
                     disabled={disabled}
-                    placeholder={placeholder || "Phone number"}
-                    onChange={(e) => emit(dialCode, e.target.value)}
+                    placeholder={country?.example ?? placeholder ?? "(201) 555-0123"}
+                    onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, "").slice(0, maxDigits)
+                        emit(dialCode, formatNationalNumber(digits, mask))
+                    }}
                     className={cn(
-                        "h-11 flex-1 rounded-lg border bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+                        "h-9 min-w-0 flex-1 border-0 bg-transparent p-0 text-2xl outline-none focus:outline-none focus:ring-0",
                         fontSizeClass,
-                        error ? "border-destructive" : "border-input",
                     )}
-                    style={color ? { color } : undefined}
+                    style={
+                        color
+                            ? {
+                                color,
+                                ...({
+                                    "--input-placeholder-color": `color-mix(in oklab, ${color} 40%, transparent)`,
+                                } as React.CSSProperties),
+                            }
+                            : undefined
+                    }
                 />
             </div>
             {settings.phoneVerification && (

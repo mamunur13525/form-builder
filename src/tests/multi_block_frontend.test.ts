@@ -3,6 +3,8 @@ import { adaptApiPage } from "../features/forms/model/adapters.ts";
 import { validatePage, validateBlock } from "../shared/hooks/useFormValidation.ts";
 import { resolveFormLogic, countRulesForPage } from "../shared/utils/formLogic.ts";
 import { npsGroups, percent, tally } from "../pages/FormResponse/components/summaryMath.ts";
+import { countryFromLocale, flagEmoji } from "../shared/constants/countries.ts";
+import { countryPhoneFromTimezone, findCountryPhone, formatNationalNumber, maxNationalDigits } from "../shared/constants/country-phone.ts";
 import type { FormPage as ApiPage } from "../entities/form/model/types.ts";
 import type { FormPage, FormLogicRule } from "../shared/types/common.ts";
 
@@ -446,6 +448,38 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   const mixed = npsGroups(new Map([["10", 1], ["9", 1], ["8", 1], ["2", 1]]), 4);
   assert.strictEqual(mixed.score, 25);
   console.log("✓ Test 10: summary breakdown tallies answers and NPS buckets");
+}
+
+// Test 11: phone country auto-detection from the browser locale
+{
+  assert.strictEqual(countryFromLocale("en-US")?.iso2, "US");
+  assert.strictEqual(countryFromLocale("bn-BD")?.iso2, "BD");
+  // Script subtags are skipped; the region still wins.
+  assert.strictEqual(countryFromLocale("zh-Hant-TW")?.iso2, "TW");
+  assert.strictEqual(countryFromLocale("en"), undefined);
+  assert.strictEqual(flagEmoji("US"), "🇺🇸");
+  // The browser timezone detects the real country even when the UI language
+  // stays en-US (e.g. a respondent in Bangladesh with an English browser).
+  assert.strictEqual(countryPhoneFromTimezone("Asia/Dhaka")?.iso2, "BD");
+  assert.strictEqual(countryPhoneFromTimezone("America/New_York")?.iso2, "US");
+  assert.strictEqual(countryPhoneFromTimezone("Europe/London")?.iso2, "GB");
+  assert.strictEqual(countryPhoneFromTimezone("Etc/UTC"), undefined);
+  console.log("✓ Test 11: phone country auto-detection from locale and timezone");
+}
+
+// Test 12: phone masks format national numbers per country
+{
+  assert.strictEqual(formatNationalNumber("2015550123", "(###) ###-####"), "(201) 555-0123");
+  assert.strictEqual(formatNationalNumber("01712345678", "#####-######"), "01712-345678");
+  assert.strictEqual(formatNationalNumber("201", "(###) ###-####"), "(201");
+  assert.strictEqual(maxNationalDigits("(###) ###-####"), 10);
+  assert.strictEqual(findCountryPhone("BD")?.dialCode, "+880");
+  assert.strictEqual(findCountryPhone("US")?.example, "(201) 555-0123");
+  // Countries without their own mask borrow one from the same dial code, and
+  // every country still gets a numeric example placeholder.
+  assert.strictEqual(findCountryPhone("GG")?.example, "07123 456789");
+  assert.strictEqual(findCountryPhone("AL")?.example, "123 456 7890");
+  console.log("✓ Test 12: phone masks format national numbers per country");
 }
 
 console.log("--- All Frontend Multi-Block & UI Tests Passed Successfully! ---");

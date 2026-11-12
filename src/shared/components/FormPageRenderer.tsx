@@ -202,6 +202,7 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                     value={(value as number) || 0}
                     onChange={(v) => onAnswer(page.pageKey, v)}
                     settings={settings.rating ?? { style: "star", max: 5 }}
+                    color={color}
                 />
             )
         case "opinionScale":
@@ -217,6 +218,7 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                             rightLabel: "",
                         }
                     }
+                    color={color}
                 />
             )
         case "address":

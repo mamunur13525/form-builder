@@ -11,6 +11,7 @@ import { ResponsePageShell } from "./components/ResponsePageShell"
 import { ResponseStateCard } from "./components/ResponseStateCard"
 import { SubmissionsTable } from "./components/SubmissionsTable"
 import { SubmissionsToolbar } from "./components/SubmissionsToolbar"
+import { SubmissionsSkeleton } from "./components/ResponseSkeletons"
 import { buildSubmissionColumns, type SubmissionLayer } from "./lib/columns"
 import {
     buildResponsesCsv,
@@ -150,9 +151,7 @@ export function SubmissionsPage() {
     return (
         <ResponsePageShell activeTab="submissions" fill>
             {isLoading ? (
-                <div className="p-4 sm:p-8">
-                    <ResponseStateCard loading message="Loading submissions..." />
-                </div>
+                <SubmissionsSkeleton />
             ) : formError || responsesError ? (
                 <div className="p-4 sm:p-8">
                     <ResponseStateCard message="Could not load submissions. Please try again." />

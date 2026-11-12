@@ -158,28 +158,37 @@ function PageContentEditorComponent({
           const isThisQuestionSelected = !hasSelectedQuestion || questionId === selectedQuestionId;
 
           return (
-            <PageQuestionItem
-              key={key}
-              question={question}
-              questionIndex={qIdx}
-              page={page}
-              pageIndex={pageIndex}
-              isMobileView={isMobileView}
-              theme={themeResolved}
-              fontSizes={fontSizes}
-              variables={variables}
-              hasMultipleQuestions={hasMultipleQuestions}
-              hasSelectedQuestion={hasSelectedQuestion}
-              isThisQuestionSelected={isThisQuestionSelected}
-              selectedQuestionId={selectedQuestionId}
-              onSelectQuestion={onSelectQuestion}
-              onUpdateQuestion={updateQuestion}
-              onInsertQuestion={insertQuestion}
-              onDeleteQuestion={deleteQuestion}
-              onDuplicateQuestion={duplicateQuestion}
-              movableProps={itemProps}
-              isDragged={isDragged}
-            />
+            <div key={key} className="group/question relative w-full">
+              <PageQuestionItem
+                question={question}
+                questionIndex={qIdx}
+                page={page}
+                pageIndex={pageIndex}
+                isMobileView={isMobileView}
+                theme={themeResolved}
+                fontSizes={fontSizes}
+                variables={variables}
+                hasMultipleQuestions={hasMultipleQuestions}
+                hasSelectedQuestion={hasSelectedQuestion}
+                isThisQuestionSelected={isThisQuestionSelected}
+                selectedQuestionId={selectedQuestionId}
+                onSelectQuestion={onSelectQuestion}
+                onUpdateQuestion={updateQuestion}
+                onDeleteQuestion={deleteQuestion}
+                onDuplicateQuestion={duplicateQuestion}
+                movableProps={itemProps}
+                isDragged={isDragged}
+              />
+              {/* Add Question bar sits outside the question's own card/selection area,
+                  revealed by hovering the question row. */}
+              <AddQuestionButton
+                onAddQuestion={(type) => insertQuestion(qIdx + 1, type)}
+                className={cn(
+                  "opacity-0 group-hover/question:opacity-100 hover:!opacity-100 transition-opacity",
+                  isDragged ? "invisible" : ""
+                )}
+              />
+            </div>
           );
         }}
       />

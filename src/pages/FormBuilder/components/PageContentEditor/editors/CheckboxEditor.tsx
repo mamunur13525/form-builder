@@ -1,4 +1,3 @@
-import { CheckSquare } from "lucide-react"
 import type { FormPage } from "@/shared/types/common"
 import { OptionListEditor } from "./OptionListEditor"
 
@@ -10,5 +9,5 @@ interface EditorProps {
 }
 
 export function CheckboxEditor(props: EditorProps) {
-    return <OptionListEditor {...props} icon={CheckSquare} />
+    return <OptionListEditor {...props} />
 }

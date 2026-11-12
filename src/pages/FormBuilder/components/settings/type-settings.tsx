@@ -9,6 +9,7 @@ import type {
     UploadSettings as UploadSettingsType,
 } from "@/shared/types/common"
 import { STATEMENT_PROVIDERS, UPLOAD_FILE_GROUPS } from "@/features/forms/model/page-defaults"
+import { DEFAULT_ADDRESS_PLACEHOLDERS } from "@/shared/constants/address"
 import { ToggleRow, NumberSetting, TextSetting, CONTROL_CLASS } from "./primitives"
 import { Switch } from "@/components/ui/switch"
 import { Eye, EyeOff, Plus, X, Shield, Link2, Type, FileText, Image as ImageIcon, Globe } from "lucide-react"
@@ -332,8 +333,9 @@ export function AddressSettingsWidget({
                                 onChange={(e) =>
                                     updatePage(page.key, { placeholder: e.target.value })
                                 }
-                                className={CONTROL_CLASS + " px-3"}
-                                placeholder="Placeholder"
+                                className={CONTROL_CLASS + " px-3 placeholder:opacity-60"}
+                                aria-label={`${page.label} placeholder`}
+                                placeholder={DEFAULT_ADDRESS_PLACEHOLDERS[page.key]}
                             />
                             <div className="flex items-center justify-between gap-3">
                                 <Label

@@ -196,13 +196,24 @@
 [contenteditable][data-placeholder]:empty:before {
     content: attr(data-placeholder);
     color: var(--muted-foreground);
-    font-style: italic;
     opacity: 0.6;
     pointer-events: none;
 }
 
+[contenteditable][data-placeholder*="Description"]:empty:before,
+[contenteditable][data-placeholder*="description"]:empty:before {
+    font-style: italic;
+}
+
 [contenteditable][data-placeholder]:empty:focus:before {
     opacity: 0.35;
+}
+
+/* Custom placeholder color variable for inputs and textareas with low opacity */
+input[style*="--input-placeholder-color"]::placeholder,
+textarea[style*="--input-placeholder-color"]::placeholder {
+    color: var(--input-placeholder-color) !important;
+    opacity: 1 !important;
 }
 
 /* ------------------------------------------------------------------ */

@@ -28,7 +28,7 @@ export function TextareaPage({
     fontSizeClass,
 }: TextareaPageProps) {
     const isError = !!error
-    const errorClasses = isError ? "border-destructive" : ""
+    const errorClasses = isError ? "border-destructive!" : ""
 
     return (
         <Textarea
@@ -39,7 +39,18 @@ export function TextareaPage({
             disabled={disabled}
             autoFocus={autoFocus}
             className={cn(inputBaseClasses, fontSizeClass, errorClasses)}
-            style={color ? { color } : undefined}
+            style={
+                color
+                    ? {
+                        color,
+                        borderColor: isError ? undefined : `color-mix(in oklab, ${color} 30%, transparent)`,
+                        backgroundColor: `color-mix(in oklab, ${color} 4%, transparent)`,
+                        ...({
+                            "--input-placeholder-color": `color-mix(in oklab, ${color} 40%, transparent)`,
+                        } as React.CSSProperties),
+                    }
+                    : undefined
+            }
         />
     )
 }

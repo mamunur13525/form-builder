@@ -108,10 +108,20 @@ export function SelectPage({
                 className={cn(
                     dropdownTriggerClasses,
                     fontSizeClass,
-                    isError ? "border-destructive" : "border-slate-600 dark:border-zinc-500",
+                    isError
+                        ? "border-destructive!"
+                        : !color && "border-slate-600 dark:border-zinc-500",
                     "cursor-pointer disabled:cursor-not-allowed",
                 )}
-                style={color ? { color } : undefined}
+                style={
+                    color
+                        ? {
+                            color,
+                            borderColor: isError ? undefined : `color-mix(in oklab, ${color} 30%, transparent)`,
+                            backgroundColor: `color-mix(in oklab, ${color} 5%, transparent)`,
+                        }
+                        : undefined
+                }
             >
                 <span className="truncate">{selected ? selected.label : placeholder}</span>
                 <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-70" />

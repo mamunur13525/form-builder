@@ -43,6 +43,7 @@ export function AddQuestionButton({ onAddQuestion, className }: AddQuestionButto
 
       <Combobox<PageType>
         items={PAGE_TYPES}
+        autoHighlight
         value={null}
         onValueChange={(type) => {
           if (!type) return;

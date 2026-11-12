@@ -34,6 +34,7 @@ import type { AnalyticsTrendPoint, FormAnalyticsFilter } from "@/entities/respon
 import { cn } from "@/lib/utils"
 import { ResponsePageShell } from "./components/ResponsePageShell"
 import { ResponseStateCard } from "./components/ResponseStateCard"
+import { AnalyticsSkeleton } from "./components/ResponseSkeletons"
 
 /** Format a duration in seconds as `45s` or `2m 5s`. */
 function formatDuration(seconds: number): string {
@@ -313,7 +314,7 @@ export function AnalyticsPage() {
             }
         >
             {isLoading ? (
-                <ResponseStateCard loading message="Loading analytics..." />
+                <AnalyticsSkeleton />
             ) : formError || analyticsError ? (
                 <ResponseStateCard message="Could not load analytics. Please try again." />
             ) : (

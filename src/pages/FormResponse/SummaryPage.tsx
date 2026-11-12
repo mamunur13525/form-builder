@@ -7,6 +7,7 @@ import { ResponsePageShell } from "./components/ResponsePageShell"
 import { ResponseStateCard } from "./components/ResponseStateCard"
 import { SummaryBreakdown } from "./components/SummaryBreakdown"
 import { SharingOptionsCard } from "./components/SharingOptionsCard"
+import { SummarySkeleton } from "./components/ResponseSkeletons"
 
 /** Question types the report can break down; open-ended ones are excluded. */
 const BREAKDOWN_TYPES = new Set([
@@ -57,7 +58,7 @@ export function SummaryPage() {
     return (
         <ResponsePageShell activeTab="summary">
             {isLoading ? (
-                <ResponseStateCard loading message="Loading summary..." />
+                <SummarySkeleton />
             ) : formError || summaryError ? (
                 <ResponseStateCard message="Could not load summary. Please try again." />
             ) : totalResponses === 0 ? (

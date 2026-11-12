@@ -28,7 +28,7 @@ export function TextPage({
     fontSizeClass,
 }: TextPageProps) {
     const isError = !!error
-    const errorClasses = isError ? "border-destructive" : ""
+    const errorClasses = isError ? "border-destructive!" : ""
 
     return (
         <Input
@@ -39,7 +39,17 @@ export function TextPage({
             disabled={disabled}
             autoFocus={autoFocus}
             className={cn(inputBaseClasses, fontSizeClass, errorClasses)}
-            style={color ? { color } : undefined}
+            style={
+                color
+                    ? {
+                        color,
+                        borderColor: isError ? undefined : `color-mix(in oklab, ${color} 40%, transparent)`,
+                        ...({
+                            "--input-placeholder-color": `color-mix(in oklab, ${color} 40%, transparent)`,
+                        } as React.CSSProperties),
+                    }
+                    : undefined
+            }
         />
     )
 }

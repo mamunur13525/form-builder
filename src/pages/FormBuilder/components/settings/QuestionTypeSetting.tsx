@@ -59,6 +59,7 @@ export function QuestionTypeSetting({
         >
             <Combobox
                 items={filteredTypes}
+                autoHighlight
                 value={type}
                 onValueChange={onChange}
                 inputValue={typeQuery}

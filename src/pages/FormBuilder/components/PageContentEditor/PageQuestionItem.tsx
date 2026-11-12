@@ -1,5 +1,5 @@
 import { Copy, GripVertical, Trash2 } from "lucide-react";
-import type { FormPage, FormQuestion, PageType } from "@/shared/types/common";
+import type { FormPage, FormQuestion } from "@/shared/types/common";
 import type { VariableItem } from "@/shared/components/pages";
 import { VariableEditable } from "@/shared/components/pages";
 import { getFontSizeClasses, getQuestionTitleClasses, resolveFormTheme } from "@/shared/utils/theme";
@@ -28,7 +28,6 @@ import {
   UploadEditor,
   RatingSettingsAwareEditor,
 } from "./editors";
-import { AddQuestionButton } from "./AddQuestionButton";
 
 const editorMap: Record<
   string,
@@ -79,7 +78,6 @@ interface PageQuestionItemProps {
   selectedQuestionId?: string | null;
   onSelectQuestion?: (questionId: string | null) => void;
   onUpdateQuestion: (index: number, updates: Partial<FormQuestion>) => void;
-  onInsertQuestion: (index: number, type: PageType) => void;
   onDeleteQuestion: (index: number) => void;
   onDuplicateQuestion: (index: number) => void;
   movableProps: React.HTMLAttributes<HTMLDivElement> & {
@@ -104,7 +102,6 @@ export function PageQuestionItem({
   selectedQuestionId,
   onSelectQuestion,
   onUpdateQuestion,
-  onInsertQuestion,
   onDeleteQuestion,
   onDuplicateQuestion,
   movableProps,
@@ -257,17 +254,6 @@ export function PageQuestionItem({
           ) : null}
         </div>
       </div>
-
-      {/* Add Question Button between questions and at the bottom:
-          Only 1 button below each question (total N for N questions, plus 1 top = N+1).
-          Opacity is hidden by default; revealed on hovering the question or the plus itself. */}
-      <AddQuestionButton
-        onAddQuestion={(type) => onInsertQuestion(questionIndex + 1, type)}
-        className={cn(
-          "opacity-0 group-hover/question:opacity-100 hover:!opacity-100 transition-opacity",
-          isDragged ? "invisible" : ""
-        )}
-      />
     </div>
   );
 }

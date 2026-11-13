@@ -29,18 +29,10 @@ interface EditorProps {
 // ---------------------------------------------------------------------------
 
 export function StatementEditor({ page }: EditorProps) {
-    const settings = page.settings?.statement ?? {
-        embedUrl: "",
-        embedProvider: "youtube" as const,
-        embedTitle: "",
-    }
+    const settings = page.settings?.statement
 
-    if (!settings.embedUrl) {
-        return (
-            <p className="rounded-lg border border-dashed py-6 text-center text-sm text-muted-foreground">
-                Add an embed link in the settings panel to preview it here.
-            </p>
-        )
+    if (!settings?.embedUrl) {
+        return null
     }
 
     return <StatementPage settings={settings} />

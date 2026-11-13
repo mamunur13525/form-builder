@@ -96,7 +96,7 @@ export function PhoneAnswerPage({
         <div className="space-y-1">
             <div
                 className={cn(
-                    "flex items-center gap-2 border-b pb-1 transition-colors duration-300",
+                    "flex items-center gap-2 border-b focus-within:border-b-2 pb-1 transition-colors duration-300",
                     error ? "border-destructive!" : !color && "border-gray-500 focus-within:border-gray-200",
                     disabled && "opacity-50",
                 )}

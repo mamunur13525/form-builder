@@ -1,4 +1,5 @@
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "../../shared/utils/cn"
 
@@ -10,7 +11,9 @@ interface DialogProps {
 }
 
 export function Dialog({ open, onOpenChange, children, className }: DialogProps) {
-    return (
+    // Portal to <body> so the dialog is not nested inside the page/form markup
+    // that opened it (keeps it out of ancestor stacking and overflow contexts).
+    return createPortal(
         <AnimatePresence>
             {open && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -33,7 +36,8 @@ export function Dialog({ open, onOpenChange, children, className }: DialogProps)
                     </motion.div>
                 </div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     )
 }
 

@@ -138,6 +138,25 @@ export function PageQuestionItem({
 
   const questionTitleSize = getQuestionTitleClasses(theme.fontSize);
 
+  const isStatementWithoutEmbed =
+    question.type === "statement" &&
+    !hasMultipleQuestions &&
+    !question.settings?.statement?.embedUrl &&
+    !page.settings?.statement?.embedUrl;
+
+  if (isStatementWithoutEmbed) {
+    return (
+      <div
+        id={`question-${questionId}`}
+        data-block-id={`block-${questionId}`}
+        data-question-item="true"
+        {...itemProps}
+        style={combinedStyle}
+        className="h-0 w-full overflow-hidden"
+      />
+    );
+  }
+
   return (
     <div
       id={`question-${questionId}`}

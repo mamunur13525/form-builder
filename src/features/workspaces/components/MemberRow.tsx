@@ -54,7 +54,7 @@ function isPastDate(value: string | null): boolean {
 
 /** Role pill. Owner gets the one accent in the row; the rest stay neutral. */
 function RoleBadge({ role }: { role: WorkspaceRole }) {
-    const label = WORKSPACE_ROLE_LABELS[role] ?? (role === ("editor" as any) ? "Editor" : (role || "Member"))
+    const label = WORKSPACE_ROLE_LABELS[role] ?? ((role as string) === "editor" ? "Editor" : (role || "Member"))
     return (
         <span
             className={cn(

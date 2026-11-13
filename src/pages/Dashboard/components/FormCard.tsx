@@ -182,7 +182,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
             />
             <DropdownMenuContent
               align="end"
-              className="editorial rounded-lg border-[var(--border)] bg-[var(--popover)] p-2"
+              className="editorial editorial-flat rounded-lg border-[var(--border)] bg-[var(--popover)] p-2"
               onClick={(e) => e.stopPropagation()}
             >
               {menuItems.map((item, index) => {

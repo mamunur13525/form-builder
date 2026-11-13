@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 // Same underline-only treatment as DatePage, with the native clock button
 // hidden so the field reads as plain `--:-- --` text.
 const inputBaseClasses =
-    "pl-0 text-2xl rounded-none border-0 border-b border-gray-500 focus:border-gray-200 outline-0! ring-0! focus:outline-0! focus:ring-0! focus-visible:outline-0! focus-visible:ring-0! focus-visible:ring-offset-0! focus-within:ring-0! focus-within:outline-0! bg-transparent duration-300 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+    "pl-0 text-2xl rounded-none border-0 border-b focus:border-b-2 border-gray-500 focus:border-gray-200 outline-0! ring-0! focus:outline-0! focus:ring-0! focus-visible:outline-0! focus-visible:ring-0! focus-visible:ring-offset-0! focus-within:ring-0! focus-within:outline-0! bg-transparent duration-300 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
 
 interface TimePageProps {
     value: string

@@ -48,6 +48,7 @@ import {
     type UpdateFormAccessRequest,
 } from "@/entities/form/api/form.api"
 import { useActiveWorkspace } from "@/features/workspaces/hooks/useWorkspaces"
+import { showError } from "@/shared/hooks/useToast"
 
 const FORMS_QUERY_KEY = ["forms"]
 
@@ -140,6 +141,7 @@ export function useCreateForm() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: FORMS_QUERY_KEY })
         },
+        onError: (error) => showError("Couldn't create form", error),
     })
 }
 

@@ -108,7 +108,7 @@ export function FormDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="editorial editorial-shadow rounded-lg border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
+            className="editorial editorial-flat editorial-shadow rounded-lg border-[var(--border)] bg-[var(--popover)] p-6 sm:p-10"
         >
             <DialogContent>
                 <DialogHeader className="mb-6">
@@ -126,7 +126,7 @@ export function FormDialog({
                         <div className="space-y-2">
                             <Label
                                 htmlFor="form-title"
-                                className="editorial-eyebrow text-[var(--editorial-subtle)]"
+                                className="editorial-eyebrow text-[var(--editorial-subtle)] mb-2 block"
                             >
                                 Form Name
                             </Label>

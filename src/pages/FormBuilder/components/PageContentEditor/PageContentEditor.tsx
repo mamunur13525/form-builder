@@ -116,10 +116,12 @@ function PageContentEditorComponent({
   const pageTitle = page.title !== undefined ? page.title : (page.label || (!hasMultipleQuestions ? questions[0]?.title : "") || "");
   const pageDescription = page.description !== undefined ? page.description : (page.helperText || "");
 
-  const isStatement = page.type === "statement";
+  const isStatement = page.type === "statement" || questions[0]?.type === "statement";
+  const hasEmbed = Boolean(page.settings?.statement?.embedUrl || questions[0]?.settings?.statement?.embedUrl);
+  const isStatementWithoutEmbed = isStatement && !hasMultipleQuestions && !hasEmbed;
 
   const content = (
-    <div className="w-full space-y-6">
+    <div className={cn("w-full", isStatementWithoutEmbed ? "space-y-4" : "space-y-6")}>
       {/* 1. Page Title and Description with page number on top-left aligned with question handles */}
       <PageHeaderEditor
         pageIndex={pageIndex}
@@ -134,12 +136,14 @@ function PageContentEditorComponent({
       />
 
       {/* 2. Top-most Add Question button (above first question) - hidden until hovered */}
-      <div className="group/topbtn relative w-full -mb-3 z-20">
-        <AddQuestionButton
-          onAddQuestion={(type) => insertQuestion(0, type)}
-          className="opacity-0 group-hover/topbtn:opacity-100 hover:!opacity-100 transition-opacity"
-        />
-      </div>
+      {!isStatement && (
+        <div className="group/topbtn relative w-full z-20">
+          <AddQuestionButton
+            onAddQuestion={(type) => insertQuestion(0, type)}
+            className="opacity-0 group-hover/topbtn:opacity-100 hover:!opacity-100 transition-opacity"
+          />
+        </div>
+      )}
 
       {/* Questions List via react-movable for 6-dot drag-and-drop reordering */}
       <List
@@ -148,7 +152,7 @@ function PageContentEditorComponent({
         transitionDuration={150}
         lockVertically
         renderList={({ children, props }) => (
-          <div {...props} className="w-full space-y-2">
+          <div {...props} className={cn("w-full", isStatementWithoutEmbed ? "" : "space-y-2")}>
             {children}
           </div>
         )}
@@ -158,7 +162,13 @@ function PageContentEditorComponent({
           const isThisQuestionSelected = !hasSelectedQuestion || questionId === selectedQuestionId;
 
           return (
-            <div key={key} className="group/question relative w-full">
+            <div
+              key={key}
+              className={cn(
+                "group/question relative w-full",
+                isStatementWithoutEmbed && "h-4 -my-1 flex items-center justify-center"
+              )}
+            >
               <PageQuestionItem
                 question={question}
                 questionIndex={qIdx}
@@ -194,7 +204,7 @@ function PageContentEditorComponent({
       />
 
       {/* Page Submit Button */}
-      <div className="pt-4">
+      <div className={cn(isStatementWithoutEmbed ? "pt-0" : "pt-4")}>
         <PageSubmitButton
           text={
             page.appearance?.submitButtonText ||

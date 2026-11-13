@@ -120,7 +120,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
                         </span>
                         <span className="block truncate text-xs text-[var(--editorial-subtle)]">
                             {activeWorkspace.currentUserRole
-                                ? (WORKSPACE_ROLE_LABELS[activeWorkspace.currentUserRole] ?? (activeWorkspace.currentUserRole === ("editor" as any) ? "Editor" : activeWorkspace.currentUserRole))
+                                ? (WORKSPACE_ROLE_LABELS[activeWorkspace.currentUserRole] ?? ((activeWorkspace.currentUserRole as string) === "editor" ? "Editor" : activeWorkspace.currentUserRole))
                                 : "Member"}
                             {" · "}
                             {activeWorkspace.memberCount}
@@ -135,7 +135,7 @@ export function WorkspaceSwitcher({ onNavigate }: WorkspaceSwitcherProps) {
                     side="bottom"
                     align="start"
                     sideOffset={8}
-                    className="editorial w-[17rem] rounded-lg border border-[var(--border)] bg-[var(--popover)] p-2"
+                    className="editorial editorial-flat w-[17rem] rounded-lg border border-[var(--border)] bg-[var(--popover)] p-2"
                 >
                     {/* Base UI requires labels to live inside a group — a bare
                         DropdownMenuLabel outside one throws on render. */}

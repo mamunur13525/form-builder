@@ -190,6 +190,11 @@
                 transparent 60%);
     }
 
+    /* Flat cards in dark mode — the sheen only helps light surfaces. */
+    .dark .bg-card {
+        background-image: none;
+    }
+
 }
 
 /* Editable placeholder styling for contentEditable elements */
@@ -198,6 +203,7 @@
     color: var(--muted-foreground);
     opacity: 0.6;
     pointer-events: none;
+    transition: opacity 0.2s ease;
 }
 
 [contenteditable][data-placeholder*="Description"]:empty:before,
@@ -206,7 +212,7 @@
 }
 
 [contenteditable][data-placeholder]:empty:focus:before {
-    opacity: 0.35;
+    opacity: 0.45 !important;
 }
 
 /* Custom placeholder color variable for inputs and textareas with low opacity */
@@ -214,6 +220,32 @@ input[style*="--input-placeholder-color"]::placeholder,
 textarea[style*="--input-placeholder-color"]::placeholder {
     color: var(--input-placeholder-color) !important;
     opacity: 1 !important;
+    transition: opacity 0.2s ease;
+}
+
+/* On focus, slightly soften placeholder opacity (just a little lower than main placeholder) */
+input:focus::placeholder,
+textarea:focus::placeholder {
+    opacity: 0.45 !important;
+}
+
+/* Double the border on focus only for the side(s) that previously had a border */
+input.border-b:focus,
+input.border-b:focus-visible,
+textarea.border-b:focus,
+textarea.border-b:focus-visible {
+    border-bottom-width: 2px !important;
+}
+
+input.border:not(.border-0):focus,
+input.border:not(.border-0):focus-visible,
+textarea.border:not(.border-0):focus,
+textarea.border:not(.border-0):focus-visible,
+[role="combobox"].border:focus,
+[role="combobox"].border:focus-visible,
+button[aria-haspopup="true"].border:focus,
+button[aria-haspopup="true"].border:focus-visible {
+    border-width: 2px !important;
 }
 
 /* ------------------------------------------------------------------ */
@@ -403,6 +435,19 @@ textarea[style*="--input-placeholder-color"]::placeholder {
             transparent 60%);
     background-attachment: fixed;
     background-repeat: no-repeat;
+}
+
+/* Portalled surfaces (menus, dialogs) opt out of the ambient wash in dark
+   mode — a flat popover over a dark canvas reads cleaner. */
+.dark .editorial-flat,
+.dark.editorial-flat,
+:root.dark .editorial-flat,
+.dark [data-slot="dropdown-menu-content"],
+.dark [data-slot="alert-dialog-content"],
+.dark [role="dialog"],
+.dark [role="alertdialog"],
+.dark [role="menu"] {
+    background-image: none;
 }
 
 .light.editorial,

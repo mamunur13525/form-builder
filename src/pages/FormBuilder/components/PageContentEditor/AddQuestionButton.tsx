@@ -34,7 +34,8 @@ export function AddQuestionButton({ onAddQuestion, className }: AddQuestionButto
   return (
     <div
       className={cn(
-        "relative flex items-center justify-center py-1.5 w-full group/add z-20",
+        "relative flex items-center justify-center h-0 py-0 w-full group/add z-20",
+        open && "!opacity-100",
         className
       )}
     >

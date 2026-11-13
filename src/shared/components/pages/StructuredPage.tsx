@@ -55,7 +55,7 @@ export function AddressPage({ value, onChange, pages, disabled, color, fontSizeC
                                 onChange?.({ ...current, [page.key]: e.target.value })
                             }
                             className={cn(
-                                "h-9 w-full rounded-none border-0 border-b bg-transparent px-0 text-base outline-none transition-colors duration-300 focus-visible:outline-none focus-visible:ring-0",
+                                "h-9 w-full rounded-none border-0 border-b focus:border-b-2 bg-transparent px-0 text-base outline-none transition-colors duration-300 focus-visible:outline-none focus-visible:ring-0",
                                 !color && "border-gray-500 focus:border-gray-200",
                                 fontSizeClass,
                             )}

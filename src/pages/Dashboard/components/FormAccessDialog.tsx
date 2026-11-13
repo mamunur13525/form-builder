@@ -52,7 +52,7 @@ export function FormAccessDialog({
         <Dialog
             open={open}
             onOpenChange={onOpenChange}
-            className="editorial max-w-lg rounded-lg border-[var(--border)] bg-[var(--card)] p-8"
+            className="editorial editorial-flat max-w-lg rounded-lg border-[var(--border)] bg-[var(--card)] p-8"
         >
             <DialogHeader>
                 <div className="flex items-center gap-2 text-sm text-[var(--editorial-subtle)]">

@@ -19,6 +19,7 @@ import {
     SlidersHorizontal,
     PenLine,
     Grid3x3,
+    Contact,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -41,6 +42,7 @@ export const PAGE_TYPES = [
     "url",
     "statement",
     "address",
+    "contactInfo",
     "opinionScale",
     "signature",
     "matrix",
@@ -67,6 +69,7 @@ export const PAGE_TYPE_LABELS: Record<PageType, string> = {
     url: "URL",
     statement: "Statement",
     address: "Address",
+    contactInfo: "Contact Info",
     opinionScale: "Opinion Scale",
     signature: "Signature",
     matrix: "Matrix",
@@ -98,6 +101,7 @@ export const PAGE_TYPE_VISUALS: Record<PageType, TypeVisual> = {
     yesNo: { icon: ThumbsUp, bgColor: "bg-[#22c55e]" },
     statement: { icon: MessageSquareText, bgColor: "bg-[#d946ef]" },
     address: { icon: MapPin, bgColor: "bg-[#84cc16]" },
+    contactInfo: { icon: Contact, bgColor: "bg-[#0284c7]", displayName: "Contact Info" },
     signature: { icon: PenLine, bgColor: "bg-[#78716c]" },
     matrix: { icon: Grid3x3, bgColor: "bg-[#3b82f6]" },
 }
@@ -121,6 +125,7 @@ export const PAGE_TYPE_ICONS: Record<PageType, LucideIcon> = {
     url: Link,
     statement: MessageSquareText,
     address: MapPin,
+    contactInfo: Contact,
     opinionScale: SlidersHorizontal,
     signature: PenLine,
     matrix: Grid3x3,
@@ -145,6 +150,7 @@ export const PAGE_TYPE_COLORS: Record<PageType, string> = {
     url: "from-slate-500/5 to-slate-600/10 border border-slate-300 text-slate-600 dark:text-slate-400",
     statement: "from-fuchsia-500/5 to-fuchsia-600/10 border border-fuchsia-300 text-fuchsia-600 dark:text-fuchsia-400",
     address: "from-lime-500/5 to-lime-600/10 border border-lime-300 text-lime-600 dark:text-lime-400",
+    contactInfo: "from-sky-500/5 to-sky-600/10 border border-sky-300 text-sky-600 dark:text-sky-400",
     opinionScale: "from-red-500/5 to-red-600/10 border border-red-300 text-red-600 dark:text-red-400",
     signature: "from-stone-500/5 to-stone-600/10 border border-stone-300 text-stone-600 dark:text-stone-400",
     matrix: "from-blue-500/5 to-blue-600/10 border border-blue-300 text-blue-600 dark:text-blue-400",

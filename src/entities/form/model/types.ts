@@ -250,6 +250,7 @@ export type PageType =
     | "url"
     | "statement"
     | "address"
+    | "contactInfo"
     | "opinionScale"
     | "signature"
     | "matrix"
@@ -300,7 +301,23 @@ export interface PageAddressSettings {
         required: boolean
         hidden: boolean
         order: number
+        width?: "50%" | "100%"
     }>
+    fieldsPerRow?: { desktop: number; mobile: number }
+}
+
+export interface PageContactInfoSettings {
+    pages: Array<{
+        key: "firstName" | "lastName" | "email" | "phone" | "company"
+        label: string
+        placeholder: string
+        required: boolean
+        hidden: boolean
+        order: number
+        width?: "50%" | "100%"
+    }>
+    phone?: PagePhoneSettings
+    fieldsPerRow?: { desktop: number; mobile: number }
 }
 
 export interface PageRatingSettings {
@@ -333,6 +350,7 @@ export interface PageSettings {
     statement?: PageStatementSettings
     choice?: PageChoiceSettings
     address?: PageAddressSettings
+    contactInfo?: PageContactInfoSettings
     rating?: PageRatingSettings
     opinionScale?: PageOpinionScaleSettings
     upload?: PageUploadSettings

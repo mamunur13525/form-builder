@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import type { KeyboardEvent } from "react";
 import { AlertTriangle } from "lucide-react";
 import type { FormPage } from "../types/common";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ interface FormPageContentProps {
   error: string | null;
   isSubmitting: boolean;
   isLastStep: boolean;
+  isMobileView?: boolean;
   onAnswer: (key: string, val: unknown) => void;
   onNext: () => void;
 }
@@ -37,6 +39,7 @@ export function FormPageContent({
   error,
   isSubmitting,
   isLastStep,
+  isMobileView,
   onAnswer,
   onNext,
 }: FormPageContentProps) {
@@ -88,8 +91,18 @@ export function FormPageContent({
     : [];
   const hasQuestionError = questionErrors.some(Boolean);
 
+  // Enter submits the page from any text field (Shift+Enter still adds a
+  // newline in a textarea), matching a native form's behavior.
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) return;
+    const tag = (event.target as HTMLElement).tagName;
+    if (tag !== "INPUT" && tag !== "TEXTAREA") return;
+    event.preventDefault();
+    if (!isSubmitting) onNext();
+  };
+
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6" onKeyDown={handleKeyDown}>
       {/* Page Title & Description (when present / non-empty) */}
       {(page.title || page.label || page.description || page.helperText) ? (
         <div>
@@ -170,6 +183,7 @@ export function FormPageContent({
                   }}
                   color={themeResolved.answerColor}
                   fontSizeClass={fontSizes.input}
+                  isMobileView={isMobileView}
                 />
               </div>
 

@@ -1,8 +1,9 @@
+import { useLayoutEffect, useRef } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 const inputBaseClasses =
-    "text-2xl rounded-lg h-32 border outline-0 ring-0 focus:outline-0 focus:ring-0 focus-visible:outline-0 focus-visible:ring-0 focus-within:ring-0 focus-within:outline-0 bg-white/10"
+    "text-2xl rounded-lg min-h-32 max-h-[384px] resize-none border outline-0 ring-0 focus:outline-0 focus:ring-0 focus-visible:outline-0 focus-visible:ring-0 focus-within:ring-0 focus-within:outline-0 bg-white/10"
 
 interface TextareaPageProps {
     value: string
@@ -29,9 +30,19 @@ export function TextareaPage({
 }: TextareaPageProps) {
     const isError = !!error
     const errorClasses = isError ? "border-destructive!" : ""
+    const ref = useRef<HTMLTextAreaElement>(null)
+
+    // Grow with the answer, capped by max-h-[544px]; taller content scrolls inside.
+    useLayoutEffect(() => {
+        const el = ref.current
+        if (!el) return
+        el.style.height = "auto"
+        el.style.height = `${el.scrollHeight + el.offsetHeight - el.clientHeight}px`
+    }, [value, fontSizeClass, rows])
 
     return (
         <Textarea
+            ref={ref}
             value={value}
             onChange={(e) => onChange?.(e.target.value)}
             placeholder={placeholder}

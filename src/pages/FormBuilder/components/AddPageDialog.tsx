@@ -28,7 +28,7 @@ interface BlockCategory {
 /** Groupings shown in the picker. A type may appear in more than one group. */
 const CATEGORIES: BlockCategory[] = [
     { title: "Popular", types: ["shortText", "email", "radio", "longText"] },
-    { title: "Contact", types: ["email", "phone", "address", "url"] },
+    { title: "Contact", types: ["email", "phone", "address", "contactInfo", "url"] },
     { title: "Text & Numbers", types: ["shortText", "longText", "number", "date", "time"] },
     { title: "Choice", types: ["radio", "multiSelect", "dropdown", "select", "checkbox", "matrix", "yesNo"] },
     { title: "Layout", types: ["statement"] },
@@ -63,6 +63,7 @@ const BLOCK_DESCRIPTIONS: Record<PageType, string> = {
     url: "Website address",
     statement: "Text, image or embed",
     address: "Postal address fields",
+    contactInfo: "Contact information fields",
     opinionScale: "Scale from low to high",
     signature: "Draw a signature",
     matrix: "Grid of questions",

@@ -121,7 +121,7 @@ function PageContentEditorComponent({
   const isStatementWithoutEmbed = isStatement && !hasMultipleQuestions && !hasEmbed;
 
   const content = (
-    <div className={cn("w-full", isStatementWithoutEmbed ? "space-y-4" : "space-y-6")}>
+    <div className={cn("group/pagecontent w-full", isStatementWithoutEmbed ? "space-y-4" : "space-y-6")}>
       {/* 1. Page Title and Description with page number on top-left aligned with question handles */}
       <PageHeaderEditor
         pageIndex={pageIndex}
@@ -135,76 +135,80 @@ function PageContentEditorComponent({
         onDescriptionChange={handlePageDescriptionChange}
       />
 
-      {/* 2. Top-most Add Question button (above first question) - hidden until hovered */}
-      {!isStatement && (
-        <div className="group/topbtn relative w-full z-20">
-          <AddQuestionButton
-            onAddQuestion={(type) => insertQuestion(0, type)}
-            className="opacity-0 group-hover/topbtn:opacity-100 hover:!opacity-100 transition-opacity"
-          />
-        </div>
-      )}
-
-      {/* Questions List via react-movable for 6-dot drag-and-drop reordering */}
-      <List
-        values={questions}
-        onChange={({ oldIndex, newIndex }) => moveQuestion(oldIndex, newIndex)}
-        transitionDuration={150}
-        lockVertically
-        renderList={({ children, props }) => (
-          <div {...props} className={cn("w-full", isStatementWithoutEmbed ? "" : "space-y-2")}>
-            {children}
+      {/* 2. Questions Section */}
+      <div className="relative w-full">
+        {/* Top-most Add Question button (above first question) - hidden until hovered */}
+        {!isStatement && (
+          <div className="absolute -top-3 inset-x-0 z-20 -my-2 h-4 flex items-center opacity-0 transition-opacity group-hover/pagecontent:opacity-100 focus-within:opacity-100 hover:opacity-100">
+            <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-slate-200/90 dark:bg-zinc-800" />
+            <AddQuestionButton
+              onAddQuestion={(type) => insertQuestion(0, type)}
+              className="!absolute !w-auto left-[-42px] top-1/2 -translate-y-1/2"
+            />
           </div>
         )}
-        renderItem={({ value: question, index: qIdx = 0, props, isDragged }) => {
-          const { key, ...itemProps } = props;
-          const questionId = question.questionKey || question.blockKey;
-          const isThisQuestionSelected = !hasSelectedQuestion || questionId === selectedQuestionId;
 
-          return (
-            <div
-              key={key}
-              className={cn(
-                "group/question relative w-full",
-                isStatementWithoutEmbed && "h-4 -my-1 flex items-center justify-center"
-              )}
-            >
-              <PageQuestionItem
-                question={question}
-                questionIndex={qIdx}
-                page={page}
-                pageIndex={pageIndex}
-                isMobileView={isMobileView}
-                theme={themeResolved}
-                fontSizes={fontSizes}
-                variables={variables}
-                hasMultipleQuestions={hasMultipleQuestions}
-                hasSelectedQuestion={hasSelectedQuestion}
-                isThisQuestionSelected={isThisQuestionSelected}
-                selectedQuestionId={selectedQuestionId}
-                onSelectQuestion={onSelectQuestion}
-                onUpdateQuestion={updateQuestion}
-                onDeleteQuestion={deleteQuestion}
-                onDuplicateQuestion={duplicateQuestion}
-                movableProps={itemProps}
-                isDragged={isDragged}
-              />
-              {/* Add Question bar sits outside the question's own card/selection area,
-                  revealed by hovering the question row. */}
-              <AddQuestionButton
-                onAddQuestion={(type) => insertQuestion(qIdx + 1, type)}
-                className={cn(
-                  "opacity-0 group-hover/question:opacity-100 hover:!opacity-100 transition-opacity",
-                  isDragged ? "invisible" : ""
-                )}
-              />
+        {/* Questions List via react-movable for 6-dot drag-and-drop reordering */}
+        <List
+          values={questions}
+          onChange={({ oldIndex, newIndex }) => moveQuestion(oldIndex, newIndex)}
+          transitionDuration={150}
+          lockVertically
+          renderList={({ children, props }) => (
+            <div {...props} className={cn("w-full", isStatementWithoutEmbed ? "" : "space-y-8")}>
+              {children}
             </div>
-          );
-        }}
-      />
+          )}
+          renderItem={({ value: question, index: qIdx = 0, props, isDragged }) => {
+            const { key, ...itemProps } = props;
+            const questionId = question.questionKey || question.blockKey;
+            const isThisQuestionSelected = !hasSelectedQuestion || questionId === selectedQuestionId;
+
+            return (
+              <div
+                key={key}
+                className={cn(
+                  "group/question relative w-full",
+                  isStatementWithoutEmbed && "h-4 -my-1 flex items-center justify-center"
+                )}
+              >
+                <PageQuestionItem
+                  question={question}
+                  questionIndex={qIdx}
+                  page={page}
+                  pageIndex={pageIndex}
+                  isMobileView={isMobileView}
+                  theme={themeResolved}
+                  fontSizes={fontSizes}
+                  variables={variables}
+                  hasMultipleQuestions={hasMultipleQuestions}
+                  hasSelectedQuestion={hasSelectedQuestion}
+                  isThisQuestionSelected={isThisQuestionSelected}
+                  selectedQuestionId={selectedQuestionId}
+                  onSelectQuestion={onSelectQuestion}
+                  onUpdateQuestion={updateQuestion}
+                  onDeleteQuestion={deleteQuestion}
+                  onDuplicateQuestion={duplicateQuestion}
+                  movableProps={itemProps}
+                  isDragged={isDragged}
+                />
+                {/* Full-width hover line + add button in the page margin */}
+                <div className="pointer-events-none absolute inset-x-0 -bottom-4 h-px bg-slate-200/90 opacity-0 transition-opacity group-hover/question:opacity-100 dark:bg-zinc-800" />
+                <AddQuestionButton
+                  onAddQuestion={(type) => insertQuestion(qIdx + 1, type)}
+                  className={cn(
+                    "!absolute !w-auto left-[-42px] -bottom-4 -translate-y-1/2 z-20 opacity-0 group-hover/question:opacity-100 hover:!opacity-100 focus-within:opacity-100 transition-opacity",
+                    isDragged ? "invisible" : ""
+                  )}
+                />
+              </div>
+            );
+          }}
+        />
+      </div>
 
       {/* Page Submit Button */}
-      <div className={cn(isStatementWithoutEmbed ? "pt-0" : "pt-4")}>
+      <div className={cn(isStatementWithoutEmbed ? "pt-0" : "pt-2")}>
         <PageSubmitButton
           text={
             page.appearance?.submitButtonText ||

@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { getDropdownItemStyle, getDropdownMenuStyle } from "@/shared/utils/theme"
 
 /** Shared by the fill view and the builder preview so both look the same. */
 export const dropdownTriggerClasses =
@@ -17,7 +18,6 @@ interface SelectPageProps {
     fontSizeClass?: string
 }
 
-/** Boxed dropdown with its options in a menu below, in the fill view. */
 export function SelectPage({
     value,
     onChange,
@@ -132,6 +132,7 @@ export function SelectPage({
                     id={listId}
                     role="listbox"
                     aria-label={placeholder}
+                    style={getDropdownMenuStyle(color)}
                     className="absolute left-0 right-0 top-full z-30 mt-1 max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
                 >
                     {options.map((option, index) => {
@@ -149,12 +150,15 @@ export function SelectPage({
                                 onMouseMove={() => {
                                     if (!isActive) setActiveIndex(index)
                                 }}
+                                style={getDropdownItemStyle(color, isActive)}
                                 className={cn(
                                     "flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm transition-colors",
-                                    isActive && "bg-slate-100 dark:bg-zinc-800",
-                                    isSelected
-                                        ? "font-medium text-slate-900 dark:text-white"
-                                        : "text-slate-700 dark:text-zinc-200",
+                                    isActive && !color && "bg-slate-100 dark:bg-zinc-800",
+                                    isSelected && "font-medium",
+                                    !color &&
+                                        (isSelected
+                                            ? "text-slate-900 dark:text-white"
+                                            : "text-slate-700 dark:text-zinc-200"),
                                 )}
                             >
                                 <span className="truncate">{option.label || option.value}</span>

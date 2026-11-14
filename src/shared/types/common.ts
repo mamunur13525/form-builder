@@ -189,6 +189,7 @@ export type PageType =
     | "url"
     | "statement"
     | "address"
+    | "contactInfo"
     | "opinionScale"
     | "signature"
     | "matrix"
@@ -275,6 +276,13 @@ export interface ChoiceSettings {
     selectionLimit?: SelectionLimit
 }
 
+export type FieldWidth = "50%" | "100%"
+
+export interface FieldsPerRow {
+    desktop: number
+    mobile: number
+}
+
 export interface AddressPageSetting {
     key: "address1" | "address2" | "city" | "state" | "zip" | "country"
     label: string
@@ -282,10 +290,35 @@ export interface AddressPageSetting {
     required: boolean
     hidden: boolean
     order: number
+    width?: FieldWidth
 }
 
 export interface AddressSettings {
     pages: AddressPageSetting[]
+    fieldsPerRow?: FieldsPerRow
+}
+
+export type ContactInfoSubPageKey =
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "phone"
+    | "company"
+
+export interface ContactInfoPageSetting {
+    key: ContactInfoSubPageKey
+    label: string
+    placeholder: string
+    required: boolean
+    hidden: boolean
+    order: number
+    width?: FieldWidth
+}
+
+export interface ContactInfoSettings {
+    pages: ContactInfoPageSetting[]
+    phone?: PhoneSettings
+    fieldsPerRow?: FieldsPerRow
 }
 
 export type RatingStyle = "star" | "number"
@@ -332,6 +365,7 @@ export interface PageSettings {
     statement?: StatementSettings
     choice?: ChoiceSettings
     address?: AddressSettings
+    contactInfo?: ContactInfoSettings
     rating?: RatingSettings
     opinionScale?: OpinionScaleSettings
     upload?: UploadSettings

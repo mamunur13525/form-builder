@@ -22,6 +22,7 @@ import {
   StatementEditor,
   DropdownEditor,
   AddressEditor,
+  ContactInfoEditor,
   OpinionScaleEditor,
   SignatureEditor,
   MatrixEditor,
@@ -58,6 +59,7 @@ const editorMap: Record<
   statement: StatementEditor,
   dropdown: DropdownEditor,
   address: AddressEditor,
+  contactInfo: ContactInfoEditor,
   opinionScale: OpinionScaleEditor,
   signature: SignatureEditor,
   matrix: MatrixEditor,
@@ -177,29 +179,29 @@ export function PageQuestionItem({
       className={cn(
         "group/question relative w-full rounded-xl pr-2",
         isDragged
-          ? "opacity-75 bg-slate-50/80 dark:bg-zinc-800/80 shadow-lg ring-1 ring-[#FF5722]/30"
+          ? "opacity-75 bg-slate-50/80 dark:bg-zinc-800/80 shadow-lg"
           : !hasSelectedQuestion
             ? "opacity-100"
             : isThisQuestionSelected
-              ? "opacity-100 ring-2 ring-[#FF5722]/25 rounded-xl bg-white/5 dark:bg-zinc-900/5 shadow-xs"
+              ? "opacity-100 bg-white/5 dark:bg-zinc-900/5 shadow-xs"
               : "opacity-35 hover:opacity-75 cursor-pointer"
       )}
     >
       {/* Question Main Content: clean design, no card border, no type icon */}
-      <div className="relative w-full py-2">
-        {hasMultipleQuestions ? (
-          <div className="flex items-start gap-2.5">
-            {/* 6-dot drag handle for reordering */}
-            <span
-              data-movable-handle
-              aria-hidden="true"
-              tabIndex={-1}
-              title="Drag to reorder question"
-              className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded text-slate-300 dark:text-zinc-600 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 touch-none select-none cursor-grab active:cursor-grabbing transition-colors"
-            >
-              <GripVertical className="h-4 w-4" />
-            </span>
+      <div className="relative w-full">
+        {/* 6-dot drag handle for reordering - positioned absolute to the left in the gutter */}
+        <span
+          data-movable-handle
+          aria-hidden="true"
+          tabIndex={-1}
+          title="Drag to reorder question"
+          className="absolute right-[calc(100%+8px)] top-1 flex h-6 w-6 shrink-0 items-center justify-center rounded text-slate-300 dark:text-zinc-600 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 touch-none select-none cursor-grab active:cursor-grabbing transition-colors"
+        >
+          <GripVertical className="h-4 w-4" />
+        </span>
 
+        {hasMultipleQuestions ? (
+          <div className="relative flex items-start">
             {/* Question Title (only when page has multiple questions) */}
             <div className="flex-1 min-w-0">
               <VariableEditable
@@ -216,8 +218,8 @@ export function PageQuestionItem({
               />
             </div>
 
-            {/* Question Actions: Duplicate & Delete (revealed on question hover) */}
-            <div className="flex items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity">
+            {/* Question Actions: floated in the page margin so they never cover the answer */}
+            <div className="absolute -right-6 top-1 z-10 flex flex-col items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity">
               <button
                 type="button"
                 onClick={(e) => {
@@ -243,8 +245,8 @@ export function PageQuestionItem({
             </div>
           </div>
         ) : (
-          /* Single question: allow duplicate on hover */
-          <div className="absolute top-2 right-2 flex items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity z-10">
+          /* Single question: duplicate floats in the page margin */
+          <div className="absolute -right-6 top-1 flex flex-col items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity z-10">
             <button
               type="button"
               onClick={(e) => {
@@ -260,7 +262,7 @@ export function PageQuestionItem({
         )}
 
         {/* Question Editor Input */}
-        <div className={cn("w-full pl-[34px]", hasMultipleQuestions ? "mt-4" : "mt-1")} style={{ color: theme.answerColor }}>
+        <div className={cn("w-full", hasMultipleQuestions ? "mt-3" : "")} style={{ color: theme.answerColor }}>
           {QuestionEditor ? (
             <QuestionEditor
               page={questionAsPage}

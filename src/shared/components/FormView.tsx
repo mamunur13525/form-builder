@@ -31,10 +31,11 @@ const slideVariants = {
 interface FormViewProps {
   form: Form;
   mode: "preview" | "published";
+  isMobileView?: boolean;
   onSubmit?: (answers: Record<string, unknown>) => void;
 }
 
-export function FormView({ form, mode, onSubmit }: FormViewProps) {
+export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) {
   const {
     currentStep,
     direction,
@@ -122,6 +123,7 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
       error={error}
       isSubmitting={isSubmitting}
       isLastStep={isLastStep}
+      isMobileView={isMobileView}
       onAnswer={(key, val) => handleAnswer(key, val)}
       onNext={handleNext}
     />
@@ -154,8 +156,10 @@ export function FormView({ form, mode, onSubmit }: FormViewProps) {
   }
 
   return (
+    // `light` keeps token-based controls (selects, popovers) on the form's
+    // light surface even when the app itself is in dark mode.
     <div
-      className="relative flex flex-col h-full w-full overflow-hidden"
+      className="light relative flex flex-col h-full w-full overflow-hidden"
       style={containerStyle}
     >
       {/* Background Image Layer */}

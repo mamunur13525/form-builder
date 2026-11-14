@@ -39,9 +39,6 @@ export function AddQuestionButton({ onAddQuestion, className }: AddQuestionButto
         className
       )}
     >
-      {/* Subtle guide line on hover */}
-      <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 h-px bg-transparent group-hover/add:bg-slate-200/90 dark:group-hover/add:zinc-800/90 transition-colors pointer-events-none" />
-
       <Combobox<PageType>
         items={PAGE_TYPES}
         autoHighlight

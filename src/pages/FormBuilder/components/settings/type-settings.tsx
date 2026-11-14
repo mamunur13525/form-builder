@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type {
     AddressSettings as AddressSettingsType,
+    ContactInfoSettings as ContactInfoSettingsType,
+    FieldsPerRow,
     MatrixSettings as MatrixSettingsType,
     OpinionScaleSettings as OpinionScaleSettingsType,
     StatementSettings as StatementSettingsType,
@@ -10,8 +12,11 @@ import type {
 } from "@/shared/types/common"
 import { STATEMENT_PROVIDERS, UPLOAD_FILE_GROUPS } from "@/features/forms/model/page-defaults"
 import { DEFAULT_ADDRESS_PLACEHOLDERS } from "@/shared/constants/address"
+import { DEFAULT_CONTACT_INFO_PLACEHOLDERS } from "@/shared/constants/contact-info"
 import { ToggleRow, NumberSetting, TextSetting, CONTROL_CLASS } from "./primitives"
+import { PhoneSettingsWidget } from "./phone-settings"
 import { Switch } from "@/components/ui/switch"
+import { cn } from "@/lib/utils"
 import { Eye, EyeOff, Plus, X, Shield, Link2, Type, FileText, Image as ImageIcon, Globe } from "lucide-react"
 
 // Provider brand badges
@@ -275,6 +280,86 @@ export function UploadSettingsWidget({
 // Address
 // ---------------------------------------------------------------------------
 
+export function FieldsPerRowSetting({
+    value = { desktop: 2, mobile: 1 },
+    onChange,
+}: {
+    value?: FieldsPerRow
+    onChange: (value: FieldsPerRow) => void
+}) {
+    const desktop = value?.desktop === 1 ? 1 : 2
+    const mobile = value?.mobile === 2 ? 2 : 1
+
+    return (
+        <div className="space-y-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/50 p-3">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                Fields per row
+            </Label>
+            <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                    <Label className="text-xs text-slate-600 dark:text-zinc-400">Desktop</Label>
+                    <div className="flex rounded-md border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] p-0.5">
+                        <button
+                            type="button"
+                            onClick={() => onChange({ desktop: 1, mobile })}
+                            className={cn(
+                                "flex-1 py-1 rounded text-xs font-medium transition-all cursor-pointer text-center",
+                                desktop === 1
+                                    ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-xs"
+                                    : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
+                            )}
+                        >
+                            1
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onChange({ desktop: 2, mobile })}
+                            className={cn(
+                                "flex-1 py-1 rounded text-xs font-medium transition-all cursor-pointer text-center",
+                                desktop === 2
+                                    ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-xs"
+                                    : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
+                            )}
+                        >
+                            2
+                        </button>
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    <Label className="text-xs text-slate-600 dark:text-zinc-400">Mobile</Label>
+                    <div className="flex rounded-md border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] p-0.5">
+                        <button
+                            type="button"
+                            onClick={() => onChange({ desktop, mobile: 1 })}
+                            className={cn(
+                                "flex-1 py-1 rounded text-xs font-medium transition-all cursor-pointer text-center",
+                                mobile === 1
+                                    ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-xs"
+                                    : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
+                            )}
+                        >
+                            1
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onChange({ desktop, mobile: 2 })}
+                            className={cn(
+                                "flex-1 py-1 rounded text-xs font-medium transition-all cursor-pointer text-center",
+                                mobile === 2
+                                    ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-xs"
+                                    : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
+                            )}
+                        >
+                            2
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export function AddressSettingsWidget({
     settings,
     onChange,
@@ -296,8 +381,13 @@ export function AddressSettingsWidget({
 
     return (
         <div className="space-y-3">
+            <FieldsPerRowSetting
+                value={settings.fieldsPerRow}
+                onChange={(fieldsPerRow) => onChange({ ...settings, fieldsPerRow })}
+            />
+
             <p className="text-xs leading-5 text-slate-500 dark:text-zinc-400">
-                Rename labels, set placeholders, and choose which parts are required or hidden.
+                Rename labels, set placeholders, and choose which parts are required, full/half width, or hidden.
             </p>
             {sorted.map((page) => (
                 <div
@@ -337,6 +427,39 @@ export function AddressSettingsWidget({
                                 aria-label={`${page.label} placeholder`}
                                 placeholder={DEFAULT_ADDRESS_PLACEHOLDERS[page.key]}
                             />
+
+                            <div className="flex items-center justify-between gap-3">
+                                <Label className="cursor-pointer text-xs text-slate-600 dark:text-zinc-400">
+                                    Width
+                                </Label>
+                                <div className="flex rounded-md border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] p-0.5 text-xs">
+                                    <button
+                                        type="button"
+                                        onClick={() => updatePage(page.key, { width: "50%" })}
+                                        className={cn(
+                                            "px-2.5 py-1 rounded font-medium transition-all cursor-pointer",
+                                            (page.width ?? (page.key === "zip" || page.key === "country" ? "100%" : "50%")) === "50%"
+                                                ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-xs"
+                                                : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
+                                        )}
+                                    >
+                                        50%
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => updatePage(page.key, { width: "100%" })}
+                                        className={cn(
+                                            "px-2.5 py-1 rounded font-medium transition-all cursor-pointer",
+                                            (page.width ?? (page.key === "zip" || page.key === "country" ? "100%" : "50%")) === "100%"
+                                                ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-xs"
+                                                : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
+                                        )}
+                                    >
+                                        100%
+                                    </button>
+                                </div>
+                            </div>
+
                             <div className="flex items-center justify-between gap-3">
                                 <Label
                                     htmlFor={`address-required-${page.key}`}
@@ -352,6 +475,153 @@ export function AddressSettingsWidget({
                                     }
                                 />
                             </div>
+                        </>
+                    )}
+                </div>
+            ))}
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Contact Info
+// ---------------------------------------------------------------------------
+
+export function ContactInfoSettingsWidget({
+    settings,
+    onChange,
+}: {
+    settings: ContactInfoSettingsType
+    onChange: (next: ContactInfoSettingsType) => void
+}) {
+    const updatePage = (
+        key: string,
+        patch: Partial<ContactInfoSettingsType["pages"][number]>,
+    ) => {
+        onChange({
+            ...settings,
+            pages: settings.pages.map((f) => (f.key === key ? { ...f, ...patch } : f)),
+        })
+    }
+
+    const sorted = [...settings.pages].sort((a, b) => a.order - b.order)
+
+    return (
+        <div className="space-y-3">
+            <FieldsPerRowSetting
+                value={settings.fieldsPerRow}
+                onChange={(fieldsPerRow) => onChange({ ...settings, fieldsPerRow })}
+            />
+
+            <p className="text-xs leading-5 text-slate-500 dark:text-zinc-400">
+                Rename labels, set placeholders, and choose which parts are required, full/half width, or hidden.
+            </p>
+            {sorted.map((page) => (
+                <div
+                    key={page.key}
+                    className="space-y-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/50 p-3 data-[hidden=true]:opacity-60"
+                    data-hidden={page.hidden}
+                >
+                    <div className="flex items-center gap-2">
+                        <Input
+                            value={page.label}
+                            onChange={(e) => updatePage(page.key, { label: e.target.value })}
+                            className={CONTROL_CLASS + " flex-1 px-3 font-medium"}
+                            placeholder="Label"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => updatePage(page.key, { hidden: !page.hidden })}
+                            title={page.hidden ? "Show field" : "Hide field"}
+                            className="rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] p-2 text-slate-500 dark:text-zinc-400 hover:border-slate-300 dark:hover:border-zinc-700 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                        >
+                            {page.hidden ? (
+                                <EyeOff className="h-3.5 w-3.5" />
+                            ) : (
+                                <Eye className="h-3.5 w-3.5" />
+                            )}
+                        </button>
+                    </div>
+
+                    {!page.hidden && (
+                        <>
+                            <Input
+                                value={page.placeholder}
+                                onChange={(e) =>
+                                    updatePage(page.key, { placeholder: e.target.value })
+                                }
+                                className={CONTROL_CLASS + " px-3 placeholder:opacity-60"}
+                                aria-label={`${page.label} placeholder`}
+                                placeholder={DEFAULT_CONTACT_INFO_PLACEHOLDERS[page.key]}
+                            />
+
+                            <div className="flex items-center justify-between gap-3">
+                                <Label className="cursor-pointer text-xs text-slate-600 dark:text-zinc-400">
+                                    Width
+                                </Label>
+                                <div className="flex rounded-md border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] p-0.5 text-xs">
+                                    <button
+                                        type="button"
+                                        onClick={() => updatePage(page.key, { width: "50%" })}
+                                        className={cn(
+                                            "px-2.5 py-1 rounded font-medium transition-all cursor-pointer",
+                                            (page.width ?? (page.key === "company" ? "100%" : "50%")) === "50%"
+                                                ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-xs"
+                                                : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
+                                        )}
+                                    >
+                                        50%
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => updatePage(page.key, { width: "100%" })}
+                                        className={cn(
+                                            "px-2.5 py-1 rounded font-medium transition-all cursor-pointer",
+                                            (page.width ?? (page.key === "company" ? "100%" : "50%")) === "100%"
+                                                ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-xs"
+                                                : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white",
+                                        )}
+                                    >
+                                        100%
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-3">
+                                <Label
+                                    htmlFor={`contact-info-required-${page.key}`}
+                                    className="cursor-pointer text-xs text-slate-600 dark:text-zinc-400"
+                                >
+                                    Required
+                                </Label>
+                                <Switch
+                                    id={`contact-info-required-${page.key}`}
+                                    checked={page.required}
+                                    onCheckedChange={(required) =>
+                                        updatePage(page.key, { required })
+                                    }
+                                />
+                            </div>
+
+                            {page.key === "phone" && (
+                                <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-zinc-800">
+                                    <PhoneSettingsWidget
+                                        settings={
+                                            settings.phone ?? {
+                                                phoneVerification: false,
+                                                countryCodeMode: "auto",
+                                                defaultCountry: null,
+                                            }
+                                        }
+                                        onChange={(phone) =>
+                                            onChange({
+                                                ...settings,
+                                                phone,
+                                            })
+                                        }
+                                    />
+                                </div>
+                            )}
                         </>
                     )}
                 </div>

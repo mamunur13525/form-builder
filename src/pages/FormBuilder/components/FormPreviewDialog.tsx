@@ -217,7 +217,14 @@ export function FormPreviewDialog({
                 isFullscreen ? "rounded-none border-0" : "rounded-lg border border-slate-200 dark:border-zinc-800 shadow-xl",
               )}
             >
-              {form && <FormView key={`${formKey}-${restartCount}`} form={form} mode="preview" />}
+              {form && (
+                <FormView
+                  key={`${formKey}-${restartCount}`}
+                  form={form}
+                  mode="preview"
+                  isMobileView={isMobileView}
+                />
+              )}
             </motion.div>
           </motion.div>
         </motion.div>

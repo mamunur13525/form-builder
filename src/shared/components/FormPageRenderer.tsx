@@ -10,6 +10,7 @@ import {
     SignaturePage,
     StatementPage,
     AddressPage,
+    ContactInfoPage,
     OpinionScalePage,
     MatrixPage,
     StarRatingPage,
@@ -23,6 +24,7 @@ interface FormPageRendererProps {
     value: unknown
     error: string | null
     onAnswer: (pageKey: string, value: unknown) => void
+    isMobileView?: boolean
     color?: string
     fontSizeClass?: string
 }
@@ -36,7 +38,15 @@ const CHOICE_FALLBACK = {
     hideLabels: false,
 }
 
-export function FormPageRenderer({ page, value, error, onAnswer, color, fontSizeClass }: FormPageRendererProps) {
+export function FormPageRenderer({
+    page,
+    value,
+    error,
+    onAnswer,
+    isMobileView,
+    color,
+    fontSizeClass,
+}: FormPageRendererProps) {
     const settings = page.settings ?? {}
 
     switch (page.type) {
@@ -164,6 +174,7 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                     settings={settings.choice ?? CHOICE_FALLBACK}
                     multiple={false}
                     name={page.pageKey}
+                    isMobileView={isMobileView}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />
@@ -183,6 +194,7 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                     }
                     multiple
                     name={page.pageKey}
+                    isMobileView={isMobileView}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />
@@ -227,6 +239,28 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                     value={value as Record<string, string> | undefined}
                     onChange={(v) => onAnswer(page.pageKey, v)}
                     pages={settings.address?.pages ?? []}
+                    fieldsPerRow={settings.address?.fieldsPerRow}
+                    isMobileView={isMobileView}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
+                />
+            )
+        case "contactInfo":
+            return (
+                <ContactInfoPage
+                    value={value as Record<string, string> | undefined}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    pages={settings.contactInfo?.pages ?? []}
+                    phoneSettings={
+                        settings.contactInfo?.phone ??
+                        settings.phone ?? {
+                            phoneVerification: false,
+                            countryCodeMode: "auto",
+                            defaultCountry: null,
+                        }
+                    }
+                    fieldsPerRow={settings.contactInfo?.fieldsPerRow}
+                    isMobileView={isMobileView}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />

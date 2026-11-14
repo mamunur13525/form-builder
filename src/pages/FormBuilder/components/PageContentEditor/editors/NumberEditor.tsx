@@ -15,7 +15,7 @@ export function NumberEditor({ page, pageIndex, onUpdate, color, fontSizeClass }
             <TextPage
                 value={page.placeholder}
                 onChange={(v) => onUpdate(pageIndex, { placeholder: v })}
-                placeholder="0"
+                placeholder="Enter the Number."
                 color={color}
                 fontSizeClass={fontSizeClass}
             />

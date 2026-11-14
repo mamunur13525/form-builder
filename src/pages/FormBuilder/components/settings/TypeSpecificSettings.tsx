@@ -11,11 +11,13 @@ import { PhoneSettingsWidget } from "./phone-settings"
 import { RatingSettingsWidget } from "./rating-settings"
 import {
     AddressSettingsWidget,
+    ContactInfoSettingsWidget,
     MatrixSettingsWidget,
     OpinionScaleSettingsWidget,
     StatementSettingsWidget,
     UploadSettingsWidget,
 } from "./type-settings"
+import { defaultAddressPages, defaultContactInfoPages } from "@/features/forms/model/page-defaults"
 
 interface TypeSpecificSettingsProps {
     question: FormQuestion
@@ -187,8 +189,41 @@ export function TypeSpecificSettings({
             {question.type === "address" && (
                 <SettingsSection title="Address pages">
                     <AddressSettingsWidget
-                        settings={settings.address ?? { pages: [] }}
+                        settings={
+                            settings.address ?? {
+                                pages: defaultAddressPages(),
+                                fieldsPerRow: { desktop: 2, mobile: 1 },
+                            }
+                        }
                         onChange={(address) => onPatchSettings({ address })}
+                    />
+                </SettingsSection>
+            )}
+
+            {/* ---------------- Contact info ---------------- */}
+            {question.type === "contactInfo" && (
+                <SettingsSection title="Contact info fields">
+                    <ContactInfoSettingsWidget
+                        settings={
+                            settings.contactInfo ?? {
+                                pages: defaultContactInfoPages(),
+                                fieldsPerRow: { desktop: 2, mobile: 1 },
+                                phone: settings.phone ?? {
+                                    phoneVerification: false,
+                                    countryCodeMode: "auto",
+                                    defaultCountry: null,
+                                },
+                            }
+                        }
+                        onChange={(contactInfo) =>
+                            onPatchSettings({
+                                contactInfo,
+                                phone:
+                                    contactInfo.phone ??
+                                    settings.contactInfo?.phone ??
+                                    settings.phone,
+                            })
+                        }
                     />
                 </SettingsSection>
             )}

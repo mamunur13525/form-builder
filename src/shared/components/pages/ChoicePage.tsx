@@ -13,6 +13,7 @@ interface ChoicePageProps {
     settings: ChoiceSettings
     multiple: boolean
     name: string
+    isMobileView?: boolean
     disabled?: boolean
     color?: string
     fontSizeClass?: string
@@ -57,6 +58,7 @@ export function ChoicePage({
     settings,
     multiple,
     name,
+    isMobileView,
     disabled,
     color,
     fontSizeClass,
@@ -147,8 +149,12 @@ export function ChoicePage({
                     !horizontalAlign && "space-y-2",
                     horizontalAlign && [
                         "grid gap-2",
-                        MOBILE_COLS[optionsPerRow.mobile] ?? "grid-cols-1",
-                        DESKTOP_COLS[optionsPerRow.desktop] ?? "md:grid-cols-3",
+                        isMobileView
+                            ? (MOBILE_COLS[optionsPerRow.mobile] ?? "grid-cols-1")
+                            : [
+                                MOBILE_COLS[optionsPerRow.mobile] ?? "grid-cols-1",
+                                DESKTOP_COLS[optionsPerRow.desktop] ?? "md:grid-cols-3",
+                            ],
                     ],
                 )}
             >

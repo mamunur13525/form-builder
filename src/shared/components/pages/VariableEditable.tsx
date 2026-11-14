@@ -59,6 +59,14 @@ export function VariableEditable({
         const focused = document.activeElement === el
 
         if (html === null) {
+            // If the element has no non-whitespace text, ensure it is completely empty
+            // so CSS :empty matches and displays the placeholder.
+            if (!text.trim()) {
+                if (el.childNodes.length > 0) {
+                    el.replaceChildren()
+                }
+                return
+            }
             // No tokens left — strip any stale chips back to plain text.
             if (!el.querySelector("[data-variable-token]")) return
             const offset = focused ? getCaretOffset(el) : null
@@ -150,6 +158,10 @@ export function VariableEditable({
                 }}
                 onKeyDown={handleKeyDown}
                 onBlur={() => {
+                    const el = editableRef.current
+                    if (el && !el.textContent?.trim()) {
+                        el.replaceChildren()
+                    }
                     paintTokens()
                     commit()
                 }}

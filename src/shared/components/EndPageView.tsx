@@ -187,7 +187,7 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
 
     return (
         <div
-            className="relative flex h-full w-full items-center justify-center overflow-hidden"
+            className="light relative flex h-full w-full items-center justify-center overflow-hidden"
             style={containerStyle}
         >
             {themeResolved.backgroundImage?.url && (

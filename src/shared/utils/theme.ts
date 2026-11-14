@@ -42,6 +42,23 @@ export function resolveFormTheme(theme?: IFormTheme | null) {
 /** A theme with every page filled in, as returned by `resolveFormTheme`. */
 export type ResolvedFormTheme = ReturnType<typeof resolveFormTheme>;
 
+/** Dropdown menu border tinted with the form's answer colour. */
+export function getDropdownMenuStyle(color?: string): React.CSSProperties | undefined {
+  return color ? { borderColor: `color-mix(in oklab, ${color} 25%, transparent)` } : undefined;
+}
+
+/** Dropdown option row: answer colour text, tinted highlight when active. */
+export function getDropdownItemStyle(
+  color: string | undefined,
+  active: boolean,
+): React.CSSProperties | undefined {
+  if (!color) return undefined;
+  return {
+    color,
+    backgroundColor: active ? `color-mix(in oklab, ${color} 10%, transparent)` : undefined,
+  };
+}
+
 export function getCornerRadiusClass(radius?: string): string {
   switch (radius) {
     case "none":

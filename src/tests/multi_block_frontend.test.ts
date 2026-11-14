@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import { adaptApiPage } from "../features/forms/model/adapters.ts";
+import { defaultAddressPages, defaultContactInfoPages, defaultSettingsForType } from "../features/forms/model/page-defaults.ts";
 import { validatePage, validateBlock } from "../shared/hooks/useFormValidation.ts";
 import { resolveFormLogic, countRulesForPage } from "../shared/utils/formLogic.ts";
 import { npsGroups, percent, tally } from "../pages/FormResponse/components/summaryMath.ts";
@@ -480,6 +481,103 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   assert.strictEqual(findCountryPhone("GG")?.example, "07123 456789");
   assert.strictEqual(findCountryPhone("AL")?.example, "123 456 7890");
   console.log("✓ Test 12: phone masks format national numbers per country");
+}
+
+// Test 13: contactInfo question type defaults and validation
+{
+  const pages = defaultContactInfoPages();
+  assert.strictEqual(pages.length, 5);
+  assert.deepStrictEqual(
+    pages.map((p) => p.key),
+    ["firstName", "lastName", "email", "phone", "company"]
+  );
+
+  const defaults = defaultSettingsForType("contactInfo");
+  assert.ok(defaults.contactInfo);
+  assert.strictEqual(defaults.contactInfo.pages.length, 5);
+  assert.ok(defaults.contactInfo.phone);
+  assert.strictEqual(defaults.contactInfo.phone.countryCodeMode, "auto");
+  assert.strictEqual(defaults.contactInfo.phone.phoneVerification, false);
+  assert.ok(defaults.phone);
+  assert.strictEqual(defaults.phone.countryCodeMode, "auto");
+
+  assert.deepStrictEqual(defaults.contactInfo.fieldsPerRow, { desktop: 2, mobile: 1 });
+  assert.strictEqual(pages[0].width, "50%");
+  assert.strictEqual(pages[4].width, "100%");
+
+  const contactPage: FormPage = {
+    _id: "p_contact",
+    formId: "f_contact",
+    pageKey: "contact_key",
+    title: "Contact Information",
+    label: "Contact Information",
+    type: "contactInfo",
+    required: false,
+    order: 1,
+    settings: {
+      contactInfo: {
+        fieldsPerRow: { desktop: 2, mobile: 1 },
+        pages: [
+          { key: "firstName", label: "First name", placeholder: "", required: true, hidden: false, order: 1, width: "50%" },
+          { key: "lastName", label: "Last name", placeholder: "", required: true, hidden: false, order: 2, width: "50%" },
+          { key: "email", label: "Email", placeholder: "", required: false, hidden: false, order: 3, width: "50%" },
+          { key: "phone", label: "Phone number", placeholder: "", required: false, hidden: false, order: 4, width: "50%" },
+          { key: "company", label: "Company", placeholder: "", required: false, hidden: false, order: 5, width: "100%" },
+        ],
+      },
+    },
+  };
+
+  // Missing required first name
+  assert.strictEqual(
+    validatePage(contactPage, { contact_key: { lastName: "Doe" } }),
+    "First name is required."
+  );
+
+  // Missing required last name
+  assert.strictEqual(
+    validatePage(contactPage, { contact_key: { firstName: "Jane" } }),
+    "Last name is required."
+  );
+
+  // Invalid email format
+  assert.strictEqual(
+    validatePage(contactPage, { contact_key: { firstName: "Jane", lastName: "Doe", email: "not-an-email" } }),
+    "Please enter a valid email address."
+  );
+
+  // Valid submission
+  assert.strictEqual(
+    validatePage(contactPage, { contact_key: { firstName: "Jane", lastName: "Doe", email: "jane@example.com" } }),
+    null
+  );
+
+  console.log("✓ Test 13: contactInfo question type defaults and validation work properly");
+}
+
+// Test 14: address question type defaults with fieldsPerRow and field widths
+{
+  const addressPages = defaultAddressPages();
+  assert.strictEqual(addressPages.length, 6);
+  assert.strictEqual(addressPages[0].width, "50%");
+  assert.strictEqual(addressPages[4].width, "100%"); // zip
+  assert.strictEqual(addressPages[5].width, "100%"); // country
+
+  const defaults = defaultSettingsForType("address");
+  assert.ok(defaults.address);
+  assert.deepStrictEqual(defaults.address.fieldsPerRow, { desktop: 2, mobile: 1 });
+  console.log("✓ Test 14: address question type defaults and layout configuration work properly");
+}
+
+// Test 15: url answers accept bare hosts without a scheme or www
+{
+  const urlBlock = { type: "url" as const, required: true } as unknown as FormPage;
+  assert.strictEqual(validateBlock(urlBlock, "user.com"), null);
+  assert.strictEqual(validateBlock(urlBlock, "www.user.com/path?x=1"), null);
+  assert.strictEqual(validateBlock(urlBlock, "https://user.com"), null);
+  assert.strictEqual(validateBlock(urlBlock, "not a url"), "Please enter a valid URL.");
+  assert.strictEqual(validateBlock(urlBlock, "asdf"), "Please enter a valid URL.");
+  console.log("✓ Test 15: url answers accept bare host names too");
 }
 
 console.log("--- All Frontend Multi-Block & UI Tests Passed Successfully! ---");

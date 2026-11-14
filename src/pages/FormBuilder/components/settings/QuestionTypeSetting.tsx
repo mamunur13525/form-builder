@@ -41,25 +41,15 @@ export function QuestionTypeSetting({
         }
     }, [comboboxOpen])
 
-    const filteredTypes = React.useMemo(() => {
-        if (!typeQuery.trim()) return PAGE_TYPES
-        const q = typeQuery.toLowerCase().trim()
-        return PAGE_TYPES.filter((item) => {
-            const label = (PAGE_TYPE_LABELS[item] ?? item).toLowerCase()
-            const visual = PAGE_TYPE_VISUALS[item]
-            const displayName = (visual?.displayName ?? "").toLowerCase()
-            return label.includes(q) || displayName.includes(q) || item.toLowerCase().includes(q)
-        })
-    }, [typeQuery])
-
     return (
         <SettingsSection
             title={`Question Type (${index + 1}/${total})`}
             icon={<FileText className="h-4 w-4 text-slate-400 dark:text-zinc-400" />}
         >
             <Combobox
-                items={filteredTypes}
+                items={PAGE_TYPES}
                 autoHighlight
+                itemToStringLabel={(item) => PAGE_TYPE_VISUALS[item]?.displayName ?? PAGE_TYPE_LABELS[item] ?? item}
                 value={type}
                 onValueChange={onChange}
                 inputValue={typeQuery}

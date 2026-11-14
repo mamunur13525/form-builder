@@ -3,6 +3,7 @@ import type {
     PageSettings,
     Option,
     AddressPageSetting,
+    ContactInfoPageSetting,
     StatementEmbedProvider,
 } from "@/shared/types/common"
 
@@ -42,12 +43,23 @@ export const STATEMENT_PROVIDERS: { value: StatementEmbedProvider; label: string
 /** The six fixed address sub-pages, seeded on create. */
 export function defaultAddressPages(): AddressPageSetting[] {
     return [
-        { key: "address1", label: "Address", placeholder: "", required: false, hidden: false, order: 1 },
-        { key: "address2", label: "Address line 2", placeholder: "", required: false, hidden: false, order: 2 },
-        { key: "city", label: "City", placeholder: "", required: false, hidden: false, order: 3 },
-        { key: "state", label: "State", placeholder: "", required: false, hidden: false, order: 4 },
-        { key: "zip", label: "Zip", placeholder: "", required: false, hidden: false, order: 5 },
-        { key: "country", label: "Country", placeholder: "", required: false, hidden: false, order: 6 },
+        { key: "address1", label: "Address", placeholder: "", required: false, hidden: false, order: 1, width: "50%" },
+        { key: "address2", label: "Address line 2", placeholder: "", required: false, hidden: false, order: 2, width: "50%" },
+        { key: "city", label: "City", placeholder: "", required: false, hidden: false, order: 3, width: "50%" },
+        { key: "state", label: "State", placeholder: "", required: false, hidden: false, order: 4, width: "50%" },
+        { key: "zip", label: "Zip", placeholder: "", required: false, hidden: false, order: 5, width: "100%" },
+        { key: "country", label: "Country", placeholder: "", required: false, hidden: false, order: 6, width: "100%" },
+    ]
+}
+
+/** The five contact info sub-pages, seeded on create. */
+export function defaultContactInfoPages(): ContactInfoPageSetting[] {
+    return [
+        { key: "firstName", label: "First name", placeholder: "", required: false, hidden: false, order: 1, width: "50%" },
+        { key: "lastName", label: "Last name", placeholder: "", required: false, hidden: false, order: 2, width: "50%" },
+        { key: "email", label: "Email", placeholder: "", required: false, hidden: false, order: 3, width: "50%" },
+        { key: "phone", label: "Phone number", placeholder: "", required: false, hidden: false, order: 4, width: "50%" },
+        { key: "company", label: "Company", placeholder: "", required: false, hidden: false, order: 5, width: "100%" },
     ]
 }
 
@@ -94,7 +106,29 @@ export function defaultSettingsForType(type: PageType): PageSettings {
                 },
             }
         case "address":
-            return { address: { pages: defaultAddressPages() } }
+            return {
+                address: {
+                    pages: defaultAddressPages(),
+                    fieldsPerRow: { desktop: 2, mobile: 1 },
+                },
+            }
+        case "contactInfo":
+            return {
+                contactInfo: {
+                    pages: defaultContactInfoPages(),
+                    fieldsPerRow: { desktop: 2, mobile: 1 },
+                    phone: {
+                        phoneVerification: false,
+                        countryCodeMode: "auto",
+                        defaultCountry: null,
+                    },
+                },
+                phone: {
+                    phoneVerification: false,
+                    countryCodeMode: "auto",
+                    defaultCountry: null,
+                },
+            }
         case "rating":
             return { rating: { style: "star", max: 5 } }
         case "opinionScale":

@@ -55,8 +55,15 @@ export function validateQuestion(
     }
 
     if (block.type === "url" && value) {
+        // Accept bare hosts too ("user.com"), not only absolute URLs.
+        const raw = String(value).trim()
+        const candidate = /^[a-z][a-z\d+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`
         try {
-            new URL(String(value))
+            const url = new URL(candidate)
+            // Each host label must be non-empty (rejects ".com", "a..com").
+            if (!/^[a-z\d](?:[a-z\d-]*[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]*[a-z\d])?)+$/i.test(url.hostname)) {
+                throw new Error("invalid host")
+            }
         } catch {
             return block.validation?.message || "Please enter a valid URL."
         }
@@ -123,6 +130,23 @@ export function validateQuestion(
         }
     }
 
+    // Required sub-pages on contact info.
+    if (block.type === "contactInfo" && settings.contactInfo) {
+        const answers = (value as Record<string, string> | undefined) ?? {}
+        const missing = settings.contactInfo.pages.find(
+            (f) => !f.hidden && f.required && !answers[f.key]?.trim(),
+        )
+        if (missing) {
+            return block.validation?.message || `${missing.label} is required.`
+        }
+        if (answers.email && answers.email.trim()) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            if (!emailRegex.test(answers.email.trim())) {
+                return "Please enter a valid email address."
+            }
+        }
+    }
+
     // Every visible matrix row must be answered when the page is required.
     if (block.type === "matrix" && block.required && settings.matrix) {
         const answers = (value as Record<string, string | string[]> | undefined) ?? {}
@@ -176,5 +200,12 @@ export function validatePage(page: FormPage, valueOrAnswers: unknown): string | 
         return null
     }
 
-    return validateQuestion(page, valueOrAnswers)
+    const pageValue =
+        typeof valueOrAnswers === "object" &&
+        valueOrAnswers !== null &&
+        page.pageKey in (valueOrAnswers as object)
+            ? (valueOrAnswers as Record<string, unknown>)[page.pageKey]
+            : valueOrAnswers
+
+    return validateQuestion(page, pageValue)
 }

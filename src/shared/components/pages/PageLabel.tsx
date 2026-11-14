@@ -38,7 +38,7 @@ export function PageLabel({
         return (
             <div className="w-full relative space-y-1">
                 {pageNumber !== undefined && (
-                    <span className="absolute right-[102%] top-2 text-xs font-bold text-muted select-none bg-gray-900 px-1 rounded">
+                    <span className="absolute right-[calc(100%+10px)] top-2 text-xs font-bold text-muted select-none bg-gray-900 px-1 rounded">
                         {pageNumber}
                     </span>
                 )}
@@ -66,7 +66,7 @@ export function PageLabel({
     return (
         <div className="w-full relative space-y-1">
             {pageNumber !== undefined && (
-                <span className="absolute right-[102%] top-2 text-xs font-bold text-muted select-none bg-gray-900 px-1 rounded">
+                <span className="absolute right-[calc(100%+10px)] top-2 text-xs font-bold text-muted select-none bg-gray-900 px-1 rounded">
                     {pageNumber}
                 </span>
             )}

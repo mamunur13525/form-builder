@@ -18,6 +18,7 @@ export {
     StatementEditor,
     DropdownEditor,
     AddressEditor,
+    ContactInfoEditor,
     OpinionScaleEditor,
     SignatureEditor,
     MatrixEditor,

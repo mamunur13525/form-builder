@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import type { FormPage } from "@/shared/types/common"
 import {
     AddressPage,
+    ContactInfoPage,
     MatrixPage,
     OpinionScalePage,
     SignaturePage,
@@ -13,12 +14,14 @@ import {
     UploadPage,
     dropdownTriggerClasses,
 } from "@/shared/components/pages"
+import { getDropdownItemStyle, getDropdownMenuStyle } from "@/shared/utils/theme"
 import { cn } from "@/lib/utils"
 
 interface EditorProps {
     page: FormPage
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormPage>) => void
+    isMobileView?: boolean
     color?: string
     fontSizeClass?: string
 }
@@ -58,8 +61,17 @@ export function DropdownEditor({ page, pageIndex, onUpdate, color, fontSizeClass
         return () => document.removeEventListener("pointerdown", onPointerDown)
     }, [open])
 
+    useEffect(() => {
+        if (!open) return
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setOpen(false)
+        }
+        document.addEventListener("keydown", onKeyDown)
+        return () => document.removeEventListener("keydown", onKeyDown)
+    }, [open])
+
     return (
-        <div ref={wrapperRef} className="space-y-2">
+        <div ref={wrapperRef} className="relative">
             <button
                 type="button"
                 aria-haspopup="true"
@@ -90,8 +102,23 @@ export function DropdownEditor({ page, pageIndex, onUpdate, color, fontSizeClass
                 <div
                     id={menuId}
                     aria-label="Dropdown options"
-                    className="space-y-2 rounded-lg border border-slate-200 bg-white p-2 shadow-md dark:border-zinc-700 dark:bg-zinc-900"
+                    style={getDropdownMenuStyle(color)}
+                    className="absolute left-0 right-0 top-full z-30 mt-1 max-h-80 space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
                 >
+                    <div className="flex items-center justify-between px-1">
+                        <span className="text-xs font-medium text-slate-500 dark:text-zinc-400">
+                            Dropdown options
+                        </span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 shrink-0"
+                            aria-label="Close options"
+                            onClick={() => setOpen(false)}
+                        >
+                            <X className="h-3.5 w-3.5" />
+                        </Button>
+                    </div>
                     {page.options.map((opt, optIndex) => (
                         <div key={optIndex} className="flex items-center gap-2">
                             <Input
@@ -106,7 +133,14 @@ export function DropdownEditor({ page, pageIndex, onUpdate, color, fontSizeClass
                                 }}
                                 placeholder="Option label"
                                 className="flex-1"
-                                style={color ? { color } : undefined}
+                                style={
+                                    color
+                                        ? {
+                                            ...getDropdownItemStyle(color, false),
+                                            borderColor: `color-mix(in oklab, ${color} 30%, transparent)`,
+                                        }
+                                        : undefined
+                                }
                             />
                             <Button
                                 variant="ghost"
@@ -124,6 +158,14 @@ export function DropdownEditor({ page, pageIndex, onUpdate, color, fontSizeClass
                     <Button
                         variant="outline"
                         size="sm"
+                        style={
+                            color
+                                ? {
+                                    color,
+                                    borderColor: `color-mix(in oklab, ${color} 35%, transparent)`,
+                                }
+                                : undefined
+                        }
                         onClick={() => patchOptions([...page.options, { label: "", value: "" }])}
                     >
                         <Plus className="mr-2 h-4 w-4" />
@@ -139,8 +181,9 @@ export function DropdownEditor({ page, pageIndex, onUpdate, color, fontSizeClass
 // Address — preview of the configured sub-pages.
 // ---------------------------------------------------------------------------
 
-export function AddressEditor({ page, color, fontSizeClass }: EditorProps) {
+export function AddressEditor({ page, isMobileView, color, fontSizeClass }: EditorProps) {
     const pages = page.settings?.address?.pages ?? []
+    const fieldsPerRow = page.settings?.address?.fieldsPerRow
 
     if (pages.length === 0) {
         return (
@@ -150,7 +193,52 @@ export function AddressEditor({ page, color, fontSizeClass }: EditorProps) {
         )
     }
 
-    return <AddressPage pages={pages} disabled color={color} fontSizeClass={fontSizeClass} />
+    return (
+        <AddressPage
+            pages={pages}
+            fieldsPerRow={fieldsPerRow}
+            isMobileView={isMobileView}
+            disabled
+            color={color}
+            fontSizeClass={fontSizeClass}
+        />
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Contact Info — preview of the configured sub-pages.
+// ---------------------------------------------------------------------------
+
+export function ContactInfoEditor({ page, isMobileView, color, fontSizeClass }: EditorProps) {
+    const pages = page.settings?.contactInfo?.pages ?? []
+    const fieldsPerRow = page.settings?.contactInfo?.fieldsPerRow
+    const phoneSettings =
+        page.settings?.contactInfo?.phone ??
+        page.settings?.phone ?? {
+            phoneVerification: false,
+            countryCodeMode: "auto" as const,
+            defaultCountry: null,
+        }
+
+    if (pages.length === 0) {
+        return (
+            <p className="rounded-lg border border-dashed py-6 text-center text-sm text-muted-foreground">
+                Configure the contact info fields in the settings panel.
+            </p>
+        )
+    }
+
+    return (
+        <ContactInfoPage
+            pages={pages}
+            phoneSettings={phoneSettings}
+            fieldsPerRow={fieldsPerRow}
+            isMobileView={isMobileView}
+            disabled
+            color={color}
+            fontSizeClass={fontSizeClass}
+        />
+    )
 }
 
 // ---------------------------------------------------------------------------

@@ -28,6 +28,7 @@ import {
   MatrixEditor,
   UploadEditor,
   RatingSettingsAwareEditor,
+  SliderEditor,
 } from "./editors";
 
 const editorMap: Record<
@@ -61,6 +62,7 @@ const editorMap: Record<
   address: AddressEditor,
   contactInfo: ContactInfoEditor,
   opinionScale: OpinionScaleEditor,
+  slider: SliderEditor,
   signature: SignatureEditor,
   matrix: MatrixEditor,
 };

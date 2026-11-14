@@ -170,6 +170,24 @@ export function validateQuestion(
         }
     }
 
+    // Slider values must sit inside the configured range (and low <= high).
+    if (block.type === "slider" && settings.slider) {
+        const { min = 0, max = 100, rangeMode } = settings.slider
+        if (rangeMode && Array.isArray(value)) {
+            const [low, high] = value as number[]
+            if (typeof low === "number" && typeof high === "number") {
+                if (low > high) {
+                    return block.validation?.message || "The low value cannot be greater than the high value."
+                }
+                if (low < min || high > max) {
+                    return block.validation?.message || `Please choose values between ${min} and ${max}.`
+                }
+            }
+        } else if (typeof value === "number" && (value < min || value > max)) {
+            return block.validation?.message || `Please choose a value between ${min} and ${max}.`
+        }
+    }
+
     return null
 }
 

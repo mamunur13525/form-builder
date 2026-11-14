@@ -68,7 +68,7 @@ export function RuleConditionRow({
 
     const isNumeric = isVariable
         ? currentVar?.type === "number"
-        : ["number", "rating", "opinionScale", "date", "time"].includes(
+        : ["number", "rating", "opinionScale", "slider", "date", "time"].includes(
               currentQ?.type || currentPage?.type || "",
           ) || numericSources.has(effectiveSourceKey)
 

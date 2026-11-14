@@ -97,23 +97,23 @@ export function getFontSizeClasses(size?: string) {
   switch (size) {
     case "small":
       return {
-        question: "text-[20px] sm:text-[22px]",
-        helper: "text-[14px] sm:text-[16px]",
+        question: "text-[clamp(1.125rem,0.95rem+0.8vw,1.375rem)]",
+        helper: "text-[clamp(0.8125rem,0.725rem+0.4vw,0.9375rem)]",
         input: "text-[14px]",
         button: "text-[14px]",
       };
     case "large":
       return {
-        question: "text-[30px] sm:text-[36px]",
-        helper: "text-[20px] sm:text-[22px]",
+        question: "text-[clamp(1.75rem,1.35rem+1.8vw,2.5rem)]",
+        helper: "text-[clamp(1.125rem,0.95rem+0.8vw,1.375rem)]",
         input: "text-[18px]",
         button: "text-[18px]",
       };
     case "medium":
     default:
       return {
-        question: "text-[24px] sm:text-[28px]",
-        helper: "text-[16px] sm:text-[18px]",
+        question: "text-[clamp(1.375rem,1.1rem+1.2vw,1.875rem)]",
+        helper: "text-[clamp(0.9375rem,0.825rem+0.5vw,1.125rem)]",
         input: "text-[16px]",
         button: "text-[16px]",
       };
@@ -127,12 +127,12 @@ export function getFontSizeClasses(size?: string) {
 export function getQuestionTitleClasses(size?: string) {
   switch (size) {
     case "small":
-      return "text-[16px] sm:text-[17px]";
+      return "text-[clamp(0.9375rem,0.85rem+0.4vw,1.0625rem)]";
     case "large":
-      return "text-[20px] sm:text-[22px]";
+      return "text-[clamp(1.1875rem,1rem+0.8vw,1.375rem)]";
     case "medium":
     default:
-      return "text-[17px] sm:text-[19px]";
+      return "text-[clamp(1.0625rem,0.925rem+0.6vw,1.25rem)]";
   }
 }
 

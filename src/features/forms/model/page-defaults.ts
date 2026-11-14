@@ -133,6 +133,20 @@ export function defaultSettingsForType(type: PageType): PageSettings {
             return { rating: { style: "star", max: 5 } }
         case "opinionScale":
             return { opinionScale: { min: 0, max: 10, leftLabel: "", rightLabel: "" } }
+        case "slider":
+            return {
+                slider: {
+                    min: 0,
+                    max: 100,
+                    step: 1,
+                    rangeMode: false,
+                    defaultLow: 0,
+                    defaultHigh: 100,
+                    prefix: "",
+                    suffix: "",
+                    thousandSeparator: "comma" as const,
+                },
+            }
         case "file":
             return { upload: { allowMultiple: false, allowedFileTypes: [], maxFileSizeMb: 10 } }
         case "matrix":

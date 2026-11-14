@@ -16,6 +16,7 @@ import {
     StarRatingPage,
     UploadPage,
     PhoneAnswerPage,
+    SliderPage,
 } from "./pages"
 import type { UploadedFile } from "./pages/UploadPage"
 
@@ -231,6 +232,28 @@ export function FormPageRenderer({
                         }
                     }
                     color={color}
+                />
+            )
+        case "slider":
+            return (
+                <SliderPage
+                    value={value as number | [number, number] | undefined}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    settings={
+                        settings.slider ?? {
+                            min: 0,
+                            max: 100,
+                            step: 1,
+                            rangeMode: false,
+                            defaultLow: 0,
+                            defaultHigh: 100,
+                            prefix: "",
+                            suffix: "",
+                            thousandSeparator: "comma",
+                        }
+                    }
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "address":

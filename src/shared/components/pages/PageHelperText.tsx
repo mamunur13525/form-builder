@@ -28,7 +28,7 @@ export function PageHelperText({
     variables = [],
     highlightVariables,
 }: PageHelperTextProps) {
-    const sizeClass = fontSizeClass || "text-[18px]"
+    const sizeClass = fontSizeClass || "text-[clamp(0.9375rem,0.825rem+0.5vw,1.125rem)]"
 
     if (!helperText && !editable) return null
 

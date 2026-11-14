@@ -13,6 +13,7 @@ import {
     StarRatingPage,
     UploadPage,
     dropdownTriggerClasses,
+    SliderPage,
 } from "@/shared/components/pages"
 import { getDropdownItemStyle, getDropdownMenuStyle } from "@/shared/utils/theme"
 import { cn } from "@/lib/utils"
@@ -304,6 +305,33 @@ export function UploadEditor({ page }: EditorProps) {
                 }
             }
             disabled
+        />
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Slider — preview using the configured range, defaults and decoration.
+// ---------------------------------------------------------------------------
+
+export function SliderEditor({ page, color, fontSizeClass }: EditorProps) {
+    return (
+        <SliderPage
+            settings={
+                page.settings?.slider ?? {
+                    min: 0,
+                    max: 100,
+                    step: 1,
+                    rangeMode: false,
+                    defaultLow: 0,
+                    defaultHigh: 100,
+                    prefix: "",
+                    suffix: "",
+                    thousandSeparator: "comma",
+                }
+            }
+            disabled
+            color={color}
+            fontSizeClass={fontSizeClass}
         />
     )
 }

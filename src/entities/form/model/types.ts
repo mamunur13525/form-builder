@@ -252,6 +252,7 @@ export type PageType =
     | "address"
     | "contactInfo"
     | "opinionScale"
+    | "slider"
     | "signature"
     | "matrix"
 
@@ -332,6 +333,20 @@ export interface PageOpinionScaleSettings {
     rightLabel: string
 }
 
+export type PageSliderSeparator = "comma" | "period" | "space" | "none"
+
+export interface PageSliderSettings {
+    min?: number
+    max?: number
+    step?: number
+    rangeMode?: boolean
+    defaultLow?: number | null
+    defaultHigh?: number | null
+    prefix?: string
+    suffix?: string
+    thousandSeparator?: PageSliderSeparator
+}
+
 export interface PageUploadSettings {
     allowMultiple: boolean
     allowedFileTypes: string[]
@@ -353,6 +368,7 @@ export interface PageSettings {
     contactInfo?: PageContactInfoSettings
     rating?: PageRatingSettings
     opinionScale?: PageOpinionScaleSettings
+    slider?: PageSliderSettings
     upload?: PageUploadSettings
     matrix?: PageMatrixSettings
 }

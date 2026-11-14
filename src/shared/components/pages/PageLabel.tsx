@@ -32,7 +32,7 @@ export function PageLabel({
     variables = [],
     highlightVariables,
 }: PageLabelProps) {
-    const sizeClass = fontSizeClass || "text-[26px]"
+    const sizeClass = fontSizeClass || "text-[clamp(1.375rem,1.1rem+1.2vw,1.875rem)]"
 
     if (editable) {
         return (

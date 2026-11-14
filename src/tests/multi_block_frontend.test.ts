@@ -6,6 +6,7 @@ import { resolveFormLogic, countRulesForPage } from "../shared/utils/formLogic.t
 import { npsGroups, percent, tally } from "../pages/FormResponse/components/summaryMath.ts";
 import { countryFromLocale, flagEmoji } from "../shared/constants/countries.ts";
 import { countryPhoneFromTimezone, findCountryPhone, formatNationalNumber, maxNationalDigits } from "../shared/constants/country-phone.ts";
+import { formatSliderNumber } from "../shared/utils/slider.ts";
 import type { FormPage as ApiPage } from "../entities/form/model/types.ts";
 import type { FormPage, FormLogicRule } from "../shared/types/common.ts";
 
@@ -578,6 +579,43 @@ console.log("--- Starting Frontend Multi-Block & UI Tests ---");
   assert.strictEqual(validateBlock(urlBlock, "not a url"), "Please enter a valid URL.");
   assert.strictEqual(validateBlock(urlBlock, "asdf"), "Please enter a valid URL.");
   console.log("✓ Test 15: url answers accept bare host names too");
+}
+
+// Test 16: slider defaults, formatting and range validation
+{
+  const defaults = defaultSettingsForType("slider");
+  assert.ok(defaults.slider);
+  assert.strictEqual(defaults.slider.min, 0);
+  assert.strictEqual(defaults.slider.max, 100);
+  assert.strictEqual(defaults.slider.rangeMode, false);
+
+  assert.strictEqual(formatSliderNumber(1000, "comma"), "1,000");
+  assert.strictEqual(formatSliderNumber(1000, "period"), "1.000");
+  assert.strictEqual(formatSliderNumber(1000, "space"), "1 000");
+  assert.strictEqual(formatSliderNumber(1000, "none"), "1000");
+  assert.strictEqual(formatSliderNumber(1234.5, "comma"), "1,234.5");
+
+  const single = {
+    type: "slider",
+    required: true,
+    settings: { slider: { min: 0, max: 100, rangeMode: false } },
+  } as unknown as FormPage;
+  assert.strictEqual(validateBlock(single, 50), null);
+  assert.strictEqual(
+    validateBlock(single, 150),
+    "Please choose a value between 0 and 100.",
+  );
+
+  const range = {
+    type: "slider",
+    settings: { slider: { min: 0, max: 100, rangeMode: true } },
+  } as unknown as FormPage;
+  assert.strictEqual(validateBlock(range, [20, 80]), null);
+  assert.strictEqual(
+    validateBlock(range, [80, 20]),
+    "The low value cannot be greater than the high value.",
+  );
+  console.log("✓ Test 16: slider defaults, formatting and range validation work properly");
 }
 
 console.log("--- All Frontend Multi-Block & UI Tests Passed Successfully! ---");

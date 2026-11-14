@@ -17,6 +17,7 @@ import {
     MessageSquareText,
     MapPin,
     SlidersHorizontal,
+    Sliders,
     PenLine,
     Grid3x3,
     Contact,
@@ -44,6 +45,7 @@ export const PAGE_TYPES = [
     "address",
     "contactInfo",
     "opinionScale",
+    "slider",
     "signature",
     "matrix",
 ] as const
@@ -71,6 +73,7 @@ export const PAGE_TYPE_LABELS: Record<PageType, string> = {
     address: "Address",
     contactInfo: "Contact Info",
     opinionScale: "Opinion Scale",
+    slider: "Slider",
     signature: "Signature",
     matrix: "Matrix",
 }
@@ -83,6 +86,7 @@ export interface TypeVisual {
 
 export const PAGE_TYPE_VISUALS: Record<PageType, TypeVisual> = {
     opinionScale: { icon: SlidersHorizontal, bgColor: "bg-[#7480ee]" },
+    slider: { icon: Sliders, bgColor: "bg-[#0ea5e9]" },
     url: { icon: Link, bgColor: "bg-[#48bca3]", displayName: "Website URL" },
     shortText: { icon: Type, bgColor: "bg-[#5da2f6]" },
     longText: { icon: AlignLeft, bgColor: "bg-[#38bdf8]" },
@@ -127,6 +131,7 @@ export const PAGE_TYPE_ICONS: Record<PageType, LucideIcon> = {
     address: MapPin,
     contactInfo: Contact,
     opinionScale: SlidersHorizontal,
+    slider: Sliders,
     signature: PenLine,
     matrix: Grid3x3,
 }
@@ -152,6 +157,7 @@ export const PAGE_TYPE_COLORS: Record<PageType, string> = {
     address: "from-lime-500/5 to-lime-600/10 border border-lime-300 text-lime-600 dark:text-lime-400",
     contactInfo: "from-sky-500/5 to-sky-600/10 border border-sky-300 text-sky-600 dark:text-sky-400",
     opinionScale: "from-red-500/5 to-red-600/10 border border-red-300 text-red-600 dark:text-red-400",
+    slider: "from-sky-500/5 to-sky-600/10 border border-sky-300 text-sky-600 dark:text-sky-400",
     signature: "from-stone-500/5 to-stone-600/10 border border-stone-300 text-stone-600 dark:text-stone-400",
     matrix: "from-blue-500/5 to-blue-600/10 border border-blue-300 text-blue-600 dark:text-blue-400",
 }

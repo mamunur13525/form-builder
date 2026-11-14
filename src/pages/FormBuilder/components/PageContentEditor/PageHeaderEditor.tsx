@@ -42,7 +42,7 @@ export function PageHeaderEditor({
           ariaLabel="Page Title"
           placeholder="Your Question here. Recall information with @"
           className={cn(
-            fontSizes.question || "text-[24px] sm:text-[28px]",
+            fontSizes.question || "text-[clamp(1.375rem,1.1rem+1.2vw,1.875rem)]",
             "font-normal outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
           )}
           style={questionColor ? { color: questionColor } : undefined}
@@ -56,7 +56,7 @@ export function PageHeaderEditor({
             ariaLabel="Page Description"
             placeholder="Description (optional)"
             className={cn(
-              fontSizes.helper || "text-[16px] sm:text-[18px]",
+              fontSizes.helper || "text-[clamp(0.9375rem,0.825rem+0.5vw,1.125rem)]",
               "font-normal text-muted-foreground outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
             )}
             style={textColor ? { color: textColor } : undefined}

@@ -191,6 +191,7 @@ export type PageType =
     | "address"
     | "contactInfo"
     | "opinionScale"
+    | "slider"
     | "signature"
     | "matrix"
 
@@ -335,6 +336,23 @@ export interface OpinionScaleSettings {
     rightLabel: string
 }
 
+export type SliderSeparator = "comma" | "period" | "space" | "none"
+
+export interface SliderSettings {
+    min?: number
+    max?: number
+    step?: number
+    /** Show two handles so respondents pick a low/high range. */
+    rangeMode?: boolean
+    /** Value selected before the respondent interacts (single handle). */
+    defaultLow?: number | null
+    /** High value used as the starting point in range mode. */
+    defaultHigh?: number | null
+    prefix?: string
+    suffix?: string
+    thousandSeparator?: SliderSeparator
+}
+
 export interface UploadSettings {
     allowMultiple: boolean
     allowedFileTypes: string[]
@@ -368,6 +386,7 @@ export interface PageSettings {
     contactInfo?: ContactInfoSettings
     rating?: RatingSettings
     opinionScale?: OpinionScaleSettings
+    slider?: SliderSettings
     upload?: UploadSettings
     matrix?: MatrixSettings
 }

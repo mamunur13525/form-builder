@@ -9,6 +9,7 @@ import {
 } from "./choice-settings"
 import { PhoneSettingsWidget } from "./phone-settings"
 import { RatingSettingsWidget } from "./rating-settings"
+import { SliderSettingsWidget } from "./slider-settings"
 import {
     AddressSettingsWidget,
     ContactInfoSettingsWidget,
@@ -251,6 +252,28 @@ export function TypeSpecificSettings({
                             }
                         }
                         onChange={(opinionScale) => onPatchSettings({ opinionScale })}
+                    />
+                </SettingsSection>
+            )}
+
+            {/* ---------------- Slider ---------------- */}
+            {question.type === "slider" && (
+                <SettingsSection title="Slider">
+                    <SliderSettingsWidget
+                        settings={
+                            settings.slider ?? {
+                                min: 0,
+                                max: 100,
+                                step: 1,
+                                rangeMode: false,
+                                defaultLow: 0,
+                                defaultHigh: 100,
+                                prefix: "",
+                                suffix: "",
+                                thousandSeparator: "comma",
+                            }
+                        }
+                        onChange={(slider) => onPatchSettings({ slider })}
                     />
                 </SettingsSection>
             )}

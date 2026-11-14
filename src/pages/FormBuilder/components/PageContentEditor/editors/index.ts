@@ -24,4 +24,5 @@ export {
     MatrixEditor,
     UploadEditor,
     RatingSettingsAwareEditor,
+    SliderEditor,
 } from "./NewTypeEditors"

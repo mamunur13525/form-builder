@@ -32,7 +32,7 @@ const CATEGORIES: BlockCategory[] = [
     { title: "Text & Numbers", types: ["shortText", "longText", "number", "date", "time"] },
     { title: "Choice", types: ["radio", "multiSelect", "dropdown", "select", "checkbox", "matrix", "yesNo"] },
     { title: "Layout", types: ["statement"] },
-    { title: "Rating", types: ["rating", "opinionScale"] },
+    { title: "Rating", types: ["rating", "opinionScale", "slider"] },
     { title: "Advanced", types: ["file", "signature"] },
 ]
 
@@ -65,6 +65,7 @@ const BLOCK_DESCRIPTIONS: Record<PageType, string> = {
     address: "Postal address fields",
     contactInfo: "Contact information fields",
     opinionScale: "Scale from low to high",
+    slider: "Slide to pick a number",
     signature: "Draw a signature",
     matrix: "Grid of questions",
 }

@@ -188,7 +188,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                                 side="top"
                                 align="center"
                                 sideOffset={12}
-                                className="editorial min-w-[200px] rounded-lg border border-[var(--border)] bg-[var(--popover)] p-2 shadow-xl"
+                                className="editorial editorial-flat min-w-[200px] rounded-lg border border-[var(--border)] bg-[var(--popover)] p-2 shadow-xl"
                             >
                                 <DropdownMenuItem
                                     className="rounded-lg px-3 py-2.5 cursor-pointer"

@@ -18,9 +18,11 @@ export {
     StatementEditor,
     DropdownEditor,
     AddressEditor,
+    ContactInfoEditor,
     OpinionScaleEditor,
     SignatureEditor,
     MatrixEditor,
     UploadEditor,
     RatingSettingsAwareEditor,
+    SliderEditor,
 } from "./NewTypeEditors"

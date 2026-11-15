@@ -13,9 +13,14 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 import { SUBMISSION_LAYERS, type SubmissionLayer } from "../lib/columns"
 
 interface SubmissionsToolbarProps {
+    status: "completed" | "partial"
+    onStatusChange: (status: "completed" | "partial") => void
+    completedCount: number
+    partialCount: number
     layer: SubmissionLayer
     onLayerChange: (layer: SubmissionLayer) => void
     /** Column count per layer, shown next to each tab label. */
@@ -27,10 +32,14 @@ interface SubmissionsToolbarProps {
 }
 
 /**
- * Row above the submissions table: the data-layer tabs (with hover hints
- * describing each layer) on the left, selection state and export on the right.
+ * Row above the submissions table: the status tabs (Completed / Partial) and
+ * data-layer tabs (Visible / All) on the left, selection state and export on the right.
  */
 export function SubmissionsToolbar({
+    status,
+    onStatusChange,
+    completedCount,
+    partialCount,
     layer,
     onLayerChange,
     columnCounts,
@@ -43,39 +52,91 @@ export function SubmissionsToolbar({
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-8 sm:py-4">
-            <TooltipProvider delay={200}>
-                <Tabs
-                    value={layer}
-                    onValueChange={(value) => onLayerChange(value as SubmissionLayer)}
-                    className="min-w-0 max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                >
-                    <TabsList className="h-auto w-max gap-1 bg-transparent p-0">
-                        {SUBMISSION_LAYERS.map(({ value, label, hint }) => (
-                            <Tooltip key={value}>
-                                <TooltipTrigger
-                                    render={
-                                        <TabsTrigger
-                                            value={value}
-                                            className="editorial-transition h-9 gap-1.5 rounded-lg px-2.5 text-xs whitespace-nowrap text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 data-[selected]:border data-[selected]:border-[#FF5722]/40 data-[selected]:bg-[#FF5722]/15 data-[selected]:text-[#FF5722] data-[selected]:font-semibold sm:gap-2 sm:px-4 sm:text-sm"
-                                        >
-                                            {label}
-                                            <span className="text-xs tabular-nums text-slate-400 dark:text-zinc-500">
-                                                {columnCounts[value]}
-                                            </span>
-                                        </TabsTrigger>
-                                    }
-                                />
-                                <TooltipContent
-                                    className="editorial max-w-none rounded-lg border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
-                                    side="bottom"
-                                >
-                                    {hint}
-                                </TooltipContent>
-                            </Tooltip>
-                        ))}
-                    </TabsList>
-                </Tabs>
-            </TooltipProvider>
+            <div className="flex flex-wrap items-center gap-3">
+                {/* Status tabs: 1. Completed | 2. Partial */}
+                <div className="flex items-center rounded-lg border border-[var(--editorial-border-light)] p-1 bg-muted/40">
+                    <button
+                        type="button"
+                        onClick={() => onStatusChange("completed")}
+                        className={cn(
+                            "editorial-transition flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs sm:text-sm font-medium",
+                            status === "completed"
+                                ? "bg-background text-foreground shadow-sm font-semibold"
+                                : "text-muted-foreground hover:text-foreground",
+                        )}
+                    >
+                        <span>1. Completed</span>
+                        <span
+                            className={cn(
+                                "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
+                                status === "completed"
+                                    ? "bg-primary/10 text-primary"
+                                    : "bg-muted text-muted-foreground",
+                            )}
+                        >
+                            {completedCount}
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => onStatusChange("partial")}
+                        className={cn(
+                            "editorial-transition flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs sm:text-sm font-medium",
+                            status === "partial"
+                                ? "bg-background text-foreground shadow-sm font-semibold"
+                                : "text-muted-foreground hover:text-foreground",
+                        )}
+                    >
+                        <span>2. Partial</span>
+                        <span
+                            className={cn(
+                                "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
+                                status === "partial"
+                                    ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                                    : "bg-muted text-muted-foreground",
+                            )}
+                        >
+                            {partialCount}
+                        </span>
+                    </button>
+                </div>
+
+                {/* Layer tabs: Visible data | All data */}
+                <TooltipProvider delay={200}>
+                    <Tabs
+                        value={layer}
+                        onValueChange={(value) => onLayerChange(value as SubmissionLayer)}
+                        className="min-w-0 max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    >
+                        <TabsList className="h-auto w-max gap-1 bg-transparent p-0">
+                            {SUBMISSION_LAYERS.map(({ value, label, hint }) => (
+                                <Tooltip key={value}>
+                                    <TooltipTrigger
+                                        render={
+                                            <TabsTrigger
+                                                value={value}
+                                                className="editorial-transition h-9 gap-1.5 rounded-lg px-2.5 text-xs whitespace-nowrap text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 data-[selected]:border data-[selected]:border-[#FF5722]/40 data-[selected]:bg-[#FF5722]/15 data-[selected]:text-[#FF5722] data-[selected]:font-semibold sm:gap-2 sm:px-4 sm:text-sm"
+                                            >
+                                                {label}
+                                                <span className="text-xs tabular-nums text-slate-400 dark:text-zinc-500">
+                                                    {columnCounts[value]}
+                                                </span>
+                                            </TabsTrigger>
+                                        }
+                                    />
+                                    <TooltipContent
+                                        className="editorial max-w-none rounded-lg border border-[var(--border)] bg-[var(--popover)] text-[var(--foreground)]"
+                                        side="bottom"
+                                    >
+                                        {hint}
+                                    </TooltipContent>
+                                </Tooltip>
+                            ))}
+                        </TabsList>
+                    </Tabs>
+                </TooltipProvider>
+            </div>
 
             <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:gap-3">
                 {hasSelection ? (

@@ -189,7 +189,9 @@ export type PageType =
     | "url"
     | "statement"
     | "address"
+    | "contactInfo"
     | "opinionScale"
+    | "slider"
     | "signature"
     | "matrix"
 
@@ -275,6 +277,13 @@ export interface ChoiceSettings {
     selectionLimit?: SelectionLimit
 }
 
+export type FieldWidth = "50%" | "100%"
+
+export interface FieldsPerRow {
+    desktop: number
+    mobile: number
+}
+
 export interface AddressPageSetting {
     key: "address1" | "address2" | "city" | "state" | "zip" | "country"
     label: string
@@ -282,10 +291,35 @@ export interface AddressPageSetting {
     required: boolean
     hidden: boolean
     order: number
+    width?: FieldWidth
 }
 
 export interface AddressSettings {
     pages: AddressPageSetting[]
+    fieldsPerRow?: FieldsPerRow
+}
+
+export type ContactInfoSubPageKey =
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "phone"
+    | "company"
+
+export interface ContactInfoPageSetting {
+    key: ContactInfoSubPageKey
+    label: string
+    placeholder: string
+    required: boolean
+    hidden: boolean
+    order: number
+    width?: FieldWidth
+}
+
+export interface ContactInfoSettings {
+    pages: ContactInfoPageSetting[]
+    phone?: PhoneSettings
+    fieldsPerRow?: FieldsPerRow
 }
 
 export type RatingStyle = "star" | "number"
@@ -300,6 +334,23 @@ export interface OpinionScaleSettings {
     max: number
     leftLabel: string
     rightLabel: string
+}
+
+export type SliderSeparator = "comma" | "period" | "space" | "none"
+
+export interface SliderSettings {
+    min?: number
+    max?: number
+    step?: number
+    /** Show two handles so respondents pick a low/high range. */
+    rangeMode?: boolean
+    /** Value selected before the respondent interacts (single handle). */
+    defaultLow?: number | null
+    /** High value used as the starting point in range mode. */
+    defaultHigh?: number | null
+    prefix?: string
+    suffix?: string
+    thousandSeparator?: SliderSeparator
 }
 
 export interface UploadSettings {
@@ -332,8 +383,10 @@ export interface PageSettings {
     statement?: StatementSettings
     choice?: ChoiceSettings
     address?: AddressSettings
+    contactInfo?: ContactInfoSettings
     rating?: RatingSettings
     opinionScale?: OpinionScaleSettings
+    slider?: SliderSettings
     upload?: UploadSettings
     matrix?: MatrixSettings
 }
@@ -466,6 +519,9 @@ export interface Form {
 
 export interface FormAnswer {
     pageKey: string
+    blockKey?: string
+    questionKey?: string
+    title?: string
     label: string
     type: string
     value: unknown
@@ -476,6 +532,7 @@ export interface FormResponse {
     formId: string
     respondentId?: string
     sessionId: string
+    status?: "completed" | "partial"
     answers: FormAnswer[]
     metadata: {
         ipAddress: string

@@ -51,6 +51,17 @@ export async function savePublicFormDraft(slug: string, data: SubmitFormRequest)
     })
 }
 
+/** POST /public/forms/:slug/track-view — track a public form view (public, no auth). */
+export async function trackPublicFormView(
+    slug: string,
+    data: { sessionId: string; device?: string; referrer?: string },
+): Promise<{ success: boolean; sessionId: string }> {
+    return apiRequest<{ success: boolean; sessionId: string }>(`/public/forms/${slug}/track-view`, {
+        method: "POST",
+        body: JSON.stringify(data),
+    })
+}
+
 /** GET /public/forms/:slug/submit-status/:submissionId — check submission status (public, no auth). */
 export async function getSubmissionStatus(slug: string, submissionId: string): Promise<SubmitStatus> {
     return apiRequest<SubmitStatus>(`/public/forms/${slug}/submit-status/${submissionId}`)

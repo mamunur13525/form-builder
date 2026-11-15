@@ -13,6 +13,7 @@ interface ChoicePageProps {
     settings: ChoiceSettings
     multiple: boolean
     name: string
+    isMobileView?: boolean
     disabled?: boolean
     color?: string
     fontSizeClass?: string
@@ -36,6 +37,11 @@ const DESKTOP_COLS: Record<number, string> = {
     6: "md:grid-cols-6",
 }
 
+/** Option badge letters: A–Z, then 27, 28, … for very long lists. */
+function optionBadge(index: number) {
+    return index < 26 ? String.fromCharCode(65 + index) : String(index + 1)
+}
+
 /**
  * Choice renderer that honours the `choice` settings group:
  * allowOther (with a free-text answer), horizontalAlign + optionsPerRow,
@@ -52,6 +58,7 @@ export function ChoicePage({
     settings,
     multiple,
     name,
+    isMobileView,
     disabled,
     color,
     fontSizeClass,
@@ -142,20 +149,58 @@ export function ChoicePage({
                     !horizontalAlign && "space-y-2",
                     horizontalAlign && [
                         "grid gap-2",
-                        MOBILE_COLS[optionsPerRow.mobile] ?? "grid-cols-1",
-                        DESKTOP_COLS[optionsPerRow.desktop] ?? "md:grid-cols-3",
+                        isMobileView
+                            ? (MOBILE_COLS[optionsPerRow.mobile] ?? "grid-cols-1")
+                            : [
+                                MOBILE_COLS[optionsPerRow.mobile] ?? "grid-cols-1",
+                                DESKTOP_COLS[optionsPerRow.desktop] ?? "md:grid-cols-3",
+                            ],
                     ],
                 )}
             >
-                {allOptions.map((opt) => {
+                {allOptions.map((opt, index) => {
                     const checked = isSelected(opt.value)
                     const blocked = !checked && atLimit
+
+                    const itemStyle: React.CSSProperties | undefined = color
+                        ? checked
+                            ? {
+                                borderColor: color,
+                                backgroundColor: `color-mix(in oklab, ${color} 12%, transparent)`,
+                                color,
+                            }
+                            : {
+                                borderColor: `color-mix(in oklab, ${color} 25%, transparent)`,
+                                backgroundColor: `color-mix(in oklab, ${color} 5%, transparent)`,
+                                color,
+                            }
+                        : undefined
+
+                    const badgeStyle: React.CSSProperties | undefined = color
+                        ? checked
+                            ? {
+                                borderColor: color,
+                                backgroundColor: color,
+                                color: "#ffffff",
+                            }
+                            : {
+                                borderColor: `color-mix(in oklab, ${color} 35%, transparent)`,
+                                backgroundColor: "transparent",
+                                color,
+                            }
+                        : undefined
+
                     return (
                         <label
                             key={opt.value}
+                            style={itemStyle}
                             className={cn(
-                                "flex cursor-pointer items-center gap-2 rounded-lg border p-2.5 transition-colors",
-                                checked ? "border-primary bg-primary/5" : "hover:bg-muted/50",
+                                "flex cursor-pointer items-center gap-2.5 rounded-xl border-2 p-2 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring/40",
+                                !color && (
+                                    checked
+                                        ? "border-foreground bg-background"
+                                        : "border-border bg-muted hover:bg-muted/70"
+                                ),
                                 (disabled || blocked) && "pointer-events-none opacity-50",
                                 hideLabels && "justify-center",
                             )}
@@ -167,8 +212,22 @@ export function ChoicePage({
                                 checked={checked}
                                 onChange={() => toggle(opt.value)}
                                 disabled={disabled || blocked}
-                                className="h-4 w-4 shrink-0 accent-primary"
+                                className="sr-only"
                             />
+                            <span
+                                aria-hidden
+                                style={badgeStyle}
+                                className={cn(
+                                    "flex size-8 shrink-0 items-center justify-center rounded-md border text-sm font-semibold transition-colors",
+                                    !color && (
+                                        checked
+                                            ? "border-foreground bg-foreground text-background"
+                                            : "border-border bg-background text-foreground"
+                                    ),
+                                )}
+                            >
+                                {optionBadge(index)}
+                            </span>
                             {!hideLabels && (
                                 <span
                                     className={cn("text-sm", fontSizeClass)}
@@ -191,10 +250,21 @@ export function ChoicePage({
                     placeholder={`${otherLabel || "Other"}...`}
                     onChange={(e) => changeOtherText(e.target.value)}
                     className={cn(
-                        "h-10 w-full rounded-lg border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        "h-10 w-full rounded-lg border bg-transparent px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                         fontSizeClass,
                     )}
-                    style={color ? { color } : undefined}
+                    style={
+                        color
+                            ? {
+                                color,
+                                borderColor: `color-mix(in oklab, ${color} 40%, transparent)`,
+                                backgroundColor: `color-mix(in oklab, ${color} 5%, transparent)`,
+                                ...({
+                                    "--tw-ring-color": color,
+                                } as React.CSSProperties),
+                            }
+                            : undefined
+                    }
                 />
             )}
 

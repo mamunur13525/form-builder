@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react"
 import { Plus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,14 +32,17 @@ function toValue(label: string) {
     return label.toLowerCase().trim().replace(/\s+/g, "_")
 }
 
+/** Same A–Z marker the answer page shows, so the builder and preview match. */
+function optionBadge(index: number) {
+    return index < 26 ? String.fromCharCode(65 + index) : String(index + 1)
+}
+
 export interface OptionListEditorProps {
     page: FormPage
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormPage>) => void
     /** Mobile canvas uses `optionsPerRow.mobile`, desktop uses `.desktop`. */
     isMobileView?: boolean
-    /** Leading glyph that hints at the input type (radio, checkbox, list…). */
-    icon: LucideIcon
     color?: string
     fontSizeClass?: string
 }
@@ -49,7 +51,7 @@ export interface OptionListEditorProps {
  * Option editor for the choice page types. It mirrors the `choice` settings
  * from the settings panel so the builder preview matches what respondents see:
  * horizontal alignment lays the options out on a grid of `optionsPerRow`,
- * hidden labels collapse each row to its glyph, and the "Other" option is
+ * hidden labels collapse each row to its marker, and the "Other" option is
  * previewed as a non-editable row.
  */
 export function OptionListEditor({
@@ -57,7 +59,6 @@ export function OptionListEditor({
     pageIndex,
     onUpdate,
     isMobileView = false,
-    icon: Icon,
     color,
     fontSizeClass,
 }: OptionListEditorProps) {
@@ -79,12 +80,38 @@ export function OptionListEditor({
                 {page.options.map((opt, optIndex) => (
                     <div
                         key={optIndex}
+                        style={
+                            color
+                                ? {
+                                    borderColor: `color-mix(in oklab, ${color} 25%, transparent)`,
+                                    backgroundColor: `color-mix(in oklab, ${color} 5%, transparent)`,
+                                    color,
+                                }
+                                : undefined
+                        }
                         className={cn(
-                            "flex items-center gap-2",
-                            horizontalAlign && "min-w-0 rounded-lg border p-2",
+                            "flex min-w-0 items-center gap-2.5 rounded-xl border-2 p-2",
+                            !color && "border-border bg-muted",
                         )}
                     >
-                        <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <span
+                            aria-hidden
+                            style={
+                                color
+                                    ? {
+                                        borderColor: `color-mix(in oklab, ${color} 35%, transparent)`,
+                                        backgroundColor: "transparent",
+                                        color,
+                                    }
+                                    : undefined
+                            }
+                            className={cn(
+                                "flex size-8 shrink-0 items-center justify-center rounded-md border text-sm font-semibold",
+                                !color && "border-border bg-background text-foreground",
+                            )}
+                        >
+                            {optionBadge(optIndex)}
+                        </span>
                         {!hideLabels && (
                             <Input
                                 value={opt.label}
@@ -101,8 +128,20 @@ export function OptionListEditor({
                                     )
                                 }
                                 placeholder="Option label"
-                                className={cn("min-w-0 flex-1", fontSizeClass)}
-                                style={color ? { color } : undefined}
+                                className={cn(
+                                    "h-auto min-w-0 flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0",
+                                    fontSizeClass,
+                                )}
+                                style={
+                                    color
+                                        ? {
+                                            color,
+                                            ...({
+                                                "--input-placeholder-color": `color-mix(in oklab, ${color} 40%, transparent)`,
+                                            } as React.CSSProperties),
+                                        }
+                                        : undefined
+                                }
                             />
                         )}
                         <Button
@@ -122,12 +161,38 @@ export function OptionListEditor({
                 {/* "Other" is configured in the settings panel, so preview only. */}
                 {allowOther && (
                     <div
+                        style={
+                            color
+                                ? {
+                                    borderColor: `color-mix(in oklab, ${color} 25%, transparent)`,
+                                    backgroundColor: `color-mix(in oklab, ${color} 5%, transparent)`,
+                                    color,
+                                }
+                                : undefined
+                        }
                         className={cn(
-                            "flex items-center gap-2 text-muted-foreground",
-                            horizontalAlign && "min-w-0 rounded-lg border border-dashed p-2",
+                            "flex min-w-0 items-center gap-2.5 rounded-xl border-2 p-2",
+                            !color && "border-border bg-muted text-muted-foreground",
                         )}
                     >
-                        <Icon className="h-4 w-4 shrink-0" />
+                        <span
+                            aria-hidden
+                            style={
+                                color
+                                    ? {
+                                        borderColor: `color-mix(in oklab, ${color} 35%, transparent)`,
+                                        backgroundColor: "transparent",
+                                        color,
+                                    }
+                                    : undefined
+                            }
+                            className={cn(
+                                "flex size-8 shrink-0 items-center justify-center rounded-md border text-sm font-semibold",
+                                !color && "border-border bg-background text-foreground",
+                            )}
+                        >
+                            {optionBadge(page.options.length)}
+                        </span>
                         {!hideLabels && (
                             <span
                                 className={cn("truncate text-sm", fontSizeClass)}

@@ -34,7 +34,7 @@ function EndPageContentEditorComponent({
     endPage,
     endPageIndex,
     onUpdate,
-    isMobileView,
+    isMobileView: _isMobileView,
     theme,
     variables = EMPTY_VARIABLES,
     withBackground = true,
@@ -263,12 +263,11 @@ function EndPageContentEditorComponent({
                     </div>
                 </div>
             ) : (
-                <div className={cn("relative z-10 w-full min-h-0 overflow-y-auto max-w-[800px]")}>
+                <div className="relative z-10 w-full min-h-0 overflow-y-auto px-10">
                     <div
                         className={cn(
-                            "mx-auto flex flex-col transition-all duration-500 ease-out pl-5 pr-2 py-8 sm:px-6 sm:py-12",
-                            alignClass,
-                            isMobileView ? "w-full" : "w-full sm:w-11/12",
+                            "flex w-full flex-col pl-5 pr-2 py-8 sm:px-6 sm:py-12",
+                            alignClass
                         )}
                     >
                         <CoverImageBlock

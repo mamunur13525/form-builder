@@ -16,6 +16,7 @@ export function FormProvider({ children }: { children: ReactNode }) {
   const [formRevision, setFormRevision] = useState(0);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [previewForm, setPreviewForm] = useState<Form | null>(null);
+  const previewDraftRef = useRef<Form | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -70,16 +71,20 @@ export function FormProvider({ children }: { children: ReactNode }) {
     setForm((prev) => (prev ? { ...prev, ...updates } : prev));
   }, []);
 
-  // Opens the preview dialog. Pass a form to preview the latest (unsaved)
-  // builder data, otherwise fall back to the previously staged preview form
-  // or the loaded form.
+  // Opens the preview dialog. Pass a form to preview explicit data, otherwise
+  // fall back to the latest builder draft (kept in a ref so editing never
+  // re-renders the provider) or the loaded form.
+  const setPreviewDraft = useCallback((draft: Form | null) => {
+    previewDraftRef.current = draft;
+  }, []);
+
   const openPreview = useCallback(
     (formToPreview?: Form | null) => {
-      if (formToPreview !== undefined) {
-        setPreviewForm(formToPreview);
-      } else {
-        setPreviewForm((prev) => prev ?? form);
-      }
+      setPreviewForm(
+        formToPreview !== undefined
+          ? formToPreview
+          : (previewDraftRef.current ?? form),
+      );
       setShowPreview(true);
     },
     [form],
@@ -100,6 +105,7 @@ export function FormProvider({ children }: { children: ReactNode }) {
     setHasUnpublishedChanges,
     updateFormData,
     showSaveStatus,
+    setPreviewDraft,
     setPreviewForm,
     setShowPreview,
     openPreview,

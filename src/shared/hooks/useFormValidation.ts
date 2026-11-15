@@ -22,10 +22,8 @@ export function validateQuestion(
     // Statement questions/pages are display-only and never required.
     if (block.type === "statement") return null
 
-    const titleOrLabel = block.title || block.label || "This field"
-
     if (block.required && isEmpty(value)) {
-        return block.validation?.message || `${titleOrLabel} is required.`
+        return block.validation?.message || "This field is required."
     }
 
     const settings = block.settings ?? {}
@@ -57,8 +55,15 @@ export function validateQuestion(
     }
 
     if (block.type === "url" && value) {
+        // Accept bare hosts too ("user.com"), not only absolute URLs.
+        const raw = String(value).trim()
+        const candidate = /^[a-z][a-z\d+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`
         try {
-            new URL(String(value))
+            const url = new URL(candidate)
+            // Each host label must be non-empty (rejects ".com", "a..com").
+            if (!/^[a-z\d](?:[a-z\d-]*[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]*[a-z\d])?)+$/i.test(url.hostname)) {
+                throw new Error("invalid host")
+            }
         } catch {
             return block.validation?.message || "Please enter a valid URL."
         }
@@ -125,6 +130,23 @@ export function validateQuestion(
         }
     }
 
+    // Required sub-pages on contact info.
+    if (block.type === "contactInfo" && settings.contactInfo) {
+        const answers = (value as Record<string, string> | undefined) ?? {}
+        const missing = settings.contactInfo.pages.find(
+            (f) => !f.hidden && f.required && !answers[f.key]?.trim(),
+        )
+        if (missing) {
+            return block.validation?.message || `${missing.label} is required.`
+        }
+        if (answers.email && answers.email.trim()) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            if (!emailRegex.test(answers.email.trim())) {
+                return "Please enter a valid email address."
+            }
+        }
+    }
+
     // Every visible matrix row must be answered when the page is required.
     if (block.type === "matrix" && block.required && settings.matrix) {
         const answers = (value as Record<string, string | string[]> | undefined) ?? {}
@@ -148,6 +170,24 @@ export function validateQuestion(
         }
     }
 
+    // Slider values must sit inside the configured range (and low <= high).
+    if (block.type === "slider" && settings.slider) {
+        const { min = 0, max = 100, rangeMode } = settings.slider
+        if (rangeMode && Array.isArray(value)) {
+            const [low, high] = value as number[]
+            if (typeof low === "number" && typeof high === "number") {
+                if (low > high) {
+                    return block.validation?.message || "The low value cannot be greater than the high value."
+                }
+                if (low < min || high > max) {
+                    return block.validation?.message || `Please choose values between ${min} and ${max}.`
+                }
+            }
+        } else if (typeof value === "number" && (value < min || value > max)) {
+            return block.validation?.message || `Please choose a value between ${min} and ${max}.`
+        }
+    }
+
     return null
 }
 
@@ -159,10 +199,18 @@ export function validatePage(page: FormPage, valueOrAnswers: unknown): string | 
         : (page.blocks && page.blocks.length > 0 ? page.blocks : [])
 
     if (questions.length > 0) {
-        for (const question of questions) {
-            const key: string = question.questionKey || question.blockKey || page.pageKey
+        const hasMultiple = questions.length > 1
+        for (let idx = 0; idx < questions.length; idx++) {
+            const question = questions[idx]
+            const key: string =
+                question.questionKey ||
+                question.blockKey ||
+                (question as any).id ||
+                (question as any)._id ||
+                (hasMultiple ? `${page.pageKey}_q${idx + 1}` : page.pageKey)
             const questionValue = (typeof valueOrAnswers === "object" && valueOrAnswers !== null)
-                ? (valueOrAnswers as Record<string, unknown>)[key] ?? (valueOrAnswers as Record<string, unknown>)[page.pageKey]
+                ? ((valueOrAnswers as Record<string, unknown>)[key] ??
+                   (!hasMultiple ? (valueOrAnswers as Record<string, unknown>)[page.pageKey] : undefined))
                 : valueOrAnswers
             const error = validateQuestion(question, questionValue)
             if (error) return error
@@ -170,5 +218,12 @@ export function validatePage(page: FormPage, valueOrAnswers: unknown): string | 
         return null
     }
 
-    return validateQuestion(page, valueOrAnswers)
+    const pageValue =
+        typeof valueOrAnswers === "object" &&
+        valueOrAnswers !== null &&
+        page.pageKey in (valueOrAnswers as object)
+            ? (valueOrAnswers as Record<string, unknown>)[page.pageKey]
+            : valueOrAnswers
+
+    return validateQuestion(page, pageValue)
 }

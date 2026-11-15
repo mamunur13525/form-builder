@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useForms } from "@/features/forms/hooks/useForms"
 import { useFormPermissions } from "@/features/forms/hooks/useFormPermissions"
-import { FormCard } from "@/pages/Dashboard/components/FormCard"
+import { FormCard, FormCardSkeleton } from "@/pages/Dashboard/components/FormCard"
 import { FormDialog } from "@/pages/Dashboard/components/FormDialog"
 import { DeleteFormDialog } from "@/pages/Dashboard/components/DeleteFormDialog"
 import { DuplicateFormDialog } from "@/pages/Dashboard/components/DuplicateFormDialog"
 import type { FormStatus } from "@/entities/form/model/types"
 import { cn } from "@/lib/utils"
+import { PageLayout } from "@/shared/components/PageLayout"
 
 /** Status filters shown above the grid. `all` keeps every form. */
 const FILTERS: { value: FormStatus | "all"; label: string }[] = [
@@ -42,28 +43,20 @@ export function FormsPage() {
     }, [forms, query, status])
 
     return (
-        <div className="editorial mx-auto w-full max-w-[1600px] space-y-8 px-4 pt-8 pb-12 sm:space-y-12 sm:px-6 sm:pt-12 sm:pb-16 lg:px-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
-                <div>
-                    <h1 className="font-display text-[32px] leading-[1.1] sm:text-[48px] text-[var(--foreground)]">
-                        Forms
-                    </h1>
-                    <p className="mt-1 text-sm leading-6 sm:mt-2 sm:text-base text-[var(--editorial-body)]">
-                        Every form in your workspace, in one calm place.
-                    </p>
-                </div>
-                {/* A viewer can read every form here but cannot add one. */}
-                {canCreate && (
-                    <Button
-                        onClick={() => setCreateDialogOpen(true)}
-                    >
+        <PageLayout
+            title="Forms"
+            description="Every form in your workspace, in one calm place."
+            actions={
+                // A viewer can read every form here but cannot add one.
+                canCreate && (
+                    <Button onClick={() => setCreateDialogOpen(true)}>
                         <Plus className="h-5 w-5" />
                         <span className="hidden sm:inline">New Form</span>
                         <span className="sm:hidden">New</span>
                     </Button>
-                )}
-            </div>
-
+                )
+            }
+        >
             {/* Search + status filters */}
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-lg border border-[var(--input)] bg-[var(--card)] px-5 py-1 focus-within:border-[var(--primary)] sm:px-6 lg:min-w-[280px] lg:flex-1">
@@ -97,9 +90,11 @@ export function FormsPage() {
             </div>
 
             {isLoading ? (
-                <p className="py-16 text-center text-base text-[var(--editorial-subtle)]">
-                    Loading forms...
-                </p>
+                <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {[0, 1, 2, 3, 4, 5].map((index) => (
+                        <FormCardSkeleton key={index} index={index} />
+                    ))}
+                </div>
             ) : visibleForms.length === 0 ? (
                 <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
                     <CardContent className="py-20 text-center">
@@ -158,6 +153,6 @@ export function FormsPage() {
                 open={duplicateDialogOpen}
                 onOpenChange={setDuplicateDialogOpen}
             />
-        </div>
+        </PageLayout>
     )
 }

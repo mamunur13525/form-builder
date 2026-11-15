@@ -1,9 +1,10 @@
 import { useState } from "react"
-import { Bell, Link2, Pencil, Shield, User as UserIcon } from "lucide-react"
+import { Bell, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import {
     useCurrentUserProfile,
@@ -12,54 +13,41 @@ import {
 import { useChangePassword } from "@/features/auth/hooks/useAuth"
 import { showError, showSuccess } from "@/shared/hooks/useToast"
 import { cn } from "@/lib/utils"
+import { ProfileSettingsCard } from "./components/ProfileSettingsCard"
 
 const inputClass =
     "h-[52px] rounded-lg border-[var(--input)] bg-[var(--secondary)] px-6 text-base placeholder:text-[var(--editorial-subtle)]"
 
-
-/** A titled settings block, matching the editorial card treatment. */
-function SettingsCard({
-    icon: Icon,
-    title,
-    description,
-    children,
-}: {
-    icon: typeof UserIcon
-    title: string
-    description: string
-    children: React.ReactNode
-}) {
+/** Placeholder cards for the profile, security and notification sections. */
+function SettingsCardSkeleton({ index = 0 }: { index?: number }) {
     return (
-        <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
-            <CardContent className="p-5 sm:p-8">
+        <Card
+            className="editorial-shadow-sm animate-in fade-in duration-300 rounded-lg border-[var(--border)] bg-[var(--card)]"
+            style={{
+                animationDelay: `${index * 80}ms`,
+                animationFillMode: "backwards",
+            }}
+        >
+            <CardContent className="space-y-4 p-5 sm:p-8">
                 <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
-                        <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <h2 className="font-display text-xl leading-tight sm:text-2xl text-[var(--foreground)]">
-                            {title}
-                        </h2>
-                        <p className="mt-1 text-sm leading-6 sm:text-base text-[var(--editorial-body)]">
-                            {description}
-                        </p>
+                    <Skeleton className="h-12 w-12 rounded-lg" />
+                    <div className="min-w-0 flex-1 space-y-2">
+                        <Skeleton className="h-5 w-40" />
+                        <Skeleton className="h-4 w-64 max-w-full" />
                     </div>
                 </div>
-                <div className="mt-6 space-y-6 sm:mt-8">{children}</div>
+                <Skeleton className="h-[52px] w-full rounded-lg" />
+                <Skeleton className="h-[52px] w-full rounded-lg" />
             </CardContent>
         </Card>
     )
 }
 
 export function SettingsPage({ embedded = false }: { embedded?: boolean }) {
-    const { data: user } = useCurrentUserProfile()
+    const { data: user, isLoading } = useCurrentUserProfile()
     const updateProfile = useUpdateCurrentUserProfile()
     const changePassword = useChangePassword()
 
-    // Edits are held as overrides so the loaded profile can be shown without
-    // copying it into state inside an effect.
-    const [nameEdit, setNameEdit] = useState<string | null>(null)
-    const [avatarEdit, setAvatarEdit] = useState<string | null>(null)
     const [currentPassword, setCurrentPassword] = useState("")
     const [newPassword, setNewPassword] = useState("")
 
@@ -67,24 +55,11 @@ export function SettingsPage({ embedded = false }: { embedded?: boolean }) {
     const [emailOnResponse, setEmailOnResponse] = useState(true)
     const [weeklyDigest, setWeeklyDigest] = useState(false)
 
-    // Local text for the avatar URL input, decoupled from the saved override.
-    const [avatarInput, setAvatarInput] = useState("")
-    const [avatarEditorOpen, setAvatarEditorOpen] = useState(false)
-    const [isAvatarValid, setIsAvatarValid] = useState(true)
-
-    const name = nameEdit ?? user?.name ?? ""
-    const avatarUrl = avatarEdit ?? user?.avatarUrl ?? ""
-
-    const handleProfileSave = () => {
+    const handleProfileSave = (name: string, avatarUrl: string) => {
         updateProfile.mutate(
-            { name: name.trim(), avatarUrl: avatarUrl.trim() },
+            { name, avatarUrl },
             {
-                onSuccess: () => {
-                    // Drop the overrides so the freshly saved profile is shown.
-                    setNameEdit(null)
-                    setAvatarEdit(null)
-                    showSuccess("Profile updated")
-                },
+                onSuccess: () => showSuccess("Profile updated"),
                 onError: (error) => showError("Could not update profile", error),
             },
         )
@@ -103,49 +78,30 @@ export function SettingsPage({ embedded = false }: { embedded?: boolean }) {
                     setNewPassword("")
                     showSuccess("Password changed")
                 },
-                 onError: (error) => showError("Could not change password", error),
+                onError: (error) => showError("Could not change password", error),
             },
         )
     }
 
-    const initialsOf = (userName: string | undefined): string => {
-        if (!userName) return "?"
-        return userName
-            .trim()
-            .split(/\s+/)
-            .slice(0, 2)
-            .map((part) => part[0]?.toUpperCase() ?? "")
-            .join("")
-    }
+    const shellClass = cn(
+        "editorial mx-auto w-full space-y-6",
+        embedded
+            ? "max-w-none px-1 pb-4"
+            : "max-w-[900px] px-4 pt-8 pb-12 sm:space-y-12 sm:px-6 sm:pt-12 sm:pb-16 lg:px-8",
+    )
 
-    const isValidAvatarUrl = (url: string): boolean => {
-        try {
-            const u = new URL(url)
-            return /^https?:$/.test(u.protocol)
-        } catch {
-            return false
-        }
-    }
-
-    const handleAvatarSave = () => {
-        const trimmed = avatarInput.trim()
-        if (!trimmed || !isValidAvatarUrl(trimmed)) {
-            setIsAvatarValid(false)
-            return
-        }
-        setAvatarEdit(trimmed)
-        setAvatarEditorOpen(false)
+    if (isLoading) {
+        return (
+            <div className={shellClass}>
+                {[0, 1, 2].map((index) => (
+                    <SettingsCardSkeleton key={index} index={index} />
+                ))}
+            </div>
+        )
     }
 
     return (
-        <div
-            className={cn(
-                "editorial mx-auto w-full space-y-6",
-                embedded
-                    ? "max-w-none px-1 pb-4"
-                    : "max-w-[900px] px-4 pt-8 pb-12 sm:space-y-12 sm:px-6 sm:pt-12 sm:pb-16 lg:px-8",
-            )}
-        >
+        <div className={shellClass}>
             {!embedded && (
                 <div>
                     <h1 className="font-display text-[32px] leading-[1.1] sm:text-[48px] text-[var(--foreground)]">
@@ -157,219 +113,115 @@ export function SettingsPage({ embedded = false }: { embedded?: boolean }) {
                 </div>
             )}
 
-            <SettingsCard
-                icon={UserIcon}
-                title="Profile"
-                description="How your name and picture appear across the workspace."
-            >
-                 <div className="space-y-2">
-                    <Label htmlFor="settings-avatar" className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                        Avatar
-                    </Label>
-                    <div className="flex items-end gap-3">
-                         <div className="relative -mb-1 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--foreground)]">
-                            {avatarUrl ? (
-                                <img
-                                    src={avatarUrl}
-                                    alt="Your avatar"
-                                    className="h-full w-full object-cover rounded-full"
-                                />
-                            ) : (
-                                <span className="text-xl font-semibold">
-                                    {initialsOf(name || user?.name)}
-                                </span>
-                            )}
-                            <button
-                                type="button"
-                                aria-label="Edit avatar"
-                                onClick={() => {
-                                    setAvatarInput(avatarUrl)
-                                    setIsAvatarValid(true)
-                                    setAvatarEditorOpen((open) => !open)
-                                }}
-                                className={cn(
-                                    "editorial-transition absolute bottom-0.5 end-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--editorial-subtle)] shadow-sm",
-                                    "hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white",
-                                )}
-                            >
-                                <Pencil className="h-3.5 w-3.5" />
-                            </button>
+            <ProfileSettingsCard
+                user={user}
+                onSaveProfile={handleProfileSave}
+                isSaving={updateProfile.isPending}
+            />
+
+            <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
+                <CardContent className="p-5 sm:p-8">
+                    <div className="flex items-start gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
+                            <Shield className="h-5 w-5" />
                         </div>
-                        <span className="text-xs text-[var(--editorial-subtle)]">
-                            Click the pencil to set an avatar URL.
-                        </span>
-                       
+                        <div className="min-w-0 flex-1">
+                            <h2 className="font-display text-xl leading-tight sm:text-2xl text-[var(--foreground)]">
+                                Security
+                            </h2>
+                            <p className="mt-1 text-sm leading-6 sm:text-base text-[var(--editorial-body)]">
+                                Update the password you use to sign in.
+                            </p>
+                        </div>
                     </div>
-                     {avatarEditorOpen && (
-                            <div className="space-y-3 pt-1">
-                                <div className="space-y-1">
-                                    <Label
-                                        htmlFor="avatar-url"
-                                        className="editorial-eyebrow text-[var(--editorial-subtle)]"
-                                    >
-                                        Image URL
-                                    </Label>
-                                    <div className="relative">
-                                        <Link2 className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--editorial-subtle)]" />
-                                        <Input
-                                            id="avatar-url"
-                                            value={avatarInput}
-                                            onChange={(event) => {
-                                                setAvatarInput(event.target.value)
-                                                setIsAvatarValid(true)
-                                            }}
-                                            onKeyDown={(event) =>
-                                                event.key === "Enter" && handleAvatarSave()
-                                            }
-                                            placeholder="https://example.com/photo.jpg"
-                                            aria-invalid={!isAvatarValid}
-                                            className={cn(
-                                                inputClass,
-                                                "pl-10",
-                                                !isAvatarValid && "border-[var(--destructive)]",
-                                            )}
-                                        />
-                                    </div>
-                                    {!isAvatarValid && (
-                                        <p className="text-xs leading-5 text-[var(--destructive)]">
-                                            Please paste a valid HTTP(S) URL.
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="flex justify-end gap-2">
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() => setAvatarEditorOpen(false)}
-                                        className="text-sm"
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        onClick={handleAvatarSave}
-                                        className="text-sm"
-                                    >
-                                        Save
-                                    </Button>
-                                </div>
+                    <div className="mt-6 space-y-6 sm:mt-8">
+                        <div className="space-y-2">
+                            <Label htmlFor="settings-current-password" className="editorial-eyebrow text-[var(--editorial-subtle)]">
+                                Current password
+                            </Label>
+                            <Input
+                                id="settings-current-password"
+                                type="password"
+                                value={currentPassword}
+                                onChange={(event) => setCurrentPassword(event.target.value)}
+                                placeholder="••••••••"
+                                className={inputClass}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="settings-new-password" className="editorial-eyebrow text-[var(--editorial-subtle)]">
+                                New password
+                            </Label>
+                            <Input
+                                id="settings-new-password"
+                                type="password"
+                                value={newPassword}
+                                onChange={(event) => setNewPassword(event.target.value)}
+                                placeholder="••••••••"
+                                className={inputClass}
+                            />
+                        </div>
+                        <div className="flex justify-stretch sm:justify-end">
+                            <Button
+                                onClick={handlePasswordChange}
+                                disabled={changePassword.isPending}
+                            >
+                                {changePassword.isPending ? "Updating..." : "Change password"}
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
+                <CardContent className="p-5 sm:p-8">
+                    <div className="flex items-start gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--secondary)] text-[var(--primary)]">
+                            <Bell className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <h2 className="font-display text-xl leading-tight sm:text-2xl text-[var(--foreground)]">
+                                Notifications
+                            </h2>
+                            <p className="mt-1 text-sm leading-6 sm:text-base text-[var(--editorial-body)]">
+                                Choose when we should email you about activity.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="mt-6 space-y-6 sm:mt-8">
+                        <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                                <Label htmlFor="notify-response" className="cursor-pointer text-base text-[var(--foreground)]">
+                                    New response alerts
+                                </Label>
+                                <p className="mt-1 text-xs leading-5 text-[var(--editorial-subtle)]">
+                                    Get an email whenever someone completes one of your forms.
+                                </p>
                             </div>
-                        )}
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="settings-name" className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                        Full name
-                    </Label>
-                    <Input
-                        id="settings-name"
-                        value={name}
-                        onChange={(event) => setNameEdit(event.target.value)}
-                        placeholder="Your name"
-                        className={inputClass}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="settings-email" className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                        Email
-                    </Label>
-                    <Input
-                        id="settings-email"
-                        value={user?.email ?? ""}
-                        readOnly
-                        className={`${inputClass} text-[var(--editorial-subtle)]`}
-                    />
-                    <p className="text-xs leading-5 text-[var(--editorial-subtle)]">
-                        Your sign-in email cannot be changed here.
-                    </p>
-                </div>
-               
-                <div className="flex justify-stretch sm:justify-end">
-                    <Button
-                        onClick={handleProfileSave}
-                        disabled={updateProfile.isPending}
-                    >
-                        {updateProfile.isPending ? "Saving..." : "Save changes"}
-                    </Button>
-                </div>
-            </SettingsCard>
-
-            <SettingsCard
-                icon={Shield}
-                title="Security"
-                description="Update the password you use to sign in."
-            >
-                <div className="space-y-2">
-                    <Label htmlFor="settings-current-password" className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                        Current password
-                    </Label>
-                    <Input
-                        id="settings-current-password"
-                        type="password"
-                        value={currentPassword}
-                        onChange={(event) => setCurrentPassword(event.target.value)}
-                        placeholder="••••••••"
-                        className={inputClass}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="settings-new-password" className="editorial-eyebrow text-[var(--editorial-subtle)]">
-                        New password
-                    </Label>
-                    <Input
-                        id="settings-new-password"
-                        type="password"
-                        value={newPassword}
-                        onChange={(event) => setNewPassword(event.target.value)}
-                        placeholder="••••••••"
-                        className={inputClass}
-                    />
-                </div>
-                <div className="flex justify-stretch sm:justify-end">
-                    <Button
-                        onClick={handlePasswordChange}
-                        disabled={changePassword.isPending}
-                    >
-                        {changePassword.isPending ? "Updating..." : "Change password"}
-                    </Button>
-                </div>
-            </SettingsCard>
-
-            <SettingsCard
-                icon={Bell}
-                title="Notifications"
-                description="Choose when we should email you about activity."
-            >
-                <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                        <Label htmlFor="notify-response" className="cursor-pointer text-base text-[var(--foreground)]">
-                            New response alerts
-                        </Label>
-                        <p className="mt-1 text-xs leading-5 text-[var(--editorial-subtle)]">
-                            Get an email whenever someone completes one of your forms.
-                        </p>
+                            <Switch
+                                id="notify-response"
+                                checked={emailOnResponse}
+                                onCheckedChange={setEmailOnResponse}
+                            />
+                        </div>
+                        <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                                <Label htmlFor="notify-digest" className="cursor-pointer text-base text-[var(--foreground)]">
+                                    Weekly digest
+                                </Label>
+                                <p className="mt-1 text-xs leading-5 text-[var(--editorial-subtle)]">
+                                    A calm Monday summary of the past week's responses.
+                                </p>
+                            </div>
+                            <Switch
+                                id="notify-digest"
+                                checked={weeklyDigest}
+                                onCheckedChange={setWeeklyDigest}
+                            />
+                        </div>
                     </div>
-                    <Switch
-                        id="notify-response"
-                        checked={emailOnResponse}
-                        onCheckedChange={setEmailOnResponse}
-                    />
-                </div>
-                <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                        <Label htmlFor="notify-digest" className="cursor-pointer text-base text-[var(--foreground)]">
-                            Weekly digest
-                        </Label>
-                        <p className="mt-1 text-xs leading-5 text-[var(--editorial-subtle)]">
-                            A calm Monday summary of the past week's responses.
-                        </p>
-                    </div>
-                    <Switch
-                        id="notify-digest"
-                        checked={weeklyDigest}
-                        onCheckedChange={setWeeklyDigest}
-                    />
-                </div>
-            </SettingsCard>
+                </CardContent>
+            </Card>
         </div>
     )
 }

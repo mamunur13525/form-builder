@@ -6,10 +6,13 @@ import { apiRequest, apiRequestVoid, buildQuery } from "@/shared/api/client"
 import type {
     ExportParams,
     ExportResult,
+    FormAnalytics,
+    FormAnalyticsFilter,
     FormResponse,
     ResponsesListParams,
     ResponseStats,
     ResponseSummary,
+    ResponseSummaryPage,
     UpdateResponseRequest,
 } from "@/entities/response/model/types"
 
@@ -62,7 +65,25 @@ export async function getResponseStats(formId: string): Promise<ResponseStats> {
 
 /** GET /forms/:formId/responses/summary — get response summary. */
 export async function getResponseSummary(formId: string): Promise<ResponseSummary> {
-    return apiRequest<ResponseSummary>(`/forms/${formId}/responses/summary`)
+    // The API groups answers by pageKey in an object; the UI wants a list.
+    type ApiSummaryPage = { label: string; type: string; values: unknown[]; count: number }
+    const data = await apiRequest<{
+        totalResponses?: number
+        pages?: Record<string, ApiSummaryPage> | ResponseSummaryPage[]
+    }>(`/forms/${formId}/responses/summary`)
+
+    const pages: ResponseSummaryPage[] = Array.isArray(data.pages)
+        ? data.pages
+        : Object.entries(data.pages ?? {}).map(([pageKey, page]) => ({
+              pageKey,
+              label: page.label,
+              type: page.type,
+              answerCount: page.count,
+              uniqueAnswers: new Set(page.values.map((value) => JSON.stringify(value))).size,
+              values: page.values,
+          }))
+
+    return { totalResponses: data.totalResponses ?? 0, pages }
 }
 
 /** PATCH /forms/:formId/responses/:responseId/mark-read — mark a response as read. */
@@ -92,3 +113,14 @@ export async function unstarResponse(formId: string, responseId: string): Promis
         method: "PATCH",
     })
 }
+
+/** GET /forms/:formId/analytics — get form analytics, trends, and question drop-off rates. */
+export async function getFormAnalytics(
+    formId: string,
+    filters?: FormAnalyticsFilter,
+): Promise<FormAnalytics> {
+    return apiRequest<FormAnalytics>(
+        `/forms/${formId}/analytics${buildQuery(filters as Record<string, unknown> | undefined)}`,
+    )
+}
+

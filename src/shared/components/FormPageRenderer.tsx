@@ -10,11 +10,13 @@ import {
     SignaturePage,
     StatementPage,
     AddressPage,
+    ContactInfoPage,
     OpinionScalePage,
     MatrixPage,
     StarRatingPage,
     UploadPage,
     PhoneAnswerPage,
+    SliderPage,
 } from "./pages"
 import type { UploadedFile } from "./pages/UploadPage"
 
@@ -23,6 +25,7 @@ interface FormPageRendererProps {
     value: unknown
     error: string | null
     onAnswer: (pageKey: string, value: unknown) => void
+    isMobileView?: boolean
     color?: string
     fontSizeClass?: string
 }
@@ -36,7 +39,15 @@ const CHOICE_FALLBACK = {
     hideLabels: false,
 }
 
-export function FormPageRenderer({ page, value, error, onAnswer, color, fontSizeClass }: FormPageRendererProps) {
+export function FormPageRenderer({
+    page,
+    value,
+    error,
+    onAnswer,
+    isMobileView,
+    color,
+    fontSizeClass,
+}: FormPageRendererProps) {
     const settings = page.settings ?? {}
 
     switch (page.type) {
@@ -164,6 +175,7 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                     settings={settings.choice ?? CHOICE_FALLBACK}
                     multiple={false}
                     name={page.pageKey}
+                    isMobileView={isMobileView}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />
@@ -183,6 +195,7 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                     }
                     multiple
                     name={page.pageKey}
+                    isMobileView={isMobileView}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />
@@ -202,6 +215,7 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                     value={(value as number) || 0}
                     onChange={(v) => onAnswer(page.pageKey, v)}
                     settings={settings.rating ?? { style: "star", max: 5 }}
+                    color={color}
                 />
             )
         case "opinionScale":
@@ -217,6 +231,29 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                             rightLabel: "",
                         }
                     }
+                    color={color}
+                />
+            )
+        case "slider":
+            return (
+                <SliderPage
+                    value={value as number | [number, number] | undefined}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    settings={
+                        settings.slider ?? {
+                            min: 0,
+                            max: 100,
+                            step: 1,
+                            rangeMode: false,
+                            defaultLow: 0,
+                            defaultHigh: 100,
+                            prefix: "",
+                            suffix: "",
+                            thousandSeparator: "comma",
+                        }
+                    }
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "address":
@@ -225,6 +262,28 @@ export function FormPageRenderer({ page, value, error, onAnswer, color, fontSize
                     value={value as Record<string, string> | undefined}
                     onChange={(v) => onAnswer(page.pageKey, v)}
                     pages={settings.address?.pages ?? []}
+                    fieldsPerRow={settings.address?.fieldsPerRow}
+                    isMobileView={isMobileView}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
+                />
+            )
+        case "contactInfo":
+            return (
+                <ContactInfoPage
+                    value={value as Record<string, string> | undefined}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    pages={settings.contactInfo?.pages ?? []}
+                    phoneSettings={
+                        settings.contactInfo?.phone ??
+                        settings.phone ?? {
+                            phoneVerification: false,
+                            countryCodeMode: "auto",
+                            defaultCountry: null,
+                        }
+                    }
+                    fieldsPerRow={settings.contactInfo?.fieldsPerRow}
+                    isMobileView={isMobileView}
                     color={color}
                     fontSizeClass={fontSizeClass}
                 />

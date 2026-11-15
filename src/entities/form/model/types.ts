@@ -67,6 +67,11 @@ export interface Form {
     hasUnpublishedChanges?: boolean
     version?: number
     responses_count?: number
+    partial_count?: number
+    views_count?: number
+    workspaceId?: string
+    allowedEditors?: string[]
+    canEdit?: boolean
 }
 
 export interface PublishedForm {
@@ -245,7 +250,9 @@ export type PageType =
     | "url"
     | "statement"
     | "address"
+    | "contactInfo"
     | "opinionScale"
+    | "slider"
     | "signature"
     | "matrix"
 
@@ -295,7 +302,23 @@ export interface PageAddressSettings {
         required: boolean
         hidden: boolean
         order: number
+        width?: "50%" | "100%"
     }>
+    fieldsPerRow?: { desktop: number; mobile: number }
+}
+
+export interface PageContactInfoSettings {
+    pages: Array<{
+        key: "firstName" | "lastName" | "email" | "phone" | "company"
+        label: string
+        placeholder: string
+        required: boolean
+        hidden: boolean
+        order: number
+        width?: "50%" | "100%"
+    }>
+    phone?: PagePhoneSettings
+    fieldsPerRow?: { desktop: number; mobile: number }
 }
 
 export interface PageRatingSettings {
@@ -308,6 +331,20 @@ export interface PageOpinionScaleSettings {
     max: number
     leftLabel: string
     rightLabel: string
+}
+
+export type PageSliderSeparator = "comma" | "period" | "space" | "none"
+
+export interface PageSliderSettings {
+    min?: number
+    max?: number
+    step?: number
+    rangeMode?: boolean
+    defaultLow?: number | null
+    defaultHigh?: number | null
+    prefix?: string
+    suffix?: string
+    thousandSeparator?: PageSliderSeparator
 }
 
 export interface PageUploadSettings {
@@ -328,8 +365,10 @@ export interface PageSettings {
     statement?: PageStatementSettings
     choice?: PageChoiceSettings
     address?: PageAddressSettings
+    contactInfo?: PageContactInfoSettings
     rating?: PageRatingSettings
     opinionScale?: PageOpinionScaleSettings
+    slider?: PageSliderSettings
     upload?: PageUploadSettings
     matrix?: PageMatrixSettings
 }

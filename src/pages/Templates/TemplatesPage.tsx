@@ -1,119 +1,59 @@
 import { useMemo, useState } from "react"
-import {
-    ClipboardList,
-    CalendarCheck,
-    MessageSquareHeart,
-    Users,
-    Briefcase,
-    GraduationCap,
-    Search,
-    ArrowRight,
-    Sparkles,
-    FileSearch,
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+import { Search, ArrowRight, Sparkles, FileSearch } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useCreateForm } from "@/features/forms/hooks/useForms"
+import { useTemplates, type Template } from "@/features/templates/hooks/useTemplates"
 import { useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
-
-interface Template {
-    id: string
-    title: string
-    description: string
-    category: string
-    pageCount: number
-    icon: LucideIcon
-    /** Soft tint used for the icon tile background. */
-    tint: string
-    /** A short, human label for the category badge. */
-    badge: string
-}
-
-/**
- * Starter templates. Creating from one currently seeds a new blank form with
- * the template's title — the page presets are added in the builder.
- */
-const TEMPLATES: Template[] = [
-    {
-        id: "contact",
-        title: "Contact Form",
-        description: "A calm way to let people reach you without exposing an inbox.",
-        category: "General",
-        pageCount: 4,
-        icon: ClipboardList,
-        tint: "bg-[#FF5722]/15 text-[#FF5722]",
-        badge: "Everyday",
-    },
-    {
-        id: "feedback",
-        title: "Customer Feedback",
-        description: "Understand how people feel about your product in a few questions.",
-        category: "Research",
-        pageCount: 6,
-        icon: MessageSquareHeart,
-        tint: "bg-violet-500/15 text-violet-400",
-        badge: "Research",
-    },
-    {
-        id: "event",
-        title: "Event Registration",
-        description: "Collect attendee details, dietary needs and session choices.",
-        category: "Events",
-        pageCount: 7,
-        icon: CalendarCheck,
-        tint: "bg-sky-500/15 text-sky-400",
-        badge: "Events",
-    },
-    {
-        id: "application",
-        title: "Job Application",
-        description: "Gather candidate information and portfolio links in one pass.",
-        category: "Hiring",
-        pageCount: 8,
-        icon: Briefcase,
-        tint: "bg-emerald-500/15 text-emerald-400",
-        badge: "Hiring",
-    },
-    {
-        id: "survey",
-        title: "Community Survey",
-        description: "A longer questionnaire for research and audience discovery.",
-        category: "Research",
-        pageCount: 10,
-        icon: Users,
-        tint: "bg-amber-500/15 text-amber-400",
-        badge: "Research",
-    },
-    {
-        id: "course",
-        title: "Course Enrolment",
-        description: "Sign students up and record their prior experience.",
-        category: "Education",
-        pageCount: 6,
-        icon: GraduationCap,
-        tint: "bg-rose-500/15 text-rose-400",
-        badge: "Education",
-    },
-]
-
-const CATEGORIES = ["All", ...Array.from(new Set(TEMPLATES.map((t) => t.category)))]
+import { PageLayout } from "@/shared/components/PageLayout"
 
 /** The first template gets a "Featured" treatment in the grid. */
 const FEATURED_ID = "contact"
 
+/** Placeholder with the same footprint as a template card. */
+function TemplateCardSkeleton({ index = 0 }: { index?: number }) {
+    return (
+        <Card
+            className="animate-in fade-in duration-300 border-[var(--border)]"
+            style={{
+                animationDelay: `${index * 80}ms`,
+                animationFillMode: "backwards",
+            }}
+        >
+            <CardContent className="flex flex-1 flex-col">
+                <Skeleton className="h-14 w-14 rounded-lg" />
+                <Skeleton className="mt-6 h-3 w-16" />
+                <Skeleton className="mt-3 h-7 w-3/4" />
+                <Skeleton className="mt-3 h-4 w-full" />
+                <Skeleton className="mt-2 h-4 w-5/6" />
+                <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--editorial-border-light)] pt-5">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-9 w-32 rounded-lg" />
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
 export function TemplatesPage() {
     const navigate = useNavigate()
     const createForm = useCreateForm()
+    const { data: templates = [], isLoading } = useTemplates()
 
     const [query, setQuery] = useState("")
     const [category, setCategory] = useState("All")
 
+    const categories = useMemo(
+        () => ["All", ...Array.from(new Set(templates.map((t) => t.category)))],
+        [templates],
+    )
+
     const visibleTemplates = useMemo(() => {
         const term = query.trim().toLowerCase()
-        return TEMPLATES.filter((template) => {
+        return templates.filter((template) => {
             const matchesCategory = category === "All" || template.category === category
             const matchesQuery =
                 !term ||
@@ -121,7 +61,7 @@ export function TemplatesPage() {
                 template.description.toLowerCase().includes(term)
             return matchesCategory && matchesQuery
         })
-    }, [query, category])
+    }, [templates, query, category])
 
     /** Creates a form from the template and drops the user into the builder. */
     const createFromTemplate = (template: Template) => {
@@ -134,17 +74,10 @@ export function TemplatesPage() {
     }
 
     return (
-        <div className="editorial mx-auto w-full max-w-[1600px] space-y-8 px-4 pt-8 pb-12 sm:space-y-12 sm:px-6 sm:pt-12 sm:pb-16 lg:px-8">
-            <div>
-                <h1 className="font-display text-[32px] leading-[1.1] sm:text-[48px] text-[var(--foreground)]">
-                    Templates
-                </h1>
-                <p className="mt-1 max-w-xl text-sm leading-6 sm:mt-2 sm:text-base text-[var(--editorial-body)]">
-                    Start from a considered layout instead of a blank page. Every template
-                    is a normal form once created — edit anything you like.
-                </p>
-            </div>
-
+        <PageLayout
+            title="Templates"
+            description="Start from a considered layout instead of a blank page. Every template is a normal form once created — edit anything you like."
+        >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-lg border border-[var(--input)] bg-[var(--card)] px-5 py-1 focus-within:border-[var(--primary)] sm:px-6 lg:min-w-[280px] lg:flex-1">
                     <Search className="h-5 w-5 shrink-0 text-[var(--editorial-subtle)]" />
@@ -159,7 +92,7 @@ export function TemplatesPage() {
 
                 {/* Segmented control — inset track with a raised active item. */}
                 <div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible shadow-xs">
-                    {CATEGORIES.map((item) => (
+                    {categories.map((item) => (
                         <button
                             key={item}
                             type="button"
@@ -178,8 +111,14 @@ export function TemplatesPage() {
             </div>
 
             {/* Template grid */}
-            {visibleTemplates.length === 0 ? (
-                <Card className="editorial-shadow-sm mt-8 border-[var(--border)] bg-[var(--card)] sm:mt-10">
+            {isLoading ? (
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                    {[0, 1, 2, 3, 4, 5].map((index) => (
+                        <TemplateCardSkeleton key={index} index={index} />
+                    ))}
+                </div>
+            ) : visibleTemplates.length === 0 ? (
+                <Card className="editorial-shadow-sm border-[var(--border)] bg-[var(--card)]">
                     <CardContent className="flex flex-col items-center py-20 text-center">
                         <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[var(--editorial-border-light)] bg-[var(--editorial-canvas)] text-[var(--editorial-subtle)]">
                             <FileSearch className="h-6 w-6" />
@@ -202,7 +141,7 @@ export function TemplatesPage() {
                     </CardContent>
                 </Card>
             ) : (
-                <div className="mt-8 grid gap-5 sm:mt-10 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {visibleTemplates.map((template) => {
                         const isFeatured = template.id === FEATURED_ID
                         const Icon = template.icon
@@ -266,6 +205,6 @@ export function TemplatesPage() {
                     })}
                 </div>
             )}
-        </div>
+        </PageLayout>
     )
 }

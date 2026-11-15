@@ -8,7 +8,7 @@ interface FormSubmittedViewProps {
 
 export function FormSubmittedView({ onReset }: FormSubmittedViewProps) {
     return (
-        <div className="relative w-full h-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-muted/40 via-background to-background p-6">
+        <div className="light relative w-full h-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-muted/40 via-background to-background p-6">
             {/* Ambient background accents */}
             <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-green-500/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />

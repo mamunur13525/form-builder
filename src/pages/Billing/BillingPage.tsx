@@ -3,6 +3,7 @@ import { CreditCard, ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import type { Subscription, SubscriptionStatus } from "@/entities/billing/model/types"
 import {
@@ -109,7 +110,22 @@ export function BillingPage() {
     return (
         <div className="editorial mx-auto w-full max-w-none space-y-6 px-1 pb-4">
             {subscriptionQuery.isLoading ? (
-                <div className="h-[280px] animate-pulse rounded-lg border border-[var(--border)] bg-[var(--secondary)]" />
+                <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
+                    <CardContent className="space-y-4 p-5 sm:p-8">
+                        <div className="flex items-start gap-4">
+                            <Skeleton className="h-12 w-12 rounded-lg" />
+                            <div className="min-w-0 flex-1 space-y-2">
+                                <Skeleton className="h-6 w-48 max-w-full" />
+                                <Skeleton className="h-4 w-72 max-w-full" />
+                            </div>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <Skeleton className="h-10 rounded-lg" />
+                            <Skeleton className="h-10 rounded-lg" />
+                        </div>
+                        <Skeleton className="h-11 w-40 max-w-full rounded-lg" />
+                    </CardContent>
+                </Card>
             ) : (
                 <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
                     <CardContent className="p-5 sm:p-8">

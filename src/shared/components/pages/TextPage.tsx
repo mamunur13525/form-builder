@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 const inputBaseClasses =
-    "pl-0 text-2xl rounded-none border-0 border-b border-gray-500 focus:border-gray-200 outline-0! ring-0! focus:outline-0! focus:ring-0! focus-visible:outline-0! focus-visible:ring-0! focus-visible:ring-offset-0! focus-within:ring-0! focus-within:outline-0! bg-transparent duration-300"
+    "pl-0 text-2xl rounded-none border-0 border-b focus:border-b-2 border-gray-500 focus:border-gray-200 outline-0! ring-0! focus:outline-0! focus:ring-0! focus-visible:outline-0! focus-visible:ring-0! focus-visible:ring-offset-0! focus-within:ring-0! focus-within:outline-0! bg-transparent duration-300"
 
 interface TextPageProps {
     value: string
@@ -28,7 +28,7 @@ export function TextPage({
     fontSizeClass,
 }: TextPageProps) {
     const isError = !!error
-    const errorClasses = isError ? "border-destructive" : ""
+    const errorClasses = isError ? "border-destructive!" : ""
 
     return (
         <Input
@@ -39,7 +39,17 @@ export function TextPage({
             disabled={disabled}
             autoFocus={autoFocus}
             className={cn(inputBaseClasses, fontSizeClass, errorClasses)}
-            style={color ? { color } : undefined}
+            style={
+                color
+                    ? {
+                        color,
+                        borderColor: isError ? undefined : `color-mix(in oklab, ${color} 40%, transparent)`,
+                        ...({
+                            "--input-placeholder-color": `color-mix(in oklab, ${color} 40%, transparent)`,
+                        } as React.CSSProperties),
+                    }
+                    : undefined
+            }
         />
     )
 }

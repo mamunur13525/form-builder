@@ -23,6 +23,12 @@ export interface FormContextValue {
   setHasUnpublishedChanges: (hasChanges: boolean) => void;
   updateFormData: (updates: Partial<Form>) => void;
   showSaveStatus: (status: SaveStatus) => void;
+  /**
+   * Stores the latest builder draft for the next `openPreview()` without
+   * triggering a context re-render. Builder edits fire on every keystroke, so
+   * syncing them through state would re-render every consumer.
+   */
+  setPreviewDraft: (form: Form | null) => void;
   setPreviewForm: (form: Form | null) => void;
   setShowPreview: (show: boolean) => void;
   openPreview: (form?: Form | null) => void;

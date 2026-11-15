@@ -59,7 +59,7 @@ export function RuleEditorV2({
     const numericSources = useMemo(() => {
         const set = new Set<string>()
         for (const p of pages) {
-            if (["number", "rating", "opinionScale", "date", "time"].includes(p.type)) {
+            if (["number", "rating", "opinionScale", "slider", "date", "time"].includes(p.type)) {
                 set.add(p.pageKey)
             }
         }

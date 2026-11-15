@@ -11,6 +11,7 @@ import { ResponsePageShell } from "./components/ResponsePageShell"
 import { ResponseStateCard } from "./components/ResponseStateCard"
 import { SubmissionsTable } from "./components/SubmissionsTable"
 import { SubmissionsToolbar } from "./components/SubmissionsToolbar"
+import { SubmissionsSkeleton } from "./components/ResponseSkeletons"
 import { buildSubmissionColumns, type SubmissionLayer } from "./lib/columns"
 import {
     buildResponsesCsv,
@@ -25,6 +26,7 @@ export function SubmissionsPage() {
     const navigate = useNavigate()
 
     const [layer, setLayer] = useState<SubmissionLayer>("visible")
+    const [statusTab, setStatusTab] = useState<"completed" | "partial">("completed")
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
     const {
@@ -39,10 +41,34 @@ export function SubmissionsPage() {
     } = useResponses(formId || "")
 
     const form: CommonForm | null = apiForm ? adaptApiForm(apiForm) : null
-    const formResponses = useMemo(
+    const allFormResponses = useMemo(
         () => (apiResponses ?? []).map(adaptApiResponse),
         [apiResponses],
     )
+
+    const completedCount = useMemo(
+        () => allFormResponses.filter((r) => r.status !== "partial").length,
+        [allFormResponses],
+    )
+
+    const partialCount = useMemo(
+        () => allFormResponses.filter((r) => r.status === "partial").length,
+        [allFormResponses],
+    )
+
+    const formResponses = useMemo(
+        () =>
+            allFormResponses.filter((r) =>
+                statusTab === "partial" ? r.status === "partial" : r.status !== "partial",
+            ),
+        [allFormResponses, statusTab],
+    )
+
+    const handleStatusChange = (nextStatus: "completed" | "partial") => {
+        setStatusTab(nextStatus)
+        setSelectedIds(new Set())
+    }
+
     const isLoading = formLoading || responsesLoading
 
     const columns = useMemo(() => buildSubmissionColumns(form, layer), [form, layer])
@@ -119,20 +145,18 @@ export function SubmissionsPage() {
         )
     }
 
-    const hasResponses = formResponses.length > 0
-    const showTable = !isLoading && !formError && !responsesError && hasResponses
+    const hasAnyResponses = allFormResponses.length > 0
+    const showToolbarAndContent = !isLoading && !formError && !responsesError && hasAnyResponses
 
     return (
         <ResponsePageShell activeTab="submissions" fill>
             {isLoading ? (
-                <div className="p-4 sm:p-8">
-                    <ResponseStateCard loading message="Loading submissions..." />
-                </div>
+                <SubmissionsSkeleton />
             ) : formError || responsesError ? (
                 <div className="p-4 sm:p-8">
                     <ResponseStateCard message="Could not load submissions. Please try again." />
                 </div>
-            ) : !hasResponses ? (
+            ) : !hasAnyResponses ? (
                 <motion.div
                     className="p-4 sm:p-8"
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -156,10 +180,14 @@ export function SubmissionsPage() {
                 </motion.div>
             ) : null}
 
-            {showTable && (
+            {showToolbarAndContent && (
                 <>
                     <div className="border-b border-[var(--editorial-border-light)]">
                         <SubmissionsToolbar
+                            status={statusTab}
+                            onStatusChange={handleStatusChange}
+                            completedCount={completedCount}
+                            partialCount={partialCount}
                             layer={layer}
                             onLayerChange={setLayer}
                             columnCounts={columnCounts}
@@ -169,19 +197,26 @@ export function SubmissionsPage() {
                             onExport={handleExport}
                         />
                     </div>
-                    <motion.div
-                        className="min-h-0 flex-1"
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        <SubmissionsTable
-                            columns={columns}
-                            responses={formResponses}
-                            selectedIds={selectedIds}
-                            onToggleRow={toggleRow}
-                            onToggleAll={toggleAll}
-                        />
-                    </motion.div>
+                    {formResponses.length > 0 ? (
+                        <motion.div
+                            key={statusTab}
+                            className="min-h-0 flex-1"
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <SubmissionsTable
+                                columns={columns}
+                                responses={formResponses}
+                                selectedIds={selectedIds}
+                                onToggleRow={toggleRow}
+                                onToggleAll={toggleAll}
+                            />
+                        </motion.div>
+                    ) : (
+                        <div className="p-8 text-center text-muted-foreground">
+                            No {statusTab} submissions yet.
+                        </div>
+                    )}
                 </>
             )}
         </ResponsePageShell>

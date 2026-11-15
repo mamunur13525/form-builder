@@ -1,5 +1,6 @@
+import { useState } from "react";
 import type { FormPage } from "@/shared/types/common";
-import { TextPage } from "@/shared/components/pages";
+import { PhoneAnswerPage } from "@/shared/components/pages";
 
 interface EditorProps {
   page: FormPage;
@@ -9,13 +10,23 @@ interface EditorProps {
   fontSizeClass?: string;
 }
 
-export function PhoneEditor({ page, pageIndex, onUpdate, color, fontSizeClass }: EditorProps) {
+export function PhoneEditor({ page, color, fontSizeClass }: EditorProps) {
+  // Local demo value: typing or changing the country previews the mask without
+  // writing the answer into the question's placeholder.
+  const [preview, setPreview] = useState("");
+
   return (
     <div className="space-y-1">
-      <TextPage
-        value={page.placeholder}
-        onChange={(v) => onUpdate(pageIndex, { placeholder: v })}
-        placeholder="+1 (555) 000-0000"
+      <PhoneAnswerPage
+        value={preview}
+        onChange={setPreview}
+        settings={
+          page.settings?.phone ?? {
+            phoneVerification: false,
+            countryCodeMode: "auto",
+            defaultCountry: null,
+          }
+        }
         color={color}
         fontSizeClass={fontSizeClass}
       />

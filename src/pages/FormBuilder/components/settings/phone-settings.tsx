@@ -1,8 +1,11 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
-import { COUNTRIES, type Country } from "@/shared/constants/countries"
-import type { PhoneSettings as PhoneSettingsType } from "@/shared/types/common"
-import { ToggleRow, CONTROL_CLASS, OVERLAY_CLASS } from "./primitives"
+import { CountrySelect } from "@/shared/components/CountrySelect"
+import type { CountryCodeMode, PhoneSettings as PhoneSettingsType } from "@/shared/types/common"
+import { COUNTRY_PHONES } from "@/shared/constants/country-phone"
+import { ToggleRow, CONTROL_CLASS, TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "./primitives"
+
+const DEFAULT_COUNTRY = COUNTRY_PHONES.find((country) => country.iso2 === "BD") ?? COUNTRY_PHONES[0]
 
 /** Phone settings: verification + country code mode + specific country picker. */
 export function PhoneSettingsWidget({
@@ -12,8 +15,23 @@ export function PhoneSettingsWidget({
     settings: PhoneSettingsType
     onChange: (next: PhoneSettingsType) => void
 }) {
+    const setMode = (mode: CountryCodeMode) => {
+        onChange({
+            ...settings,
+            countryCodeMode: mode,
+            defaultCountry:
+                mode === "specific"
+                    ? (settings.defaultCountry ?? {
+                          iso2: DEFAULT_COUNTRY.iso2,
+                          name: DEFAULT_COUNTRY.name,
+                          dialCode: DEFAULT_COUNTRY.dialCode,
+                      })
+                    : settings.defaultCountry,
+        })
+    }
+
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             <ToggleRow
                 id="phone-verification"
                 label="Phone verification"
@@ -22,103 +40,54 @@ export function PhoneSettingsWidget({
                 onCheckedChange={(checked) => onChange({ ...settings, phoneVerification: checked })}
             />
 
-            <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-zinc-200">Default country code</Label>
-                <p className="text-xs leading-5 text-zinc-400">
-                    We'll auto-select the country code from the respondent's country. They can
-                    still change it before submitting.
-                </p>
+            <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-800 dark:text-zinc-100">
+                    Default country code
+                </Label>
 
-                <div className="flex items-center gap-2">
-                    <button
-                        type="button"
-                        onClick={() => onChange({ ...settings, countryCodeMode: "auto" })}
-                        className={`flex h-10 flex-1 items-center justify-center rounded-lg border px-4 text-xs font-medium transition-all cursor-pointer ${
-                            settings.countryCodeMode === "auto"
-                                ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
-                                : "border-zinc-800 bg-[#1a1a20] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
-                        }`}
-                    >
-                        Auto-detect
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() =>
-                            onChange({
-                                ...settings,
-                                countryCodeMode: "specific",
-                                defaultCountry: settings.defaultCountry ?? {
-                                    iso2: "BD",
-                                    name: "Bangladesh",
-                                    dialCode: "+880",
-                                },
-                            })
-                        }
-                        className={`flex h-10 flex-1 items-center justify-center rounded-lg border px-4 text-xs font-medium transition-all cursor-pointer ${
-                            settings.countryCodeMode === "specific"
-                                ? "border-[#FF5722] bg-[#FF5722]/15 text-[#FF5722]"
-                                : "border-zinc-800 bg-[#1a1a20] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
-                        }`}
-                    >
-                        Specific
-                    </button>
-                </div>
+                <Tabs
+                    value={settings.countryCodeMode}
+                    onValueChange={(value) => setMode(value === "specific" ? "specific" : "auto")}
+                >
+                    <TabsList className={TAB_LIST_CLASS}>
+                        <TabsTrigger value="auto" className={TAB_TRIGGER_CLASS}>
+                            Auto detect
+                        </TabsTrigger>
+                        <TabsTrigger value="specific" className={TAB_TRIGGER_CLASS}>
+                            Specific
+                        </TabsTrigger>
+                    </TabsList>
 
-                {settings.countryCodeMode === "specific" && (
-                    <CountrySelect
-                        value={settings.defaultCountry?.iso2 ?? ""}
-                        onChange={(country) =>
-                            onChange({
-                                ...settings,
-                                defaultCountry: {
-                                    iso2: country.iso2,
-                                    name: country.name,
-                                    dialCode: country.dialCode,
-                                },
-                            })
-                        }
-                    />
-                )}
+                    <TabsContent
+                        value="auto"
+                        className="text-xs leading-5 text-slate-500 dark:text-zinc-500"
+                    >
+                        We'll auto-select the country code from the respondent's country. They can
+                        still change it before submitting.
+                    </TabsContent>
+
+                    <TabsContent value="specific" className="space-y-2">
+                        <CountrySelect
+                            value={settings.defaultCountry?.iso2 ?? ""}
+                            className={CONTROL_CLASS + " w-full [&>svg:last-child]:text-slate-400"}
+                            onChange={(country) =>
+                                onChange({
+                                    ...settings,
+                                    defaultCountry: {
+                                        iso2: country.iso2,
+                                        name: country.name,
+                                        dialCode: country.dialCode,
+                                    },
+                                })
+                            }
+                        />
+                        <p className="text-xs leading-5 text-slate-500 dark:text-zinc-500">
+                            Respondents will see this country code by default. They can still
+                            change it before submitting.
+                        </p>
+                    </TabsContent>
+                </Tabs>
             </div>
         </div>
-    )
-}
-
-/** A searchable-ish select of all countries (iso2 → Country). */
-function CountrySelect({
-    value,
-    onChange,
-}: {
-    value: string
-    onChange: (country: Country) => void
-}) {
-    return (
-        <Select
-            value={value}
-            onValueChange={(iso2) => {
-                const country = COUNTRIES.find((c) => c.iso2 === iso2)
-                if (country) onChange(country)
-            }}
-        >
-            <SelectTrigger className={CONTROL_CLASS + " w-full [&>svg:last-child]:text-zinc-400"}>
-                <SelectValue placeholder="Select a country" />
-            </SelectTrigger>
-            <SelectContent className={OVERLAY_CLASS}>
-                {COUNTRIES.map((country) => (
-                    <SelectItem
-                        key={country.iso2}
-                        value={country.iso2}
-                        className="cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white"
-                    >
-                        <span className="flex items-center gap-2">
-                            <span className="w-16 shrink-0 text-zinc-500 font-normal">
-                                {country.dialCode}
-                            </span>
-                            <span className="text-zinc-200 font-medium">{country.name}</span>
-                        </span>
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
     )
 }

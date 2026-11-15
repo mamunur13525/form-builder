@@ -42,8 +42,13 @@ import {
     updateFormSettings,
     updateFormShare,
     updateFormTheme,
+    getFormAccess,
+    updateFormAccess,
+    type FormAccessResponse,
+    type UpdateFormAccessRequest,
 } from "@/entities/form/api/form.api"
 import { useActiveWorkspace } from "@/features/workspaces/hooks/useWorkspaces"
+import { showError } from "@/shared/hooks/useToast"
 
 const FORMS_QUERY_KEY = ["forms"]
 
@@ -136,6 +141,7 @@ export function useCreateForm() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: FORMS_QUERY_KEY })
         },
+        onError: (error) => showError("Couldn't create form", error),
     })
 }
 
@@ -260,6 +266,29 @@ export function useUpdateFormShare() {
             updateFormShare(formId, data),
         onSuccess: (updated: FormShare) => {
             queryClient.setQueryData([...FORMS_QUERY_KEY, updated.formId, "share"], updated)
+        },
+    })
+}
+
+/** GET /forms/:formId/access — retrieve form access members */
+export function useFormAccess(formId: string, enabled = true) {
+    return useQuery({
+        queryKey: [...FORMS_QUERY_KEY, formId, "access"],
+        queryFn: () => getFormAccess(formId),
+        enabled: Boolean(formId) && enabled,
+        staleTime: 60 * 1000,
+    })
+}
+
+/** PATCH /forms/:formId/access — update form access for a member */
+export function useUpdateFormAccess(formId: string) {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (data: UpdateFormAccessRequest) => updateFormAccess(formId, data),
+        onSuccess: (updated: FormAccessResponse) => {
+            queryClient.setQueryData([...FORMS_QUERY_KEY, formId, "access"], updated)
+            queryClient.invalidateQueries({ queryKey: FORMS_QUERY_KEY })
         },
     })
 }

@@ -32,6 +32,7 @@ import {
     UpdatesListPage,
     UpdateDetailPage,
 } from "../../pages/Feedback"
+import { TermsPage, PrivacyPage } from "../../pages/Legal"
 import { FormLayout } from "../layouts/FormLayout"
 import { ROUTES } from "@/shared/constants/routes"
 import { tokenStorage } from "@/shared/utils/storage"
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
                     { path: ROUTES.ADMIN_UPDATES, element: <AdminUpdatesPage /> },
                 ],
             },
+            { path: ROUTES.INVITATION_ACCEPT, element: <AcceptInvitationPage /> },
+            { path: ROUTES.INVITATION_PREVIEW, element: <AcceptInvitationPage /> },
+            { path: ROUTES.TERMS, element: <TermsPage /> },
+            { path: ROUTES.PRIVACY, element: <PrivacyPage /> },
             {
                 element: <ProtectedLayout />,
                 children: [
@@ -91,9 +96,6 @@ export const router = createBrowserRouter([
                     { path: ROUTES.WORKSPACE_SETTINGS, element: <SettingsDeepLink section="workspace" /> },
                     { path: ROUTES.BILLING, element: <SettingsDeepLink section="billing" /> },
                     { path: ROUTES.PRICING, element: <SettingsDeepLink section="pricing" /> },
-                    // Behind auth: the server matches the signed-in email against
-                    // the invited address before accepting.
-                    { path: ROUTES.INVITATION_ACCEPT, element: <AcceptInvitationPage /> },
                     { path: ROUTES.BILLING_SUCCESS, element: <BillingSuccessPage /> },
                     {
                         element: <FormLayout />,

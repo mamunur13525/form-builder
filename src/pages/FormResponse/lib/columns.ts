@@ -41,6 +41,15 @@ export interface SubmissionColumn {
 /** Metadata columns appended after the answers in the "all" layer. */
 const METADATA_COLUMNS: SubmissionColumn[] = [
     {
+        id: "meta.status",
+        label: "Status",
+        group: "metadata",
+        getValue: (response) =>
+            response.status
+                ? response.status.charAt(0).toUpperCase() + response.status.slice(1)
+                : "Completed",
+    },
+    {
         id: "meta.country",
         label: "Country",
         group: "metadata",
@@ -86,17 +95,63 @@ const METADATA_COLUMNS: SubmissionColumn[] = [
 
 /** Build the answer columns for a form, ordered the same way as the form itself. */
 function buildAnswerColumns(form: Form): SubmissionColumn[] {
-    return [...form.pages]
-        .sort((a, b) => a.order - b.order)
-        .map((page) => ({
-            id: page.pageKey,
-            label: page.label,
-            group: "answer" as const,
-            getValue: (response: FormResponse) =>
-                formatAnswerValue(
-                    response.answers.find((answer) => answer.pageKey === page.pageKey)?.value,
-                ),
-        }))
+    const columns: SubmissionColumn[] = []
+    const sortedPages = [...form.pages].sort((a, b) => a.order - b.order)
+
+    for (const page of sortedPages) {
+        const questions = (page.questions && page.questions.length > 0)
+            ? [...page.questions].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            : (page.blocks && page.blocks.length > 0)
+                ? [...page.blocks].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                : []
+
+        if (questions.length > 0) {
+            questions.forEach((q, idx) => {
+                const questionKey =
+                    q.questionKey ||
+                    q.blockKey ||
+                    (questions.length === 1 ? page.pageKey : `${page.pageKey}_q${idx + 1}`)
+                const label =
+                    q.title ||
+                    q.label ||
+                    (questions.length === 1 ? (page.title || page.label) : `Question ${idx + 1}`)
+
+                columns.push({
+                    id: questionKey,
+                    label: label || `Question ${idx + 1}`,
+                    group: "answer" as const,
+                    getValue: (response: FormResponse) => {
+                        const answer = response.answers?.find(
+                            (a) =>
+                                (a.questionKey && a.questionKey === questionKey) ||
+                                (a.blockKey && a.blockKey === questionKey) ||
+                                (a.pageKey && a.pageKey === questionKey) ||
+                                (questions.length === 1 &&
+                                    (a.pageKey === page.pageKey || a.blockKey === page.pageKey)),
+                        )
+                        return formatAnswerValue(answer?.value)
+                    },
+                })
+            })
+        } else {
+            columns.push({
+                id: page.pageKey,
+                label: page.title || page.label || page.pageKey,
+                group: "answer" as const,
+                getValue: (response: FormResponse) => {
+                    const answer = response.answers?.find(
+                        (a) =>
+                            a.pageKey === page.pageKey ||
+                            a.blockKey === page.pageKey ||
+                            a.questionKey === page.pageKey,
+                    )
+                    return formatAnswerValue(answer?.value)
+                },
+            })
+        }
+    }
+
+    return columns
 }
 
 /**

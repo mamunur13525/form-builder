@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { showError } from "@/shared/hooks/useToast"
+import { uploadImage } from "@/shared/api/upload.api"
 import type { CoverImage } from "@/shared/types/common"
 import { cn } from "@/lib/utils"
 import { TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "./primitives"
@@ -75,24 +76,29 @@ function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
     const [dragOver, setDragOver] = useState(false)
     const [uploading, setUploading] = useState(false)
 
-    const readFileAsDataUrl = (file: File) => new Promise<string>((resolve) => {
-        const reader = new FileReader()
-        reader.onloadend = () => resolve(reader.result as string)
-        reader.readAsDataURL(file)
-    })
-
     const processFile = async (file: File | undefined) => {
         if (!file) return
         if (!file.type.startsWith("image/")) {
-            showError("Invalid file type", new Error("Please select an image file."))
+            showError("Invalid file type", new Error("Please select an image file (JPG, PNG, WebP, GIF, etc)."))
+            return
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            showError("File too large", new Error("Image must be smaller than 10MB."))
             return
         }
         setUploading(true)
         try {
-            const dataUrl = await readFileAsDataUrl(file)
-            onSelect({ url: dataUrl, alt: "" })
-        } catch {
-            showError("Upload failed", new Error("Could not read the image file."))
+            const uploaded = await uploadImage(file)
+            if (uploaded?.url) {
+                const finalUrl = uploaded.url.startsWith("http")
+                    ? uploaded.url
+                    : `${(import.meta.env.VITE_API_URL || "").replace(/\/+$/, "")}${uploaded.url.startsWith("/") ? "" : "/"}${uploaded.url}`
+                onSelect({ url: finalUrl, alt: file.name || "" })
+            } else {
+                throw new Error("No URL returned from upload server.")
+            }
+        } catch (err: any) {
+            showError("Upload failed", err instanceof Error ? err : new Error("Could not upload the image file to ImageKit."))
         } finally {
             setUploading(false)
         }
@@ -110,9 +116,10 @@ function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
-                onClick={() => inputRef.current?.click()}
+                onClick={() => !uploading && inputRef.current?.click()}
                 className={cn(
                     "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed py-8 sm:py-12 text-center transition-all",
+                    uploading && "pointer-events-none opacity-70",
                     dragOver
                         ? "border-[#FF5722] bg-[#FF5722]/10"
                         : "border-slate-300 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 hover:border-[#FF5722]/60 hover:bg-slate-100/70 dark:hover:bg-zinc-900/70"
@@ -124,7 +131,7 @@ function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
                     <Upload className="h-6 w-6 text-[#FF5722]" />
                 )}
                 <div className="text-sm text-slate-800 dark:text-zinc-200 font-medium">
-                    {uploading ? "Uploading..." : "Drag & drop an image here, or click to browse"}
+                    {uploading ? "Uploading to ImageKit..." : "Drag & drop an image here, or click to browse"}
                 </div>
                 <p className="text-xs text-slate-500 dark:text-zinc-500">JPG, PNG, WebP, GIF up to 10MB</p>
             </div>

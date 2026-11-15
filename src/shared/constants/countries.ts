@@ -258,3 +258,26 @@ export const COUNTRIES: Country[] = [
 export function findCountryByIso2(iso2: string): Country | undefined {
     return COUNTRIES.find((c) => c.iso2 === iso2.toUpperCase())
 }
+
+/**
+ * Country for a BCP-47 locale such as `en-US` or `zh-Hant-TW`. Scans the
+ * subtags from the end, so script subtags (`Hant`) are skipped.
+ */
+export function countryFromLocale(locale: string): Country | undefined {
+    const parts = locale.split("-")
+    for (let index = parts.length - 1; index > 0; index--) {
+        const part = parts[index]
+        if (part.length !== 2) continue
+        const country = findCountryByIso2(part)
+        if (country) return country
+    }
+    return undefined
+}
+
+/** Regional-indicator emoji for an ISO 3166-1 alpha-2 code (e.g. `US` → 🇺🇸). */
+export function flagEmoji(iso2: string): string {
+    return iso2
+        .toUpperCase()
+        .replace(/[^A-Z]/g, "")
+        .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
+}

@@ -1,4 +1,3 @@
-import { List } from "lucide-react"
 import type { FormPage } from "@/shared/types/common"
 import { OptionListEditor } from "./OptionListEditor"
 
@@ -10,5 +9,5 @@ interface EditorProps {
 }
 
 export function SelectEditor(props: EditorProps) {
-    return <OptionListEditor {...props} icon={List} />
+    return <OptionListEditor {...props} />
 }

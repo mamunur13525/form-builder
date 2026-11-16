@@ -438,10 +438,20 @@ button[aria-haspopup="true"].border:focus-visible {
 }
 
 /* Portalled surfaces (menus, dialogs) opt out of the ambient wash in dark
-   mode — a flat popover over a dark canvas reads cleaner. */
+   mode — a flat popover over a dark canvas reads cleaner. Cards that carry
+   `.editorial` for its tokens opt out too: the wash belongs to canvases, not
+   to tiles sitting on them. Declared after `.dark .editorial` on purpose —
+   same specificity, so order decides. */
+.editorial-flat,
 .dark .editorial-flat,
 .dark.editorial-flat,
 :root.dark .editorial-flat,
+.dark .editorial.bg-card,
+.dark.editorial.bg-card,
+:root.dark .editorial.bg-card,
+.dark .editorial.bg-\[var\(--card\)\],
+.dark.editorial.bg-\[var\(--card\)\],
+:root.dark .editorial.bg-\[var\(--card\)\],
 .dark [data-slot="dropdown-menu-content"],
 .dark [data-slot="alert-dialog-content"],
 .dark [role="dialog"],

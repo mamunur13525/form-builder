@@ -119,7 +119,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
   return (
     <>
       <Card
-        className="editorial editorial-transition cursor-pointer border-[var(--border)] bg-[var(--card)] p-6 hover:-translate-y-0.5 hover:border-[#FF5722]/50 hover:shadow-[0_12px_32px_rgba(255,87,34,0.08)] transition-all flex flex-col justify-between rounded-lg"
+        className="editorial editorial-flat editorial-transition cursor-pointer border-[var(--border)] bg-card p-6 hover:-translate-y-0.5 hover:border-[#FF5722]/50 hover:shadow-[0_12px_32px_rgba(255,87,34,0.08)] transition-all flex flex-col justify-between rounded-lg"
         onClick={() => navigate(`/form-builder/${form.id}`)}
       >
         <CardHeader className="p-0">
@@ -230,7 +230,7 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
 export function FormCardSkeleton({ index = 0 }: { index?: number }) {
   return (
     <Card
-      className="editorial animate-in fade-in duration-300 border-[var(--border)] bg-[var(--card)] p-6 rounded-lg"
+      className="editorial editorial-flat animate-in fade-in duration-300 border-[var(--border)] bg-card p-6 rounded-lg"
       style={{
         animationDelay: `${index * 80}ms`,
         animationFillMode: "backwards",

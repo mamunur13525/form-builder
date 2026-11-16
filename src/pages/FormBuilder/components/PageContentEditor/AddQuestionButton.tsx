@@ -83,10 +83,10 @@ export function AddQuestionButton({ onAddQuestion, className }: AddQuestionButto
               showTrigger={false}
               showClear={Boolean(searchQuery)}
               placeholder="Search question types..."
-              className="w-full text-xs h-8 bg-slate-50/80 dark:bg-zinc-800/60 rounded-lg border border-slate-200 dark:border-zinc-700 outline-0 ring-0 shadow-none focus:outline-0 focus:ring-0 focus:border-[#FF5722] focus-within:outline-0 focus-within:ring-0 focus-within:border-[#FF5722]"
+              className="w-full text-sm h-10 bg-slate-50/80 dark:bg-zinc-800/60 rounded-lg border border-slate-200 dark:border-zinc-700 outline-0 ring-0 shadow-none focus:outline-0 focus:ring-0 focus:border-[#FF5722] focus-within:outline-0 focus-within:ring-0 focus-within:border-[#FF5722]"
             >
               <InputGroupAddon align="inline-start">
-                <Search className="size-3.5 text-slate-400 dark:text-zinc-500" />
+                <Search className="size-4 text-slate-400 dark:text-zinc-500" />
               </InputGroupAddon>
             </ComboboxInput>
           </div>

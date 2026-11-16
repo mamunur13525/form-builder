@@ -74,9 +74,10 @@ export function SliderPage({
 
     const span = max - min || 1
     const percent = (n: number) => ((n - min) / span) * 100
-    const thumbColor = color || "#0f172a"
+    const thumbColor = color || "#09090b"
     const lowPercent = percent(lowValue)
     const highPercent = percent(highValue)
+    const singlePercent = clamp(percent(singleValue), 0, 100)
 
     const shellStyle = { "--slider-color": thumbColor } as CSSProperties
 
@@ -92,14 +93,14 @@ export function SliderPage({
 
     return (
         <div
-            className={cn("w-full select-none", disabled && "opacity-60")}
+            className="w-full select-none"
             style={shellStyle}
         >
             <div
                 className={cn(
-                    "mb-4 flex items-baseline gap-1 font-semibold tabular-nums",
+                    "mb-4 flex items-baseline gap-1 font-bold tabular-nums",
                     fontSizeClass || "text-2xl",
-                    !color && "text-slate-900 dark:text-zinc-100",
+                    !color && "text-black dark:text-zinc-50",
                 )}
                 style={color ? { color } : undefined}
             >
@@ -114,13 +115,21 @@ export function SliderPage({
             <div className="relative h-6 w-full">
                 <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-slate-200 dark:bg-zinc-700" />
 
-                {rangeMode && (
+                {rangeMode ? (
                     <div
                         className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full"
                         style={{
                             left: `${lowPercent}%`,
                             width: `${Math.max(highPercent - lowPercent, 0)}%`,
-                            backgroundColor: `color-mix(in oklab, ${thumbColor} 30%, transparent)`,
+                            backgroundColor: thumbColor,
+                        }}
+                    />
+                ) : (
+                    <div
+                        className="absolute top-1/2 left-0 h-2 -translate-y-1/2 rounded-full"
+                        style={{
+                            width: `${singlePercent}%`,
+                            backgroundColor: thumbColor,
                         }}
                     />
                 )}
@@ -203,9 +212,9 @@ function RangeInput({
                 "pointer-events-none absolute inset-0 h-6 w-full appearance-none bg-transparent focus-visible:outline-none",
                 "disabled:cursor-not-allowed",
                 "[&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-transparent",
-                "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-color)] [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110",
+                "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:-mt-1.5 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[var(--slider-color)] [&::-webkit-slider-thumb]:bg-[var(--slider-color)] [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110",
                 "[&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-transparent",
-                "[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-[var(--slider-color)] [&::-moz-range-thumb]:shadow-md",
+                "[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[var(--slider-color)] [&::-moz-range-thumb]:bg-[var(--slider-color)] [&::-moz-range-thumb]:shadow-md",
                 className,
             )}
         />

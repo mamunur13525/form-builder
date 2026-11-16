@@ -95,7 +95,7 @@ export function QuestionTypeSetting({
                         </ComboboxInput>
                     </div>
                     <ComboboxEmpty className="py-4 text-center text-xs text-slate-400 dark:text-zinc-500">No question types found.</ComboboxEmpty>
-                    <ComboboxList className="space-y-1 max-h-[380px] overflow-y-auto p-1">
+                    <ComboboxList className="space-y-1 max-h-[520px] overflow-y-auto p-1">
                         {(item: PageType) => {
                             const visual = PAGE_TYPE_VISUALS[item]
                             const Icon = visual?.icon ?? FileText

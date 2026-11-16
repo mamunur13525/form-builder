@@ -1,16 +1,10 @@
 import { useState } from "react"
-import { Plus, Trash2, Flag, ArrowUpToLine, Loader2, MoreVertical, Check } from "lucide-react"
+import { Plus, Trash2, Flag, ArrowUpToLine, Loader2, Check } from "lucide-react"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "../../../../components/ui/popover"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Button } from "../../../../components/ui/button"
 import {
     Tooltip,
@@ -170,6 +164,27 @@ function EndPageItem({
             </div>
 
             <div className="flex shrink-0 items-center gap-0.5">
+                {!isFirst && (
+                    <Tooltip>
+                        <TooltipTrigger
+                            render={
+                                <button
+                                    type="button"
+                                    aria-label="Show on submit"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        onReorderToFirst(index)
+                                    }}
+                                    className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                >
+                                    <ArrowUpToLine className="h-3.5 w-3.5" />
+                                </button>
+                            }
+                        />
+                        <TooltipContent>Show on submit</TooltipContent>
+                    </Tooltip>
+                )}
+
                 {canDelete && (
                     <Popover open={confirmOpen} onOpenChange={setConfirmOpen}>
                         <Tooltip>
@@ -228,46 +243,6 @@ function EndPageItem({
                         </PopoverContent>
                     </Popover>
                 )}
-
-                <DropdownMenu>
-                    <DropdownMenuTrigger
-                        render={
-                            <button
-                                type="button"
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
-                            >
-                                <MoreVertical className="h-4 w-4" />
-                            </button>
-                        }
-                    />
-                    <DropdownMenuContent align="end" className="w-48 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#18181c] p-1.5 shadow-xl dark:shadow-2xl text-slate-800 dark:text-zinc-200">
-                        {!isFirst && (
-                            <DropdownMenuItem
-                                className="cursor-pointer rounded-lg text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    onReorderToFirst(index)
-                                }}
-                            >
-                                <ArrowUpToLine className="h-3.5 w-3.5 mr-2 text-slate-400 dark:text-zinc-400" />
-                                Show on submit
-                            </DropdownMenuItem>
-                        )}
-                        {canDelete && (
-                            <DropdownMenuItem
-                                className="cursor-pointer rounded-lg text-xs font-medium text-rose-500 hover:bg-rose-500/10 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    setConfirmOpen(true)
-                                }}
-                            >
-                                <Trash2 className="h-3.5 w-3.5 mr-2" />
-                                Delete
-                            </DropdownMenuItem>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </div>
         </div>
     )

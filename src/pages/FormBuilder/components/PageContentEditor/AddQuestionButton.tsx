@@ -99,7 +99,7 @@ export function AddQuestionButton({ onAddQuestion, className }: AddQuestionButto
             No question types found.
           </ComboboxEmpty>
 
-          <ComboboxList className="max-h-[320px] p-0.5">
+          <ComboboxList className="max-h-[480px] p-0.5">
             {(type: PageType) => {
               const visual = PAGE_TYPE_VISUALS[type];
               const TypeIcon = visual?.icon;

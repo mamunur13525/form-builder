@@ -1,4 +1,5 @@
 import { Copy, GripVertical, Trash2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FormPage, FormQuestion } from "@/shared/types/common";
 import type { VariableItem } from "@/shared/components/pages";
 import { VariableEditable } from "@/shared/components/pages";
@@ -222,44 +223,65 @@ export function PageQuestionItem({
 
             {/* Question Actions: floated in the page margin so they never cover the answer */}
             <div className="absolute -right-6 top-1 z-10 flex flex-col items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDuplicateQuestion(questionIndex);
-                }}
-                title="Duplicate question"
-                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
-              >
-                <Copy className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDeleteQuestion(questionIndex);
-                }}
-                title="Delete question"
-                className="p-1 rounded text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      type="button"
+                      aria-label="Duplicate question"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDuplicateQuestion(questionIndex);
+                      }}
+                      className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  }
+                />
+                <TooltipContent side="top">Duplicate </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      type="button"
+                      aria-label="Delete question"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteQuestion(questionIndex);
+                      }}
+                      className="p-1 rounded text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  }
+                />
+                <TooltipContent side="top">Delete</TooltipContent>
+              </Tooltip>
             </div>
           </div>
         ) : (
           /* Single question: duplicate floats in the page margin */
           <div className="absolute -right-6 top-1 flex flex-col items-center gap-0.5 opacity-0 group-hover/question:opacity-100 transition-opacity z-10">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDuplicateQuestion(questionIndex);
-              }}
-              title="Duplicate question"
-              className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
-            >
-              <Copy className="h-3.5 w-3.5" />
-            </button>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    aria-label="Duplicate question"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDuplicateQuestion(questionIndex);
+                    }}
+                    className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </button>
+                }
+              />
+              <TooltipContent side="top">Duplicate</TooltipContent>
+            </Tooltip>
           </div>
         )}
 

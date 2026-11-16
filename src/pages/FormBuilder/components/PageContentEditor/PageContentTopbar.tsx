@@ -54,7 +54,7 @@ const PageContentTopbar = ({
         <button
           type="button"
           onClick={onAddPage}
-          className="flex items-center gap-2 rounded-lg bg-[#FF5722] hover:bg-[#F4511E] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[#FF5722]/20 transition-all cursor-pointer active:scale-95"
+          className="flex items-center gap-2 rounded-lg bg-black hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-200 dark:text-neutral-900 px-4 py-2 text-sm font-semibold shadow-sm transition-all cursor-pointer active:scale-95"
         >
           <Plus className="h-4 w-4 stroke-[2.5]" />
           <span>Add page</span>

@@ -32,6 +32,13 @@ import { adaptApiForm } from "@/features/forms/model/adapters"
 import type { Form as CommonForm } from "@/shared/types/common"
 import type { AnalyticsTrendPoint, FormAnalyticsFilter } from "@/entities/response/model/types"
 import { cn } from "@/lib/utils"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+    type ChartConfig,
+} from "@/components/ui/chart"
 import { ResponsePageShell } from "./components/ResponsePageShell"
 import { ResponseStateCard } from "./components/ResponseStateCard"
 import { AnalyticsSkeleton } from "./components/ResponseSkeletons"
@@ -89,172 +96,60 @@ function getQuestionTypeBadge(type: string) {
     }
 }
 
-/** Helper to compute a smooth cubic bezier path through coordinate points. */
-function createSmoothPath(points: { x: number; y: number }[]): string {
-    if (points.length === 0) return ""
-    if (points.length === 1) return `M ${points[0].x} ${points[0].y}`
-    if (points.length === 2) {
-        return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`
-    }
+type TrendMetric = "views" | "starts" | "submissions"
 
-    let d = `M ${points[0].x} ${points[0].y}`
-    for (let i = 0; i < points.length - 1; i++) {
-        const p0 = points[i === 0 ? i : i - 1]
-        const p1 = points[i]
-        const p2 = points[i + 1]
-        const p3 = points[i + 2 < points.length ? i + 2 : i + 1]
-
-        const cp1x = p1.x + (p2.x - p0.x) / 6
-        const cp1y = p1.y + (p2.y - p0.y) / 6
-        const cp2x = p2.x - (p3.x - p1.x) / 6
-        const cp2y = p2.y - (p3.y - p1.y) / 6
-
-        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`
-    }
-    return d
-}
+/** Colors match the metric cards above so each series is recognizable. */
+const trendConfig = {
+    views: { label: "Views", color: "#A855F7" },
+    starts: { label: "Starts", color: "#0EA5E9" },
+    submissions: { label: "Submissions", color: "#22C55E" },
+} satisfies ChartConfig
 
 interface TrendChartProps {
     data: AnalyticsTrendPoint[]
-    metric: "views" | "starts" | "submissions"
+    metric: TrendMetric
 }
 
 function TrendChart({ data, metric }: TrendChartProps) {
-    const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
-
-    const width = 800
-    const height = 220
-    const padding = { top: 20, right: 30, bottom: 40, left: 40 }
-    const chartWidth = width - padding.left - padding.right
-    const chartHeight = height - padding.top - padding.bottom
-
-    const values = data.map((d) => d[metric] ?? 0)
-    const rawMax = Math.max(...values, 0)
-    const maxValue = rawMax === 0 ? 5 : Math.ceil(rawMax * 1.25)
-
-    const points = data.map((d, i) => {
-        const x = padding.left + (data.length > 1 ? (i / (data.length - 1)) * chartWidth : chartWidth / 2)
-        const val = d[metric] ?? 0
-        const y = padding.top + (1 - val / maxValue) * chartHeight
-        return { x, y, value: val, date: d.date }
-    })
-
-    const linePath = createSmoothPath(points)
-    const areaPath =
-        points.length > 0
-            ? `${linePath} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${points[0].x} ${padding.top + chartHeight} Z`
-            : ""
-
-    // Grid ticks (0, 50%, 100%)
-    const gridTicks = [0, Math.round(maxValue / 2), maxValue]
+    const { color } = trendConfig[metric]
+    const gradientId = `trend-${metric}-fill`
 
     return (
-        <div className="relative w-full overflow-hidden">
-            <svg
-                viewBox={`0 0 ${width} ${height}`}
-                className="w-full h-48 sm:h-56 select-none"
-                preserveAspectRatio="none"
-            >
+        <ChartContainer config={trendConfig} className="aspect-auto h-48 w-full sm:h-56">
+            <AreaChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: 0 }}>
                 <defs>
-                    <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#C084FC" stopOpacity="0.45" />
-                        <stop offset="60%" stopColor="#E9D5FF" stopOpacity="0.15" />
-                        <stop offset="100%" stopColor="#FAF5FF" stopOpacity="0.0" />
+                    <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={color} stopOpacity={0.45} />
+                        <stop offset="100%" stopColor={color} stopOpacity={0} />
                     </linearGradient>
                 </defs>
-
-                {/* Horizontal Grid lines */}
-                {gridTicks.map((tick, i) => {
-                    const y = padding.top + (1 - tick / maxValue) * chartHeight
-                    return (
-                        <g key={i}>
-                            <line
-                                x1={padding.left}
-                                y1={y}
-                                x2={width - padding.right}
-                                y2={y}
-                                stroke="currentColor"
-                                className="text-slate-100 dark:text-zinc-800"
-                                strokeDasharray="3 3"
-                            />
-                            <text
-                                x={padding.left - 10}
-                                y={y + 4}
-                                textAnchor="end"
-                                className="text-[10px] fill-slate-400 dark:fill-zinc-500 font-mono"
-                            >
-                                {tick}
-                            </text>
-                        </g>
-                    )
-                })}
-
-                {/* Area fill */}
-                {areaPath && (
-                    <path
-                        d={areaPath}
-                        fill="url(#trendGradient)"
-                    />
-                )}
-
-                {/* Smooth Curve Stroke */}
-                {linePath && (
-                    <path
-                        d={linePath}
-                        fill="none"
-                        stroke="#A855F7"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                )}
-
-                {/* Data Points */}
-                {points.map((pt, idx) => (
-                    <g key={idx}>
-                        <circle
-                            cx={pt.x}
-                            cy={pt.y}
-                            r={hoveredIdx === idx ? 5 : 3}
-                            className="fill-white stroke-[#9333EA] stroke-2 cursor-pointer transition-all"
-                            onMouseEnter={() => setHoveredIdx(idx)}
-                            onMouseLeave={() => setHoveredIdx(null)}
-                        />
-                    </g>
-                ))}
-
-                {/* X-axis labels */}
-                {points.map((pt, idx) => {
-                    // Show a label every few points if there are many
-                    const step = Math.max(1, Math.floor(points.length / 7))
-                    if (idx % step !== 0 && idx !== points.length - 1) return null
-                    return (
-                        <text
-                            key={idx}
-                            x={pt.x}
-                            y={height - 10}
-                            textAnchor="middle"
-                            className="text-[10px] fill-slate-400 dark:fill-zinc-500"
-                        >
-                            {pt.date}
-                        </text>
-                    )
-                })}
-            </svg>
-
-            {/* Hover Tooltip */}
-            {hoveredIdx !== null && points[hoveredIdx] && (
-                <div
-                    className="absolute pointer-events-none -top-1 bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs px-2.5 py-1 rounded shadow-md transform -translate-x-1/2 transition-all z-10"
-                    style={{
-                        left: `${(points[hoveredIdx].x / width) * 100}%`,
-                    }}
-                >
-                    <div className="font-semibold capitalize">{metric}: {points[hoveredIdx].value}</div>
-                    <div className="text-[10px] opacity-75">{points[hoveredIdx].date}</div>
-                </div>
-            )}
-        </div>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    minTickGap={24}
+                />
+                <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    allowDecimals={false}
+                    width={32}
+                />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                <Area
+                    type="monotone"
+                    dataKey={metric}
+                    stroke={color}
+                    strokeWidth={2.5}
+                    fill={`url(#${gradientId})`}
+                    dot={{ r: 3, fill: "var(--background)", stroke: color, strokeWidth: 2 }}
+                    activeDot={{ r: 5 }}
+                />
+            </AreaChart>
+        </ChartContainer>
     )
 }
 
@@ -263,7 +158,7 @@ export function AnalyticsPage() {
 
     const [timeRange, setTimeRange] = useState<NonNullable<FormAnalyticsFilter["timeRange"]>>("all")
     const [device, setDevice] = useState<NonNullable<FormAnalyticsFilter["device"]>>("all")
-    const [trendMetric, setTrendMetric] = useState<"views" | "starts" | "submissions">("views")
+    const [trendMetric, setTrendMetric] = useState<TrendMetric>("views")
 
     const {
         data: apiForm,
@@ -468,7 +363,7 @@ export function AnalyticsPage() {
                                 <Select
                                     value={trendMetric}
                                     onValueChange={(val) => {
-                                        if (val) setTrendMetric(val as "views" | "starts" | "submissions")
+                                        if (val) setTrendMetric(val as TrendMetric)
                                     }}
                                 >
                                     <SelectTrigger className="h-8 w-full rounded-lg border border-slate-200 bg-white dark:border-zinc-800 dark:bg-[#18181b] text-xs font-medium px-2.5 text-slate-700 dark:text-zinc-200 shadow-xs">

@@ -143,7 +143,7 @@ function PageContentEditorComponent({
             <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-slate-200/90 dark:bg-zinc-800" />
             <AddQuestionButton
               onAddQuestion={(type) => insertQuestion(0, type)}
-              className="!absolute !w-auto left-[-42px] top-1/2 -translate-y-1/2"
+              className="absolute! w-auto! left-[-42px] top-1/2 -translate-y-1/2"
             />
           </div>
         )}
@@ -193,11 +193,11 @@ function PageContentEditorComponent({
                   isDragged={isDragged}
                 />
                 {/* Full-width hover line + add button in the page margin */}
-                <div className="pointer-events-none absolute inset-x-0 -bottom-4 h-px bg-slate-200/90 opacity-0 transition-opacity group-hover/question:opacity-100 dark:bg-zinc-800" />
+                <div className="pointer-events-none absolute inset-x-0 -bottom-4 h-px bg-slate-200/90 opacity-0 transition-opacity group-hover/pagecontent:opacity-100 dark:bg-zinc-800" />
                 <AddQuestionButton
                   onAddQuestion={(type) => insertQuestion(qIdx + 1, type)}
                   className={cn(
-                    "!absolute !w-auto left-[-42px] -bottom-4 -translate-y-1/2 z-20 opacity-0 group-hover/question:opacity-100 hover:!opacity-100 focus-within:opacity-100 transition-opacity",
+                    "absolute! w-auto! left-[-42px] -bottom-4 -translate-y-1/2 z-20 opacity-0 group-hover/pagecontent:opacity-100 hover:opacity-100! focus-within:opacity-100 transition-opacity",
                     isDragged ? "invisible" : ""
                   )}
                 />

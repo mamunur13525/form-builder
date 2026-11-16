@@ -65,7 +65,7 @@ export function SubmissionsToolbar({
                                 : "text-muted-foreground hover:text-foreground",
                         )}
                     >
-                        <span>1. Completed</span>
+                        <span>Completed</span>
                         <span
                             className={cn(
                                 "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
@@ -88,7 +88,7 @@ export function SubmissionsToolbar({
                                 : "text-muted-foreground hover:text-foreground",
                         )}
                     >
-                        <span>2. Partial</span>
+                        <span>Partial</span>
                         <span
                             className={cn(
                                 "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",

@@ -1,6 +1,5 @@
 import React from "react"
-import { Layers, Palette, Settings as SettingsIcon } from "lucide-react"
-import { Tabs, TabsContent } from "../../../components/ui/tabs"
+import { Layers } from "lucide-react"
 
 import type {
     PageSettings,
@@ -28,7 +27,6 @@ interface SettingsPanelProps {
     page: FormPage
     pageIndex: number
     onUpdate: (index: number, updates: Partial<FormPage>) => void
-    onOpenDesignDrawer: () => void
     selectedQuestionId?: string | null
     onSelectQuestion?: (questionId: string | null) => void
 }
@@ -37,7 +35,6 @@ function SettingsPanelComponent({
     page,
     pageIndex,
     onUpdate,
-    onOpenDesignDrawer,
     selectedQuestionId,
     onSelectQuestion,
 }: SettingsPanelProps) {
@@ -145,82 +142,60 @@ function SettingsPanelComponent({
                 <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Page settings</h3>
             </div>
 
-            <div className="flex flex-1 min-h-0 flex-col">
-                <Tabs defaultValue="settings" className="flex flex-1 min-h-0 flex-col">
-                    {/* Pill tabs: Settings (active) | Design */}
-                    <div className="px-6 py-2">
-                        <div className="flex h-10 rounded-lg bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1">
-                            <div className="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#1e1e24] text-sm font-medium text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-zinc-700/60">
-                                <SettingsIcon className="h-4 w-4 text-[#FF5722]" />
-                                Settings
-                            </div>
-                            <button
-                                type="button"
-                                onClick={onOpenDesignDrawer}
-                                className="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-                            >
-                                <Palette className="h-4 w-4 text-slate-400 dark:text-zinc-400" />
-                                Design
-                            </button>
-                        </div>
-                    </div>
+            <div className="flex flex-1 min-h-0 flex-col overflow-y-auto">
+                <div className="space-y-6 px-6 py-4">
+                    <QuestionSwitcher
+                        questions={questions}
+                        activeIndex={safeQuestionIndex}
+                        onSelect={(idx, q) => {
+                            setActiveQuestionIndex(idx)
+                            onSelectQuestion?.(q.questionKey || q.blockKey || null)
+                        }}
+                    />
 
-                    <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
-                        <div className="space-y-6 px-6 py-4">
-                            <QuestionSwitcher
-                                questions={questions}
-                                activeIndex={safeQuestionIndex}
-                                onSelect={(idx, q) => {
-                                    setActiveQuestionIndex(idx)
-                                    onSelectQuestion?.(q.questionKey || q.blockKey || null)
-                                }}
-                            />
+                    <QuestionTypeSetting
+                        type={currentQuestion.type}
+                        index={safeQuestionIndex}
+                        total={questions.length}
+                        onChange={handleTypeChange}
+                    />
 
-                            <QuestionTypeSetting
-                                type={currentQuestion.type}
-                                index={safeQuestionIndex}
-                                total={questions.length}
-                                onChange={handleTypeChange}
-                            />
+                    {/* Required — every type except statement */}
+                    {!isStatement && (
+                        <RequiredToggle
+                            checked={currentQuestion.required ?? false}
+                            onCheckedChange={(required) => updateCurrentQuestion({ required })}
+                        />
+                    )}
 
-                            {/* Required — every type except statement */}
-                            {!isStatement && (
-                                <RequiredToggle
-                                    checked={currentQuestion.required ?? false}
-                                    onCheckedChange={(required) => updateCurrentQuestion({ required })}
-                                />
-                            )}
+                    <TypeSpecificSettings
+                        question={currentQuestion}
+                        settings={settings}
+                        isChoiceType={isChoiceType}
+                        isMultiAnswer={isMultiAnswer}
+                        isStatement={isStatement}
+                        onPatchSettings={patchSettings}
+                        onPatchValidation={patchValidation}
+                    />
 
-                            <TypeSpecificSettings
-                                question={currentQuestion}
-                                settings={settings}
-                                isChoiceType={isChoiceType}
-                                isMultiAnswer={isMultiAnswer}
-                                isStatement={isStatement}
-                                onPatchSettings={patchSettings}
-                                onPatchValidation={patchValidation}
-                            />
+                    <ValidationMessageSetting
+                        validation={currentQuestion.validation}
+                        onPatch={patchValidation}
+                    />
 
-                            <ValidationMessageSetting
-                                validation={currentQuestion.validation}
-                                onPatch={patchValidation}
-                            />
+                    <CoverImageSetting
+                        page={page}
+                        pageIndex={pageIndex}
+                        onUpdate={onUpdate}
+                    />
 
-                            <CoverImageSetting
-                                page={page}
-                                pageIndex={pageIndex}
-                                onUpdate={onUpdate}
-                            />
-
-                            <PageButtonSetting
-                                page={page}
-                                pageIndex={pageIndex}
-                                isStatement={isStatement}
-                                onUpdate={onUpdate}
-                            />
-                        </div>
-                    </TabsContent>
-                </Tabs>
+                    <PageButtonSetting
+                        page={page}
+                        pageIndex={pageIndex}
+                        isStatement={isStatement}
+                        onUpdate={onUpdate}
+                    />
+                </div>
             </div>
         </div>
     )

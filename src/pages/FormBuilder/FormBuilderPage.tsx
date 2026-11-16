@@ -211,7 +211,6 @@ export function FormBuilderPage() {
         page={selectedPage}
         pageIndex={selectedPageIndex}
         onUpdate={updatePage}
-        onOpenDesignDrawer={openDesignDrawer}
         selectedQuestionId={selectedQuestionId}
         onSelectQuestion={selectQuestionId}
       />

@@ -9,6 +9,7 @@ import { ForgotPasswordPage } from "../../pages/ForgotPassword"
 import { DashboardPage } from "../../pages/Dashboard"
 import { FormsPage } from "../../pages/Forms"
 import { TemplatesPage } from "../../pages/Templates"
+import { PaymentsPage } from "../../pages/Payments"
 import { AcceptInvitationPage } from "../../pages/AcceptInvitation"
 import { BillingSuccessPage } from "../../pages/BillingSuccess"
 import { FormBuilderPage } from "../../pages/FormBuilder"
@@ -92,6 +93,7 @@ export const router = createBrowserRouter([
                     { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
                     { path: ROUTES.FORMS, element: <FormsPage /> },
                     { path: ROUTES.TEMPLATES, element: <TemplatesPage /> },
+                    { path: ROUTES.PAYMENTS, element: <PaymentsPage /> },
                     { path: ROUTES.SETTINGS, element: <SettingsDeepLink section="account" /> },
                     { path: ROUTES.WORKSPACE_SETTINGS, element: <SettingsDeepLink section="workspace" /> },
                     { path: ROUTES.BILLING, element: <SettingsDeepLink section="billing" /> },

@@ -1,6 +1,11 @@
-import { Code2 } from "lucide-react"
+import { Code2, CalendarClock } from "lucide-react"
 import type { ChoiceSettings, FormQuestion, PageSettings, Validation } from "../../../../shared/types/common"
 import { NumberSetting, SettingsSection, ToggleRow } from "./primitives"
+import {
+    MeetingSettingsWidget,
+    type MeetingSourceField,
+} from "./meeting-settings"
+import { defaultMeetingSettings } from "@/shared/constants/meeting"
 import {
     HideLabelsSetting,
     HorizontalAlignSetting,
@@ -8,12 +13,14 @@ import {
     SelectionLimitSetting,
 } from "./choice-settings"
 import { PhoneSettingsWidget } from "./phone-settings"
+import { PaymentSettingsWidget } from "./payment-settings"
 import { RatingSettingsWidget } from "./rating-settings"
 import { SliderSettingsWidget } from "./slider-settings"
 import {
     AddressSettingsWidget,
     ContactInfoSettingsWidget,
     MatrixSettingsWidget,
+    NpsSettingsWidget,
     OpinionScaleSettingsWidget,
     StatementSettingsWidget,
     UploadSettingsWidget,
@@ -28,6 +35,8 @@ interface TypeSpecificSettingsProps {
     isStatement: boolean
     onPatchSettings: (group: Partial<PageSettings>) => void
     onPatchValidation: (patch: Partial<Validation>) => void
+    /** Fields that appear before this question, for meeting prefill mapping. */
+    earlierFields?: MeetingSourceField[]
 }
 
 /** Every per-question-type settings section, in one place. */
@@ -39,6 +48,7 @@ export function TypeSpecificSettings({
     isStatement,
     onPatchSettings,
     onPatchValidation,
+    earlierFields = [],
 }: TypeSpecificSettingsProps) {
     // The choice group with guaranteed defaults, so widgets never see undefined.
     const choice: ChoiceSettings = settings.choice ?? {
@@ -163,6 +173,23 @@ export function TypeSpecificSettings({
                 </SettingsSection>
             )}
 
+            {/* ---------------- Meeting / scheduling ---------------- */}
+            {question.type === "meeting" && (
+                <SettingsSection
+                    title="Meeting"
+                    icon={<CalendarClock className="h-4 w-4 text-slate-400" />}
+                >
+                    <MeetingSettingsWidget
+                        settings={{
+                            ...defaultMeetingSettings(),
+                            ...settings.meeting,
+                        }}
+                        onChange={(meeting) => onPatchSettings({ meeting })}
+                        earlierFields={earlierFields}
+                    />
+                </SettingsSection>
+            )}
+
             {/* ---------------- Choice types ---------------- */}
             {isChoiceType && (
                 <SettingsSection title="Options">
@@ -256,6 +283,22 @@ export function TypeSpecificSettings({
                 </SettingsSection>
             )}
 
+            {/* ---------------- NPS ---------------- */}
+            {question.type === "nps" && (
+                <SettingsSection title="NPS">
+                    <NpsSettingsWidget
+                        settings={
+                            settings.nps ?? {
+                                leftLabel: "",
+                                rightLabel: "",
+                                singleRowOnMobile: false,
+                            }
+                        }
+                        onChange={(nps) => onPatchSettings({ nps })}
+                    />
+                </SettingsSection>
+            )}
+
             {/* ---------------- Slider ---------------- */}
             {question.type === "slider" && (
                 <SettingsSection title="Slider">
@@ -306,6 +349,25 @@ export function TypeSpecificSettings({
                             }
                         }
                         onChange={(matrix) => onPatchSettings({ matrix })}
+                    />
+                </SettingsSection>
+            )}
+
+            {/* ---------------- Payment ---------------- */}
+            {question.type === "payment" && (
+                <SettingsSection title="Payment">
+                    <PaymentSettingsWidget
+                        settings={
+                            settings.payment ?? {
+                                stripeAccountId: "",
+                                currency: "usd",
+                                amount: 0,
+                                allowInstallments: false,
+                                receiptEmailKey: "",
+                            }
+                        }
+                        onChange={(payment) => onPatchSettings({ payment })}
+                        earlierFields={earlierFields}
                     />
                 </SettingsSection>
             )}

@@ -191,9 +191,12 @@ export type PageType =
     | "address"
     | "contactInfo"
     | "opinionScale"
+    | "nps"
     | "slider"
     | "signature"
     | "matrix"
+    | "meeting"
+    | "payment"
 
 // ---------------------------------------------------------------------------
 // Cover image (available on every page type)
@@ -252,6 +255,31 @@ export interface StatementSettings {
     embedUrl: string
     embedProvider: StatementEmbedProvider
     embedTitle: string
+}
+
+export type MeetingProvider =
+    | "calendly"
+    | "calcom"
+    | "calid"
+    | "savvycal"
+    | "tidycal"
+
+/** Maps an answer from an earlier question into a booking-page query param. */
+export interface MeetingPrefillMapping {
+    id: string
+    /** `questionKey`/`blockKey` of the source question. */
+    sourceKey: string
+    /** Query param understood by the scheduling provider (e.g. `name`). */
+    targetKey: string
+}
+
+export interface MeetingSettings {
+    provider: MeetingProvider
+    /** Full booking-page URL, e.g. `https://cal.com/jane/intro`. */
+    link: string
+    /** Label on the button that opens the scheduling dialog. */
+    openerText: string
+    prefillMappings: MeetingPrefillMapping[]
 }
 
 export type SelectionLimitMode = "none" | "exact" | "range"
@@ -336,6 +364,13 @@ export interface OpinionScaleSettings {
     rightLabel: string
 }
 
+export interface NpsSettings {
+    leftLabel: string
+    rightLabel: string
+    /** Shrink the 0–10 buttons so they fit in one row on mobile. */
+    singleRowOnMobile: boolean
+}
+
 export type SliderSeparator = "comma" | "period" | "space" | "none"
 
 export interface SliderSettings {
@@ -377,18 +412,32 @@ export interface MatrixSettings {
     allowMultiplePerRow: boolean
 }
 
+export interface PaymentSettings {
+    /** Connected Stripe account that receives the charge. */
+    stripeAccountId: string
+    currency: string
+    /** Fixed price in the currency's minor unit (cents). */
+    amount: number
+    allowInstallments: boolean
+    /** Earlier email question key that receives the receipt. Empty = no receipt. */
+    receiptEmailKey: string
+}
+
 export interface PageSettings {
     email?: EmailSettings
     phone?: PhoneSettings
     statement?: StatementSettings
+    meeting?: MeetingSettings
     choice?: ChoiceSettings
     address?: AddressSettings
     contactInfo?: ContactInfoSettings
     rating?: RatingSettings
     opinionScale?: OpinionScaleSettings
+    nps?: NpsSettings
     slider?: SliderSettings
     upload?: UploadSettings
     matrix?: MatrixSettings
+    payment?: PaymentSettings
 }
 
 export interface FormQuestion {

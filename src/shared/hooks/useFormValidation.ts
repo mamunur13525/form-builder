@@ -19,8 +19,22 @@ export function validateQuestion(
     block: FormQuestion | FormBlock | FormPage,
     value: unknown,
 ): string | null {
-    // Statement questions/pages are display-only and never required.
-    if (block.type === "statement") return null
+    // Statement and meeting questions/pages are display-only and never required.
+    if (block.type === "statement" || block.type === "meeting") return null
+
+    // A payment page only counts as answered once Stripe has confirmed it. The
+    // value stored here is the verified session returned by the server.
+    if (block.type === "payment") {
+        const paid =
+            typeof value === "object" &&
+            value !== null &&
+            (value as { status?: unknown }).status === "paid" &&
+            Boolean((value as { sessionId?: unknown }).sessionId)
+        if (!paid) {
+            return block.validation?.message || "Complete the payment to continue."
+        }
+        return null
+    }
 
     if (block.required && isEmpty(value)) {
         return block.validation?.message || "This field is required."

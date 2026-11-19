@@ -32,7 +32,7 @@ function FormLayoutContent() {
   const handleOpenForm = () => {
     setShowPublishDialog(false);
     
-    window.open(`/form/${formId}`, "_blank");
+    window.open(`/form/${form?.slug || formId}`, "_blank");
   };
 
   return (
@@ -51,6 +51,7 @@ function FormLayoutContent() {
         open={showPublishDialog}
         onOpenChange={setShowPublishDialog}
         formId={formId}
+        slug={form?.slug}
         isPublished={isPublished}
         hasUnpublishedChanges={hasUnpublishedChanges}
         onIsPublishedChange={setIsPublished}

@@ -252,9 +252,12 @@ export type PageType =
     | "address"
     | "contactInfo"
     | "opinionScale"
+    | "nps"
     | "slider"
     | "signature"
     | "matrix"
+    | "meeting"
+    | "payment"
 
 export interface PageOption {
     label?: string
@@ -283,6 +286,24 @@ export interface PageStatementSettings {
     embedUrl: string
     embedProvider: "youtube" | "loom" | "vimeo" | "pdf" | "image" | "other"
     embedTitle: string
+}
+
+export type PageMeetingProvider =
+    | "calendly"
+    | "calcom"
+    | "calid"
+    | "savvycal"
+    | "tidycal"
+
+export interface PageMeetingSettings {
+    provider: PageMeetingProvider
+    link: string
+    openerText: string
+    prefillMappings: Array<{
+        id: string
+        sourceKey: string
+        targetKey: string
+    }>
 }
 
 export interface PageChoiceSettings {
@@ -333,6 +354,21 @@ export interface PageOpinionScaleSettings {
     rightLabel: string
 }
 
+export interface PageNpsSettings {
+    leftLabel: string
+    rightLabel: string
+    singleRowOnMobile: boolean
+}
+
+export interface PagePaymentSettings {
+    stripeAccountId: string
+    currency: string
+    /** Fixed price in the currency's minor unit (cents). */
+    amount: number
+    allowInstallments: boolean
+    receiptEmailKey: string
+}
+
 export type PageSliderSeparator = "comma" | "period" | "space" | "none"
 
 export interface PageSliderSettings {
@@ -363,14 +399,17 @@ export interface PageSettings {
     email?: PageEmailSettings
     phone?: PagePhoneSettings
     statement?: PageStatementSettings
+    meeting?: PageMeetingSettings
     choice?: PageChoiceSettings
     address?: PageAddressSettings
     contactInfo?: PageContactInfoSettings
     rating?: PageRatingSettings
     opinionScale?: PageOpinionScaleSettings
+    nps?: PageNpsSettings
     slider?: PageSliderSettings
     upload?: PageUploadSettings
     matrix?: PageMatrixSettings
+    payment?: PagePaymentSettings
 }
 
 export interface PageValidation {

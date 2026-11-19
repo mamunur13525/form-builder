@@ -16,6 +16,8 @@ import { BuilderCanvas } from "./components/BuilderCanvas";
 import { BuilderWorkspace } from "./components/BuilderWorkspace";
 import { BuilderError, BuilderLoading } from "./components/BuilderStatus";
 import { EmptySettingsState } from "./components/EmptySettingsState";
+import type { MeetingSourceField } from "./components/settings/meeting-settings";
+import { createPageOfType } from "@/features/forms/model/page-defaults";
 
 export function FormBuilderPage() {
   const { formId } = useParams();
@@ -69,6 +71,44 @@ export function FormBuilderPage() {
     [settingsData?.settings.variables, form?.title],
   );
 
+  // Questions on every page before the selected one. A meeting/scheduler
+  // question uses these to build its prefill mappings.
+  const previousFields = useMemo<MeetingSourceField[]>(() => {
+    if (selectedPageIndex <= 0) return [];
+    const fields: MeetingSourceField[] = [];
+    for (const page of pages.slice(0, selectedPageIndex)) {
+      const questions =
+        page.questions?.length ? page.questions
+          : page.blocks?.length ? page.blocks
+            : [];
+      if (questions.length === 0) {
+        if (page.type && page.type !== "statement" && page.type !== "meeting") {
+          fields.push({
+            key: page.pageKey,
+            label: page.title || page.label || `Question ${fields.length + 1}`,
+            type: page.type,
+          });
+        }
+        continue;
+      }
+      for (const question of questions) {
+        if (question.type === "statement" || question.type === "meeting") continue;
+        const key = question.questionKey || question.blockKey;
+        if (!key) continue;
+        fields.push({
+          key,
+          label:
+            question.title ||
+            question.label ||
+            (questions.length === 1 ? page.title || page.label : "") ||
+            `Question ${fields.length + 1}`,
+          type: question.type,
+        });
+      }
+    }
+    return fields;
+  }, [pages, selectedPageIndex]);
+
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
   const [showPagesDrawer, setShowPagesDrawer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
@@ -99,6 +139,10 @@ export function FormBuilderPage() {
     setShowPagesDrawer(false);
     setShowAddPageDialog(true);
   }, []);
+
+  const addPaymentPage = useCallback(() => {
+    addPage(createPageOfType("payment", formId ?? "", pages.length + 1));
+  }, [addPage, formId, pages.length]);
 
   const openPagesDrawer = useCallback(() => setShowPagesDrawer(true), []);
   const openSettingsDrawer = useCallback(() => setShowSettingsDrawer(true), []);
@@ -213,6 +257,7 @@ export function FormBuilderPage() {
         onUpdate={updatePage}
         selectedQuestionId={selectedQuestionId}
         onSelectQuestion={selectQuestionId}
+        previousFields={previousFields}
       />
     ) : (
       <EmptySettingsState />
@@ -232,6 +277,7 @@ export function FormBuilderPage() {
       onUpdateEndPage={updateEndPage}
       onSelectQuestion={selectQuestionId}
       onAddPage={openAddPageDialog}
+      onAddPaymentPage={addPaymentPage}
       onPreview={handlePreview}
       onOpenDesignDrawer={openDesignDrawer}
       onOpenPages={isDesktop ? undefined : openPagesDrawer}

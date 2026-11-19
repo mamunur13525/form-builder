@@ -1,10 +1,142 @@
-import { useState, useMemo, useCallback, useEffect } from "react"
+import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import type { Form, FormPage } from "../types/common"
 import { validatePage } from "./useFormValidation"
 import { submitPublicForm, savePublicFormDraft, trackPublicFormView } from "@/entities/response/api/public-form.api"
+import {
+    createPaymentSession,
+    verifyPaymentSession,
+} from "@/entities/payment/api/payment.api"
+import { isPaymentAnswer } from "../utils/payment"
 import { resolveFormLogic, JUMP_TO_END } from "../utils/formLogic"
 import { useFormStore } from "@/app/store/formStore"
 import { dispatchClientIntegrations } from "@/pages/FormIntegrations/services/integrationService"
+
+// ---------------------------------------------------------------------------
+// Payment redirect state
+// ---------------------------------------------------------------------------
+
+/**
+ * Hosted Stripe Checkout leaves the page entirely, so a respondent's progress
+ * has to survive a full reload. Everything needed to rebuild the session is
+ * stashed in sessionStorage right before the redirect and restored on return.
+ */
+interface PendingPaymentState {
+    answers: Record<string, unknown>
+    committedAnswers: Record<string, unknown>
+    step: number
+}
+
+const pendingPaymentKey = (slug: string) => `form_payment_pending_${slug}`
+
+/** True when Stripe sent the respondent back to the form. */
+function hasPaymentReturn(): boolean {
+    if (typeof window === "undefined") return false
+    return new URLSearchParams(window.location.search).has("payment")
+}
+
+interface PaymentReturn {
+    outcome: string
+    pageKey: string
+    sessionId: string
+}
+
+function readPaymentReturn(): PaymentReturn | null {
+    if (typeof window === "undefined") return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has("payment")) return null
+    return {
+        outcome: params.get("payment") || "",
+        pageKey: params.get("payment_page") || "",
+        sessionId: params.get("session_id") || "",
+    }
+}
+
+function readPendingPayment(slug: string | undefined): PendingPaymentState | null {
+    if (!slug || typeof window === "undefined") return null
+    try {
+        const raw = sessionStorage.getItem(pendingPaymentKey(slug))
+        if (!raw) return null
+        const parsed = JSON.parse(raw) as PendingPaymentState
+        if (!parsed || typeof parsed !== "object" || !parsed.answers) return null
+        return {
+            answers: parsed.answers,
+            committedAnswers: parsed.committedAnswers ?? {},
+            step: typeof parsed.step === "number" ? parsed.step : 0,
+        }
+    } catch {
+        return null
+    }
+}
+
+function writePendingPayment(slug: string, state: PendingPaymentState) {
+    try {
+        sessionStorage.setItem(pendingPaymentKey(slug), JSON.stringify(state))
+    } catch {
+        // Private browsing / quota: the redirect will simply restart the form.
+    }
+}
+
+function clearPendingPayment(slug: string) {
+    try {
+        sessionStorage.removeItem(pendingPaymentKey(slug))
+    } catch {
+        // ignore
+    }
+}
+
+/**
+ * A checkout can be unpaid when Stripe sends the respondent back (Klarna,
+ * Afterpay and other delayed methods settle asynchronously). Remember which
+ * session still needs confirming so a refresh can finish the job.
+ */
+interface PendingVerification {
+    pageKey: string
+    sessionId: string
+}
+
+const pendingVerificationKey = (slug: string) =>
+    `form_payment_verify_${slug}`
+
+function readPendingVerification(slug: string | undefined): PendingVerification | null {
+    if (!slug || typeof window === "undefined") return null
+    try {
+        const raw = sessionStorage.getItem(pendingVerificationKey(slug))
+        if (!raw) return null
+        const parsed = JSON.parse(raw) as PendingVerification
+        if (!parsed?.pageKey || !parsed?.sessionId) return null
+        return parsed
+    } catch {
+        return null
+    }
+}
+
+function writePendingVerification(slug: string, state: PendingVerification) {
+    try {
+        sessionStorage.setItem(pendingVerificationKey(slug), JSON.stringify(state))
+    } catch {
+        // ignore
+    }
+}
+
+function clearPendingVerification(slug: string) {
+    try {
+        sessionStorage.removeItem(pendingVerificationKey(slug))
+    } catch {
+        // ignore
+    }
+}
+
+/** Drop the Stripe return parameters from the address bar without a reload. */
+function stripPaymentParams() {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.search)
+    params.delete("payment")
+    params.delete("payment_page")
+    params.delete("session_id")
+    const qs = params.toString()
+    const next = `${window.location.pathname}${qs ? `?${qs}` : ""}${window.location.hash}`
+    window.history.replaceState({}, "", next)
+}
 
 function buildAnswersPayload(form: Form, currentAnswers: Record<string, unknown>) {
     const list: Array<{
@@ -117,6 +249,8 @@ interface UseFormNavigationReturn {
     direction: number
     answers: Record<string, unknown>
     isSubmitting: boolean
+    /** True while a payment is being started or verified after the redirect. */
+    isProcessingPayment: boolean
     submitted: boolean
     error: string | null
     submittedPages: Set<number>
@@ -134,17 +268,40 @@ interface UseFormNavigationReturn {
 }
 
 export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOptions): UseFormNavigationReturn {
-    const [currentStep, setCurrentStep] = useState(0)
+    const [paymentReturn] = useState(() => readPaymentReturn())
+    const [storedVerification] = useState(() =>
+        readPendingVerification(form.slug),
+    )
+    // A reload during a delayed payment (or during verification) must rebuild
+    // the same session, so keep the stashed answers until Stripe confirms.
+    const [pendingPayment] = useState(() =>
+        hasPaymentReturn() || storedVerification
+            ? readPendingPayment(form.slug)
+            : null,
+    )
+    const [currentStep, setCurrentStep] = useState(pendingPayment?.step ?? 0)
     const [direction, setDirection] = useState(1)
-    const [answers, setAnswers] = useState<Record<string, unknown>>({})
+    const [answers, setAnswers] = useState<Record<string, unknown>>(
+        pendingPayment?.answers ?? {},
+    )
     // Snapshot of answers committed when a page is submitted. Logic rules
     // evaluate against THIS — not the live `answers` — so rules react to
     // submitted answers, never to characters being typed into an input.
-    const [committedAnswers, setCommittedAnswers] = useState<Record<string, unknown>>({})
+    const [committedAnswers, setCommittedAnswers] = useState<Record<string, unknown>>(
+        pendingPayment?.committedAnswers ?? {},
+    )
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isProcessingPayment, setIsProcessingPayment] = useState(
+        () => Boolean(paymentReturn?.sessionId || storedVerification),
+    )
     const [submitted, setSubmitted] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const [error, setError] = useState<string | null>(() =>
+        readPaymentReturn()?.outcome === "cancelled"
+            ? "Payment cancelled. You can try again when you're ready."
+            : null,
+    )
     const [submittedPages, setSubmittedPages] = useState<Set<number>>(new Set())
+    const returnHandled = useRef(false)
 
     const isPreview = mode === "preview"
 
@@ -220,6 +377,138 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         if (error) setError(null)
     }, [error])
 
+    /**
+     * Send the respondent to hosted Stripe Checkout. The payment page stores a
+     * fixed price in the published settings, so nothing price-related travels
+     * from the browser — the server builds the session.
+     */
+    const startCheckout = useCallback(async (page: FormPage) => {
+        const settings = page.settings?.payment
+        if (!form.slug) return
+        if (!settings?.stripeAccountId || !settings.amount) {
+            setError("This payment page hasn't been set up yet.")
+            return
+        }
+
+        setIsProcessingPayment(true)
+        setError(null)
+        try {
+            // The redirect reloads the app: keep answers and the current step.
+            writePendingPayment(form.slug, {
+                answers,
+                committedAnswers,
+                step: currentStep,
+            })
+
+            const receiptKey = settings.receiptEmailKey
+            const email = receiptKey ? String(answers[receiptKey] ?? "").trim() : ""
+
+            const session = await createPaymentSession(form.slug, {
+                pageKey: page.pageKey,
+                email: email || undefined,
+                respondentSessionId: sessionId,
+            })
+
+            window.location.assign(session.url)
+        } catch (err) {
+            console.error("Failed to start payment:", err)
+            clearPendingPayment(form.slug)
+            setIsProcessingPayment(false)
+            setError("We couldn't start the payment. Please try again.")
+        }
+    }, [form.slug, answers, committedAnswers, currentStep, sessionId])
+
+    /**
+     * On return from Stripe, verify the session server-side and store the
+     * verified payment as this page's answer. The URL parameters are removed
+     * so a refresh doesn't replay verification.
+     */
+    useEffect(() => {
+        if (returnHandled.current || isPreview) return
+
+        const slug = form.slug
+        const returned = paymentReturn
+        const target =
+            returned &&
+            returned.outcome === "success" &&
+            returned.pageKey &&
+            returned.sessionId
+                ? {
+                      pageKey: returned.pageKey,
+                      sessionId: returned.sessionId,
+                  }
+                : !returned
+                  ? storedVerification
+                  : null
+
+        if (returned) stripPaymentParams()
+        if (returned?.outcome === "cancelled") {
+            returnHandled.current = true
+            clearPendingPayment(slug)
+            clearPendingVerification(slug)
+            return
+        }
+        if (!target || !slug) return
+        returnHandled.current = true
+
+        writePendingVerification(slug, target)
+
+        const finish = (payment: {
+            sessionId: string
+            amount: number
+            currency: string
+        }) => {
+            const verified = {
+                sessionId: payment.sessionId,
+                status: "paid" as const,
+                amount: payment.amount,
+                currency: payment.currency,
+            }
+            setAnswers((prev) => ({ ...prev, [target.pageKey]: verified }))
+            setCommittedAnswers((prev) => ({
+                ...prev,
+                [target.pageKey]: verified,
+            }))
+            setSubmittedPages((prev) => new Set(prev).add(currentStep))
+            clearPendingPayment(slug)
+            clearPendingVerification(slug)
+            setIsProcessingPayment(false)
+        }
+
+        const attempt = (tries: number) => {
+            verifyPaymentSession(slug, target.sessionId, target.pageKey)
+                .then((payment) => {
+                    finish(payment)
+                })
+                .catch((err) => {
+                    const status = (err as { status?: number } | null)?.status
+                    // 402: Stripe accepted the checkout but a delayed method
+                    // (Klarna/Afterpay) has not settled yet. Poll briefly.
+                    if (status === 402 && tries < 5) {
+                        setTimeout(() => attempt(tries + 1), 3000)
+                        return
+                    }
+                    console.error("Failed to verify payment:", err)
+                    if (status === 402) {
+                        setError(
+                            "Your payment is still processing. Refresh this page in a moment and we'll finish confirming it.",
+                        )
+                    } else {
+                        clearPendingPayment(slug)
+                        clearPendingVerification(slug)
+                        setError(
+                            "We couldn't confirm your payment. If you were charged, please contact the form owner.",
+                        )
+                    }
+                    setIsProcessingPayment(false)
+                })
+        }
+
+        attempt(0)
+        // No cleanup: `returnHandled` guarantees one logical attempt and the
+        // delayed-payment poll must survive StrictMode's double-invoked effect.
+    }, [form.slug, isPreview, paymentReturn, storedVerification, currentStep])
+
     const handleSubmit = useCallback(async () => {
         if (isPreview) {
             setSubmitted(true)
@@ -247,6 +536,15 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
 
     const handleNext = useCallback(() => {
         if (!currentPage) return
+
+        // Payment pages hand off to Stripe before ordinary validation: a paid
+        // answer can only exist once the server has verified a session.
+        if (currentPage.type === "payment" && !isPreview) {
+            if (!isPaymentAnswer(answers[currentPage.pageKey])) {
+                void startCheckout(currentPage)
+                return
+            }
+        }
 
         const validationError = validatePage(currentPage, answers)
         if (validationError) {
@@ -336,6 +634,7 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         isPreview,
         form,
         sessionId,
+        startCheckout,
     ])
 
     const handlePrev = useCallback(() => {
@@ -358,6 +657,7 @@ export function useFormNavigation({ form, mode, onSubmit }: UseFormNavigationOpt
         direction,
         answers,
         isSubmitting,
+        isProcessingPayment,
         submitted,
         error,
         submittedPages,

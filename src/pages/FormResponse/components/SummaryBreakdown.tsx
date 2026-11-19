@@ -3,6 +3,7 @@ import { Star } from "lucide-react"
 import type { Form, FormPage, FormQuestion, PageType } from "@/shared/types/common"
 import type { ResponseSummaryPage } from "@/entities/response/model/types"
 import { PAGE_TYPE_ICONS, PAGE_TYPE_VISUALS } from "@/shared/constants/form-types"
+import { formatPaymentAmount } from "@/shared/constants/payment"
 import { cn } from "@/lib/utils"
 import { npsGroups, percent, plural, tally, type NpsSummary } from "./summaryMath"
 
@@ -64,13 +65,22 @@ export function SummaryBreakdown({ form, page, totalResponses }: SummaryBreakdow
         : null
 
     const rating = source?.settings?.rating ?? { style: "star" as const, max: 5 }
-    const scale = source?.settings?.opinionScale ?? {
+    const opinionScale = source?.settings?.opinionScale ?? {
         min: 0,
         max: 10,
         leftLabel: "Not likely",
         rightLabel: "Highly likely",
     }
-    const isNps = type === "opinionScale" && scale.min === 0 && scale.max === 10
+    const npsSettings = source?.settings?.nps ?? {
+        leftLabel: "Not likely",
+        rightLabel: "Highly likely",
+        singleRowOnMobile: false,
+    }
+    const isNpsType = type === "nps"
+    const scaleMin = isNpsType ? 0 : opinionScale.min
+    const scaleMax = isNpsType ? 10 : opinionScale.max
+    const isNps =
+        isNpsType || (type === "opinionScale" && scaleMin === 0 && scaleMax === 10)
     const nps = isNps ? npsGroups(counts, answered) : null
 
     return (
@@ -106,6 +116,10 @@ export function SummaryBreakdown({ form, page, totalResponses }: SummaryBreakdow
             </header>
 
             <div className="mt-6">
+                {type === "payment" && (
+                    <PaymentBreakdown values={values} answered={answered} />
+                )}
+
                 {CHOICE_TYPES.has(type) && (
                     <ChoiceBreakdown
                         type={type}
@@ -115,8 +129,7 @@ export function SummaryBreakdown({ form, page, totalResponses }: SummaryBreakdow
                     />
                 )}
 
-                {type === "rating" &&
-                    (rating.style === "star" ? (
+                {type === "rating" &&                    (rating.style === "star" ? (
                         <StarBreakdown
                             max={rating.max}
                             counts={counts}
@@ -132,21 +145,56 @@ export function SummaryBreakdown({ form, page, totalResponses }: SummaryBreakdow
                         />
                     ))}
 
-                {type === "opinionScale" && (
+                {(type === "opinionScale" || isNpsType) && (
                     <ScaleBreakdown
                         numbers={Array.from(
-                            { length: Math.max(scale.max - scale.min + 1, 0) },
-                            (_, i) => scale.min + i,
+                            { length: Math.max(scaleMax - scaleMin + 1, 0) },
+                            (_, i) => scaleMin + i,
                         )}
                         counts={counts}
                         answered={answered}
-                        leftLabel={scale.leftLabel}
-                        rightLabel={scale.rightLabel}
+                        leftLabel={isNpsType ? npsSettings.leftLabel : opinionScale.leftLabel}
+                        rightLabel={isNpsType ? npsSettings.rightLabel : opinionScale.rightLabel}
                         nps={nps}
                     />
                 )}
             </div>
         </article>
+    )
+}
+
+/** Revenue summary for a payment page: totals per currency, from verified sessions. */
+function PaymentBreakdown({ values, answered }: { values: unknown[]; answered: number }) {
+    const totals = new Map<string, number>()
+    let paid = 0
+
+    for (const value of values) {
+        if (typeof value !== "object" || value === null) continue
+        const record = value as Record<string, unknown>
+        if (record.status !== "paid") continue
+        if (typeof record.amount !== "number" || typeof record.currency !== "string") continue
+        paid += 1
+        totals.set(record.currency, (totals.get(record.currency) ?? 0) + record.amount)
+    }
+
+    if (paid === 0) {
+        return <p className="text-sm text-slate-500 dark:text-zinc-400">No payments yet.</p>
+    }
+
+    return (
+        <div className="space-y-3">
+            {[...totals.entries()].map(([currency, amount]) => (
+                <div key={currency} className="flex items-center justify-between gap-4 text-sm">
+                    <span className="text-slate-700 dark:text-zinc-300">Total collected</span>
+                    <span className="font-semibold tabular-nums text-slate-900 dark:text-zinc-100">
+                        {formatPaymentAmount(amount, currency)}
+                    </span>
+                </div>
+            ))}
+            <p className="text-xs text-slate-500 dark:text-zinc-400">
+                {paid} of {answered} {answered === 1 ? "person" : "people"} paid.
+            </p>
+        </div>
     )
 }
 

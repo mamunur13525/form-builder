@@ -16,12 +16,15 @@ export { MultiSelectEditor } from "./MultiSelectEditor"
 export { OptionListEditor } from "./OptionListEditor"
 export {
     StatementEditor,
+    MeetingEditor,
     DropdownEditor,
     AddressEditor,
     ContactInfoEditor,
     OpinionScaleEditor,
+    NpsEditor,
     SignatureEditor,
     MatrixEditor,
+    PaymentEditor,
     UploadEditor,
     RatingSettingsAwareEditor,
     SliderEditor,

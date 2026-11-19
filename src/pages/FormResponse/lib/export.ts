@@ -1,11 +1,23 @@
 import type { FormResponse } from "@/shared/types/common"
+import { formatPaymentAmount } from "@/shared/constants/payment"
 import type { SubmissionColumn } from "./columns"
 
 /** Render an answer value as display text (used by both the table and the exports). */
 export function formatAnswerValue(value: unknown): string {
     if (value === null || value === undefined || value === "") return ""
     if (Array.isArray(value)) return value.map((item) => formatAnswerValue(item)).join(", ")
-    if (typeof value === "object") return JSON.stringify(value)
+    if (typeof value === "object") {
+        const record = value as Record<string, unknown>
+        // Payment answers store the Stripe-verified session — show the price paid.
+        if (
+            record.status === "paid" &&
+            typeof record.amount === "number" &&
+            typeof record.currency === "string"
+        ) {
+            return formatPaymentAmount(record.amount, record.currency)
+        }
+        return JSON.stringify(value)
+    }
     return String(value)
 }
 

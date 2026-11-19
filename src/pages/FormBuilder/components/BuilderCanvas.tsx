@@ -25,6 +25,7 @@ interface BuilderCanvasProps {
   onUpdateEndPage: (index: number, updates: Partial<EndPage>) => void;
   onSelectQuestion: (questionId: string | null) => void;
   onAddPage: () => void;
+  onAddPaymentPage?: () => void;
   onPreview: () => void;
   onOpenDesignDrawer: () => void;
   onOpenPages?: () => void;
@@ -51,6 +52,7 @@ function BuilderCanvasComponent({
   onUpdateEndPage,
   onSelectQuestion,
   onAddPage,
+  onAddPaymentPage,
   onPreview,
   onOpenDesignDrawer,
   onOpenPages,
@@ -154,6 +156,7 @@ function BuilderCanvasComponent({
                   withBackground={false}
                   selectedQuestionId={selectedQuestionId}
                   onSelectQuestion={onSelectQuestion}
+                  onAddPaymentPage={onAddPaymentPage}
                 />
               </SelectionFrame>
             ) : (

@@ -41,6 +41,7 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
     direction,
     answers,
     isSubmitting,
+    isProcessingPayment,
     submitted,
     error,
     submittedPages,
@@ -121,9 +122,10 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
       variableItems={variableItems}
       answers={answers}
       error={error}
-      isSubmitting={isSubmitting}
+      isSubmitting={isSubmitting || isProcessingPayment}
       isLastStep={isLastStep}
       isMobileView={isMobileView}
+      isPreview={mode === "preview"}
       onAnswer={(key, val) => handleAnswer(key, val)}
       onNext={handleNext}
     />

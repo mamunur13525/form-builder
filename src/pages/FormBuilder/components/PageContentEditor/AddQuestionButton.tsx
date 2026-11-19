@@ -31,6 +31,8 @@ export function AddQuestionButton({ onAddQuestion, className }: AddQuestionButto
     return () => clearTimeout(timer);
   }, [open]);
 
+  // Payment is a whole-page charge: picking it creates a new page instead of
+  // joining this page's questions (handled by the caller).
   return (
     <div
       className={cn(
@@ -121,6 +123,11 @@ export function AddQuestionButton({ onAddQuestion, className }: AddQuestionButto
                   <span className="font-medium text-slate-800 dark:text-zinc-200 text-xs truncate">
                     {label}
                   </span>
+                  {type === "payment" && (
+                    <span className="ml-auto shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:bg-zinc-800 dark:text-zinc-400">
+                      New page
+                    </span>
+                  )}
                 </ComboboxItem>
               );
             }}

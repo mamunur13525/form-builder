@@ -17,11 +17,13 @@ import { RequiredToggle } from "./settings/primitives"
 import { QuestionSwitcher } from "./settings/QuestionSwitcher"
 import { QuestionTypeSetting } from "./settings/QuestionTypeSetting"
 import { TypeSpecificSettings } from "./settings/TypeSpecificSettings"
+import type { MeetingSourceField } from "./settings/meeting-settings"
 import { CoverImageSetting } from "./settings/CoverImageSetting"
 import {
     PageButtonSetting,
     ValidationMessageSetting,
 } from "./settings/PageSettingsSections"
+import { ConfirmDialog } from "@/features/workspaces/components/ConfirmDialog"
 
 interface SettingsPanelProps {
     page: FormPage
@@ -29,6 +31,8 @@ interface SettingsPanelProps {
     onUpdate: (index: number, updates: Partial<FormPage>) => void
     selectedQuestionId?: string | null
     onSelectQuestion?: (questionId: string | null) => void
+    /** Fields on pages that come before this page, for meeting prefill. */
+    previousFields?: MeetingSourceField[]
 }
 
 function SettingsPanelComponent({
@@ -37,6 +41,7 @@ function SettingsPanelComponent({
     onUpdate,
     selectedQuestionId,
     onSelectQuestion,
+    previousFields,
 }: SettingsPanelProps) {
     const [activeQuestionIndex, setActiveQuestionIndex] = React.useState(0)
 
@@ -114,25 +119,84 @@ function SettingsPanelComponent({
         updateCurrentQuestion({ validation: { ...(currentQuestion.validation || {}), ...patch } })
     }
 
+    const [pendingPaymentConvert, setPendingPaymentConvert] = React.useState(false)
+
+    const applyTypeChange = (nextType: FormPage["type"]) => {
+        const isOptionType = defaultOptionsForType(nextType).length > 0
+        updateCurrentQuestion({
+            type: nextType,
+            settings: defaultSettingsForType(nextType),
+            ...(nextType === "payment" || nextType === "statement" || nextType === "meeting"
+                ? { required: false, options: [] }
+                : isOptionType && (!currentQuestion.options || currentQuestion.options.length === 0)
+                ? { options: defaultOptionsForType(nextType) }
+                : {}),
+        })
+    }
+
+    const confirmPaymentConversion = () => {
+        const question: FormQuestion = {
+            ...currentQuestion,
+            type: "payment",
+            settings: defaultSettingsForType("payment"),
+            options: [],
+            required: false,
+        }
+        onUpdate(pageIndex, {
+            type: "payment",
+            questions: [question],
+            blocks: [question],
+            settings: question.settings,
+            label: question.label || page.label,
+            title: question.title || page.title,
+            required: false,
+        })
+        setActiveQuestionIndex(0)
+        onSelectQuestion?.(question.questionKey || question.blockKey || null)
+        setPendingPaymentConvert(false)
+    }
+
     /**
      * Changing the question type resets settings to the new type's defaults.
      */
     const handleTypeChange = (value: FormPage["type"] | null) => {
         if (!value) return
         const nextType = value
-        const isOptionType = defaultOptionsForType(nextType).length > 0
-        updateCurrentQuestion({
-            type: nextType,
-            settings: defaultSettingsForType(nextType),
-            ...(isOptionType && (!currentQuestion.options || currentQuestion.options.length === 0)
-                ? { options: defaultOptionsForType(nextType) }
-                : {}),
-        })
+
+        // Payment must be the only question on its page.
+        if (nextType === "payment" && questions.length > 1) {
+            setPendingPaymentConvert(true)
+            return
+        }
+
+        applyTypeChange(nextType)
     }
 
     const isChoiceType = CHOICE_TYPES.includes(currentQuestion.type)
     const isMultiAnswer = MULTI_ANSWER_TYPES.includes(currentQuestion.type)
     const isStatement = currentQuestion.type === "statement"
+    const isMeeting = currentQuestion.type === "meeting"
+    const isPayment = currentQuestion.type === "payment"
+
+    // Earlier fields for meeting prefill: every question on previous pages,
+    // then the questions above the scheduler on this page.
+    const earlierFields = React.useMemo(() => {
+        const fields: MeetingSourceField[] = [...(previousFields ?? [])]
+        questions.slice(0, safeQuestionIndex).forEach((question) => {
+            if (question.type === "statement" || question.type === "meeting") return
+            const key = question.questionKey || question.blockKey
+            if (!key) return
+            fields.push({
+                key,
+                label:
+                    question.title ||
+                    question.label ||
+                    `Question ${fields.length + 1}`,
+                type: question.type,
+            })
+        })
+        return fields
+    }, [previousFields, questions, safeQuestionIndex])
 
     return (
         <div data-settings-panel="true" className="flex h-full w-full flex-col overflow-hidden bg-white dark:bg-[#141418] border-l border-slate-200/90 dark:border-zinc-800/90 text-slate-800 dark:text-zinc-100">
@@ -160,8 +224,8 @@ function SettingsPanelComponent({
                         onChange={handleTypeChange}
                     />
 
-                    {/* Required — every type except statement */}
-                    {!isStatement && (
+                    {/* Required — every type except display-only ones */}
+                    {!isStatement && !isMeeting && !isPayment && (
                         <RequiredToggle
                             checked={currentQuestion.required ?? false}
                             onCheckedChange={(required) => updateCurrentQuestion({ required })}
@@ -176,12 +240,15 @@ function SettingsPanelComponent({
                         isStatement={isStatement}
                         onPatchSettings={patchSettings}
                         onPatchValidation={patchValidation}
+                        earlierFields={earlierFields}
                     />
 
-                    <ValidationMessageSetting
-                        validation={currentQuestion.validation}
-                        onPatch={patchValidation}
-                    />
+                    {!isPayment && (
+                        <ValidationMessageSetting
+                            validation={currentQuestion.validation}
+                            onPatch={patchValidation}
+                        />
+                    )}
 
                     <CoverImageSetting
                         page={page}
@@ -197,6 +264,15 @@ function SettingsPanelComponent({
                     />
                 </div>
             </div>
+
+            <ConfirmDialog
+                open={pendingPaymentConvert}
+                onOpenChange={setPendingPaymentConvert}
+                title="Convert to payment page?"
+                description={`Payment must be the only question on its page. Converting will keep this question and remove the other ${questions.length - 1} question${questions.length > 2 ? "s" : ""} from this page.`}
+                confirmLabel="Convert to payment"
+                onConfirm={confirmPaymentConversion}
+            />
         </div>
     )
 }

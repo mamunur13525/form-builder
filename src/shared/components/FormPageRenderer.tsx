@@ -9,10 +9,13 @@ import {
     ChoicePage,
     SignaturePage,
     StatementPage,
+    MeetingPage,
     AddressPage,
     ContactInfoPage,
     OpinionScalePage,
+    NpsPage,
     MatrixPage,
+    PaymentPage,
     StarRatingPage,
     UploadPage,
     PhoneAnswerPage,
@@ -25,6 +28,12 @@ interface FormPageRendererProps {
     value: unknown
     error: string | null
     onAnswer: (pageKey: string, value: unknown) => void
+    /** Starts hosted checkout for a payment page (published mode only). */
+    onPay?: () => void
+    /** Builder preview: "Pay" simulates a completed payment instead of charging. */
+    isPreview?: boolean
+    /** Every answer so far, used for meeting prefill mappings. */
+    answers?: Record<string, unknown>
     isMobileView?: boolean
     color?: string
     fontSizeClass?: string
@@ -44,6 +53,9 @@ export function FormPageRenderer({
     value,
     error,
     onAnswer,
+    onPay,
+    isPreview,
+    answers,
     isMobileView,
     color,
     fontSizeClass,
@@ -234,6 +246,22 @@ export function FormPageRenderer({
                     color={color}
                 />
             )
+        case "nps":
+            return (
+                <NpsPage
+                    value={value as number | undefined}
+                    onChange={(v) => onAnswer(page.pageKey, v)}
+                    settings={
+                        settings.nps ?? {
+                            leftLabel: "",
+                            rightLabel: "",
+                            singleRowOnMobile: false,
+                        }
+                    }
+                    isMobileView={isMobileView}
+                    color={color}
+                />
+            )
         case "slider":
             return (
                 <SliderPage
@@ -309,6 +337,34 @@ export function FormPageRenderer({
                     onChange={(v) => onAnswer(page.pageKey, v)}
                 />
             )
+        case "payment":
+            return (
+                <PaymentPage
+                    settings={
+                        settings.payment ?? {
+                            stripeAccountId: "",
+                            currency: "usd",
+                            amount: 0,
+                            allowInstallments: false,
+                            receiptEmailKey: "",
+                        }
+                    }
+                    value={value}
+                    onPay={
+                        isPreview
+                            ? () =>
+                                  onAnswer(page.pageKey, {
+                                      sessionId: "preview",
+                                      status: "paid",
+                                      amount: settings.payment?.amount ?? 0,
+                                      currency: settings.payment?.currency ?? "usd",
+                                  })
+                            : onPay
+                    }
+                    disabled={!isPreview && !onPay}
+                    color={color}
+                />
+            )
         case "statement":
             return (
                 <StatementPage
@@ -319,6 +375,24 @@ export function FormPageRenderer({
                             embedTitle: "",
                         }
                     }
+                />
+            )
+        case "meeting":
+            return (
+                <MeetingPage
+                    settings={
+                        settings.meeting ?? {
+                            provider: "calcom",
+                            link: "",
+                            openerText: "Select the slot.",
+                            prefillMappings: [],
+                        }
+                    }
+                    answers={answers}
+                    value={value}
+                    onBooked={(booked) => onAnswer(page.pageKey, booked)}
+                    color={color}
+                    fontSizeClass={fontSizeClass}
                 />
             )
         case "file":

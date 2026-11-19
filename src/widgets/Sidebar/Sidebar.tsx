@@ -3,6 +3,7 @@ import {
     LayoutDashboard,
     FileText,
     LayoutTemplate,
+    CreditCard,
     Settings,
     LogOut,
     ChevronsUpDown,
@@ -38,6 +39,7 @@ const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: ROUTES.DASHBOARD },
     { label: "Forms", icon: FileText, path: ROUTES.FORMS },
     { label: "Templates", icon: LayoutTemplate, path: ROUTES.TEMPLATES },
+    { label: "Payments", icon: CreditCard, path: ROUTES.PAYMENTS },
 ]
 
 /** First letters of the display name, used when the user has no avatar. */

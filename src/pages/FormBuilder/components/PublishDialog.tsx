@@ -30,6 +30,8 @@ interface PublishDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   formId: string | undefined;
+  /** Public slug used in the shareable link; falls back to the id. */
+  slug?: string;
   isPublished: boolean;
   hasUnpublishedChanges?: boolean;
   title?: string;
@@ -48,6 +50,7 @@ export function PublishDialog({
   open,
   onOpenChange,
   formId,
+  slug,
   isPublished,
   hasUnpublishedChanges = false,
   title,
@@ -140,7 +143,7 @@ export function PublishDialog({
 
   const copy = COPY[state];
   const confirmCopy = confirming ? CONFIRM_COPY[confirming] : null;
-  const publishedFormUrl = `${window.location.origin}/form/${formId}`;
+  const publishedFormUrl = `${window.location.origin}/form/${slug || formId}`;
 
   return (
     <Dialog

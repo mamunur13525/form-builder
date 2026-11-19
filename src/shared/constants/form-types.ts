@@ -5,6 +5,7 @@ import {
     Phone,
     Hash,
     Calendar,
+    CalendarClock,
     Clock,
     CircleDot,
     CheckSquare,
@@ -18,6 +19,8 @@ import {
     MapPin,
     SlidersHorizontal,
     Sliders,
+    Gauge,
+    CreditCard,
     PenLine,
     Grid3x3,
     Contact,
@@ -45,9 +48,12 @@ export const PAGE_TYPES = [
     "address",
     "contactInfo",
     "opinionScale",
+    "nps",
     "slider",
     "signature",
     "matrix",
+    "meeting",
+    "payment",
 ] as const
 
 export type PageType = (typeof PAGE_TYPES)[number]
@@ -73,9 +79,12 @@ export const PAGE_TYPE_LABELS: Record<PageType, string> = {
     address: "Address",
     contactInfo: "Contact Info",
     opinionScale: "Opinion Scale",
+    nps: "NPS",
     slider: "Slider",
     signature: "Signature",
     matrix: "Matrix",
+    meeting: "Meeting Scheduler",
+    payment: "Payment",
 }
 
 export interface TypeVisual {
@@ -86,6 +95,7 @@ export interface TypeVisual {
 
 export const PAGE_TYPE_VISUALS: Record<PageType, TypeVisual> = {
     opinionScale: { icon: SlidersHorizontal, bgColor: "bg-[#7480ee]" },
+    nps: { icon: Gauge, bgColor: "bg-[#f97316]" },
     slider: { icon: Sliders, bgColor: "bg-[#0ea5e9]" },
     url: { icon: Link, bgColor: "bg-[#48bca3]", displayName: "Website URL" },
     shortText: { icon: Type, bgColor: "bg-[#5da2f6]" },
@@ -108,6 +118,8 @@ export const PAGE_TYPE_VISUALS: Record<PageType, TypeVisual> = {
     contactInfo: { icon: Contact, bgColor: "bg-[#0284c7]", displayName: "Contact Info" },
     signature: { icon: PenLine, bgColor: "bg-[#78716c]" },
     matrix: { icon: Grid3x3, bgColor: "bg-[#3b82f6]" },
+    meeting: { icon: CalendarClock, bgColor: "bg-[#6366f1]", displayName: "Meeting Scheduler" },
+    payment: { icon: CreditCard, bgColor: "bg-[#635bff]", displayName: "Payment" },
 }
 
 export const PAGE_TYPE_ICONS: Record<PageType, LucideIcon> = {
@@ -131,9 +143,12 @@ export const PAGE_TYPE_ICONS: Record<PageType, LucideIcon> = {
     address: MapPin,
     contactInfo: Contact,
     opinionScale: SlidersHorizontal,
+    nps: Gauge,
     slider: Sliders,
     signature: PenLine,
     matrix: Grid3x3,
+    meeting: CalendarClock,
+    payment: CreditCard,
 }
 
 export const PAGE_TYPE_COLORS: Record<PageType, string> = {
@@ -157,9 +172,12 @@ export const PAGE_TYPE_COLORS: Record<PageType, string> = {
     address: "from-lime-500/5 to-lime-600/10 border border-lime-300 text-lime-600 dark:text-lime-400",
     contactInfo: "from-sky-500/5 to-sky-600/10 border border-sky-300 text-sky-600 dark:text-sky-400",
     opinionScale: "from-red-500/5 to-red-600/10 border border-red-300 text-red-600 dark:text-red-400",
+    nps: "from-orange-500/5 to-orange-600/10 border border-orange-300 text-orange-600 dark:text-orange-400",
     slider: "from-sky-500/5 to-sky-600/10 border border-sky-300 text-sky-600 dark:text-sky-400",
     signature: "from-stone-500/5 to-stone-600/10 border border-stone-300 text-stone-600 dark:text-stone-400",
     matrix: "from-blue-500/5 to-blue-600/10 border border-blue-300 text-blue-600 dark:text-blue-400",
+    meeting: "from-indigo-500/5 to-indigo-600/10 border border-indigo-300 text-indigo-600 dark:text-indigo-400",
+    payment: "from-violet-500/5 to-violet-600/10 border border-violet-300 text-violet-600 dark:text-violet-400",
 }
 
 export const FORM_STATUS = ["draft", "published", "archived"] as const

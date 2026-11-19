@@ -6,6 +6,7 @@ export const ROUTES = {
     DASHBOARD: "/dashboard",
     FORMS: "/forms",
     TEMPLATES: "/templates",
+    PAYMENTS: "/payments",
     SETTINGS: "/settings",
     WORKSPACE_SETTINGS: "/workspace/settings",
     // Matches invite URLs: `${FRONTEND_URL}/invite/:token` or `${FRONTEND_URL}/invitations/:token`

@@ -7,8 +7,8 @@ import {
     PAGE_TYPES,
     type PageType,
 } from "@/shared/constants/form-types"
-import type { FormPage, FormQuestion } from "@/shared/types/common"
-import { defaultOptionsForType, defaultSettingsForType } from "@/features/forms/model/page-defaults"
+import type { FormPage } from "@/shared/types/common"
+import { createPageOfType } from "@/features/forms/model/page-defaults"
 import { cn } from "@/lib/utils"
 
 interface AddPageDialogProps {
@@ -27,13 +27,13 @@ interface BlockCategory {
 
 /** Groupings shown in the picker. A type may appear in more than one group. */
 const CATEGORIES: BlockCategory[] = [
-    { title: "Popular", types: ["shortText", "email", "radio", "longText"] },
+    { title: "Popular", types: ["shortText", "email", "radio", "longText", "meeting"] },
     { title: "Contact", types: ["email", "phone", "address", "contactInfo", "url"] },
     { title: "Text & Numbers", types: ["shortText", "longText", "number", "date", "time"] },
     { title: "Choice", types: ["radio", "multiSelect", "dropdown", "select", "checkbox", "matrix", "yesNo"] },
     { title: "Layout", types: ["statement"] },
-    { title: "Rating", types: ["rating", "opinionScale", "slider"] },
-    { title: "Advanced", types: ["file", "signature"] },
+    { title: "Rating", types: ["rating", "opinionScale", "nps", "slider"] },
+    { title: "Advanced", types: ["file", "signature", "meeting", "payment"] },
 ]
 
 /** Category columns, laid out the way the reference design reads. */
@@ -65,12 +65,22 @@ const BLOCK_DESCRIPTIONS: Record<PageType, string> = {
     address: "Postal address fields",
     contactInfo: "Contact information fields",
     opinionScale: "Scale from low to high",
+    nps: "0–10 recommendation score",
     slider: "Slide to pick a number",
     signature: "Draw a signature",
     matrix: "Grid of questions",
+    meeting: "Book a meeting slot",
+    payment: "Collect a Stripe payment",
 }
 
 const blockLabel = (type: PageType) => PAGE_TYPE_VISUALS[type]?.displayName ?? PAGE_TYPE_LABELS[type]
+
+/** Extra words the picker search should match beyond the visible label. */
+const BLOCK_SEARCH_ALIASES: Partial<Record<PageType, string>> = {
+    meeting: "meeting scheduler schedule calendar booking calendly cal.com cal.id savvycal tidycal",
+    nps: "nps net promoter score recommendation",
+    payment: "payment stripe checkout pay purchase price",
+}
 
 /** Solid tile in the block's own hue, with a white glyph. */
 function tileStyle(type: PageType): CSSProperties {
@@ -96,49 +106,8 @@ export function AddPageDialog({
     const addPage = useCallback(
         (type: PageType) => {
             onOpenChange(false)
-
-            // Pages are now embedded in the form, so we create them locally
-            // and they will be saved when the form is updated
-            const blockKey = `block_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
-            const initialTitle = PAGE_TYPE_LABELS[type] || "New Question"
-            const question: FormQuestion = {
-                questionKey: blockKey,
-                blockKey,
-                type,
-                title: initialTitle,
-                description: "",
-                label: initialTitle,
-                helperText: "",
-                placeholder: "",
-                required: false,
-                order: 1,
-                options: defaultOptionsForType(type),
-                settings: defaultSettingsForType(type),
-                appearance: { width: "full", icon: "" },
-                isActive: true,
-            }
-            const newPage: FormPage = {
-                _id: undefined,
-                formId: id || "",
-                pageKey: `page_${Date.now()}`,
-                title: initialTitle,
-                description: "",
-                label: initialTitle,
-                helperText: "",
-                placeholder: "",
-                type,
-                required: false,
-                order: pagesLength + 1,
-                options: defaultOptionsForType(type),
-                logic: [],
-                appearance: { width: "full", icon: "" },
-                isActive: true,
-                coverImage: null,
-                settings: defaultSettingsForType(type),
-                questions: [question],
-                blocks: [question],
-            }
-            onAddPage(newPage)
+            // Pages are embedded in the form and saved with it.
+            onAddPage(createPageOfType(type, id, pagesLength + 1))
         },
         [id, pagesLength, onAddPage, onOpenChange],
     )
@@ -185,7 +154,8 @@ function BlockPicker({ onPick, onClose }: { onPick: (type: PageType) => void; on
             for (const title of COLUMNS[column]) {
                 const category = CATEGORIES.find((c) => c.title === title)
                 for (const type of category?.types ?? []) {
-                    if (!term || blockLabel(type).toLowerCase().includes(term)) {
+                    const haystack = `${blockLabel(type)} ${BLOCK_SEARCH_ALIASES[type] ?? ""}`.toLowerCase()
+                    if (!term || haystack.includes(term)) {
                         items.push({ type, category: title, column, row, index: items.length })
                         row++
                     }

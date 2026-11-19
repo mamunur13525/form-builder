@@ -19,6 +19,7 @@ const BREAKDOWN_TYPES = new Set([
     "yesNo",
     "rating",
     "opinionScale",
+    "nps",
 ])
 
 export function SummaryPage() {

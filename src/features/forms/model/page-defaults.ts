@@ -5,7 +5,11 @@ import type {
     AddressPageSetting,
     ContactInfoPageSetting,
     StatementEmbedProvider,
+    FormPage,
+    FormQuestion,
 } from "@/shared/types/common"
+import { PAGE_TYPE_LABELS } from "@/shared/constants/form-types"
+import { defaultMeetingSettings } from "@/shared/constants/meeting"
 
 /** Page types that use the `choice` settings group. */
 export const CHOICE_TYPES: PageType[] = ["select", "multiSelect", "radio", "checkbox"]
@@ -89,6 +93,8 @@ export function defaultSettingsForType(type: PageType): PageSettings {
             }
         case "statement":
             return { statement: { embedUrl: "", embedProvider: "youtube", embedTitle: "" } }
+        case "meeting":
+            return { meeting: defaultMeetingSettings() }
         case "select":
         case "multiSelect":
         case "radio":
@@ -133,6 +139,8 @@ export function defaultSettingsForType(type: PageType): PageSettings {
             return { rating: { style: "star", max: 5 } }
         case "opinionScale":
             return { opinionScale: { min: 0, max: 10, leftLabel: "", rightLabel: "" } }
+        case "nps":
+            return { nps: { leftLabel: "", rightLabel: "", singleRowOnMobile: false } }
         case "slider":
             return {
                 slider: {
@@ -157,7 +165,61 @@ export function defaultSettingsForType(type: PageType): PageSettings {
                     allowMultiplePerRow: false,
                 },
             }
+        case "payment":
+            return {
+                payment: {
+                    stripeAccountId: "",
+                    currency: "usd",
+                    amount: 0,
+                    allowInstallments: false,
+                    receiptEmailKey: "",
+                },
+            }
         default:
             return {}
+    }
+}
+
+/** A new page holding the single question it starts with. */
+export function createPageOfType(type: PageType, formId = "", order = 1): FormPage {
+    const key = `question_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
+    const title = PAGE_TYPE_LABELS[type] || "New Question"
+    const settings = defaultSettingsForType(type)
+    const question: FormQuestion = {
+        questionKey: key,
+        blockKey: key,
+        type,
+        title,
+        description: "",
+        label: title,
+        helperText: "",
+        placeholder: "",
+        required: false,
+        order: 1,
+        options: defaultOptionsForType(type),
+        settings,
+        appearance: { width: "full", icon: "" },
+        isActive: true,
+    }
+    return {
+        _id: undefined,
+        formId,
+        pageKey: `page_${Date.now()}`,
+        title,
+        description: "",
+        label: title,
+        helperText: "",
+        placeholder: "",
+        type,
+        required: false,
+        order,
+        options: defaultOptionsForType(type),
+        logic: [],
+        appearance: { width: "full", icon: "" },
+        isActive: true,
+        coverImage: null,
+        settings,
+        questions: [question],
+        blocks: [question],
     }
 }

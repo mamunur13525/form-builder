@@ -1,5 +1,5 @@
 import { useEffect, useMemo, memo } from "react";
-import type { FormPage, IFormTheme } from "@/shared/types/common";
+import type { FormPage, IFormTheme, PageType } from "@/shared/types/common";
 import { PageSubmitButton, type VariableItem } from "@/shared/components/pages";
 import { CoverImageBlock, CoverImageSide } from "@/shared/components/CoverImageBlock";
 import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme";
@@ -23,6 +23,8 @@ interface PageContentEditorProps {
   withBackground?: boolean;
   selectedQuestionId?: string | null;
   onSelectQuestion?: (questionId: string | null) => void;
+  /** Payment is a whole-page charge, so picking it adds a new page. */
+  onAddPaymentPage?: () => void;
 }
 
 function PageContentEditorComponent({
@@ -35,6 +37,7 @@ function PageContentEditorComponent({
   withBackground = true,
   selectedQuestionId,
   onSelectQuestion,
+  onAddPaymentPage,
 }: PageContentEditorProps) {
   const themeResolved = useMemo(() => resolveFormTheme(theme), [theme]);
 
@@ -99,6 +102,12 @@ function PageContentEditorComponent({
 
   const hasMultipleQuestions = questions.length > 1;
 
+  // Payment cannot share a page, so it becomes its own page below this one.
+  const addQuestion = (index: number, type: PageType) => {
+    if (type === "payment") onAddPaymentPage?.();
+    else insertQuestion(index, type);
+  };
+
   const handlePageTitleChange = (nextTitle: string) => {
     onUpdate(pageIndex, {
       title: nextTitle,
@@ -117,6 +126,8 @@ function PageContentEditorComponent({
   const pageDescription = page.description !== undefined ? page.description : (page.helperText || "");
 
   const isStatement = page.type === "statement" || questions[0]?.type === "statement";
+  // Payments are whole-page charges, so they cannot share a page with questions.
+  const isPaymentPage = page.type === "payment" || questions[0]?.type === "payment";
   const hasEmbed = Boolean(page.settings?.statement?.embedUrl || questions[0]?.settings?.statement?.embedUrl);
   const isStatementWithoutEmbed = isStatement && !hasMultipleQuestions && !hasEmbed;
 
@@ -138,11 +149,11 @@ function PageContentEditorComponent({
       {/* 2. Questions Section */}
       <div className="relative w-full">
         {/* Top-most Add Question button (above first question) - hidden until hovered */}
-        {!isStatement && (
+        {!isStatement && !isPaymentPage && (
           <div className="absolute -top-3 inset-x-0 z-20 -my-2 h-4 flex items-center opacity-0 transition-opacity group-hover/pagecontent:opacity-100 focus-within:opacity-100 hover:opacity-100">
             <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-slate-200/90 dark:bg-zinc-800" />
             <AddQuestionButton
-              onAddQuestion={(type) => insertQuestion(0, type)}
+              onAddQuestion={(type) => addQuestion(0, type)}
               className="absolute! w-auto! left-[-42px] top-1/2 -translate-y-1/2"
             />
           </div>
@@ -194,13 +205,15 @@ function PageContentEditorComponent({
                 />
                 {/* Full-width hover line + add button in the page margin */}
                 <div className="pointer-events-none absolute inset-x-0 -bottom-4 h-px bg-slate-200/90 opacity-0 transition-opacity group-hover/pagecontent:opacity-100 dark:bg-zinc-800" />
-                <AddQuestionButton
-                  onAddQuestion={(type) => insertQuestion(qIdx + 1, type)}
-                  className={cn(
-                    "absolute! w-auto! left-[-42px] -bottom-4 -translate-y-1/2 z-20 opacity-0 group-hover/pagecontent:opacity-100 hover:opacity-100! focus-within:opacity-100 transition-opacity",
-                    isDragged ? "invisible" : ""
-                  )}
-                />
+                {!isPaymentPage && (
+                  <AddQuestionButton
+                    onAddQuestion={(type) => addQuestion(qIdx + 1, type)}
+                    className={cn(
+                      "absolute! w-auto! left-[-42px] -bottom-4 -translate-y-1/2 z-20 opacity-0 group-hover/pagecontent:opacity-100 hover:opacity-100! focus-within:opacity-100 transition-opacity",
+                      isDragged ? "invisible" : ""
+                    )}
+                  />
+                )}
               </div>
             );
           }}

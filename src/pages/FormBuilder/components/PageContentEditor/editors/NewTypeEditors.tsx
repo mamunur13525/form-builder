@@ -7,7 +7,10 @@ import {
     AddressPage,
     ContactInfoPage,
     MatrixPage,
+    MeetingPage,
     OpinionScalePage,
+    NpsPage,
+    PaymentPage,
     SignaturePage,
     StatementPage,
     StarRatingPage,
@@ -16,6 +19,7 @@ import {
     SliderPage,
 } from "@/shared/components/pages"
 import { getDropdownItemStyle, getDropdownMenuStyle } from "@/shared/utils/theme"
+import { meetingProviderMeta } from "@/shared/constants/meeting"
 import { cn } from "@/lib/utils"
 
 interface EditorProps {
@@ -40,6 +44,39 @@ export function StatementEditor({ page }: EditorProps) {
     }
 
     return <StatementPage settings={settings} />
+}
+
+// ---------------------------------------------------------------------------
+// Meeting — a booking button. Until a provider link is configured the editor
+// explains where to add it instead of rendering an unusable button.
+// ---------------------------------------------------------------------------
+
+export function MeetingEditor({ page, color, fontSizeClass }: EditorProps) {
+    const settings = page.settings?.meeting
+    const provider = meetingProviderMeta(settings?.provider)
+
+    if (!settings?.link?.trim()) {
+        return (
+            <div
+                role="status"
+                className="flex w-full items-center gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+            >
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500 text-white">
+                    <X className="h-3.5 w-3.5" strokeWidth={3} />
+                </span>
+                <span>Please add {provider.label} link from the right editor.</span>
+            </div>
+        )
+    }
+
+    return (
+        <MeetingPage
+            settings={settings}
+            preview
+            color={color}
+            fontSizeClass={fontSizeClass}
+        />
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -264,6 +301,27 @@ export function OpinionScaleEditor({ page, color }: EditorProps) {
 }
 
 // ---------------------------------------------------------------------------
+// NPS — 0–10 row with its mobile layout preview.
+// ---------------------------------------------------------------------------
+
+export function NpsEditor({ page, isMobileView, color }: EditorProps) {
+    return (
+        <NpsPage
+            settings={
+                page.settings?.nps ?? {
+                    leftLabel: "",
+                    rightLabel: "",
+                    singleRowOnMobile: false,
+                }
+            }
+            isMobileView={isMobileView}
+            disabled
+            color={color}
+        />
+    )
+}
+
+// ---------------------------------------------------------------------------
 // Signature — preview of the signing board.
 // ---------------------------------------------------------------------------
 
@@ -286,6 +344,28 @@ export function MatrixEditor({ page }: EditorProps) {
                 }
             }
             disabled
+        />
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Payment — preview of the fixed-price card.
+// ---------------------------------------------------------------------------
+
+export function PaymentEditor({ page, color }: EditorProps) {
+    return (
+        <PaymentPage
+            settings={
+                page.settings?.payment ?? {
+                    stripeAccountId: "",
+                    currency: "usd",
+                    amount: 0,
+                    allowInstallments: false,
+                    receiptEmailKey: "",
+                }
+            }
+            disabled
+            color={color}
         />
     )
 }

@@ -24,6 +24,7 @@ import { ShareTargetsRow } from "./components/ShareTargetsRow"
 export function FormSharePage() {
     const { formId } = useParams<{ formId: string }>()
     const {
+        form,
         isPublished,
         hasUnpublishedChanges,
         setIsPublished,
@@ -32,11 +33,12 @@ export function FormSharePage() {
     } = useFormContext()
     const [showPublishDialog, setShowPublishDialog] = useState(false)
 
+    const publicUrl = `${window.location.origin}/form/${form?.slug || formId}`
     const handleOpenForm = () => {
         setShowPublishDialog(false)
-        window.open(`/form/${formId}`, "_blank", "noopener,noreferrer")
+        window.open(publicUrl, "_blank", "noopener,noreferrer")
     }
-    const formUrl = `${window.location.origin}/form/${formId}`
+    const formUrl = publicUrl
     const shareText = "Check out this form"
 
     const [copiedKey, setCopiedKey] = useState<string | null>(null)
@@ -226,6 +228,7 @@ export function FormSharePage() {
                 open={showPublishDialog}
                 onOpenChange={setShowPublishDialog}
                 formId={formId}
+                slug={form?.slug}
                 isPublished={isPublished}
                 hasUnpublishedChanges={hasUnpublishedChanges}
                 onIsPublishedChange={setIsPublished}

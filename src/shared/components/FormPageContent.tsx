@@ -25,6 +25,7 @@ interface FormPageContentProps {
   isSubmitting: boolean;
   isLastStep: boolean;
   isMobileView?: boolean;
+  isPreview?: boolean;
   onAnswer: (key: string, val: unknown) => void;
   onNext: () => void;
 }
@@ -40,6 +41,7 @@ export function FormPageContent({
   isSubmitting,
   isLastStep,
   isMobileView,
+  isPreview,
   onAnswer,
   onNext,
 }: FormPageContentProps) {
@@ -71,7 +73,9 @@ export function FormPageContent({
         ];
 
   const hasMultipleQuestions = questions.length > 1;
-  const isStatementOnly = questions.every((q) => q.type === "statement");
+  const isDisplayOnly = questions.every(
+    (q) => q.type === "statement" || q.type === "meeting",
+  );
   const questionTitleClass = getQuestionTitleClasses(themeResolved.fontSize);
   // Errors are per question: each one shows under the field it belongs to.
   const questionErrors = error
@@ -181,6 +185,9 @@ export function FormPageContent({
                       onAnswer(page.pageKey, val);
                     }
                   }}
+                  answers={answers}
+                  onPay={isSubmitting ? undefined : onNext}
+                  isPreview={isPreview}
                   color={themeResolved.answerColor}
                   fontSizeClass={fontSizes.input}
                   isMobileView={isMobileView}
@@ -217,7 +224,7 @@ export function FormPageContent({
             isSubmitting
               ? "Submitting..."
               : page.appearance?.submitButtonText ||
-                (!isLastStep ? "Next" : isStatementOnly ? "Continue" : "Submit")
+                (!isLastStep ? "Next" : isDisplayOnly ? "Continue" : "Submit")
           }
           color={themeResolved.buttonColor || page.appearance?.submitButtonColor}
           textColor={themeResolved.buttonTextColor}

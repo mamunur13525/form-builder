@@ -6,6 +6,7 @@ import type {
     ContactInfoSettings as ContactInfoSettingsType,
     FieldsPerRow,
     MatrixSettings as MatrixSettingsType,
+    NpsSettings as NpsSettingsType,
     OpinionScaleSettings as OpinionScaleSettingsType,
     StatementSettings as StatementSettingsType,
     UploadSettings as UploadSettingsType,
@@ -208,6 +209,44 @@ export function OpinionScaleSettingsWidget({
                 value={settings.rightLabel}
                 onChange={(rightLabel) => onChange({ ...settings, rightLabel })}
                 placeholder="Very likely"
+            />
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------
+// NPS
+// ---------------------------------------------------------------------------
+
+export function NpsSettingsWidget({
+    settings,
+    onChange,
+}: {
+    settings: NpsSettingsType
+    onChange: (next: NpsSettingsType) => void
+}) {
+    return (
+        <div className="space-y-3">
+            <TextSetting
+                label="Left Label"
+                value={settings.leftLabel}
+                onChange={(leftLabel) => onChange({ ...settings, leftLabel })}
+                placeholder="Not likely"
+            />
+
+            <TextSetting
+                label="Right Label"
+                value={settings.rightLabel}
+                onChange={(rightLabel) => onChange({ ...settings, rightLabel })}
+                placeholder="Very likely"
+            />
+
+            <ToggleRow
+                label="Single row on mobile"
+                checked={settings.singleRowOnMobile}
+                onCheckedChange={(singleRowOnMobile) =>
+                    onChange({ ...settings, singleRowOnMobile })
+                }
             />
         </div>
     )

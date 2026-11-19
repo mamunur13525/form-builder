@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useEffect } from "react"
 import { createPortal } from "react-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "../../shared/utils/cn"
@@ -11,6 +12,15 @@ interface DialogProps {
 }
 
 export function Dialog({ open, onOpenChange, children, className }: DialogProps) {
+    useEffect(() => {
+        if (!open) return
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") onOpenChange(false)
+        }
+        document.addEventListener("keydown", onKeyDown)
+        return () => document.removeEventListener("keydown", onKeyDown)
+    }, [open, onOpenChange])
+
     // Portal to <body> so the dialog is not nested inside the page/form markup
     // that opened it (keeps it out of ancestor stacking and overflow contexts).
     return createPortal(
@@ -26,6 +36,8 @@ export function Dialog({ open, onOpenChange, children, className }: DialogProps)
                         transition={{ duration: 0.2 }}
                     />
                     <motion.div
+                        role="dialog"
+                        aria-modal="true"
                         className={cn("relative z-50 w-full max-w-lg rounded-lg border bg-background shadow-lg", className)}
                         initial={{ opacity: 0, scale: 0.96, y: -12 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}

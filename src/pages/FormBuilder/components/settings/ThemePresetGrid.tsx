@@ -1,6 +1,6 @@
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getCornerRadiusCss } from "@/shared/utils/theme"
+import { getCornerRadiusCss, getCoverImageFilterStyle } from "@/shared/utils/theme"
 import type { ThemePreset } from "./theme-presets"
 
 interface ThemePresetCardProps {
@@ -17,7 +17,7 @@ interface ThemePresetCardProps {
 function ThemePresetCard({ preset, selected, onSelect }: ThemePresetCardProps) {
     const { theme, name, mood } = preset
     const radius = getCornerRadiusCss(theme.roundCorners)
-    const image = theme.backgroundImage
+    const image = preset.coverImage
 
     return (
         <button
@@ -43,10 +43,10 @@ function ThemePresetCard({ preset, selected, onSelect }: ThemePresetCardProps) {
                         className="absolute inset-0 -z-10"
                         style={{
                             backgroundImage: `url(${image.url})`,
-                            backgroundSize: image.tile ? "auto" : "cover",
-                            backgroundRepeat: image.tile ? "repeat" : "no-repeat",
+                            backgroundSize: "cover",
+                            backgroundRepeat: "no-repeat",
                             backgroundPosition: "center",
-                            filter: `brightness(${(100 + (image.brightness ?? 0)) / 100})`,
+                            ...getCoverImageFilterStyle(image.brightness),
                         }}
                     />
                 )}

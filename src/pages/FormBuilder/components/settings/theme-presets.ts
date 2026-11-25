@@ -1,4 +1,4 @@
-import type { IFormTheme } from "@/shared/types/common"
+import type { CoverImage, IFormTheme } from "@/shared/types/common"
 
 /**
  * A named, ready-to-apply form theme shown in the Design drawer's Themes tab.
@@ -13,6 +13,8 @@ export interface ThemePreset {
     /** Short grouping label shown beside the name on the card. */
     mood: "Light" | "Dark" | "Bold" | "Photo"
     theme: IFormTheme
+    /** Optional wallpaper cover image applied to the active page/end-page. */
+    coverImage?: CoverImage | null
 }
 
 /** Unsplash URLs are built at a fixed width so preview thumbnails stay light. */
@@ -22,10 +24,6 @@ const photo = (id: string) =>
 /**
  * Presets are spelled out in full rather than composed from a base, so each one
  * can be read and tweaked in isolation.
- *
- * `backgroundImage.brightness` is an offset applied as
- * `brightness((100 + value) / 100)`, so negative values darken the photo. Photo
- * presets darken enough for light text to stay readable.
  */
 export const THEME_PRESETS: readonly ThemePreset[] = [
     // ---------------------------------------------------------------- Light
@@ -45,7 +43,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "medium",
             font: { family: "Inter", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -64,7 +61,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "large",
             font: { family: "Inter", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -83,7 +79,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "full",
             font: { family: "Lora", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -102,7 +97,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "large",
             font: { family: "Outfit", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -121,7 +115,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "medium",
             font: { family: "Plus Jakarta Sans", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -140,7 +133,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "large",
             roundCorners: "full",
             font: { family: "Playfair Display", source: "google" },
-            backgroundImage: null,
         },
     },
     // ----------------------------------------------------------------- Dark
@@ -160,7 +152,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "medium",
             font: { family: "Inter", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -179,7 +170,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "large",
             roundCorners: "full",
             font: { family: "Space Grotesk", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -198,7 +188,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "large",
             font: { family: "Outfit", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -217,7 +206,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "large",
             font: { family: "Playfair Display", source: "google" },
-            backgroundImage: null,
         },
     },
     // ----------------------------------------------------------------- Bold
@@ -237,7 +225,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "large",
             roundCorners: "full",
             font: { family: "Outfit", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -256,7 +243,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "large",
             roundCorners: "none",
             font: { family: "Space Grotesk", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -275,7 +261,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "full",
             font: { family: "Plus Jakarta Sans", source: "google" },
-            backgroundImage: null,
         },
     },
     {
@@ -294,7 +279,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "large",
             roundCorners: "medium",
             font: { family: "Playfair Display", source: "google" },
-            backgroundImage: null,
         },
     },
     // ---------------------------------------------------------------- Photo
@@ -314,12 +298,13 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "large",
             roundCorners: "full",
             font: { family: "Inter", source: "google" },
-            backgroundImage: {
-                url: photo("1506905925346-21bda4d32df4"),
-                alt: "Misty mountain range at dawn",
-                brightness: -35,
-                tile: false,
-            },
+        },
+        coverImage: {
+            url: photo("1506905925346-21bda4d32df4"),
+            alt: "Misty mountain range at dawn",
+            layout: "wallpaper",
+            mobileLayout: "wallpaper",
+            brightness: -35,
         },
     },
     {
@@ -338,12 +323,13 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "large",
             roundCorners: "large",
             font: { family: "Outfit", source: "google" },
-            backgroundImage: {
-                url: photo("1441974231531-c6227db76b6e"),
-                alt: "Sunlight through a green forest canopy",
-                brightness: -40,
-                tile: false,
-            },
+        },
+        coverImage: {
+            url: photo("1441974231531-c6227db76b6e"),
+            alt: "Sunlight through a green forest canopy",
+            layout: "wallpaper",
+            mobileLayout: "wallpaper",
+            brightness: -40,
         },
     },
     {
@@ -362,12 +348,13 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "large",
             roundCorners: "full",
             font: { family: "Lora", source: "google" },
-            backgroundImage: {
-                url: photo("1509316785289-025f5b846b35"),
-                alt: "Rippled sand dunes",
-                brightness: -30,
-                tile: false,
-            },
+        },
+        coverImage: {
+            url: photo("1509316785289-025f5b846b35"),
+            alt: "Rippled sand dunes",
+            layout: "wallpaper",
+            mobileLayout: "wallpaper",
+            brightness: -30,
         },
     },
     {
@@ -386,12 +373,13 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "medium",
             font: { family: "Space Grotesk", source: "google" },
-            backgroundImage: {
-                url: photo("1470071459604-3b5ec3a7fe05"),
-                alt: "City skyline at night",
-                brightness: -45,
-                tile: false,
-            },
+        },
+        coverImage: {
+            url: photo("1470071459604-3b5ec3a7fe05"),
+            alt: "City skyline at night",
+            layout: "wallpaper",
+            mobileLayout: "wallpaper",
+            brightness: -45,
         },
     },
     {
@@ -410,12 +398,13 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "full",
             font: { family: "Plus Jakarta Sans", source: "google" },
-            backgroundImage: {
-                url: photo("1507525428034-b723cf961d3e"),
-                alt: "Calm turquoise shoreline",
-                brightness: -30,
-                tile: false,
-            },
+        },
+        coverImage: {
+            url: photo("1507525428034-b723cf961d3e"),
+            alt: "Calm turquoise shoreline",
+            layout: "wallpaper",
+            mobileLayout: "wallpaper",
+            brightness: -30,
         },
     },
     {
@@ -434,12 +423,13 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
             fontSize: "medium",
             roundCorners: "medium",
             font: { family: "Inter", source: "google" },
-            backgroundImage: {
-                url: photo("1618221195710-dd6b41faaea6"),
-                alt: "Soft white marble texture",
-                brightness: 10,
-                tile: false,
-            },
+        },
+        coverImage: {
+            url: photo("1618221195710-dd6b41faaea6"),
+            alt: "Soft white marble texture",
+            layout: "wallpaper",
+            mobileLayout: "wallpaper",
+            brightness: 10,
         },
     },
 ]

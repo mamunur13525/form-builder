@@ -9,6 +9,7 @@ import {
     Palette,
     Layers,
     Settings as SettingsIcon,
+    SlidersHorizontal,
 } from "lucide-react"
 import type {
     EndPage,
@@ -22,17 +23,23 @@ import {
     SettingsSection,
     InputSetting,
     IconChoiceSetting,
+    RangeSetting,
+    ImageZoomSetting,
     ToggleRow,
 } from "../settings/primitives"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
+import { getCoverImageStyle } from "@/shared/utils/theme"
 import { ImagePickerDialog } from "../settings/ImagePickerDialog"
+import { ImageEditorDialog } from "../settings/ImageEditorDialog"
 import { CoverImageLayoutSetting } from "../settings/cover-image-layout"
+import { FocalPointSetting } from "../settings/FocalPointSetting"
 
 interface EndPageSettingsPanelProps {
     endPage: EndPage
     endPageIndex: number
     onUpdate: (index: number, updates: Partial<EndPage>) => void
     onOpenDesignDrawer: () => void
+    onChangeViewMode?: (isMobile: boolean) => void
 }
 
 const ALIGN_OPTIONS = [
@@ -59,8 +66,10 @@ function EndPageSettingsPanelComponent({
     endPageIndex,
     onUpdate,
     onOpenDesignDrawer,
+    onChangeViewMode,
 }: EndPageSettingsPanelProps) {
     const [coverDialogOpen, setCoverDialogOpen] = useState(false)
+    const [coverEditorOpen, setCoverEditorOpen] = useState(false)
 
     const patch = (updates: Partial<EndPage>) => onUpdate(endPageIndex, updates)
     const patchButton = (b: Partial<EndPageButton>) =>
@@ -101,7 +110,7 @@ function EndPageSettingsPanelComponent({
                     </div>
 
                     <TabsContent value="settings" className="flex-1 min-h-0 overflow-y-auto">
-                        <div className="space-y-6 px-6 py-4">
+                        <div className="divide-y divide-slate-200/80 dark:divide-zinc-800/80 px-6 py-4 [&>*]:py-5 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
                     {/* Alignment */}
                     <SettingsSection title="Alignment">
                         <IconChoiceSetting<ContentAlignment>
@@ -196,31 +205,82 @@ function EndPageSettingsPanelComponent({
                                     <img
                                         src={endPage.coverImage.url}
                                         alt={endPage.coverImage.alt || "Cover"}
+                                        style={getCoverImageStyle(endPage.coverImage)}
                                         className="h-28 w-full object-cover"
                                     />
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
                                     <button
                                         type="button"
                                         onClick={() => setCoverDialogOpen(true)}
-                                        className="flex h-10 flex-1 items-center justify-center rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-3 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                        className="flex h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-2.5 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                                     >
+                                       <ImagePlus className="h-3.5 w-3.5"/>
                                         Replace
                                     </button>
                                     <button
                                         type="button"
+                                        onClick={() => setCoverEditorOpen(true)}
+                                        className="flex h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-[#1a1a20] px-2.5 text-xs font-medium text-slate-700 dark:text-zinc-300 shadow-xs hover:bg-slate-200 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                                    >
+                                        <SlidersHorizontal className="h-3.5 w-3.5" />
+                                        Edit image
+                                    </button>
+                                    <button
+                                        type="button"
                                         onClick={() => patch({ coverImage: null })}
-                                        className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                                        className="flex h-10 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-rose-500/30 bg-rose-500/10 px-2.5 text-xs font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                                     >
                                         <Trash2 className="h-3.5 w-3.5" />
                                         Remove
                                     </button>
                                 </div>
+                                <hr className="border-0 border-t border-slate-200/80 dark:border-zinc-800/80" />
                                 <CoverImageLayoutSetting
                                     value={endPage.coverImage.layout}
-                                    onChange={(layout) =>
+                                    mobileValue={endPage.coverImage.mobileLayout}
+                                    onChange={(layout) => {
                                         patch({
                                             coverImage: { ...endPage.coverImage!, layout },
+                                        })
+                                        onChangeViewMode?.(false)
+                                    }}
+                                    onMobileChange={(mobileLayout) => {
+                                        patch({
+                                            coverImage: { ...endPage.coverImage!, mobileLayout },
+                                        })
+                                        onChangeViewMode?.(true)
+                                    }}
+                                />
+                                <hr className="border-0 border-t border-slate-200/80 dark:border-zinc-800/80" />
+                                <FocalPointSetting
+                                    url={endPage.coverImage.url}
+                                    alt={endPage.coverImage.alt}
+                                    value={endPage.coverImage.focalPoint}
+                                    onChange={(focalPoint) =>
+                                        patch({
+                                            coverImage: { ...endPage.coverImage!, focalPoint },
+                                        })
+                                    }
+                                />
+                                <hr className="border-0 border-t border-slate-200/80 dark:border-zinc-800/80" />
+                                <RangeSetting
+                                    label="Brightness"
+                                    min={-100}
+                                    max={100}
+                                    value={endPage.coverImage.brightness ?? 0}
+                                    onChange={(brightness) =>
+                                        patch({
+                                            coverImage: { ...endPage.coverImage!, brightness },
+                                        })
+                                    }
+                                />
+                                <hr className="border-0 border-t border-slate-200/80 dark:border-zinc-800/80" />
+                                <ImageZoomSetting
+                                    value={endPage.coverImage.zoom ?? 100}
+                                    onChange={(zoom) =>
+                                        patch({
+                                            coverImage: { ...endPage.coverImage!, zoom },
                                         })
                                     }
                                 />
@@ -271,11 +331,27 @@ function EndPageSettingsPanelComponent({
                         coverImage: {
                             ...coverImage,
                             layout: endPage.coverImage?.layout ?? "top",
+                            mobileLayout: endPage.coverImage?.mobileLayout,
                         },
                     })
                 }
-                currentImage={endPage.coverImage}
             />
+        {endPage.coverImage?.url && (
+            <ImageEditorDialog
+                open={coverEditorOpen}
+                onOpenChange={setCoverEditorOpen}
+                coverImage={endPage.coverImage}
+                onSave={({ brightness, edits }) =>
+                    patch({
+                        coverImage: {
+                            ...endPage.coverImage!,
+                            brightness,
+                            edits,
+                        },
+                    })
+                }
+            />
+        )}
         </div>
     )
 }

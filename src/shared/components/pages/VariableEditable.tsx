@@ -3,6 +3,7 @@ import {
     useLayoutEffect,
     useRef,
 } from "react"
+import { cn } from "@/lib/utils"
 import { type VariableItem } from "./formVariables"
 import {
     getCaretOffset,
@@ -120,7 +121,10 @@ export function VariableEditable({
                 contentEditable
                 suppressContentEditableWarning
                 data-placeholder={placeholder}
-                className={className}
+                className={cn(
+                    "outline-none rounded-md border border-transparent focus:border-[#FF5722] focus:ring-1 focus:ring-[#FF5722] transition-all px-1 py-0.5",
+                    className
+                )}
                 style={style}
                 onInput={() => {
                     // Repaint first so the caret rect below reflects final DOM.

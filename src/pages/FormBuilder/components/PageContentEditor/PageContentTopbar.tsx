@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PageContentTopbarProps {
   onAddPage: () => void;
@@ -40,14 +41,21 @@ const PageContentTopbar = ({
     <div className="flex shrink-0 items-center justify-between gap-3 rounded-lg border border-slate-200/90 bg-white/95 px-3 py-2 text-slate-800 shadow-xl backdrop-blur-md dark:border-zinc-800 dark:bg-[#141418]/95 dark:text-zinc-100 dark:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.9)]">
       <div className="flex min-w-0 items-center gap-2">
         {onOpenPages && (
-          <button
-            type="button"
-            aria-label="Open pages"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-            onClick={onOpenPages}
-          >
-            <PanelLeft className="h-5 w-5" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  aria-label="Open pages"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+                  onClick={onOpenPages}
+                >
+                  <PanelLeft className="h-5 w-5" />
+                </button>
+              }
+            />
+            <TooltipContent side="bottom">Pages</TooltipContent>
+          </Tooltip>
         )}
 
         {/* Add Page button */}
@@ -88,57 +96,84 @@ const PageContentTopbar = ({
         {/* Device view switcher */}
         {!isCompact && (
           <div className="flex items-center gap-1 rounded-lg border border-slate-200/80 bg-slate-100/90 p-1 dark:border-zinc-800 dark:bg-zinc-900/80">
-            <button
-              type="button"
-              onClick={() => isMobileView && onToggleView()}
-              className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-lg transition-all cursor-pointer",
-                !isMobileView
-                  ? "bg-[#FF5722] text-white shadow-xs"
-                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:text-white dark:hover:bg-zinc-800",
-              )}
-              title="Desktop view"
-            >
-              <Monitor className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => !isMobileView && onToggleView()}
-              className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-lg transition-all cursor-pointer",
-                isMobileView
-                  ? "bg-[#FF5722] text-white shadow-xs"
-                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:text-white dark:hover:bg-zinc-800",
-              )}
-              title="Mobile view"
-            >
-              <Smartphone className="h-4 w-4" />
-            </button>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    onClick={() => isMobileView && onToggleView()}
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-lg transition-all cursor-pointer",
+                      !isMobileView
+                        ? "bg-[#FF5722] text-white shadow-xs"
+                        : "text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:text-white dark:hover:bg-zinc-800",
+                    )}
+                    aria-label="Desktop view"
+                  >
+                    <Monitor className="h-4 w-4" />
+                  </button>
+                }
+              />
+              <TooltipContent side="bottom">Desktop view</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    onClick={() => !isMobileView && onToggleView()}
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-lg transition-all cursor-pointer",
+                      isMobileView
+                        ? "bg-[#FF5722] text-white shadow-xs"
+                        : "text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:text-white dark:hover:bg-zinc-800",
+                    )}
+                    aria-label="Mobile view"
+                  >
+                    <Smartphone className="h-4 w-4" />
+                  </button>
+                }
+              />
+              <TooltipContent side="bottom">Mobile view</TooltipContent>
+            </Tooltip>
           </div>
         )}
 
         {/* Preview trigger */}
         {!isCompact && (
-          <button
-            type="button"
-            onClick={onPreview}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200/80 bg-white text-slate-500 shadow-xs transition-colors cursor-pointer hover:bg-slate-50 hover:text-slate-800 dark:border-zinc-800 dark:bg-[#18181c] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-            title="Open preview"
-            aria-label="Open preview"
-          >
-            <Play className="h-4 w-4" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  onClick={onPreview}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200/80 bg-white text-slate-500 shadow-xs transition-colors cursor-pointer hover:bg-slate-50 hover:text-slate-800 dark:border-zinc-800 dark:bg-[#18181c] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+                  aria-label="Open preview"
+                >
+                  <Play className="h-4 w-4" />
+                </button>
+              }
+            />
+            <TooltipContent side="bottom">Preview</TooltipContent>
+          </Tooltip>
         )}
 
         {onOpenSettings && (
-          <button
-            type="button"
-            aria-label="Open settings"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-            onClick={onOpenSettings}
-          >
-            <SlidersHorizontal className="h-5 w-5" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  aria-label="Open settings"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+                  onClick={onOpenSettings}
+                >
+                  <SlidersHorizontal className="h-5 w-5" />
+                </button>
+              }
+            />
+            <TooltipContent side="bottom">Settings</TooltipContent>
+          </Tooltip>
         )}
       </div>
     </div>

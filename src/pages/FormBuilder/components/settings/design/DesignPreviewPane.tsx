@@ -48,6 +48,7 @@ export function DesignPreviewPane({
                             onUpdate={onUpdateEndPage ?? noop}
                             isMobileView={false}
                             theme={theme}
+                            showCoverActions={false}
                         />
                     ) : page ? (
                         <PageContentEditor
@@ -56,6 +57,7 @@ export function DesignPreviewPane({
                             onUpdate={onUpdatePage ?? noop}
                             isMobileView={false}
                             theme={theme}
+                            showCoverActions={false}
                         />
                     ) : (
                         <div className="flex h-64 items-center justify-center text-sm text-slate-400">

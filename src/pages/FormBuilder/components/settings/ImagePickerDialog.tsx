@@ -1,12 +1,22 @@
-import React, { useState, useCallback, useRef, type DragEvent } from "react"
+import React, { useState, useCallback, useMemo, useRef, type DragEvent } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Link2, Upload, ImagePlus, Loader2, X, Check } from "lucide-react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { Search, Link2, Upload, ImagePlus, Images, Loader2, Check, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { showError } from "@/shared/hooks/useToast"
 import { uploadImage } from "@/shared/api/upload.api"
+import {
+    GALLERY_QUERY_KEY,
+    deleteGalleryItem,
+    listGalleryItems,
+    saveGalleryItem,
+    type GalleryItem,
+    type GalleryMediaType,
+    type GallerySource,
+} from "@/shared/api/gallery.api"
 import type { CoverImage } from "@/shared/types/common"
 import { cn } from "@/lib/utils"
 import { TAB_LIST_CLASS, TAB_TRIGGER_CLASS } from "./primitives"
@@ -19,16 +29,38 @@ interface ImagePickerDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onSelect: (image: CoverImage) => void
-    currentImage?: CoverImage | null
     title?: string
     description?: string
 }
 
+type PickOrigin = {
+    source: GallerySource
+    thumbnailUrl?: string
+    width?: number
+    height?: number
+}
+
+type GalleryFilter = "all" | GalleryMediaType
+
+const GALLERY_FILTERS: ReadonlyArray<{ value: GalleryFilter; label: string }> = [
+    { value: "all", label: "All" },
+    { value: "image", label: "Images" },
+    { value: "gif", label: "Gifs" },
+    { value: "icon", label: "Icons" },
+]
+
 // ── Helpers ─────────────────────────────────────────────────────────────────
+function resolveAssetUrl(url: string): string {
+    if (!url) return ""
+    if (/^(https?:|data:|blob:)/i.test(url)) return url
+    const base = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "")
+    return `${base}${url.startsWith("/") ? "" : "/"}${url}`
+}
+
 function isValidImageUrl(url: string): boolean {
     try {
         const u = new URL(url)
-        return /^https?:$/.test(u.protocol) && /\.(jpg|jpeg|png|webp|gif|avif)(\?.*)?$/i.test(u.pathname)
+        return /^https?:$/.test(u.protocol) && /\.(jpg|jpeg|png|webp|gif|avif|svg|ico)(\?.*)?$/i.test(u.pathname)
     } catch {
         return false
     }
@@ -52,26 +84,11 @@ const MOCK_UNSPLASH: UnsplashImage[] = [
 ]
 
 // ── Shared pieces ───────────────────────────────────────────────────────────
-function ImagePreview({ src, alt, className }: { src: string; alt?: string; className?: string }) {
-    const [loaded, setLoaded] = useState(false)
-    return (
-        <div className={cn("relative overflow-hidden rounded-lg border border-slate-200 dark:border-zinc-800", className)}>
-            <img
-                src={src}
-                alt={alt || "Cover"}
-                className={cn("h-28 w-full object-cover transition-opacity duration-300", loaded ? "opacity-100" : "opacity-0")}
-                onLoad={() => setLoaded(true)}
-            />
-            {!loaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-zinc-900">
-                    <Loader2 className="h-5 w-5 animate-spin text-[#FF5722]" />
-                </div>
-            )}
-        </div>
-    )
-}
-
-function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
+function UploadTab({
+    onSelect,
+}: {
+    onSelect: (image: CoverImage, origin: PickOrigin) => void
+}) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [dragOver, setDragOver] = useState(false)
     const [uploading, setUploading] = useState(false)
@@ -90,14 +107,21 @@ function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
         try {
             const uploaded = await uploadImage(file)
             if (uploaded?.url) {
-                const finalUrl = uploaded.url.startsWith("http")
-                    ? uploaded.url
-                    : `${(import.meta.env.VITE_API_URL || "").replace(/\/+$/, "")}${uploaded.url.startsWith("/") ? "" : "/"}${uploaded.url}`
-                onSelect({ url: finalUrl, alt: file.name || "" })
+                const finalUrl = resolveAssetUrl(uploaded.url)
+                const finalThumb = resolveAssetUrl(uploaded.thumbnailUrl || uploaded.url)
+                onSelect(
+                    { url: finalUrl, fileId: uploaded.fileId, alt: file.name || "" },
+                    {
+                        source: "upload",
+                        thumbnailUrl: finalThumb,
+                        width: uploaded.width,
+                        height: uploaded.height,
+                    }
+                )
             } else {
                 throw new Error("No URL returned from upload server.")
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             showError("Upload failed", err instanceof Error ? err : new Error("Could not upload the image file to ImageKit."))
         } finally {
             setUploading(false)
@@ -150,7 +174,11 @@ function UploadTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
     )
 }
 
-function LinkTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
+function LinkTab({
+    onSelect,
+}: {
+    onSelect: (image: CoverImage, origin: PickOrigin) => void
+}) {
     const [url, setUrl] = useState("")
     const [validating, setValidating] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -166,7 +194,7 @@ function LinkTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
             if (!valid) { setError("URL does not appear to be an image."); setValidating(false); return }
             const reachable = await imageExists(trimmed)
             if (!reachable) { setError("Could not load image from this URL."); setValidating(false); return }
-            onSelect({ url: trimmed, alt: "" })
+            onSelect({ url: trimmed, alt: "" }, { source: "link" })
             setUrl("")
         } catch {
             setError("Something went wrong while validating the URL.")
@@ -200,7 +228,11 @@ function LinkTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
     )
 }
 
-function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
+function UnsplashTab({
+    onSelect,
+}: {
+    onSelect: (image: CoverImage, origin: PickOrigin) => void
+}) {
     const [query, setQuery] = useState("")
     const [results, setResults] = useState<UnsplashImage[]>([])
     const [searching, setSearching] = useState(false)
@@ -222,7 +254,7 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
 
     const pick = (img: UnsplashImage) => {
         setSelectedId(img.id)
-        onSelect({ url: img.url, alt: img.alt })
+        onSelect({ url: img.url, alt: img.alt }, { source: "unsplash", thumbnailUrl: img.thumb })
     }
 
     return (
@@ -275,38 +307,230 @@ function UnsplashTab({ onSelect }: { onSelect: (image: CoverImage) => void }) {
     )
 }
 
+function MyGalleryTab({
+    open,
+    onSelect,
+}: {
+    open: boolean
+    onSelect: (image: CoverImage, origin: PickOrigin) => void
+}) {
+    const queryClient = useQueryClient()
+    const [search, setSearch] = useState("")
+    const [filter, setFilter] = useState<GalleryFilter>("all")
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+
+    const { data: items = [], isLoading, isError } = useQuery({
+        queryKey: GALLERY_QUERY_KEY,
+        queryFn: listGalleryItems,
+        enabled: open,
+        staleTime: 0,
+        refetchOnMount: "always",
+    })
+
+    const filteredItems = useMemo(() => {
+        const q = search.trim().toLowerCase()
+        return items.filter((item) => {
+            if (filter !== "all" && item.mediaType !== filter) return false
+            if (!q) return true
+            return (
+                item.name.toLowerCase().includes(q) ||
+                item.url.toLowerCase().includes(q) ||
+                item.source.toLowerCase().includes(q)
+            )
+        })
+    }, [items, search, filter])
+
+    const handleRemove = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation()
+        setDeletingId(id)
+        try {
+            await deleteGalleryItem(id)
+            queryClient.setQueryData<GalleryItem[]>(GALLERY_QUERY_KEY, (prev = []) =>
+                prev.filter((entry) => entry.id !== id)
+            )
+        } catch (err) {
+            showError("Could not remove image", err)
+        } finally {
+            setDeletingId(null)
+        }
+    }
+
+    const pickItem = (item: GalleryItem) => {
+        const finalUrl = resolveAssetUrl(item.url)
+        onSelect(
+            {
+                url: finalUrl,
+                fileId: item.fileId || undefined,
+                alt: item.name || "",
+            },
+            {
+                source: item.source,
+                thumbnailUrl: resolveAssetUrl(item.thumbnailUrl || item.url),
+                width: item.width,
+                height: item.height,
+            }
+        )
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+                <div className="relative min-w-[180px] flex-1">
+                    <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-zinc-500" />
+                    <Input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search gallery"
+                        className="h-10 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#1a1a20] pl-10 pr-4 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] shadow-xs"
+                    />
+                </div>
+                <div className="flex items-center gap-1.5" role="group" aria-label="Filter gallery by media type">
+                    {GALLERY_FILTERS.map((option) => {
+                        const active = filter === option.value
+                        return (
+                            <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => setFilter(option.value)}
+                                className={cn(
+                                    "h-10 rounded-lg px-3.5 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap",
+                                    active
+                                        ? "bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs"
+                                        : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-zinc-800/80 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                                )}
+                            >
+                                {option.label}
+                            </button>
+                        )
+                    })}
+                </div>
+            </div>
+
+            {isLoading ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-12 text-sm text-slate-500 dark:text-zinc-400">
+                    <Loader2 className="h-5 w-5 animate-spin text-[#FF5722]" />
+                    <span>Loading your gallery...</span>
+                </div>
+            ) : isError ? (
+                <div className="rounded-lg border border-rose-200 dark:border-rose-900/40 bg-rose-50/60 dark:bg-rose-950/20 py-10 text-center text-sm text-rose-600 dark:text-rose-400">
+                    Could not load your saved gallery images.
+                </div>
+            ) : filteredItems.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-slate-200 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/30 px-6 py-12 text-center">
+                    <Images className="mx-auto h-7 w-7 text-slate-400 dark:text-zinc-500" />
+                    <p className="mt-2.5 text-sm font-medium text-slate-700 dark:text-zinc-200">
+                        {items.length === 0
+                            ? "No saved images in your gallery yet"
+                            : "No matching items found"}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-zinc-500">
+                        {items.length === 0
+                            ? "Images you upload, link, or use as cover images will appear here automatically."
+                            : "Try a different search term or media filter."}
+                    </p>
+                </div>
+            ) : (
+                <div className="max-h-[360px] overflow-y-auto pr-1">
+                    <div className="columns-2 sm:columns-3 gap-3">
+                        {filteredItems.map((item) => {
+                            const previewUrl = resolveAssetUrl(item.thumbnailUrl || item.url)
+                            const isIcon = item.mediaType === "icon"
+                            return (
+                                <div
+                                    key={item.id}
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={() => pickItem(item)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" || e.key === " ") {
+                                            e.preventDefault()
+                                            pickItem(item)
+                                        }
+                                    }}
+                                    className="group relative mb-3 break-inside-avoid overflow-hidden rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-900/80 shadow-xs transition-all hover:border-[#FF5722]/70 hover:shadow-md cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5722]"
+                                >
+                                    <img
+                                        src={previewUrl}
+                                        alt={item.name || "Gallery image"}
+                                        loading="lazy"
+                                        className={cn(
+                                            "w-full transition-transform duration-300 group-hover:scale-[1.02]",
+                                            isIcon
+                                                ? "h-32 bg-white dark:bg-zinc-900 p-5 object-contain"
+                                                : "h-auto max-h-64 object-cover"
+                                        )}
+                                    />
+                                    <button
+                                        type="button"
+                                        aria-label={`Remove ${item.name || "image"} from My Gallery`}
+                                        onClick={(e) => handleRemove(e, item.id)}
+                                        disabled={deletingId === item.id}
+                                        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-md bg-black/65 text-white opacity-0 backdrop-blur-xs transition-opacity group-hover:opacity-100 hover:bg-rose-600 focus-visible:opacity-100 cursor-pointer"
+                                    >
+                                        {deletingId === item.id ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        ) : (
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        )}
+                                    </button>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
 // ── Dialog ───────────────────────────────────────────────────────────────────
 export function ImagePickerDialog({
     open,
     onOpenChange,
     onSelect,
-    currentImage,
     title = "Cover image",
-    description = "Upload, paste a link, or search Unsplash to add an image.",
+    description = "Upload, paste a link, search Unsplash, or pick from My Gallery.",
 }: ImagePickerDialogProps) {
+    const queryClient = useQueryClient()
     const [tab, setTab] = useState("upload")
-    const [preview, setPreview] = useState<string | null>(currentImage?.url ?? null)
 
-    const reset = () => {
-        setPreview(currentImage?.url ?? null)
-        setTab("upload")
-    }
-
-    const handleSelect = (image: CoverImage) => {
-        setPreview(image.url)
+    const handleSelect = (image: CoverImage, origin?: PickOrigin) => {
         onSelect(image)
         onOpenChange(false)
-    }
 
-    const clearSelection = () => {
-        setPreview(null)
-        onSelect({ url: "", alt: "" })
+        if (image.url) {
+            saveGalleryItem({
+                url: image.url,
+                thumbnailUrl: origin?.thumbnailUrl || image.url,
+                fileId: image.fileId,
+                name: image.alt,
+                source: origin?.source || "cover",
+                width: origin?.width,
+                height: origin?.height,
+            })
+                .then((savedItem) => {
+                    queryClient.setQueryData<GalleryItem[]>(GALLERY_QUERY_KEY, (prev) => {
+                        if (!prev) return [savedItem]
+                        return [
+                            savedItem,
+                            ...prev.filter(
+                                (entry) => entry.id !== savedItem.id && entry.url !== savedItem.url
+                            ),
+                        ]
+                    })
+                    return queryClient.invalidateQueries({
+                        queryKey: GALLERY_QUERY_KEY,
+                        refetchType: "all",
+                    })
+                })
+                .catch(() => {})
+        }
     }
 
     return (
         <Dialog
             open={open}
-            onOpenChange={(next) => { if (!next) reset(); onOpenChange(next); }}
+            onOpenChange={(next) => { if (!next) setTab("upload"); onOpenChange(next); }}
             className="w-full max-w-3xl rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#141418] text-slate-900 dark:text-zinc-100 p-6 sm:p-10 shadow-2xl"
         >
             <DialogContent className="border-0 bg-transparent text-slate-900 dark:text-zinc-100">
@@ -320,7 +544,7 @@ export function ImagePickerDialog({
                 </DialogHeader>
 
                 <Tabs value={tab} onValueChange={setTab} className="w-full">
-                    <TabsList className={TAB_LIST_CLASS}>
+                    <TabsList className={cn(TAB_LIST_CLASS, "h-auto flex-wrap sm:h-10 sm:flex-nowrap")}>
                         <TabsTrigger value="upload" className={TAB_TRIGGER_CLASS}>
                             <Upload className="h-4 w-4" />
                             Upload
@@ -332,6 +556,10 @@ export function ImagePickerDialog({
                         <TabsTrigger value="unsplash" className={TAB_TRIGGER_CLASS}>
                             <ImagePlus className="h-4 w-4" />
                             Unsplash
+                        </TabsTrigger>
+                        <TabsTrigger value="gallery" className={TAB_TRIGGER_CLASS}>
+                            <Images className="h-4 w-4" />
+                            My Gallery
                         </TabsTrigger>
                     </TabsList>
 
@@ -345,23 +573,11 @@ export function ImagePickerDialog({
                         <TabsContent value="unsplash" className="mt-0">
                             <UnsplashTab onSelect={handleSelect} />
                         </TabsContent>
+                        <TabsContent value="gallery" className="mt-0">
+                            <MyGalleryTab open={open} onSelect={handleSelect} />
+                        </TabsContent>
                     </div>
                 </Tabs>
-
-                {preview && (
-                    <div className="mt-6 flex items-start justify-between gap-4">
-                        <ImagePreview src={preview} alt="Selected image" className="h-28 flex-1" />
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={clearSelection}
-                            className="shrink-0 rounded-full border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-rose-500 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-500/40 cursor-pointer shadow-xs"
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </div>
-                )}
 
                 <DialogFooter className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <Button

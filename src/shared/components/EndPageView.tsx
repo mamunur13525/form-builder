@@ -3,7 +3,15 @@ import { motion } from "framer-motion"
 import { Share2, ExternalLink } from "lucide-react"
 import type { EndPage, IFormTheme } from "../types/common"
 import { cn } from "@/lib/utils"
-import { resolveFormTheme, getFontSizeClasses, getCornerRadiusCss, loadThemeFont } from "../utils/theme"
+import {
+    resolveFormTheme,
+    getFontSizeClasses,
+    getCornerRadiusCss,
+    loadThemeFont,
+    resolveCoverImageLayout,
+    getCoverImageStyle,
+} from "../utils/theme"
+import { useMediaQuery } from "../hooks/useMediaQuery"
 import { ConfettiBurst } from "./ConfettiBurst"
 import { CoverImageBlock, CoverImageSide } from "./CoverImageBlock"
 
@@ -15,6 +23,7 @@ interface EndPageViewProps {
      * navigate away, so the builder/preview stays put.
      */
     mode?: "preview" | "published"
+    isMobileView?: boolean
 }
 
 export type ShareKey = "facebook" | "twitter" | "linkedin" | "whatsapp"
@@ -43,9 +52,11 @@ export function buildShareLinks(message: string): Record<ShareKey, string> {
  * Presentational completion screen for a single end page. Themed to match the
  * form and reused by both the live form (on submit) and the builder preview.
  */
-export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewProps) {
+export function EndPageView({ endPage, theme, mode = "published", isMobileView }: EndPageViewProps) {
     const themeResolved = resolveFormTheme(theme)
     const fontSizes = getFontSizeClasses(themeResolved.fontSize)
+    const isSmallViewport = useMediaQuery("(max-width: 639px)")
+    const effectiveMobile = isMobileView ?? isSmallViewport
 
     useEffect(() => {
         if (themeResolved.font) loadThemeFont(themeResolved.font)
@@ -81,7 +92,8 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
         (k) => endPage.socialShareMedia?.[k],
     )
 
-    const coverLayout = endPage.coverImage?.layout ?? "top"
+    const coverLayout = resolveCoverImageLayout(endPage.coverImage, effectiveMobile)
+    const coverFilterStyle = getCoverImageStyle(endPage.coverImage)
     const isSideCover =
         Boolean(endPage.coverImage?.url) &&
         (coverLayout === "left" || coverLayout === "right")
@@ -93,19 +105,6 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
             ? `"${themeResolved.font.family}", sans-serif`
             : undefined,
     }
-
-    const bgImageStyle: React.CSSProperties = themeResolved.backgroundImage?.url
-        ? {
-            backgroundImage: `url(${themeResolved.backgroundImage.url})`,
-            backgroundRepeat: themeResolved.backgroundImage.tile ? "repeat" : "no-repeat",
-            backgroundSize: themeResolved.backgroundImage.tile ? "auto" : "cover",
-            backgroundPosition: "center",
-            filter:
-                themeResolved.backgroundImage.brightness !== undefined
-                    ? `brightness(${(100 + themeResolved.backgroundImage.brightness) / 100})`
-                    : undefined,
-        }
-        : {}
 
     const content = (
         <>
@@ -190,8 +189,13 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
             className="light relative flex h-full w-full items-center justify-center overflow-hidden"
             style={containerStyle}
         >
-            {themeResolved.backgroundImage?.url && (
-                <div className="absolute inset-0 pointer-events-none z-0" style={bgImageStyle} />
+            {endPage.coverImage?.url && coverLayout === "wallpaper" && (
+                <img
+                    src={endPage.coverImage.url}
+                    alt={endPage.coverImage.alt || ""}
+                    style={coverFilterStyle}
+                    className="absolute inset-0 h-full w-full object-cover transition-[object-position,transform] duration-500 ease-out pointer-events-none z-0"
+                />
             )}
 
             {endPage.showConfetti && <ConfettiBurst originY="20%" />}
@@ -202,15 +206,15 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className={cn(
                     "relative z-10 w-full",
-                    isSideCover
+                    isSideCover || (coverLayout === "banner" && Boolean(endPage.coverImage?.url))
                         ? "h-full overflow-hidden"
-                        : "max-w-xl overflow-y-auto px-6 py-10",
+                        : "max-h-full max-w-xl overflow-y-auto px-6 py-10",
                 )}
             >
                 {isSideCover ? (
                     /* Left/right: split the page in half — image on one side,
                        all content (including the button) on the other. */
-                    <div className="flex h-full w-full flex-col sm:flex-row">
+                    <div className="flex h-full w-full flex-col overflow-hidden sm:flex-row">
                         <CoverImageSide coverImage={endPage.coverImage} side={coverLayout} />
                         <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto px-6 py-10 sm:h-full sm:w-1/2">
                             <div className={cn("mx-auto my-auto flex w-full max-w-xl flex-col", alignClass)}>
@@ -218,10 +222,27 @@ export function EndPageView({ endPage, theme, mode = "published" }: EndPageViewP
                             </div>
                         </div>
                     </div>
+                ) : coverLayout === "banner" && endPage.coverImage?.url ? (
+                    <div className="flex h-full w-full flex-col overflow-hidden">
+                        <div className="w-full h-44 sm:h-60 shrink-0 overflow-hidden">
+                            <img
+                                src={endPage.coverImage.url}
+                                alt={endPage.coverImage.alt || ""}
+                                style={coverFilterStyle}
+                                className="w-full h-full object-cover transition-[object-position,transform] duration-500 ease-out"
+                            />
+                        </div>
+                        <div className="flex min-h-0 w-full flex-1 overflow-y-auto px-6 py-10">
+                            <div className={cn("mx-auto my-auto flex w-full max-w-xl flex-col", alignClass)}>
+                                {content}
+                            </div>
+                        </div>
+                    </div>
                 ) : (
-                    <div className={cn("flex w-full flex-col", alignClass)}>
+                    <div className={cn("flex w-full flex-col relative z-10", alignClass)}>
                         <CoverImageBlock
                             coverImage={endPage.coverImage}
+                            layout={coverLayout}
                             imageClassName="rounded-lg border"
                             contentClassName={alignClass}
                             gapClassName="gap-6"

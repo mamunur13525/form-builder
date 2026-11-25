@@ -44,14 +44,16 @@ export function DesignDrawer({
     const {
         containerRef,
         draftTheme,
+        draftCoverImage,
         sidebarTab,
         setSidebarTab,
         activePresetId,
         applyPreset,
         patchTheme,
         patchFont,
-        patchBackgroundImage,
-        setBackgroundImageUrl,
+        patchWallpaperImage,
+        setWallpaperImage,
+        setWallpaperImageUrl,
         handleSaveClick,
         handleCancelClick,
         handleCancelPopoverOpenChange,
@@ -63,19 +65,28 @@ export function DesignDrawer({
     } = useDesignDrawerDraft({
         open,
         theme,
+        page,
+        pageIndex,
+        onUpdatePage,
+        endPage,
+        endPageIndex,
+        onUpdateEndPage,
         onSaveTheme,
         onCancel,
         hasChangesRef,
     })
 
+    const previewPage = page ? { ...page, coverImage: draftCoverImage } : undefined
+    const previewEndPage = endPage ? { ...endPage, coverImage: draftCoverImage } : undefined
+
     return (
         <div ref={containerRef} className="flex h-full min-h-0 w-full overflow-hidden">
             <DesignPreviewPane
                 theme={draftTheme}
-                page={page}
+                page={previewPage}
                 pageIndex={pageIndex}
                 onUpdatePage={onUpdatePage}
-                endPage={endPage}
+                endPage={previewEndPage}
                 endPageIndex={endPageIndex}
                 onUpdateEndPage={onUpdateEndPage}
             />
@@ -142,10 +153,13 @@ export function DesignDrawer({
                     >
                         <ThemeSettingsTab
                             draftTheme={draftTheme}
+                            draftCoverImage={draftCoverImage}
+                            hasTargetPage={Boolean(endPage || page)}
                             patchTheme={patchTheme}
                             patchFont={patchFont}
-                            patchBackgroundImage={patchBackgroundImage}
-                            setBackgroundImageUrl={setBackgroundImageUrl}
+                            patchWallpaperImage={patchWallpaperImage}
+                            setWallpaperImage={setWallpaperImage}
+                            setWallpaperImageUrl={setWallpaperImageUrl}
                         />
                     </TabsContent>
 

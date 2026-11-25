@@ -10,7 +10,14 @@ import { EndPageView } from "./EndPageView";
 import { CoverImageBlock, CoverImageSide } from "./CoverImageBlock";
 import { FormNavigationFooter } from "./FormNavigationFooter";
 import { buildVariableItems, extractFormVariables } from "./pages";
-import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "../utils/theme";
+import {
+  resolveFormTheme,
+  getFontSizeClasses,
+  loadThemeFont,
+  resolveCoverImageLayout,
+  getCoverImageStyle,
+} from "../utils/theme";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { FormPageContent } from "./FormPageContent";
 
 const slideVariants = {
@@ -100,19 +107,6 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
     fontFamily: themeResolved.font?.family ? `"${themeResolved.font.family}", sans-serif` : undefined,
   };
 
-  const bgImageStyle: React.CSSProperties = themeResolved.backgroundImage?.url
-    ? {
-      backgroundImage: `url(${themeResolved.backgroundImage.url})`,
-      backgroundRepeat: themeResolved.backgroundImage.tile ? "repeat" : "no-repeat",
-      backgroundSize: themeResolved.backgroundImage.tile ? "auto" : "cover",
-      backgroundPosition: "center",
-      filter:
-        themeResolved.backgroundImage.brightness !== undefined
-          ? `brightness(${(100 + themeResolved.backgroundImage.brightness) / 100})`
-          : undefined,
-    }
-    : {};
-
   const renderContent = (page: FormPage) => (
     <FormPageContent
       page={page}
@@ -131,9 +125,13 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
     />
   );
 
+  const isSmallViewport = useMediaQuery("(max-width: 639px)");
+  const effectiveMobile = isMobileView ?? isSmallViewport;
+
   const renderPageQuestion = (page: FormPage) => (
     <CoverImageBlock
       coverImage={page.coverImage}
+      layout={resolveCoverImageLayout(page.coverImage, effectiveMobile)}
       imageClassName="rounded-lg border"
       contentClassName={alignClass}
     >
@@ -141,7 +139,8 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
     </CoverImageBlock>
   );
 
-  const coverLayout = currentPage?.coverImage?.layout ?? "top";
+  const coverLayout = resolveCoverImageLayout(currentPage?.coverImage, effectiveMobile);
+  const coverFilterStyle = getCoverImageStyle(currentPage?.coverImage);
   const isSideCover =
     Boolean(currentPage?.coverImage?.url) &&
     (coverLayout === "left" || coverLayout === "right");
@@ -151,7 +150,7 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
     // pages exist in the builder but never render here.
     const endPage = form.endPages?.[0];
     return endPage ? (
-      <EndPageView endPage={endPage} theme={form.theme} mode={mode} />
+      <EndPageView endPage={endPage} theme={form.theme} mode={mode} isMobileView={isMobileView} />
     ) : (
       <FormSubmittedView onReset={() => { }} />
     );
@@ -164,14 +163,6 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
       className="light relative flex flex-col h-full w-full overflow-hidden"
       style={containerStyle}
     >
-      {/* Background Image Layer */}
-      {themeResolved.backgroundImage?.url && (
-        <div
-          className="absolute inset-0 pointer-events-none z-0"
-          style={bgImageStyle}
-        />
-      )}
-
       {/* Progress bar */}
       {form.settings?.showProgressBar && (
         <div className="relative z-10">
@@ -197,17 +188,22 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
                 x: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 },
               }}
-              className={cn(
-                "absolute inset-0",
-                isSideCover
-                  ? "flex overflow-hidden"
-                  : "overflow-y-auto px-6 py-10 flex",
-              )}
+              className="absolute inset-0 flex overflow-hidden"
             >
+              {/* Page Wallpaper Cover Image Layer */}
+              {currentPage?.coverImage?.url && coverLayout === "wallpaper" && (
+                <img
+                  src={currentPage.coverImage.url}
+                  alt={currentPage.coverImage.alt || ""}
+                  style={coverFilterStyle}
+                  className="absolute inset-0 h-full w-full object-cover transition-[object-position,transform] duration-500 ease-out pointer-events-none z-0"
+                />
+              )}
+
               {isSideCover && currentPage ? (
                 /* Left/right: split the page in half — image on one side,
                    all content (including the submit button) on the other. */
-                <div className="flex h-full w-full flex-col sm:flex-row">
+                <div className="flex h-full w-full flex-col overflow-hidden sm:flex-row">
                   <CoverImageSide coverImage={currentPage.coverImage} side={coverLayout} />
                   <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto px-6 py-10 sm:h-full sm:w-1/2">
                     <div className={cn("mx-auto my-auto flex w-full max-w-2xl flex-col", alignClass)}>
@@ -215,22 +211,40 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
                     </div>
                   </div>
                 </div>
+              ) : coverLayout === "banner" && currentPage?.coverImage?.url ? (
+                <div className="flex h-full w-full flex-col overflow-hidden">
+                  <div className="w-full h-44 sm:h-60 shrink-0 overflow-hidden">
+                    <img
+                      src={currentPage.coverImage.url}
+                      alt={currentPage.coverImage.alt || ""}
+                      style={coverFilterStyle}
+                      className="w-full h-full object-cover transition-[object-position,transform] duration-500 ease-out"
+                    />
+                  </div>
+                  <div className="flex min-h-0 w-full flex-1 overflow-y-auto px-6 py-10">
+                    <div className={cn("mx-auto my-auto flex w-full max-w-2xl flex-col", alignClass)}>
+                      {renderContent(currentPage)}
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <div className="mx-auto my-auto max-w-2xl w-full">
-                  {activePages.length === 0 ? (
-                    <div className="text-center py-20 text-muted-foreground">
-                      <p className="text-lg">No pages in this form yet.</p>
-                      <p className="text-base mt-2">
-                        Add pages in the form builder to see them here.
-                      </p>
-                    </div>
-                  ) : currentPage ? (
-                    renderPageQuestion(currentPage)
-                  ) : (
-                    <div className="text-center py-20 text-muted-foreground">
-                      <p>Loading page...</p>
-                    </div>
-                  )}
+                <div className="relative z-10 flex h-full w-full overflow-y-auto px-6 py-10">
+                  <div className="mx-auto my-auto w-full max-w-2xl">
+                    {activePages.length === 0 ? (
+                      <div className="text-center py-20 text-muted-foreground">
+                        <p className="text-lg">No pages in this form yet.</p>
+                        <p className="text-base mt-2">
+                          Add pages in the form builder to see them here.
+                        </p>
+                      </div>
+                    ) : currentPage ? (
+                      renderPageQuestion(currentPage)
+                    ) : (
+                      <div className="text-center py-20 text-muted-foreground">
+                        <p>Loading page...</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </motion.div>
@@ -239,15 +253,16 @@ export function FormView({ form, mode, isMobileView, onSubmit }: FormViewProps) 
       </div>
 
       {/* Footer */}
-      <div className="relative z-10">
-        <FormNavigationFooter
-          currentStep={currentStep}
-          isLastStep={isLastStep}
-          hasSubmittedCurrent={submittedPages.has(currentStep)}
-          onPrev={handlePrev}
-          onNavNext={handleNavNext}
-        />
-      </div>
+      <FormNavigationFooter
+        currentStep={currentStep}
+        isLastStep={isLastStep}
+        hasSubmittedCurrent={submittedPages.has(currentStep)}
+        onPrev={handlePrev}
+        onNavNext={handleNavNext}
+        buttonColor={currentPage?.appearance?.submitButtonColor || themeResolved.buttonColor}
+        buttonTextColor={themeResolved.buttonTextColor}
+        roundCorners={themeResolved.roundCorners}
+      />
     </div>
   );
 }

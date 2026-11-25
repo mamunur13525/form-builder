@@ -113,6 +113,7 @@ export function FormBuilderPage() {
   const [showPagesDrawer, setShowPagesDrawer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   const [designDrawerOpen, setDesignDrawerOpen] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
   const isDesktop = useIsDesktop();
 
   // The drawers only exist on the compact layout. Reset them while the
@@ -249,6 +250,7 @@ export function FormBuilderPage() {
         endPageIndex={selectedEndPageIndex}
         onUpdate={updateEndPage}
         onOpenDesignDrawer={openDesignDrawer}
+        onChangeViewMode={setIsMobileView}
       />
     ) : selectedPage ? (
       <SettingsPanel
@@ -258,6 +260,7 @@ export function FormBuilderPage() {
         selectedQuestionId={selectedQuestionId}
         onSelectQuestion={selectQuestionId}
         previousFields={previousFields}
+        onChangeViewMode={setIsMobileView}
       />
     ) : (
       <EmptySettingsState />
@@ -283,6 +286,8 @@ export function FormBuilderPage() {
       onOpenPages={isDesktop ? undefined : openPagesDrawer}
       onOpenSettings={isDesktop ? undefined : openSettingsDrawer}
       isDesktop={isDesktop}
+      isMobileView={isMobileView}
+      onToggleMobileView={() => setIsMobileView((prev) => !prev)}
     />
   );
 

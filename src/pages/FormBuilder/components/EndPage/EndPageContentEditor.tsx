@@ -2,8 +2,20 @@ import { useEffect, useMemo, useCallback, useRef, useState, memo } from "react"
 import { Share2 } from "lucide-react"
 import type { EndPage, IFormTheme } from "@/shared/types/common"
 import { PageLabel, PageHelperText, PageSubmitButton, type VariableItem } from "@/shared/components/pages"
-import { CoverImageBlock, CoverImageSide } from "@/shared/components/CoverImageBlock"
-import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme"
+import {
+    CoverImageBlock,
+    CoverImageHoverBar,
+    CoverImageSide,
+} from "@/shared/components/CoverImageBlock"
+import { ImagePickerDialog } from "../settings/ImagePickerDialog"
+import { ImageEditorDialog } from "../settings/ImageEditorDialog"
+import {
+    resolveFormTheme,
+    getFontSizeClasses,
+    loadThemeFont,
+    resolveCoverImageLayout,
+    getCoverImageStyle,
+} from "@/shared/utils/theme"
 import { ConfettiBurst } from "@/shared/components/ConfettiBurst"
 import { SHARE_LABELS, buildShareLinks, type ShareKey } from "@/shared/components/EndPageView"
 import { cn } from "@/lib/utils"
@@ -21,6 +33,8 @@ interface EndPageContentEditorProps {
      * transparent and lets it show through.
      */
     withBackground?: boolean
+    /** Show Change / Edit image / Remove hover actions on the cover image. */
+    showCoverActions?: boolean
 }
 
 const EMPTY_VARIABLES: VariableItem[] = []
@@ -34,11 +48,14 @@ function EndPageContentEditorComponent({
     endPage,
     endPageIndex,
     onUpdate,
-    isMobileView: _isMobileView,
+    isMobileView,
     theme,
     variables = EMPTY_VARIABLES,
     withBackground = true,
+    showCoverActions = true,
 }: EndPageContentEditorProps) {
+    const [coverPickerOpen, setCoverPickerOpen] = useState(false)
+    const [coverEditorOpen, setCoverEditorOpen] = useState(false)
     const themeResolved = useMemo(() => resolveFormTheme(theme), [theme])
 
     const fontKey = useMemo(() => {
@@ -91,20 +108,6 @@ function EndPageContentEditorComponent({
         ],
     )
 
-    const bgImageStyle = useMemo<React.CSSProperties>(() => {
-        if (!themeResolved.backgroundImage?.url) return {}
-        return {
-            backgroundImage: `url(${themeResolved.backgroundImage.url})`,
-            backgroundRepeat: themeResolved.backgroundImage.tile ? "repeat" : "no-repeat",
-            backgroundSize: themeResolved.backgroundImage.tile ? "auto" : "cover",
-            backgroundPosition: "center",
-            filter:
-                themeResolved.backgroundImage.brightness !== undefined
-                    ? `brightness(${(100 + themeResolved.backgroundImage.brightness) / 100})`
-                    : undefined,
-        }
-    }, [themeResolved.backgroundImage])
-
     const onUpdateRef = useRef(onUpdate)
     useEffect(() => {
         onUpdateRef.current = onUpdate
@@ -144,7 +147,8 @@ function EndPageContentEditorComponent({
         return Boolean(trimmedEmbedUrl && /^https?:\/\//i.test(trimmedEmbedUrl))
     }, [trimmedEmbedUrl])
 
-    const coverLayout = endPage.coverImage?.layout ?? "top"
+    const coverLayout = resolveCoverImageLayout(endPage.coverImage, isMobileView)
+    const coverFilterStyle = getCoverImageStyle(endPage.coverImage)
     const isSideCover =
         Boolean(endPage.coverImage?.url) &&
         (coverLayout === "left" || coverLayout === "right")
@@ -235,22 +239,50 @@ function EndPageContentEditorComponent({
         ],
     )
 
+    const coverHoverBar =
+        showCoverActions && endPage.coverImage?.url ? (
+            <CoverImageHoverBar
+                onChangeImage={() => setCoverPickerOpen(true)}
+                onEditImage={() => setCoverEditorOpen(true)}
+                onRemoveImage={() => onUpdate(endPageIndex, { coverImage: null })}
+            />
+        ) : null
+
     return (
         <div
-            className="light relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
+            className={cn(
+                "light relative flex h-full w-full flex-col items-center justify-center overflow-hidden",
+                coverLayout === "wallpaper" && "group/wallpaper"
+            )}
             style={containerStyle}
         >
-            {withBackground && themeResolved.backgroundImage?.url && (
-                <div className="absolute inset-0 pointer-events-none z-0" style={bgImageStyle} />
-            )}
-
             {confettiActive && <ConfettiBurst originY="20%" />}
 
-            {isSideCover ? (
+            {withBackground && endPage.coverImage?.url && coverLayout === "wallpaper" && (
+                <>
+                    <img
+                        src={endPage.coverImage.url}
+                        alt={endPage.coverImage.alt || ""}
+                        style={coverFilterStyle}
+                        className="absolute inset-0 h-full w-full object-cover transition-[object-position,transform] duration-500 ease-out pointer-events-none z-0"
+                    />
+                    {coverHoverBar && (
+                        <div className="pointer-events-none absolute top-3 right-3 z-30 flex justify-end opacity-0 transition-opacity duration-200 group-hover/wallpaper:opacity-100">
+                            {coverHoverBar}
+                        </div>
+                    )}
+                </>
+            )}
+
+            {withBackground && isSideCover ? (
                 /* Left/right: the page is split in half — image on one side,
                    all content (including the button) on the other. */
                 <div className="relative z-10 flex h-full w-full flex-col sm:flex-row">
-                    <CoverImageSide coverImage={endPage.coverImage} side={coverLayout} />
+                    <CoverImageSide
+                        coverImage={endPage.coverImage}
+                        side={coverLayout}
+                        hoverActions={coverHoverBar}
+                    />
                     <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto sm:h-full sm:w-1/2">
                         <div
                             className={cn(
@@ -262,16 +294,44 @@ function EndPageContentEditorComponent({
                         </div>
                     </div>
                 </div>
+            ) : withBackground && coverLayout === "banner" && endPage.coverImage?.url ? (
+                <div className="relative z-10 flex h-full w-full flex-col overflow-y-auto">
+                    <div className="group/cover relative w-full h-44 sm:h-56 shrink-0 overflow-hidden">
+                        <img
+                            src={endPage.coverImage.url}
+                            alt={endPage.coverImage.alt || ""}
+                            style={coverFilterStyle}
+                            className="w-full h-full object-cover transition-[object-position,transform] duration-500 ease-out"
+                        />
+                        {coverHoverBar && (
+                            <div className="pointer-events-none absolute top-3 right-3 z-20 flex justify-end opacity-0 transition-opacity duration-200 group-hover/cover:opacity-100">
+                                {coverHoverBar}
+                            </div>
+                        )}
+                    </div>
+                    <div className="w-full min-h-0 px-10">
+                        <div
+                            className={cn(
+                                "flex w-full flex-col pl-5 pr-2 py-8 sm:px-6 sm:py-12",
+                                alignClass
+                            )}
+                        >
+                            {content}
+                        </div>
+                    </div>
+                </div>
             ) : (
                 <div className="relative z-10 w-full min-h-0 overflow-y-auto px-10">
                     <div
                         className={cn(
-                            "flex w-full flex-col pl-5 pr-2 py-8 sm:px-6 sm:py-12",
+                            "flex w-full flex-col pl-5 pr-2 py-8 sm:px-6 sm:py-12 relative z-10",
                             alignClass
                         )}
                     >
                         <CoverImageBlock
                             coverImage={endPage.coverImage}
+                            layout={coverLayout}
+                            hoverActions={coverHoverBar}
                             imageClassName="rounded-lg border border-[var(--editorial-border-light)]"
                             contentClassName={alignClass}
                         >
@@ -279,6 +339,40 @@ function EndPageContentEditorComponent({
                         </CoverImageBlock>
                     </div>
                 </div>
+            )}
+
+            {showCoverActions && (
+                <>
+                    <ImagePickerDialog
+                        open={coverPickerOpen}
+                        onOpenChange={setCoverPickerOpen}
+                        onSelect={(nextImage) =>
+                            onUpdate(endPageIndex, {
+                                coverImage: {
+                                    ...nextImage,
+                                    layout: endPage.coverImage?.layout ?? "top",
+                                    mobileLayout: endPage.coverImage?.mobileLayout,
+                                },
+                            })
+                        }
+                    />
+                    {endPage.coverImage?.url && (
+                        <ImageEditorDialog
+                            open={coverEditorOpen}
+                            onOpenChange={setCoverEditorOpen}
+                            coverImage={endPage.coverImage}
+                            onSave={({ brightness, edits }) =>
+                                onUpdate(endPageIndex, {
+                                    coverImage: {
+                                        ...endPage.coverImage!,
+                                        brightness,
+                                        edits,
+                                    },
+                                })
+                            }
+                        />
+                    )}
+                </>
             )}
         </div>
     )

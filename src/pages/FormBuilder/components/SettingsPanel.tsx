@@ -33,6 +33,8 @@ interface SettingsPanelProps {
     onSelectQuestion?: (questionId: string | null) => void
     /** Fields on pages that come before this page, for meeting prefill. */
     previousFields?: MeetingSourceField[]
+    /** Switches the builder canvas between mobile and desktop preview. */
+    onChangeViewMode?: (isMobile: boolean) => void
 }
 
 function SettingsPanelComponent({
@@ -42,6 +44,7 @@ function SettingsPanelComponent({
     selectedQuestionId,
     onSelectQuestion,
     previousFields,
+    onChangeViewMode,
 }: SettingsPanelProps) {
     const [activeQuestionIndex, setActiveQuestionIndex] = React.useState(0)
 
@@ -207,7 +210,7 @@ function SettingsPanelComponent({
             </div>
 
             <div className="flex flex-1 min-h-0 flex-col overflow-y-auto">
-                <div className="space-y-6 px-6 py-4">
+                <div className="divide-y divide-slate-200/80 dark:divide-zinc-800/80 px-6 py-4 [&>*]:py-5 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
                     <QuestionSwitcher
                         questions={questions}
                         activeIndex={safeQuestionIndex}
@@ -254,6 +257,7 @@ function SettingsPanelComponent({
                         page={page}
                         pageIndex={pageIndex}
                         onUpdate={onUpdate}
+                        onChangeViewMode={onChangeViewMode}
                     />
 
                     <PageButtonSetting

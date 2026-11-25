@@ -5,7 +5,7 @@ import {
     type ReactElement,
     type ReactNode,
 } from "react"
-import { ImagePlus, Loader2, Trash2, Asterisk } from "lucide-react"
+import { ImagePlus, Loader2, Trash2, Asterisk, ZoomIn, ZoomOut } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
@@ -26,7 +26,9 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { RadioGroup, RadioGroupCard } from "@/components/ui/radio-group"
+import { useQueryClient } from "@tanstack/react-query"
 import { uploadFile } from "@/entities/upload/api/upload.api"
+import { GALLERY_QUERY_KEY } from "@/shared/api/gallery.api"
 import { showError } from "@/shared/hooks/useToast"
 import type { CoverImage } from "@/shared/types/common"
 import { cn } from "@/lib/utils"
@@ -474,14 +476,22 @@ export function ColorSetting({
     )
 }
 
-/** A labeled range slider that shows its current value beside the label. */
+/**
+ * A labeled range slider with an exact-aligned active fill track and synced
+ * number input on the right. Dragging updates smoothly locally and commits
+ * `onChange` when the slide drag ends; typing updates immediately.
+ */
 export function RangeSetting({
     label,
     value,
     onChange,
     min,
     max,
-    step,
+    step = 1,
+    neutralValue,
+    headerAction,
+    leadingControl,
+    trailingControl,
 }: {
     label: string
     value: number
@@ -489,26 +499,215 @@ export function RangeSetting({
     min: number
     max: number
     step?: number
+    neutralValue?: number
+    headerAction?: ReactNode
+    leadingControl?: ReactNode
+    trailingControl?: ReactNode
 }) {
+    const [dragValue, setDragValue] = useState<number | null>(null)
+    const [inputText, setInputText] = useState<string | null>(null)
+    const trackRef = useRef<HTMLDivElement>(null)
+    const isDraggingRef = useRef(false)
+    const dragValueRef = useRef<number | null>(null)
+
+    const clamp = (num: number) => Math.min(max, Math.max(min, num))
+    const displayedValue = clamp(dragValue ?? value)
+
+    const computeFromClientX = (clientX: number) => {
+        const rect = trackRef.current?.getBoundingClientRect()
+        if (!rect || rect.width <= 0) return displayedValue
+        const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
+        const raw = min + ratio * (max - min)
+        const stepped = Math.round(raw / step) * step
+        return clamp(stepped)
+    }
+
+    const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.currentTarget.setPointerCapture(e.pointerId)
+        e.currentTarget.focus()
+        isDraggingRef.current = true
+        const next = computeFromClientX(e.clientX)
+        dragValueRef.current = next
+        setDragValue(next)
+        setInputText(String(next))
+    }
+
+    const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!isDraggingRef.current) return
+        const next = computeFromClientX(e.clientX)
+        dragValueRef.current = next
+        setDragValue(next)
+        setInputText(String(next))
+    }
+
+    const handlePointerEnd = () => {
+        if (!isDraggingRef.current) return
+        isDraggingRef.current = false
+        const finalValue = dragValueRef.current
+        dragValueRef.current = null
+        setDragValue(null)
+        setInputText(null)
+        if (finalValue !== null) {
+            onChange(clamp(finalValue))
+        }
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        let next: number | null = null
+        if (e.key === "ArrowRight" || e.key === "ArrowUp") next = clamp(displayedValue + step)
+        else if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = clamp(displayedValue - step)
+        else if (e.key === "Home") next = min
+        else if (e.key === "End") next = max
+        if (next !== null) {
+            e.preventDefault()
+            onChange(next)
+        }
+    }
+
+    const span = max - min
+    const thumbPct = span > 0 ? ((displayedValue - min) / span) * 100 : 0
+    const anchorValue = neutralValue ?? (min < 0 && max > 0 ? 0 : min)
+    const hasNeutralAnchor = anchorValue > min && anchorValue < max && span > 0
+    const anchorPct = span > 0 ? ((anchorValue - min) / span) * 100 : 0
+    const activeLeft = hasNeutralAnchor ? Math.min(anchorPct, thumbPct) : 0
+    const activeWidth = hasNeutralAnchor ? Math.abs(thumbPct - anchorPct) : thumbPct
+
     return (
         <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-zinc-400">
                 <span>{label}</span>
-                <span className="tabular-nums font-semibold text-slate-900 dark:text-zinc-200">
-                    {value}
-                </span>
+                {headerAction}
             </div>
-            <input
-                type="range"
-                aria-label={label}
-                min={min}
-                max={max}
-                step={step}
-                value={value}
-                onChange={(e) => onChange(Number(e.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 dark:bg-zinc-800 accent-[#FF5722]"
-            />
+            <div className="flex items-center gap-2">
+                {leadingControl}
+                <div className="flex-1 px-2">
+                    <div
+                        ref={trackRef}
+                        role="slider"
+                        tabIndex={0}
+                        aria-label={label}
+                        aria-valuemin={min}
+                        aria-valuemax={max}
+                        aria-valuenow={displayedValue}
+                        onPointerDown={handlePointerDown}
+                        onPointerMove={handlePointerMove}
+                        onPointerUp={handlePointerEnd}
+                        onPointerCancel={handlePointerEnd}
+                        onKeyDown={handleKeyDown}
+                        className="group relative flex h-6 w-full cursor-pointer touch-none items-center select-none focus:outline-none"
+                    >
+                        <div className="relative h-1.5 w-full rounded-full bg-slate-200 dark:bg-zinc-800">
+                            <div
+                                className="absolute inset-y-0 rounded-full bg-[#FF5722]"
+                                style={{ left: `${activeLeft}%`, width: `${activeWidth}%` }}
+                            />
+                            {hasNeutralAnchor && (
+                                <span
+                                    aria-hidden
+                                    className="pointer-events-none absolute top-1/2 h-3 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-400/80 dark:bg-zinc-600"
+                                    style={{ left: `${anchorPct}%` }}
+                                />
+                            )}
+                            <span
+                                aria-hidden
+                                className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[#FF5722] shadow-md ring-1 ring-black/10 transition-transform group-hover:scale-110 group-focus-visible:ring-4 group-focus-visible:ring-[#FF5722]/25 dark:border-zinc-900"
+                                style={{ left: `${thumbPct}%` }}
+                            />
+                        </div>
+                    </div>
+                </div>
+                {trailingControl}
+                <Input
+                    type="number"
+                    aria-label={`${label} value`}
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={inputText ?? String(displayedValue)}
+                    onChange={(e) => {
+                        const raw = e.target.value
+                        setInputText(raw)
+                        if (raw === "" || raw === "-") return
+                        const parsed = Number(raw)
+                        if (!Number.isNaN(parsed)) {
+                            onChange(clamp(parsed))
+                        }
+                    }}
+                    onBlur={() => {
+                        if (inputText !== null) {
+                            const parsed = Number(inputText)
+                            if (inputText !== "" && inputText !== "-" && !Number.isNaN(parsed)) {
+                                onChange(clamp(parsed))
+                            }
+                            setInputText(null)
+                        }
+                    }}
+                    className="h-8 w-16 shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2 text-right text-xs font-semibold tabular-nums text-slate-900 [appearance:textfield] focus-visible:border-[#FF5722] focus-visible:ring-1 focus-visible:ring-[#FF5722] dark:border-zinc-800 dark:bg-[#1a1a20] dark:text-zinc-100 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                />
+            </div>
         </div>
+    )
+}
+
+/** Zoom slider (50%–300%) with Zoom Out / Zoom In buttons and reset to 100%. */
+export function ImageZoomSetting({
+    value,
+    onChange,
+}: {
+    value: number
+    onChange: (zoom: number) => void
+}) {
+    const clamped = Math.min(300, Math.max(50, value))
+    const step = 10
+
+    return (
+        <RangeSetting
+            label="Zoom (%)"
+            min={50}
+            max={300}
+            step={5}
+            neutralValue={100}
+            value={clamped}
+            onChange={onChange}
+            headerAction={
+                clamped !== 100 ? (
+                    <button
+                        type="button"
+                        onClick={() => onChange(100)}
+                        className="cursor-pointer text-[11px] font-medium text-[#FF5722] hover:underline"
+                    >
+                        Reset
+                    </button>
+                ) : null
+            }
+            leadingControl={
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label="Zoom out image"
+                    disabled={clamped <= 50}
+                    onClick={() => onChange(Math.max(50, clamped - step))}
+                    className="h-7 w-7 shrink-0 cursor-pointer rounded-lg border-slate-200 bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                    <ZoomOut className="h-3.5 w-3.5" />
+                </Button>
+            }
+            trailingControl={
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label="Zoom in image"
+                    disabled={clamped >= 300}
+                    onClick={() => onChange(Math.min(300, clamped + step))}
+                    className="h-7 w-7 shrink-0 cursor-pointer rounded-lg border-slate-200 bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                    <ZoomIn className="h-3.5 w-3.5" />
+                </Button>
+            }
+        />
     )
 }
 
@@ -589,6 +788,7 @@ export function CoverImagePage({
     value: CoverImage | null | undefined
     onChange: (value: CoverImage | null) => void
 }) {
+    const queryClient = useQueryClient()
     const inputRef = useRef<HTMLInputElement>(null)
     const [uploading, setUploading] = useState(false)
 
@@ -598,6 +798,7 @@ export function CoverImagePage({
         try {
             const res = await uploadFile(file)
             onChange({ url: res.url, fileId: res.fileId, alt: "" })
+            void queryClient.invalidateQueries({ queryKey: GALLERY_QUERY_KEY, refetchType: "all" })
         } catch (err) {
             console.error("Cover image upload failed:", err)
             showError("Failed to upload image", err)

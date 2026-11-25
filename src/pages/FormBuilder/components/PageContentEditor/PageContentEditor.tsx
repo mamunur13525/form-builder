@@ -1,8 +1,20 @@
-import { useEffect, useMemo, memo } from "react";
+import { useEffect, useMemo, useState, memo } from "react";
 import type { FormPage, IFormTheme, PageType } from "@/shared/types/common";
 import { PageSubmitButton, type VariableItem } from "@/shared/components/pages";
-import { CoverImageBlock, CoverImageSide } from "@/shared/components/CoverImageBlock";
-import { resolveFormTheme, getFontSizeClasses, loadThemeFont } from "@/shared/utils/theme";
+import {
+  CoverImageBlock,
+  CoverImageHoverBar,
+  CoverImageSide,
+} from "@/shared/components/CoverImageBlock";
+import { ImagePickerDialog } from "../settings/ImagePickerDialog";
+import { ImageEditorDialog } from "../settings/ImageEditorDialog";
+import {
+  resolveFormTheme,
+  getFontSizeClasses,
+  loadThemeFont,
+  resolveCoverImageLayout,
+  getCoverImageStyle,
+} from "@/shared/utils/theme";
 import { List } from "react-movable";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +37,8 @@ interface PageContentEditorProps {
   onSelectQuestion?: (questionId: string | null) => void;
   /** Payment is a whole-page charge, so picking it adds a new page. */
   onAddPaymentPage?: () => void;
+  /** Show Change / Edit image / Remove hover actions on the cover image. */
+  showCoverActions?: boolean;
 }
 
 function PageContentEditorComponent({
@@ -38,7 +52,10 @@ function PageContentEditorComponent({
   selectedQuestionId,
   onSelectQuestion,
   onAddPaymentPage,
+  showCoverActions = true,
 }: PageContentEditorProps) {
+  const [coverPickerOpen, setCoverPickerOpen] = useState(false);
+  const [coverEditorOpen, setCoverEditorOpen] = useState(false);
   const themeResolved = useMemo(() => resolveFormTheme(theme), [theme]);
 
   const fontKey = useMemo(() => {
@@ -68,20 +85,8 @@ function PageContentEditorComponent({
     fontFamily: themeResolved.font?.family ? `"${themeResolved.font.family}", sans-serif` : undefined,
   };
 
-  const bgImageStyle: React.CSSProperties = themeResolved.backgroundImage?.url
-    ? {
-        backgroundImage: `url(${themeResolved.backgroundImage.url})`,
-        backgroundRepeat: themeResolved.backgroundImage.tile ? "repeat" : "no-repeat",
-        backgroundSize: themeResolved.backgroundImage.tile ? "auto" : "cover",
-        backgroundPosition: "center",
-        filter:
-          themeResolved.backgroundImage.brightness !== undefined
-            ? `brightness(${(100 + themeResolved.backgroundImage.brightness) / 100})`
-            : undefined,
-      }
-    : {};
-
-  const coverLayout = page.coverImage?.layout ?? "top";
+  const coverLayout = resolveCoverImageLayout(page.coverImage, isMobileView);
+  const coverFilterStyle = getCoverImageStyle(page.coverImage);
   const isSideCover =
     Boolean(page.coverImage?.url) &&
     (coverLayout === "left" || coverLayout === "right");
@@ -236,9 +241,21 @@ function PageContentEditorComponent({
     </div>
   );
 
+  const coverHoverBar =
+    showCoverActions && page.coverImage?.url ? (
+      <CoverImageHoverBar
+        onChangeImage={() => setCoverPickerOpen(true)}
+        onEditImage={() => setCoverEditorOpen(true)}
+        onRemoveImage={() => onUpdate(pageIndex, { coverImage: null })}
+      />
+    ) : null;
+
   return (
     <div
-      className="light relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
+      className={cn(
+        "light relative flex h-full w-full flex-col items-center justify-center overflow-hidden",
+        coverLayout === "wallpaper" && "group/wallpaper"
+      )}
       style={containerStyle}
       onClick={(e) => {
         const target = e.target as HTMLElement | null;
@@ -253,17 +270,30 @@ function PageContentEditorComponent({
         }
       }}
     >
-      {/* Background Image Layer */}
-      {withBackground && themeResolved.backgroundImage?.url && (
-        <div
-          className="absolute inset-0 pointer-events-none z-0"
-          style={bgImageStyle}
-        />
+      {/* Page Wallpaper Cover Image Layer (owned by outer canvas when withBackground=false) */}
+      {withBackground && page.coverImage?.url && coverLayout === "wallpaper" && (
+        <>
+          <img
+            src={page.coverImage.url}
+            alt={page.coverImage.alt || ""}
+            style={coverFilterStyle}
+            className="absolute inset-0 h-full w-full object-cover transition-[object-position,transform] duration-500 ease-out pointer-events-none z-0"
+          />
+          {coverHoverBar && (
+            <div className="pointer-events-none absolute top-3 right-3 z-30 flex justify-end opacity-0 transition-opacity duration-200 group-hover/wallpaper:opacity-100">
+              {coverHoverBar}
+            </div>
+          )}
+        </>
       )}
 
-      {isSideCover ? (
+      {withBackground && isSideCover ? (
         <div className="relative z-10 flex h-full w-full flex-col sm:flex-row">
-          <CoverImageSide coverImage={page.coverImage} side={coverLayout} />
+          <CoverImageSide
+            coverImage={page.coverImage}
+            side={coverLayout}
+            hoverActions={coverHoverBar}
+          />
           <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto sm:h-full sm:w-1/2">
             <div
               className={cn(
@@ -275,16 +305,44 @@ function PageContentEditorComponent({
             </div>
           </div>
         </div>
+      ) : withBackground && coverLayout === "banner" && page.coverImage?.url ? (
+        <div className="relative z-10 flex h-full w-full flex-col overflow-y-auto">
+          <div className="group/cover relative w-full h-44 sm:h-56 shrink-0 overflow-hidden">
+            <img
+              src={page.coverImage.url}
+              alt={page.coverImage.alt || ""}
+              style={coverFilterStyle}
+              className="w-full h-full object-cover transition-[object-position,transform] duration-500 ease-out"
+            />
+            {coverHoverBar && (
+              <div className="pointer-events-none absolute top-3 right-3 z-20 flex justify-end opacity-0 transition-opacity duration-200 group-hover/cover:opacity-100">
+                {coverHoverBar}
+              </div>
+            )}
+          </div>
+          <div className="w-full min-h-0 px-10">
+            <div
+              className={cn(
+                "flex w-full flex-col pl-5 pr-2 py-8 sm:px-6 sm:py-12",
+                alignClass
+              )}
+            >
+              {content}
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="relative z-10 w-full min-h-0 overflow-y-auto px-10">
           <div
             className={cn(
-              "flex w-full flex-col pl-5 pr-2 py-8 sm:px-6 sm:py-12",
+              "flex w-full flex-col pl-5 pr-2 py-8 sm:px-6 sm:py-12 relative z-10",
               alignClass
             )}
           >
             <CoverImageBlock
               coverImage={page.coverImage}
+              layout={coverLayout}
+              hoverActions={coverHoverBar}
               imageClassName="rounded-lg border border-[var(--editorial-border-light)]"
               contentClassName={alignClass}
             >
@@ -292,6 +350,40 @@ function PageContentEditorComponent({
             </CoverImageBlock>
           </div>
         </div>
+      )}
+
+      {showCoverActions && (
+        <>
+          <ImagePickerDialog
+            open={coverPickerOpen}
+            onOpenChange={setCoverPickerOpen}
+            onSelect={(nextImage) =>
+              onUpdate(pageIndex, {
+                coverImage: {
+                  ...nextImage,
+                  layout: page.coverImage?.layout ?? "top",
+                  mobileLayout: page.coverImage?.mobileLayout,
+                },
+              })
+            }
+          />
+          {page.coverImage?.url && (
+            <ImageEditorDialog
+              open={coverEditorOpen}
+              onOpenChange={setCoverEditorOpen}
+              coverImage={page.coverImage}
+              onSave={({ brightness, edits }) =>
+                onUpdate(pageIndex, {
+                  coverImage: {
+                    ...page.coverImage!,
+                    brightness,
+                    edits,
+                  },
+                })
+              }
+            />
+          )}
+        </>
       )}
     </div>
   );

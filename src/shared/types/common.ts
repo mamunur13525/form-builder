@@ -116,14 +116,6 @@ export type FontSize = "small" | "medium" | "large"
 export type CornerRadius = "none" | "small" | "medium" | "large" | "full"
 export type ThemeFontSource = "google" | "system" | "custom"
 
-export interface IThemeBackgroundImage {
-    url: string
-    fileId?: string
-    alt?: string
-    brightness?: number
-    tile?: boolean
-}
-
 export interface IThemeFont {
     family: string
     source: ThemeFontSource
@@ -141,7 +133,6 @@ export interface IFormTheme {
     alignment?: ContentAlignment
     fontSize?: FontSize
     roundCorners?: CornerRadius
-    backgroundImage?: IThemeBackgroundImage | null
     font?: IThemeFont
 }
 
@@ -204,19 +195,56 @@ export type PageType =
 
 /**
  * Where the cover image sits relative to the question:
- * - `top`    image above the question (default)
- * - `bottom` image below the question
- * - `left`   image on the left, question on the right
- * - `right`  image on the right, question on the left
+ * - `top`       image above the question (default)
+ * - `bottom`    image below the question
+ * - `left`      image on the left, question on the right (desktop)
+ * - `right`     image on the right, question on the left (desktop)
+ * - `banner`    full-width top cover banner
+ * - `wallpaper` full background wallpaper
  */
-export type CoverImageLayout = "top" | "bottom" | "left" | "right"
+export type CoverImageLayout = "top" | "bottom" | "left" | "right" | "banner" | "wallpaper"
+export type MobileCoverImageLayout = "top" | "bottom" | "banner" | "wallpaper"
+
+export interface CoverImageFocalPoint {
+    x: number
+    y: number
+}
+
+export interface CoverImageCrop {
+    x: number
+    y: number
+    width: number
+    height: number
+    aspect?: string
+}
+
+export interface CoverImageEdits {
+    crop?: CoverImageCrop
+    angle?: number
+    rotate?: number
+    flipH?: boolean
+    flipV?: boolean
+    contrast?: number
+    saturation?: number
+    filter?: string
+}
 
 export interface CoverImage {
     url: string
     fileId?: string
     alt?: string
-    /** Placement of the image relative to the question. Defaults to `top`. */
+    /** Placement of the image on desktop (and fallback on mobile). Defaults to `top`. */
     layout?: CoverImageLayout
+    /** Placement of the image on mobile viewports. */
+    mobileLayout?: MobileCoverImageLayout
+    /** Relative brightness offset, -100..100, where 0 leaves the image untouched. */
+    brightness?: number
+    /** Image zoom percentage, 50..300, where 100 is unscaled. */
+    zoom?: number
+    /** Focal point percentages (0..100) for `object-position`. Defaults to center (50, 50). */
+    focalPoint?: CoverImageFocalPoint
+    /** Non-destructive image editor adjustments (crop, rotate, flip, color, filter). */
+    edits?: CoverImageEdits
 }
 
 // ---------------------------------------------------------------------------

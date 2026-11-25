@@ -1,4 +1,4 @@
-import { useState, type ComponentProps } from "react";
+import { useState, type ComponentProps, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     BarChart3,
@@ -46,7 +46,18 @@ type MenuItemData =
   }
   | { isSeparator: true };
 
-export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProps) {
+/**
+ * The form's overflow menu, shared by the card and list views on both the
+ * dashboard and the forms page.
+ * `trigger` lets a view supply its own icon button; clicks inside it never
+ * bubble to the clickable card or row behind it.
+ */
+export function FormActionsMenu({
+  form,
+  onDeleteClick,
+  onDuplicateClick,
+  trigger,
+}: FormCardProps & { trigger?: ReactElement }) {
   const navigate = useNavigate();
   const [accessDialogOpen, setAccessDialogOpen] = useState(false);
   const { canCreate, canEdit, canDelete, canViewResponses, isReady } = useFormPermissions();
@@ -118,101 +129,52 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
 
   return (
     <>
-      <Card
-        className="editorial editorial-flat editorial-transition cursor-pointer border-[var(--border)] bg-card p-6 hover:-translate-y-0.5 hover:border-[#FF5722]/50 hover:shadow-[0_12px_32px_rgba(255,87,34,0.08)] transition-all flex flex-col justify-between rounded-lg"
-        onClick={() => navigate(`/form-builder/${form.id}`)}
-      >
-        <CardHeader className="p-0">
-          <div className="flex items-start justify-between gap-4">
-            <CardTitle className="font-display text-2xl leading-tight text-[var(--foreground)]">
-              {form.title}
-            </CardTitle>
-            <div className="flex items-center gap-2 shrink-0">
-              {form.canEdit === false && (
-                <Badge
-                  variant="outline"
-                  className="whitespace-nowrap rounded-lg border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-medium text-amber-500"
-                >
-                  View Only
-                </Badge>
-              )}
-              <Badge
-                className={
-                  form.status === "published"
-                    ? "whitespace-nowrap rounded-lg border border-emerald-500/30 bg-emerald-500/15 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-emerald-400"
-                    : "whitespace-nowrap rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-zinc-400"
-                }
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            trigger ?? (
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Form actions"
               >
-                {form.status}
-              </Badge>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="flex items-end justify-between p-0 pt-6">
-          <div className="flex gap-2 text-sm text-[var(--editorial-body)]">
-            <span>{form.pages?.length || 0} pages</span>
-            <span className="text-[var(--editorial-disabled)]">•</span>
-            <span>
-              {(() => {
-                const completed = form.responses_count || 0;
-                const partial = form.partial_count || 0;
-                if (completed === 0 && partial > 0) {
-                  return `${partial} partial`;
-                }
-                const completedText = `${completed} ${completed === 1 ? "response" : "responses"}`;
-                if (partial > 0) {
-                  return `${completedText} • ${partial} partial`;
-                }
-                return completedText;
-              })()}
-            </span>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Form actions"
-                >
-                  <EllipsisVertical className="h-5 w-5" />
-                </Button>
-              }
-              onClick={(e) => e.stopPropagation()}
-            />
-            <DropdownMenuContent
-              align="end"
-              className="editorial editorial-flat rounded-lg border-[var(--border)] bg-[var(--popover)] p-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {menuItems.map((item, index) => {
-                if ("isSeparator" in item) {
-                  return (
-                    <DropdownMenuSeparator
-                      key={index}
-                      className="bg-[var(--editorial-border-light)]"
-                    />
-                  );
-                }
+                <EllipsisVertical className="h-5 w-5" />
+              </Button>
+            )
+          }
+          onClick={(e) => e.stopPropagation()}
+        />
+        <DropdownMenuContent
+          align="end"
+          className="editorial editorial-flat rounded-lg border-[var(--border)] bg-[var(--popover)] p-2"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {menuItems.map((item, index) => {
+            if ("isSeparator" in item) {
+              return (
+                <DropdownMenuSeparator
+                  key={index}
+                  className="bg-[var(--editorial-border-light)]"
+                />
+              );
+            }
 
-                const Icon = item.icon;
+            const Icon = item.icon;
 
-                return (
-                  <DropdownMenuItem
-                    key={index}
-                    className="rounded-lg px-3 py-2 cursor-pointer"
-                    variant={item.variant}
-                    onClick={item.onClick}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </CardContent>
-      </Card>
+            return (
+              <DropdownMenuItem
+                key={index}
+                className="rounded-lg px-3 py-2 cursor-pointer"
+                variant={item.variant}
+                onClick={item.onClick}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {accessDialogOpen && (
         <FormAccessDialog
@@ -223,6 +185,69 @@ export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProp
         />
       )}
     </>
+  );
+}
+
+export function FormCard({ form, onDeleteClick, onDuplicateClick }: FormCardProps) {
+  const navigate = useNavigate();
+
+  return (
+    <Card
+      className="editorial editorial-flat editorial-transition cursor-pointer border-[var(--border)] bg-card p-6 hover:-translate-y-0.5 hover:border-[#FF5722]/50 hover:shadow-[0_12px_32px_rgba(255,87,34,0.08)] transition-all flex flex-col justify-between rounded-lg"
+      onClick={() => navigate(`/form-builder/${form.id}`)}
+    >
+      <CardHeader className="p-0">
+        <div className="flex items-start justify-between gap-4">
+          <CardTitle className="font-display text-2xl leading-tight text-[var(--foreground)]">
+            {form.title}
+          </CardTitle>
+          <div className="flex items-center gap-2 shrink-0">
+            {form.canEdit === false && (
+              <Badge
+                variant="outline"
+                className="whitespace-nowrap rounded-lg border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-medium text-amber-500"
+              >
+                View Only
+              </Badge>
+            )}
+            <Badge
+              className={
+                form.status === "published"
+                  ? "whitespace-nowrap rounded-lg border border-emerald-500/30 bg-emerald-500/15 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-emerald-400"
+                  : "whitespace-nowrap rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-zinc-400"
+              }
+            >
+              {form.status}
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="flex items-end justify-between p-0 pt-6">
+        <div className="flex gap-2 text-sm text-[var(--editorial-body)]">
+          <span>{form.pages?.length || 0} pages</span>
+          <span className="text-[var(--editorial-disabled)]">•</span>
+          <span>
+            {(() => {
+              const completed = form.responses_count || 0;
+              const partial = form.partial_count || 0;
+              if (completed === 0 && partial > 0) {
+                return `${partial} partial`;
+              }
+              const completedText = `${completed} ${completed === 1 ? "response" : "responses"}`;
+              if (partial > 0) {
+                return `${completedText} • ${partial} partial`;
+              }
+              return completedText;
+            })()}
+          </span>
+        </div>
+        <FormActionsMenu
+          form={form}
+          onDeleteClick={onDeleteClick}
+          onDuplicateClick={onDuplicateClick}
+        />
+      </CardContent>
+    </Card>
   );
 }
 

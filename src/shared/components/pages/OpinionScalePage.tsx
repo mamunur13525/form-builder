@@ -22,10 +22,7 @@ export function OpinionScalePage({
 
     return (
         <div className="space-y-2">
-            <div
-                className="grid gap-2"
-                style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}
-            >
+            <div className="flex flex-wrap gap-2">
                 {numbers.map((n) => {
                     const isSelected = value === n
                     return (
@@ -50,7 +47,7 @@ export function OpinionScalePage({
                                     : undefined
                             }
                             className={cn(
-                                "h-11 w-full rounded-lg border px-1 text-base transition-colors",
+                                "h-11 min-w-11 rounded-lg border px-3 text-base transition-colors",
                                 !color && (
                                     isSelected
                                         ? "border-primary bg-primary text-primary-foreground"

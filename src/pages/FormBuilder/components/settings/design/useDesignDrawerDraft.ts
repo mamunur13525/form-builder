@@ -1,8 +1,10 @@
 import React from "react"
 import { THEME_PRESETS, type ThemePreset } from "../theme-presets"
 import type {
+    CoverImage,
+    EndPage,
+    FormPage,
     IFormTheme,
-    IThemeBackgroundImage,
     IThemeFont,
 } from "@/shared/types/common"
 import { resolveFormTheme, loadThemeFont, type ResolvedFormTheme } from "@/shared/utils/theme"
@@ -13,6 +15,12 @@ import { OVERLAY_SELECTORS, type SidebarTab } from "./designOptions"
 interface UseDesignDrawerDraftOptions {
     open: boolean
     theme?: IFormTheme | null
+    page?: FormPage
+    pageIndex?: number
+    onUpdatePage?: (index: number, updates: Partial<FormPage>) => void
+    endPage?: EndPage
+    endPageIndex?: number
+    onUpdateEndPage?: (index: number, updates: Partial<EndPage>) => void
     onSaveTheme: (theme: IFormTheme) => Promise<void>
     onCancel: () => void
     hasChangesRef: React.MutableRefObject<boolean>
@@ -21,6 +29,12 @@ interface UseDesignDrawerDraftOptions {
 export function useDesignDrawerDraft({
     open,
     theme,
+    page,
+    pageIndex = 0,
+    onUpdatePage,
+    endPage,
+    endPageIndex = 0,
+    onUpdateEndPage,
     onSaveTheme,
     onCancel,
     hasChangesRef,
@@ -36,23 +50,43 @@ export function useDesignDrawerDraft({
     const baseTheme = React.useMemo(() => resolveFormTheme(theme), [theme])
     const baseSignature = React.useMemo(() => JSON.stringify(baseTheme), [baseTheme])
 
+    const baseCoverImage = React.useMemo<CoverImage | null>(
+        () => (endPage ? endPage.coverImage : page?.coverImage) ?? null,
+        [endPage, page]
+    )
+    const baseCoverSignature = React.useMemo(() => JSON.stringify(baseCoverImage), [baseCoverImage])
+
     /**
      * The draft is stamped with the editing session it belongs to, so reopening
-     * the drawer or receiving a new theme discards stale edits without an
+     * the drawer or receiving a new theme/page discards stale edits without an
      * effect that copies props into state.
      */
-    const sessionKey = `${open}:${baseSignature}`
-    const [draft, setDraft] = React.useState<{ key: string; theme: ResolvedFormTheme } | null>(null)
+    const sessionKey = `${open}:${baseSignature}:${baseCoverSignature}`
+    const [draft, setDraft] = React.useState<{
+        key: string
+        theme: ResolvedFormTheme
+        coverImage: CoverImage | null
+    } | null>(null)
     const draftTheme = draft?.key === sessionKey ? draft.theme : baseTheme
+    const draftCoverImage = draft?.key === sessionKey ? draft.coverImage : baseCoverImage
 
     const updateDraft = React.useCallback(
-        (updater: (prev: ResolvedFormTheme) => ResolvedFormTheme) => {
+        (
+            updater: (prev: {
+                theme: ResolvedFormTheme
+                coverImage: CoverImage | null
+            }) => { theme: ResolvedFormTheme; coverImage: CoverImage | null }
+        ) => {
             setDraft((prev) => ({
                 key: sessionKey,
-                theme: updater(prev?.key === sessionKey ? prev.theme : baseTheme),
+                ...updater(
+                    prev?.key === sessionKey
+                        ? { theme: prev.theme, coverImage: prev.coverImage }
+                        : { theme: baseTheme, coverImage: baseCoverImage }
+                ),
             }))
         },
-        [sessionKey, baseTheme]
+        [sessionKey, baseTheme, baseCoverImage]
     )
 
     // Load font in document head for live preview
@@ -62,8 +96,11 @@ export function useDesignDrawerDraft({
 
     // Publish unsaved-change state so the parent Sheet can block outside dismissal
     React.useEffect(() => {
-        hasChangesRef.current = open && JSON.stringify(draftTheme) !== baseSignature
-    }, [draftTheme, baseSignature, open, hasChangesRef])
+        hasChangesRef.current =
+            open &&
+            (JSON.stringify(draftTheme) !== baseSignature ||
+                JSON.stringify(draftCoverImage) !== baseCoverSignature)
+    }, [draftTheme, draftCoverImage, baseSignature, baseCoverSignature, open, hasChangesRef])
 
     const clearNudgeTimers = React.useCallback(() => {
         nudgeTimers.current.forEach(window.clearTimeout)
@@ -105,67 +142,106 @@ export function useDesignDrawerDraft({
     }, [open, hasChangesRef, onCancel, nudgeFooterButtons])
 
     const activePresetId = React.useMemo(() => {
-        const current = JSON.stringify(draftTheme)
-        const match = THEME_PRESETS.find(
-            (preset) => JSON.stringify(resolveFormTheme(preset.theme)) === current
-        )
+        const currentTheme = JSON.stringify(draftTheme)
+        const match = THEME_PRESETS.find((preset) => {
+            if (JSON.stringify(resolveFormTheme(preset.theme)) !== currentTheme) {
+                return false
+            }
+            if (preset.coverImage) {
+                return (
+                    draftCoverImage?.layout === "wallpaper" &&
+                    draftCoverImage.url === preset.coverImage.url &&
+                    (draftCoverImage.brightness ?? 0) === (preset.coverImage.brightness ?? 0)
+                )
+            }
+            return draftCoverImage?.layout !== "wallpaper"
+        })
         return match?.id ?? null
-    }, [draftTheme])
+    }, [draftTheme, draftCoverImage])
 
     const applyPreset = React.useCallback(
         (preset: ThemePreset) => {
-            updateDraft(() => resolveFormTheme(preset.theme))
+            updateDraft((prev) => ({
+                theme: resolveFormTheme(preset.theme),
+                coverImage: preset.coverImage
+                    ? { ...preset.coverImage, layout: "wallpaper", mobileLayout: "wallpaper" }
+                    : prev.coverImage?.layout === "wallpaper"
+                        ? null
+                        : prev.coverImage,
+            }))
         },
         [updateDraft]
     )
 
     const patchTheme = React.useCallback(
         (patch: Partial<ResolvedFormTheme>) => {
-            updateDraft((prev) => ({ ...prev, ...patch }))
+            updateDraft((prev) => ({ ...prev, theme: { ...prev.theme, ...patch } }))
         },
         [updateDraft]
     )
 
     const patchFont = React.useCallback(
         (patch: Partial<IThemeFont>) => {
-            updateDraft((prev) => ({ ...prev, font: { ...prev.font, ...patch } }))
-        },
-        [updateDraft]
-    )
-
-    const patchBackgroundImage = React.useCallback(
-        (patch: Partial<IThemeBackgroundImage>) => {
             updateDraft((prev) => ({
                 ...prev,
-                backgroundImage: prev.backgroundImage
-                    ? { ...prev.backgroundImage, ...patch }
-                    : null,
+                theme: { ...prev.theme, font: { ...prev.theme.font, ...patch } },
             }))
         },
         [updateDraft]
     )
 
-    const setBackgroundImageUrl = React.useCallback(
-        (url: string) => {
+    const patchWallpaperImage = React.useCallback(
+        (patch: Partial<CoverImage>) => {
             updateDraft((prev) => ({
                 ...prev,
-                backgroundImage: url
+                coverImage:
+                    prev.coverImage?.layout === "wallpaper"
+                        ? { ...prev.coverImage, ...patch, layout: "wallpaper" }
+                        : prev.coverImage,
+            }))
+        },
+        [updateDraft]
+    )
+
+    const setWallpaperImage = React.useCallback(
+        (image: CoverImage | null) => {
+            updateDraft((prev) => ({
+                ...prev,
+                coverImage: image?.url
                     ? {
-                        brightness: 0,
-                        tile: false,
-                        ...prev.backgroundImage,
-                        url,
+                        ...(prev.coverImage?.layout === "wallpaper" ? prev.coverImage : {}),
+                        ...image,
+                        layout: "wallpaper",
+                        mobileLayout: "wallpaper",
                     }
-                    : null,
+                    : prev.coverImage?.layout === "wallpaper"
+                        ? null
+                        : prev.coverImage,
             }))
         },
         [updateDraft]
+    )
+
+    const setWallpaperImageUrl = React.useCallback(
+        (url: string) => {
+            setWallpaperImage(url ? { url } : null)
+        },
+        [setWallpaperImage]
     )
 
     const handleSaveClick = async () => {
         setIsSaving(true)
         try {
-            await onSaveTheme(draftTheme)
+            if (JSON.stringify(draftTheme) !== baseSignature) {
+                await onSaveTheme(draftTheme)
+            }
+            if (JSON.stringify(draftCoverImage) !== baseCoverSignature) {
+                if (endPage && onUpdateEndPage) {
+                    onUpdateEndPage(endPageIndex, { coverImage: draftCoverImage })
+                } else if (page && onUpdatePage) {
+                    onUpdatePage(pageIndex, { coverImage: draftCoverImage })
+                }
+            }
             hasChangesRef.current = false
             setSavePopoverOpen(false)
             showSuccess("Design saved", "Your theme changes have been applied.")
@@ -198,14 +274,16 @@ export function useDesignDrawerDraft({
     return {
         containerRef,
         draftTheme,
+        draftCoverImage,
         sidebarTab,
         setSidebarTab,
         activePresetId,
         applyPreset,
         patchTheme,
         patchFont,
-        patchBackgroundImage,
-        setBackgroundImageUrl,
+        patchWallpaperImage,
+        setWallpaperImage,
+        setWallpaperImageUrl,
         handleSaveClick,
         handleCancelClick,
         handleCancelPopoverOpenChange,

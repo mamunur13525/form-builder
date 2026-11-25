@@ -201,11 +201,11 @@ export function FormPreviewDialog({
           layout
           transition={{ type: "spring", stiffness: 220, damping: 28 }}
           className={cn(
-            "w-full flex-1 flex items-stretch justify-center",
+            "w-full flex-1 min-h-0 overflow-hidden flex items-stretch justify-center",
             isFullscreen ? "p-0" : "px-3 pb-8 pt-20 sm:px-10 sm:pt-28 sm:pb-14 ",
           )}
         >
-          <motion.div layout className={cn("w-full flex-1 grid place-items-center")}>
+          <motion.div layout className={cn("w-full h-full min-h-0 flex-1 overflow-hidden grid place-items-center")}>
             <motion.div
               layout
               style={{

@@ -51,7 +51,7 @@ export function PageLabel({
                         placeholder="Type your question... Use @ to recall information."
                         className={cn(
                             sizeClass,
-                            "outline-none border-0 border-transparent pb-1 transition-colors cursor-text",
+                            "pb-1 cursor-text",
                         )}
                         style={color ? { color } : undefined}
                     />
@@ -76,12 +76,12 @@ export function PageLabel({
                         as="h2"
                         text={label}
                         variables={variables}
-                        className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-normal")}
+                        className={cn(sizeClass, "w-full outline-none border-b border-transparent pb-1 font-normal")}
                         style={color ? { color } : undefined}
                     />
                 ) : (
                     <h2
-                        className={cn(sizeClass, "outline-none border-b border-transparent pb-1 font-normal")}
+                        className={cn(sizeClass, "w-full outline-none border-b border-transparent pb-1 font-normal")}
                         style={color ? { color } : undefined}
                     >
                         {renderVariableText(label, variables)}

@@ -5,7 +5,11 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useForms } from "@/features/forms/hooks/useForms"
 import { useFormPermissions } from "@/features/forms/hooks/useFormPermissions"
-import { FormCard, FormCardSkeleton } from "@/pages/Dashboard/components/FormCard"
+import {
+    FormsView,
+    FormViewToggle,
+    type FormsViewMode,
+} from "@/pages/Dashboard/components/FormsView"
 import { FormDialog } from "@/pages/Dashboard/components/FormDialog"
 import { DeleteFormDialog } from "@/pages/Dashboard/components/DeleteFormDialog"
 import { DuplicateFormDialog } from "@/pages/Dashboard/components/DuplicateFormDialog"
@@ -13,7 +17,7 @@ import type { FormStatus } from "@/entities/form/model/types"
 import { cn } from "@/lib/utils"
 import { PageLayout } from "@/shared/components/PageLayout"
 
-/** Status filters shown above the grid. `all` keeps every form. */
+/** Status filters shown above the collection. `all` keeps every form. */
 const FILTERS: { value: FormStatus | "all"; label: string }[] = [
     { value: "all", label: "All" },
     { value: "published", label: "Published" },
@@ -27,6 +31,7 @@ export function FormsPage() {
 
     const [query, setQuery] = useState("")
     const [status, setStatus] = useState<FormStatus | "all">("all")
+    const [view, setView] = useState<FormsViewMode>("card")
     const [createDialogOpen, setCreateDialogOpen] = useState(false)
     const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
     const [formToDelete, setFormToDelete] = useState<string | null>(null)
@@ -57,7 +62,7 @@ export function FormsPage() {
                 )
             }
         >
-            {/* Search + status filters */}
+            {/* Search + status filters + view toggle */}
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="editorial-transition flex h-[52px] w-full items-center gap-3 rounded-lg border border-[var(--input)] bg-[var(--card)] px-5 py-1 focus-within:border-[var(--primary)] sm:px-6 lg:min-w-[280px] lg:flex-1">
                     <Search className="h-5 w-5 shrink-0 text-[var(--editorial-subtle)]" />
@@ -69,70 +74,63 @@ export function FormsPage() {
                         className="h-full flex-1 border-0 bg-transparent p-0 text-base shadow-none placeholder:text-[var(--editorial-subtle)] focus-visible:ring-0"
                     />
                 </div>
-                {/* Chips scroll sideways on narrow screens rather than wrapping. */}
-                <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:px-6 lg:mx-0 lg:overflow-visible lg:px-0 lg:pb-0">
-                    {FILTERS.map((filter) => (
-                        <button
-                            key={filter.value}
-                            type="button"
-                            onClick={() => setStatus(filter.value)}
-                            className={cn(
-                                "editorial-transition h-11 shrink-0 rounded-lg border px-4 text-sm",
-                                status === filter.value
-                                    ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)]"
-                                    : "border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]",
-                            )}
-                        >
-                            {filter.label}
-                        </button>
-                    ))}
+                <div className="flex w-full items-center gap-3 lg:w-auto">
+                    {/* Chips scroll sideways on narrow screens rather than wrapping. */}
+                    <div className="-mx-4 flex min-w-0 flex-1 items-center gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-none lg:overflow-visible lg:px-0 lg:pb-0">
+                        {FILTERS.map((filter) => (
+                            <button
+                                key={filter.value}
+                                type="button"
+                                onClick={() => setStatus(filter.value)}
+                                className={cn(
+                                    "editorial-transition h-11 shrink-0 rounded-lg border px-4 text-sm",
+                                    status === filter.value
+                                        ? "border-[var(--editorial-primary-ring)] bg-[var(--editorial-primary-selected)] text-[var(--primary)]"
+                                        : "border-[var(--border)] bg-[var(--card)] text-[var(--editorial-body)] hover:-translate-y-0.5 hover:border-[var(--editorial-primary-ring)] hover:bg-[var(--editorial-primary-light)]",
+                                )}
+                            >
+                                {filter.label}
+                            </button>
+                        ))}
+                    </div>
+                    <FormViewToggle value={view} onChange={setView} />
                 </div>
             </div>
 
-            {isLoading ? (
-                <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {[0, 1, 2, 3, 4, 5].map((index) => (
-                        <FormCardSkeleton key={index} index={index} />
-                    ))}
-                </div>
-            ) : visibleForms.length === 0 ? (
-                <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
-                    <CardContent className="py-20 text-center">
-                        <FileText className="mx-auto mb-4 h-8 w-8 text-[var(--editorial-disabled)]" />
-                        <p className="text-base text-[var(--editorial-subtle)]">
-                            {forms.length === 0
-                                ? "No forms yet"
-                                : "No forms match your search"}
-                        </p>
-                        {forms.length === 0 && canCreate && (
-                            <Button
-                                className="mt-7"
-                                onClick={() => setCreateDialogOpen(true)}
-                            >
-                                Create your first form
-                            </Button>
-                        )}
-                    </CardContent>
-                </Card>
-            ) : (
-                <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {visibleForms.map((form) => (
-                        <FormCard
-                            key={form.id}
-                            form={form}
-                            onDeleteClick={(formId) => {
-                                setFormToDelete(formId)
-                                setDeleteAlertOpen(true)
-                            }}
-                            onDuplicateClick={(formId) => {
-                                const form = forms.find((f) => f.id === formId)
-                                setFormToDuplicate({ id: formId, title: form?.title || "" })
-                                setDuplicateDialogOpen(true)
-                            }}
-                        />
-                    ))}
-                </div>
-            )}
+            <FormsView
+                forms={visibleForms}
+                view={view}
+                isLoading={isLoading}
+                emptyState={
+                    <Card className="editorial-shadow-sm rounded-lg border-[var(--border)] bg-[var(--card)]">
+                        <CardContent className="py-20 text-center">
+                            <FileText className="mx-auto mb-4 h-8 w-8 text-[var(--editorial-disabled)]" />
+                            <p className="text-base text-[var(--editorial-subtle)]">
+                                {forms.length === 0
+                                    ? "No forms yet"
+                                    : "No forms match your search"}
+                            </p>
+                            {forms.length === 0 && canCreate && (
+                                <Button
+                                    className="mt-7"
+                                    onClick={() => setCreateDialogOpen(true)}
+                                >
+                                    Create your first form
+                                </Button>
+                            )}
+                        </CardContent>
+                    </Card>
+                }
+                onDeleteClick={(formId) => {
+                    setFormToDelete(formId)
+                    setDeleteAlertOpen(true)
+                }}
+                onDuplicateClick={(formId) => {
+                    const form = forms.find((f) => f.id === formId)
+                    setFormToDuplicate({ id: formId, title: form?.title || "" })
+                    setDuplicateDialogOpen(true)
+                }}
+            />
 
             <FormDialog
                 type="create"

@@ -43,7 +43,7 @@ export function PageHelperText({
                     placeholder="Description (optional)"
                     className={cn(
                         sizeClass,
-                        "text-muted-foreground outline-none border-0 border-transparent pb-1 transition-colors cursor-text",
+                        "text-muted-foreground pb-1 cursor-text",
                     )}
                     style={color ? { color } : undefined}
                 />

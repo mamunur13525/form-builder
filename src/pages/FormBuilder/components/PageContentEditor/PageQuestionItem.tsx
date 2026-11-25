@@ -221,7 +221,7 @@ export function PageQuestionItem({
                 placeholder="Question title..."
                 className={cn(
                   questionTitleSize,
-                  "font-normal outline-none border-0 border-transparent pb-1 transition-colors cursor-text w-full"
+                  "font-normal pb-1 cursor-text w-full"
                 )}
                 style={theme.questionColor ? { color: theme.questionColor } : undefined}
               />

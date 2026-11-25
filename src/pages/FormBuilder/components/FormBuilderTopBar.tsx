@@ -7,15 +7,16 @@ import {
   Puzzle,
   Share2,
   BarChart3,
-  Loader2,
   AlertCircle,
   Pencil,
-  CheckCheck,
   ChevronDown,
   ChevronRight,
   Send,
   Sun,
   Moon,
+  CloudCheck,
+  CloudUpload,
+  CloudAlert,
 } from "lucide-react";
 import { useTheme } from "@/app/providers/ThemeProvider";
 import {
@@ -24,6 +25,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
@@ -177,30 +179,41 @@ export function FormBuilderTopBar({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div className="relative flex shrink-0 items-center gap-2 lg:gap-3">
-        <span
-          className={cn(
-            "absolute -left-20 flex shrink-0 items-center gap-1.5 overflow-hidden text-xs text-slate-500 dark:text-zinc-400",
-            saveStatus !== "idle" ? "opacity-100" : "opacity-0",
-          )}
-        >
-          {saveStatus === "saving" && (
-            <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#FF5722]" />
-          )}
-          {saveStatus === "saved" && (
-            <CheckCheck className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
-          )}
-          {saveStatus === "error" && (
-            <AlertCircle className="h-4 w-4 shrink-0 text-rose-500 dark:text-rose-400" />
-          )}
-          <span className="hidden lg:inline font-medium">
+      <div className="flex shrink-0 items-center gap-2 lg:gap-3">
+        {/* Save status icon */}
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <div
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 dark:text-zinc-500 cursor-default"
+                aria-label={
+                  saveStatus === "saving"
+                    ? "Saving changes"
+                    : saveStatus === "error"
+                      ? "Failed to save changes"
+                      : "All changes saved"
+                }
+              >
+                {saveStatus === "saving" ? (
+                  <CloudUpload className="h-4 w-4 shrink-0 animate-pulse text-[#FF5722]" />
+                ) : saveStatus === "error" ? (
+                  <CloudAlert className="h-4 w-4 shrink-0 text-rose-500 dark:text-rose-400" />
+                ) : saveStatus === "saved" ? (
+                  <CloudCheck className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400 transition-colors" />
+                ) : (
+                  <CloudCheck className="h-4 w-4 shrink-0 text-slate-400/80 dark:text-zinc-500 transition-colors" />
+                )}
+              </div>
+            }
+          />
+          <TooltipContent side="bottom">
             {saveStatus === "saving"
-              ? "Saving..."
-              : saveStatus === "saved"
-                ? "Saved"
-                : "Error"}
-          </span>
-        </span>
+              ? "Saving changes..."
+              : saveStatus === "error"
+                ? "Failed to save changes"
+                : "All changes saved"}
+          </TooltipContent>
+        </Tooltip>
 
         <button
           type="button"

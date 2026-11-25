@@ -4,12 +4,12 @@ export type FormStatus = "draft" | "published" | "archived"
 
 import type {
     IFormTheme,
-    IThemeBackgroundImage,
     IThemeFont,
     ContentAlignment,
     FontSize,
     CornerRadius,
     ThemeFontSource,
+    CoverImageEdits,
     EndPage,
     EndPageButton,
     EndPageRedirect,
@@ -20,7 +20,6 @@ import type {
 
 export type {
     IFormTheme,
-    IThemeBackgroundImage,
     IThemeFont,
     ContentAlignment,
     FontSize,
@@ -268,7 +267,12 @@ export interface PageCoverImage {
     url: string
     fileId?: string
     alt?: string
-    layout?: "top" | "bottom" | "left" | "right"
+    layout?: "top" | "bottom" | "left" | "right" | "banner" | "wallpaper"
+    mobileLayout?: "top" | "bottom" | "banner" | "wallpaper"
+    brightness?: number
+    zoom?: number
+    focalPoint?: { x: number; y: number }
+    edits?: CoverImageEdits
 }
 
 export interface PageEmailSettings {
